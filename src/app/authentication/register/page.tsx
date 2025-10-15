@@ -131,7 +131,7 @@ export default function RegisterPage() {
 
             <div className="auth-switch">
               <span>Already have an account?</span>
-              <Link href="/auth/login" className="switch-btn">Sign in</Link>
+              <Link href="/authentication/login" className="switch-btn">Sign in</Link>
             </div>
           </div>
         </div>

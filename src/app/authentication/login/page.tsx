@@ -101,7 +101,7 @@ export default function LoginPage() {
 
               <div className="auth-switch">
                 <span>Don&apos;t have an account?</span>
-                <Link href="/auth/register" className="switch-btn">Sign up</Link>
+                <Link href="/authentication/register" className="switch-btn">Sign up</Link>
               </div>
             </form>
           </div>

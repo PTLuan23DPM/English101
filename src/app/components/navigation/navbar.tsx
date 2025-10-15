@@ -13,8 +13,8 @@ export default function HeaderMinimal() {
 
         {/* Buttons (right) */}
         <div className="em-actions">
-          <Link href="/auth/login" className="em-btn em-btn--ghost">Log in</Link>
-          <Link href="/auth/register" className="em-btn em-btn--primary">Register</Link>
+          <Link href="/authentication/login" className="em-btn em-btn--ghost">Log in</Link>
+          <Link href="/authentication/register" className="em-btn em-btn--primary">Register</Link>
         </div>
       </div>
     </header>

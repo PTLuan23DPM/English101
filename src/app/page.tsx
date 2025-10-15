@@ -34,7 +34,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          <Link href="/auth/login" className="cta-button">
+          <Link href="/authentication/login" className="cta-button">
             Start Learning English <span className="button-arrow">→</span>
           </Link>
         </div>

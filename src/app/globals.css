@@ -1923,3 +1923,42 @@ body {
     font-size: 14px;
   }
 }
+
+/* ==== Back to Home button (refined) ==== */
+.auth-header {
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.auth-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #2563eb;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 5px 10px;
+  /* giảm độ cao và viền */
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  line-height: 1.2;
+  box-shadow: 0 0 0 transparent;
+}
+
+.auth-back-btn:hover {
+  background: #eff6ff;
+  /* xanh nhạt hơn khi hover */
+  border-color: #bfdbfe;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.15);
+}
+
+/* làm nút cao hơn trên trang */
+.auth-container {
+  margin-top: -70px;
+  /* đẩy toàn bộ card lên gần mép trên hơn */
+}

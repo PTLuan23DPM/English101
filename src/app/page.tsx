@@ -1,103 +1,62 @@
-import Image from "next/image";
+"use client";
+import Link from "next/link";
+import HeaderMinimal from "./components/navigation/navbar";
 
-export default function Home() {
+export default function HomePage() {
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <main>
+      <HeaderMinimal />
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+
+      {/* HERO (copy cấu trúc & text từ file gốc) */}
+      <section className="hero">
+        <div className="hero-content">
+          <h1 className="hero-title">
+            Master English with <span className="highlight">CEFR Levels</span>
+          </h1>
+          <p className="hero-subtitle">
+            Learn English from beginner to advanced with our structured
+            approach. Build your streak and track your progress!
+          </p>
+
+          <div className="hero-features">
+            <div className="feature">
+              <div className="feature-icon">🎯</div>
+              <span>CEFR-based curriculum</span>
+            </div>
+            <div className="feature">
+              <div className="feature-icon">🔥</div>
+              <span>Daily streak system</span>
+            </div>
+            <div className="feature">
+              <div className="feature-icon">📈</div>
+              <span>Progress tracking</span>
+            </div>
+          </div>
+
+          <Link href="/auth/login" className="cta-button">
+            Start Learning English <span className="button-arrow">→</span>
+          </Link>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+
+        {/* các thẻ nổi A1–C2 ở bên phải */}
+        <div className="hero-image">
+          <div className="hero-graphic">
+            <div className="floating-card card-1">
+              <div className="card-icon">🟢</div>
+              <div className="card-text">A1-A2<br /><small>Beginner</small></div>
+            </div>
+            <div className="floating-card card-2">
+              <div className="card-icon">🔵</div>
+              <div className="card-text">B1-B2<br /><small>Intermediate</small></div>
+            </div>
+            <div className="floating-card card-3">
+              <div className="card-icon">🟡</div>
+              <div className="card-text">C1-C2<br /><small>Advanced</small></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
   );
 }

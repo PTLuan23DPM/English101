@@ -4,12 +4,11 @@ import Link from "next/link";
 import { FormEvent, useMemo, useState } from "react";
 
 export default function RegisterPage() {
-  const [expandEmail, setExpandEmail] = useState(true);
+  const [expandEmail, setExpandEmail] = useState(false);
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
   const [emailErr, setEmailErr] = useState("");
   const [pwErr, setPwErr] = useState("");
-
   const [pw, setPw] = useState("");
   const req = useMemo(() => ({
     length: pw.length >= 8,
@@ -63,14 +62,19 @@ export default function RegisterPage() {
               <button
                 className="email-signup-toggle"
                 type="button"
+                aria-expanded={expandEmail}
+                aria-controls="email-signup-content"
                 onClick={() => setExpandEmail(v => !v)}
               >
-                <span id="email-toggle-text">{expandEmail ? "Hide email sign up" : "Sign up with email"}</span>
+                <span>{expandEmail ? "Hide email sign up" : "Sign up with email"}</span>
                 <span className="toggle-arrow">{expandEmail ? "▲" : "▼"}</span>
               </button>
 
               {expandEmail && (
-                <div className="email-signup-content">
+                <div
+                  id="email-signup-content"
+                  className={`email-signup-anim ${expandEmail ? "is-open" : ""}`}
+                >
                   <div className="auth-divider"><span>or</span></div>
 
                   <form className="auth-fields" onSubmit={onSubmit}>

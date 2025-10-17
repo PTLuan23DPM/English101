@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { signIn } from "next-auth/react";
 import { FormEvent, useState } from "react";
 
 export default function LoginPage() {
@@ -47,15 +48,14 @@ export default function LoginPage() {
             <h2>Welcome back!</h2>
             <p className="auth-subtitle">Sign in to continue your learning journey</p>
 
-            <button className="google-auth-btn" type="button">
-              <img
-                src="https://developers.google.com/identity/images/g-logo.png"
-                alt="Google"
-                className="google-icon"
-              />
+            <button
+              className="google-auth-btn"
+              type="button"
+              onClick={() => signIn("google", { callbackUrl: "/" })}
+            >
+              <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google" className="google-icon" />
               Continue with Google
             </button>
-
             <div className="auth-divider"><span>or</span></div>
 
             <form className="auth-fields" onSubmit={onSubmit}>

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { signIn } from "next-auth/react";
 import { FormEvent, useMemo, useState } from "react";
 
 export default function RegisterPage() {
@@ -49,12 +50,13 @@ export default function RegisterPage() {
             <h2>Join EnglishMaster</h2>
             <p className="auth-subtitle">Start your English learning journey today</p>
 
-            <button className="google-auth-btn" type="button">
-              <img
-                src="https://developers.google.com/identity/images/g-logo.png"
-                alt="Google"
-                className="google-icon"
-              />
+            
+            <button
+              className="google-auth-btn"
+              type="button"
+              onClick={() => signIn("google", { callbackUrl: "/" })}
+            >
+              <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google" className="google-icon" />
               Continue with Google
             </button>
 

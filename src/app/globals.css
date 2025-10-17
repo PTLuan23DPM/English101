@@ -2613,7 +2613,7 @@ body {
 
 /* làm nút cao hơn trên trang */
 .auth-container {
-  margin-top: -70px;
+  margin-top: 0px;
   /* đẩy toàn bộ card lên gần mép trên hơn */
 }
 
@@ -2856,20 +2856,6 @@ body {
   border: 1px solid var(--line);
   border-radius: 50%;
   background: #fafafa;
-}
-
-/* ========= Dashboard (Cathoven-like) ========= */
-/* Accent tím kiểu Cathoven */
-:root {
-  --dash-accent: #5b4bdb;
-  /* tím */
-  --dash-accent-2: #6b5ff6;
-  /* tím nhạt hơn cho hover/gradient */
-  --dash-bg: var(--color-background);
-  --dash-surface: var(--color-surface);
-  --dash-text: var(--color-slate-900);
-  --dash-muted: var(--color-text-secondary);
-  --dash-border: var(--color-border);
 }
 
 /* Layout chính */

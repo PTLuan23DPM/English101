@@ -8,8 +8,6 @@ export default function DashboardPage() {
           <div className="welcome-card">
             <div className="welcome-text">
               <h2>🔥 <span id="current-streak">7</span> days streak!</h2>
-              <p className="usage-stats"><span id="free-usage">0</span>/3 weekly free check rights used</p>
-              <p className="renewal-time">Renews in 3 days 21 hours 14 minutes 24 seconds</p>
               <button className="upgrade-btn">Keep up your streak</button>
             </div>
           </div>

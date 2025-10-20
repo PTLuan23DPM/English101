@@ -1,7 +1,7 @@
 // src/app/dashboard/layout.tsx
 "use client";
-import Sidebar from "./_components/sidebar";
-import Header from "./_components/header";
+import Sidebar from "../dashboard/_components/sidebar";
+import Header from "../dashboard/_components/header";
 
 export default function DashboardLayout({
   children,

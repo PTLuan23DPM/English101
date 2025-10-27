@@ -1,8 +1,10 @@
 import "./globals.css";
+import { Providers } from "./providers";
+import { Toaster } from "sonner";
 
 export const metadata = {
-  title: "EnglishMaster",
-  description: "AI English Learning Platform",
+  title: "English101 - Master English with CEFR Levels",
+  description: "Learn English from beginner to advanced with our structured approach",
 };
 
 export default function RootLayout({
@@ -12,7 +14,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <Providers>{children}</Providers>
+        <Toaster 
+          position="top-right" 
+          richColors 
+          closeButton
+          theme="light"
+        />
+      </body>
     </html>
   );
 }

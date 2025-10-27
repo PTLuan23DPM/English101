@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { FormEvent, useMemo, useState } from "react";
+import { toast } from "sonner";
 
 export default function RegisterPage() {
   const [expandEmail, setExpandEmail] = useState(false);
@@ -19,18 +20,82 @@ export default function RegisterPage() {
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setEmailErr(""); setPwErr(""); setLoading(true);
+    setEmailErr("");
+    setPwErr("");
+    setLoading(true);
+    
     const form = e.target as HTMLFormElement;
     const email = (form.elements.namedItem("email") as HTMLInputElement).value.trim();
 
-    if (!email) setEmailErr("Please enter your email");
-    if (!(req.length && req.letter && req.number)) setPwErr("Password doesn’t meet requirements");
-    if (!email || !(req.length && req.letter && req.number)) {
+    if (!email) {
+      setEmailErr("Please enter your email");
       setLoading(false);
       return;
     }
-    // TODO: call your API / NextAuth signUp...
-    setTimeout(() => setLoading(false), 900);
+    if (!(req.length && req.letter && req.number)) {
+      setPwErr("Password doesn't meet requirements");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      // Call register API
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          password: pw,
+          name: email.split("@")[0],
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setEmailErr(data.error || "Registration failed");
+        toast.error("Registration failed", {
+          description: data.error || "Unable to create account. Please try again.",
+        });
+        setLoading(false);
+        return;
+      }
+
+      toast.success("Account created!", {
+        description: "Signing you in...",
+      });
+
+      // Auto login after successful registration
+      const result = await signIn("credentials", {
+        email,
+        password: pw,
+        redirect: false,
+      });
+
+      if (result?.ok) {
+        toast.success("Welcome to English101!", {
+          description: "Redirecting to your dashboard...",
+        });
+        setTimeout(() => {
+          window.location.href = "/english/dashboard";
+        }, 1000);
+      } else {
+        // Registration successful but login failed, redirect to login
+        toast.info("Please sign in", {
+          description: "Account created successfully. Please sign in.",
+        });
+        setTimeout(() => {
+          window.location.href = "/authentication/login";
+        }, 1500);
+      }
+    } catch (error) {
+      console.error("Registration error:", error);
+      setEmailErr("An error occurred. Please try again.");
+      toast.error("Something went wrong", {
+        description: "An unexpected error occurred. Please try again.",
+      });
+      setLoading(false);
+    }
   };
 
   return (

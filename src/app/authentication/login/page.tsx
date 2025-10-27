@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { FormEvent, useState } from "react";
+import { toast } from "sonner";
 
 export default function LoginPage() {
   const [showPw, setShowPw] = useState(false);
@@ -20,15 +21,47 @@ export default function LoginPage() {
     const email = (form.elements.namedItem("email") as HTMLInputElement).value.trim();
     const password = (form.elements.namedItem("password") as HTMLInputElement).value;
 
-    if (!email) setEmailErr("Please enter your email");
-    if (!password) setPwErr("Please enter your password");
-    if (!email || !password) {
+    if (!email) {
+      setEmailErr("Please enter your email");
+      setLoading(false);
+      return;
+    }
+    if (!password) {
+      setPwErr("Please enter your password");
       setLoading(false);
       return;
     }
 
-    // TODO: call your auth API / NextAuth signIn(...)
-    setTimeout(() => setLoading(false), 800);
+    try {
+      const result = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        setPwErr("Invalid email or password");
+        toast.error("Login failed", {
+          description: "Invalid email or password. Please try again.",
+        });
+      } else if (result?.ok) {
+        toast.success("Login successful!", {
+          description: "Redirecting to your dashboard...",
+        });
+        // Redirect to dashboard
+        setTimeout(() => {
+          window.location.href = "/english/dashboard";
+        }, 1000);
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      setPwErr("An error occurred. Please try again.");
+      toast.error("Something went wrong", {
+        description: "An unexpected error occurred. Please try again.",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -92,7 +125,9 @@ export default function LoginPage() {
                   <span className="checkmark"></span>
                   Remember me
                 </label>
-                <a className="forgot-link" href="#">Forgot your password?</a>
+                <Link href="/authentication/forgot-password" className="forgot-link">
+                  Forgot your password?
+                </Link>
               </div>
 
               <button className="auth-submit-btn" disabled={loading}>

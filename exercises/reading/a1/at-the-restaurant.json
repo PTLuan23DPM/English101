@@ -1,0 +1,119 @@
+{
+  "id": "reading-a1-001",
+  "title": "At the Restaurant",
+  "skill": "READING",
+  "level": "A1",
+  "type": "READ_MAIN_IDEA",
+  "estimatedTimeMinutes": 10,
+  "metadata": {
+    "topics": ["Food", "Daily Life"],
+    "vocabulary": ["restaurant", "order", "menu", "waiter"],
+    "grammar": ["Present Simple", "Can/Could"],
+    "difficulty": 1
+  },
+  "content": {
+    "text": "John goes to a restaurant. He is very hungry. He looks at the menu. There are many good things. He can order pizza, pasta, or a salad.\n\nThe waiter comes to the table. \"What would you like?\" asks the waiter. \"I would like pizza, please,\" says John. \"And a glass of water.\"\n\nThe waiter brings the food. The pizza is delicious. John is happy.",
+    "imageUrl": null,
+    "audioUrl": null
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "order": 1,
+      "type": "SINGLE_CHOICE",
+      "prompt": "Where does John go?",
+      "points": 5,
+      "choices": [
+        {
+          "id": "a",
+          "text": "To a restaurant",
+          "isCorrect": true
+        },
+        {
+          "id": "b",
+          "text": "To a school",
+          "isCorrect": false
+        },
+        {
+          "id": "c",
+          "text": "To a park",
+          "isCorrect": false
+        },
+        {
+          "id": "d",
+          "text": "To a hospital",
+          "isCorrect": false
+        }
+      ],
+      "explanation": "The first sentence says 'John goes to a restaurant.'"
+    },
+    {
+      "id": "q2",
+      "order": 2,
+      "type": "SINGLE_CHOICE",
+      "prompt": "What does John order?",
+      "points": 5,
+      "choices": [
+        {
+          "id": "a",
+          "text": "Pizza",
+          "isCorrect": true
+        },
+        {
+          "id": "b",
+          "text": "Pasta",
+          "isCorrect": false
+        },
+        {
+          "id": "c",
+          "text": "Salad",
+          "isCorrect": false
+        },
+        {
+          "id": "d",
+          "text": "Sandwich",
+          "isCorrect": false
+        }
+      ],
+      "explanation": "John says 'I would like pizza, please.'"
+    },
+    {
+      "id": "q3",
+      "order": 3,
+      "type": "TRUE_FALSE",
+      "prompt": "John is sad at the end.",
+      "points": 5,
+      "correctAnswer": false,
+      "explanation": "The text says 'John is happy.'"
+    },
+    {
+      "id": "q4",
+      "order": 4,
+      "type": "SHORT_TEXT",
+      "prompt": "What drink does John order?",
+      "points": 5,
+      "correctAnswers": ["water", "a glass of water", "glass of water"],
+      "explanation": "John orders 'a glass of water.'"
+    }
+  ],
+  "totalPoints": 20,
+  "passingScore": 12,
+  "vocabulary": [
+    {
+      "word": "hungry",
+      "definition": "wanting to eat food",
+      "example": "He is very hungry."
+    },
+    {
+      "word": "menu",
+      "definition": "a list of food you can order",
+      "example": "He looks at the menu."
+    },
+    {
+      "word": "delicious",
+      "definition": "very good to eat",
+      "example": "The pizza is delicious."
+    }
+  ]
+}
+

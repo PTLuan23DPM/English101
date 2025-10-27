@@ -4,13 +4,162 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 type TabKey = "pronunciation" | "topic" | "roleplay" | "picture";
 
+const SPEAKING_PROMPTS: Record<TabKey, {
+  title: string;
+  prompt: string;
+  timeLimit: string;
+  tips: string[];
+  vocab: Array<{word: string; ipa: string}>;
+  phrases: string[];
+}> = {
+  pronunciation: {
+    title: "Pronunciation Practice",
+    prompt: "Introduce yourself to a new colleague at work. Include your name, job position, and something interesting about yourself.",
+    timeLimit: "2 min",
+    tips: [
+      "Speak clearly and at moderate pace",
+      "Use natural intonation",
+      "Pause between main ideas",
+    ],
+    vocab: [
+      { word: "introduce", ipa: "/ˌɪntrəˈdjuːs/" },
+      { word: "colleague", ipa: "/ˈkɒliːɡ/" },
+      { word: "position", ipa: "/pəˈzɪʃn/" },
+    ],
+    phrases: [
+      "✓ Hi, I'm... and I work as...",
+      "✓ Nice to meet you",
+      "✓ I've been working here for...",
+      "✓ In my free time, I enjoy...",
+    ],
+  },
+  topic: {
+    title: "Topic Discussion",
+    prompt: "Talk about your favorite season of the year. Explain why you prefer it and what activities you enjoy during that time.",
+    timeLimit: "3 min",
+    tips: [
+      "Organize your ideas: introduction, reasons, conclusion",
+      "Use descriptive adjectives",
+      "Give specific examples",
+    ],
+    vocab: [
+      { word: "season", ipa: "/ˈsiːzn/" },
+      { word: "prefer", ipa: "/prɪˈfɜːr/" },
+      { word: "activity", ipa: "/ækˈtɪvɪti/" },
+    ],
+    phrases: [
+      "✓ My favorite season is...",
+      "✓ I prefer it because...",
+      "✓ During this time, I usually...",
+      "✓ What I love most is...",
+    ],
+  },
+  roleplay: {
+    title: "Role Play",
+    prompt: "You are at a restaurant. Order a meal, ask about ingredients, and request a drink. Be polite and natural.",
+    timeLimit: "2-3 min",
+    tips: [
+      "Use polite expressions: Could I have..., I'd like...",
+      "Ask clarifying questions",
+      "Show appreciation: Thank you, That sounds great",
+    ],
+    vocab: [
+      { word: "order", ipa: "/ˈɔːrdər/" },
+      { word: "ingredient", ipa: "/ɪnˈɡriːdiənt/" },
+      { word: "recommend", ipa: "/ˌrekəˈmend/" },
+    ],
+    phrases: [
+      "✓ Could I have..., please?",
+      "✓ What do you recommend?",
+      "✓ Does this contain...?",
+      "✓ I'd like to order...",
+    ],
+  },
+  picture: {
+    title: "Picture Description",
+    prompt: "Describe the scene you imagine: A busy coffee shop on a weekend morning. Include details about people, atmosphere, and activities.",
+    timeLimit: "2 min",
+    tips: [
+      "Start with an overview",
+      "Use present continuous: people are sitting, someone is ordering",
+      "Describe from general to specific details",
+    ],
+    vocab: [
+      { word: "atmosphere", ipa: "/ˈætməsfɪər/" },
+      { word: "crowded", ipa: "/ˈkraʊdɪd/" },
+      { word: "background", ipa: "/ˈbækɡraʊnd/" },
+    ],
+    phrases: [
+      "✓ In this scene, I can see...",
+      "✓ In the foreground/background...",
+      "✓ There are several people who are...",
+      "✓ The atmosphere seems...",
+    ],
+  },
+};
+
 export default function SpeakingPage() {
-  const [tab, setTab] = useState<TabKey>("pronunciation");
+  const [tab, setTab] = useState<TabKey>("topic");
   const [listening, setListening] = useState(false);
   const [recording, setRecording] = useState(false);
   const [elapsed, setElapsed] = useState(0); // seconds
+  const [transcript, setTranscript] = useState("");
+  const [micPermission, setMicPermission] = useState<"granted" | "denied" | "prompt" | "checking">("prompt");
+  const [micError, setMicError] = useState<string>("");
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const currentPrompt = SPEAKING_PROMPTS[tab];
+
+  // Check microphone permission on mount
+  useEffect(() => {
+    checkMicrophonePermission();
+  }, []);
+
+  const checkMicrophonePermission = async () => {
+    setMicPermission("checking");
+    try {
+      // Check if Permissions API is supported
+      if ('permissions' in navigator) {
+        const permissionStatus = await navigator.permissions.query({ name: 'microphone' as PermissionName });
+        setMicPermission(permissionStatus.state as "granted" | "denied" | "prompt");
+        
+        // Listen for permission changes
+        permissionStatus.onchange = () => {
+          setMicPermission(permissionStatus.state as "granted" | "denied" | "prompt");
+        };
+      } else {
+        // Fallback: try to access microphone directly
+        setMicPermission("prompt");
+      }
+    } catch (error) {
+      console.error("Error checking microphone permission:", error);
+      setMicPermission("prompt");
+    }
+  };
+
+  const requestMicrophoneAccess = async (): Promise<boolean> => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      setMicPermission("granted");
+      setMicError("");
+      // Stop the stream immediately as we just needed to request permission
+      stream.getTracks().forEach(track => track.stop());
+      return true;
+    } catch (error: any) {
+      console.error("Microphone access error:", error);
+      
+      if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+        setMicPermission("denied");
+        setMicError("Microphone access denied. Please allow microphone access in your browser settings.");
+      } else if (error.name === 'NotFoundError') {
+        setMicError("No microphone found. Please connect a microphone and try again.");
+      } else {
+        setMicError("Could not access microphone. Please check your device settings.");
+      }
+      return false;
+    }
+  };
 
   // simple timer for recording
   useEffect(() => {
@@ -32,18 +181,69 @@ export default function SpeakingPage() {
   }, [elapsed]);
 
   const toggleListen = () => setListening((v) => !v);
-  const startRec = () => {
-    setElapsed(0);
-    setRecording(true);
+  
+  const startRec = async () => {
+    // Check/request microphone permission first
+    if (micPermission !== "granted") {
+      const hasAccess = await requestMicrophoneAccess();
+      if (!hasAccess) return;
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+
+      const audioChunks: Blob[] = [];
+      mediaRecorder.ondataavailable = (event) => {
+        audioChunks.push(event.data);
+      };
+
+      mediaRecorder.onstop = () => {
+        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+        // Here you would typically upload to server or process the audio
+        console.log("Recording stopped, audio blob size:", audioBlob.size);
+        
+        // Mock transcript generation
+        setTimeout(() => {
+          setTranscript(
+            "Hello, my name is John and I work as a software engineer. I've been with this company for about two years now. In my free time, I really enjoy reading and playing chess. Nice to meet you!"
+          );
+        }, 500);
+
+        // Clean up
+        stream.getTracks().forEach(track => track.stop());
+      };
+
+      mediaRecorder.start();
+      setElapsed(0);
+      setRecording(true);
+      setMicError("");
+    } catch (error: any) {
+      console.error("Recording error:", error);
+      setMicError("Failed to start recording. Please check your microphone.");
+    }
   };
-  const stopRec = () => setRecording(false);
+
+  const stopRec = () => {
+    if (mediaRecorderRef.current && recording) {
+      mediaRecorderRef.current.stop();
+      setRecording(false);
+    }
+  };
+  
   const retry = () => {
+    if (mediaRecorderRef.current && recording) {
+      mediaRecorderRef.current.stop();
+    }
     setRecording(false);
     setElapsed(0);
+    setTranscript("");
+    setMicError("");
   };
 
   return (
-    <div id="speaking-page" className="spk">
+    <div className="dashboard-content">
       {/* Header */}
       <section className="card page-head">
         <div>
@@ -54,13 +254,16 @@ export default function SpeakingPage() {
         </div>
 
         <div className="head-actions">
-          <select className="select">
-            <option>Select Level: All</option>
-            <option>A1</option><option>A2</option>
-            <option>B1</option><option>B2</option>
-            <option>C1</option><option>C2</option>
-          </select>
-          <span className="small muted">24 Sessions | 180 Total Minutes | 7.5 Avg Score</span>
+          <div className="stats" style={{ gap: "16px" }}>
+            <div className="stat">
+              <span className="stat-val">32</span>
+              <span className="stat-lbl">Sessions</span>
+            </div>
+            <div className="stat">
+              <span className="stat-val">8.2</span>
+              <span className="stat-lbl">Avg Score</span>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -90,17 +293,14 @@ export default function SpeakingPage() {
         <div className="left-col">
           {/* Prompt */}
           <section className="card">
-            <h3 className="section-title">Speaking Prompt</h3>
+            <h3 className="section-title">📝 {currentPrompt.title}</h3>
             <div className="prompt">
-              <p>
-                “Introduce yourself to a new colleague at work. Include your name,
-                job position, and something interesting about yourself.”
-              </p>
+              <p>{currentPrompt.prompt}</p>
             </div>
             <div className="chips">
               <span className="chip blue">Level: B1</span>
-              <span className="chip amber">Time Limit: 2 min</span>
-              <span className="chip indigo">Type: Description</span>
+              <span className="chip amber">Time Limit: {currentPrompt.timeLimit}</span>
+              <span className="chip indigo">Type: {currentPrompt.title}</span>
             </div>
           </section>
 
@@ -130,19 +330,47 @@ export default function SpeakingPage() {
           {/* Recording */}
           <section className="card">
             <h3 className="section-title">🎤 Your Recording</h3>
+            
+            {/* Microphone Status */}
+            {micPermission === "checking" && (
+              <div style={{ padding: "16px", background: "#f1f5f9", borderRadius: "8px", marginBottom: "16px" }}>
+                Checking microphone access...
+              </div>
+            )}
+            {micPermission === "denied" && (
+              <div style={{ padding: "16px", background: "#fee2e2", borderRadius: "8px", marginBottom: "16px", color: "#991b1b" }}>
+                <strong>Microphone access denied.</strong> Please allow microphone access in your browser settings and refresh the page.
+              </div>
+            )}
+            {micPermission === "prompt" && !recording && (
+              <div style={{ padding: "16px", background: "#fef3c7", borderRadius: "8px", marginBottom: "16px", color: "#92400e" }}>
+                <strong>Microphone permission required.</strong> Click the record button to enable microphone access.
+              </div>
+            )}
+            {micError && (
+              <div style={{ padding: "16px", background: "#fee2e2", borderRadius: "8px", marginBottom: "16px", color: "#991b1b" }}>
+                {micError}
+              </div>
+            )}
+
             <div className="rec-wrap">
               <button
                 className={`rec-btn ${recording ? "rec-on" : ""}`}
                 onClick={recording ? stopRec : startRec}
                 aria-label="Record"
                 title={recording ? "Stop" : "Record"}
+                disabled={micPermission === "checking"}
               >
                 {recording ? "⏹" : "⏺"}
               </button>
               <div className="timer mono">{mmss}</div>
               <div className="rec-actions">
-                <button className="btn ghost" onClick={retry}>🔄 Retry</button>
-                <button className="btn primary" onClick={stopRec}>⏹ Stop &amp; Analyze</button>
+                <button className="btn ghost" onClick={retry} disabled={micPermission === "checking"}>
+                  🔄 Retry
+                </button>
+                <button className="btn primary" onClick={stopRec} disabled={!recording}>
+                  ⏹ Stop &amp; Analyze
+                </button>
               </div>
             </div>
           </section>
@@ -150,9 +378,19 @@ export default function SpeakingPage() {
           {/* Transcript */}
           <section className="card">
             <h3 className="section-title">📝 Your Transcript</h3>
-            <div className="transcript muted">
-              Your speech will appear here after recording...
+            <div className="transcript" style={{ color: transcript ? "inherit" : "var(--dash-muted)" }}>
+              {transcript || "Your speech will appear here after recording..."}
             </div>
+            {transcript && (
+              <div style={{ marginTop: "16px", padding: "12px", background: "var(--color-bg-3)", borderRadius: "8px" }}>
+                <div style={{ fontSize: "32px", fontWeight: "bold", textAlign: "center", marginBottom: "8px", color: "var(--dash-accent)" }}>
+                  8.5/10
+                </div>
+                <p className="small muted" style={{ textAlign: "center" }}>
+                  Great fluency! Minor pronunciation improvements recommended.
+                </p>
+              </div>
+            )}
           </section>
         </div>
 
@@ -164,14 +402,10 @@ export default function SpeakingPage() {
               <h3>📚 Key Vocabulary</h3>
             </div>
             <div className="pad">
-              {[
-                ["introduce", "/ˌɪntrəˈdjuːs/"],
-                ["colleague", "/ˈkɒliːɡ/"],
-                ["position", "/pəˈzɪʃn/"],
-              ].map(([w, ipa]) => (
-                <div key={w} className="vocab">
+              {currentPrompt.vocab.map(({ word, ipa }) => (
+                <div key={word} className="vocab">
                   <div className="row">
-                    <span className="w">{w}</span>
+                    <span className="w">{word}</span>
                     <button className="icon-btn">🔊</button>
                   </div>
                   <div className="ipa indigo-t">{ipa}</div>
@@ -186,12 +420,7 @@ export default function SpeakingPage() {
               <h3>💬 Useful Phrases</h3>
             </div>
             <div className="pad">
-              {[
-                `✓ "Hi, I'm... and I work as..."`,
-                `✓ "Nice to meet you"`,
-                `✓ "I've been working here for..."`,
-                `✓ "In my free time, I enjoy..."`,
-              ].map((p, i) => (
+              {currentPrompt.phrases.map((p, i) => (
                 <div key={i} className="phrase">{p}</div>
               ))}
             </div>
@@ -200,14 +429,10 @@ export default function SpeakingPage() {
           {/* Tips */}
           <section className="card no-pad">
             <div className="card-head amber">
-              <h3>💡 Pronunciation Tips</h3>
+              <h3>💡 Speaking Tips</h3>
             </div>
             <div className="pad">
-              {[
-                "Speak clearly and at moderate pace",
-                "Use natural intonation",
-                "Pause between main ideas",
-              ].map((t, i) => (
+              {currentPrompt.tips.map((t, i) => (
                 <div key={i} className="tip">• {t}</div>
               ))}
             </div>

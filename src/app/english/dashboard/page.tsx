@@ -1,14 +1,126 @@
 "use client";
 
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+
+type DashboardStats = {
+  user: {
+    name: string | null;
+    email: string | null;
+    image: string | null;
+  };
+  stats: {
+    streak: number;
+    completedUnits: number;
+    inProgressUnits: number;
+    totalAttempts: number;
+    avgScore: number;
+  };
+  skillsBreakdown: Array<{
+    skill: string;
+    completed: number;
+    avgScore: number;
+  }>;
+  recentProgress: Array<{
+    id: string;
+    unitTitle: string;
+    skill: string;
+    level: string;
+    status: string;
+    lastSeen: Date | null;
+  }>;
+  recentAttempts: Array<{
+    id: string;
+    activityTitle: string;
+    skill: string;
+    level: string;
+    score: number | null;
+    maxScore: number | null;
+    submittedAt: Date | null;
+  }>;
+};
+
 export default function DashboardPage() {
+  const router = useRouter();
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchDashboardStats();
+  }, []);
+
+  const fetchDashboardStats = async () => {
+    try {
+      const res = await fetch("/api/dashboard/stats");
+      if (res.ok) {
+        const data = await res.json();
+        setStats(data);
+      } else {
+        // Use mock data if API fails or no data
+        setStats(getMockStats());
+      }
+    } catch (error) {
+      console.error("Failed to fetch dashboard stats:", error);
+      setStats(getMockStats());
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getMockStats = (): DashboardStats => ({
+    user: {
+      name: "Student",
+      email: "student@example.com",
+      image: null,
+    },
+    stats: {
+      streak: 7,
+      completedUnits: 12,
+      inProgressUnits: 3,
+      totalAttempts: 45,
+      avgScore: 85,
+    },
+    skillsBreakdown: [
+      { skill: "LISTENING", completed: 10, avgScore: 82 },
+      { skill: "READING", completed: 12, avgScore: 88 },
+      { skill: "WRITING", completed: 8, avgScore: 79 },
+      { skill: "SPEAKING", completed: 7, avgScore: 85 },
+    ],
+    recentProgress: [],
+    recentAttempts: [],
+  });
+
+  if (loading) {
+    return (
+      <div className="dashboard-content" style={{ padding: "40px", textAlign: "center" }}>
+        <div className="loading">Loading your progress...</div>
+      </div>
+    );
+  }
+
   return (
       <div className="dashboard-content">
         {/* Welcome & Usage Stats */}
         <div className="welcome-section">
           <div className="welcome-card">
             <div className="welcome-text">
-              <h2>🔥 <span id="current-streak">7</span> days streak!</h2>
+              <h2>🔥 <span id="current-streak">{stats?.stats.streak || 0}</span> days streak!</h2>
               <button className="upgrade-btn">Keep up your streak</button>
+            </div>
+            <div className="usage-stats">
+              <div className="stat">
+                <span className="stat-val">{stats?.stats.completedUnits || 0}</span>
+                <span className="stat-lbl">Completed</span>
+              </div>
+              <div className="stat">
+                <span className="stat-val">{stats?.stats.inProgressUnits || 0}</span>
+                <span className="stat-lbl">In Progress</span>
+              </div>
+              <div className="stat">
+                <span className="stat-val">{stats?.stats.avgScore || 0}%</span>
+                <span className="stat-lbl">Avg Score</span>
+              </div>
             </div>
           </div>
         </div>
@@ -34,41 +146,131 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Getting Started */}
-        <div className="getting-started-section">
+        {/* Getting Started & Start Practice - Side by Side */}
+        <div className="dashboard-grid-2col">
+          {/* Getting Started */}
           <div className="progress-card">
-            <h3>Getting Started <span className="progress-percent">50%</span></h3>
-            <div className="progress-bar"><div className="progress-fill" style={{ width: "50%" }} /></div>
+            <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M12 2L15 8L22 9L17 14L18 21L12 18L6 21L7 14L2 9L9 8L12 2Z" fill="#6366f1"/>
+              </svg>
+              <div>
+                <h3 style={{ margin: 0 }}>Getting Started</h3>
+                <span className="progress-percent">25%</span>
+              </div>
+            </div>
+            
+            <div className="progress-bar" style={{ marginBottom: "20px" }}>
+              <div className="progress-fill" style={{ width: "25%" }} />
+            </div>
+
             <div className="checklist">
-              <div className="checklist-item completed"><span className="check-icon">✅</span><span className="check-text">Add your target level</span></div>
-              <div className="checklist-item current"><span className="check-icon">➡️</span><span className="check-text">Learn your current level</span></div>
-              <div className="checklist-item locked"><span className="check-icon">🔒</span><span className="check-text">Choose your learning path</span></div>
-              <div className="checklist-item completed"><span className="check-icon">✅</span><span className="check-text">View sample reports</span></div>
+              <div className="checklist-item completed">
+                <div className="check-icon-wrapper">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <circle cx="10" cy="10" r="10" fill="#10b981"/>
+                    <path d="M6 10L9 13L14 7" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+                <span className="check-text">Add your target score</span>
+              </div>
+
+              <Link href="/english/assessment" className="checklist-item current">
+                <div className="check-icon-wrapper">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <circle cx="10" cy="10" r="9" stroke="#6366f1" strokeWidth="2" fill="white"/>
+                  </svg>
+                </div>
+                <span className="check-text">Learn your speaking level</span>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ marginLeft: "auto" }}>
+                  <path d="M6 4L10 8L6 12" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </Link>
+
+              <Link href="/english/assessment" className="checklist-item">
+                <div className="check-icon-wrapper">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <circle cx="10" cy="10" r="9" stroke="#64748b" strokeWidth="2" fill="white"/>
+                  </svg>
+                </div>
+                <span className="check-text">Learn your writing level</span>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ marginLeft: "auto" }}>
+                  <path d="M6 4L10 8L6 12" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </Link>
+
+              <div className="checklist-item locked">
+                <div className="check-icon-wrapper">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <circle cx="10" cy="10" r="9" stroke="#cbd5e1" strokeWidth="2" fill="#f1f5f9"/>
+                    <path d="M10 7V10M10 13H10.01" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round"/>
+                  </svg>
+                </div>
+                <span className="check-text" style={{ color: "#94a3b8" }}>View premium sample reports</span>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Start Practice */}
-        <div className="practice-section">
-          <h3>Start Practice</h3>
-          <div className="practice-cards">
-            <div className="practice-card listening-card">
-              <div className="practice-icon">🎧</div>
-              <div className="practice-content">
-                <h4>Listening Practice</h4>
-                <p>Practice exercises from basic to advanced levels</p>
-                <small>Practice A1, A2, B1, B2, C1, C2</small>
+          {/* Start Practice */}
+          <div className="practice-card-container">
+            <h3 style={{ marginBottom: "16px" }}>Start Practice</h3>
+            <div className="practice-cards-compact">
+              <div className="practice-card listening-card">
+                <div className="practice-icon">🎧</div>
+                <div className="practice-content">
+                  <h4>Listening</h4>
+                  <p>Practice exercises from basic to advanced</p>
+                  <small>A1-C2 Levels</small>
+                </div>
+                <button 
+                  className="practice-btn"
+                  onClick={() => router.push("/english/listening")}
+                >
+                  Start
+                </button>
               </div>
-              <button className="practice-btn">Start Listening</button>
-            </div>
-            <div className="practice-card reading-card">
-              <div className="practice-icon">📚</div>
-              <div className="practice-content">
-                <h4>Reading Practice</h4>
-                <p>Reading comprehension and vocabulary building</p>
-                <small>Practice A1, A2, B1, B2, C1, C2</small>
+              <div className="practice-card reading-card">
+                <div className="practice-icon">📚</div>
+                <div className="practice-content">
+                  <h4>Reading</h4>
+                  <p>Comprehension and vocabulary building</p>
+                  <small>A1-C2 Levels</small>
+                </div>
+                <button 
+                  className="practice-btn"
+                  onClick={() => router.push("/english/reading")}
+                >
+                  Start
+                </button>
               </div>
-              <button className="practice-btn">Start Reading</button>
+              <div className="practice-card writing-card">
+                <div className="practice-icon">✍️</div>
+                <div className="practice-content">
+                  <h4>Writing</h4>
+                  <p>Improve your writing skills</p>
+                  <small>A1-C2 Levels</small>
+                </div>
+                <button 
+                  className="practice-btn"
+                  onClick={() => router.push("/english/writing")}
+                >
+                  Start
+                </button>
+              </div>
+              <div className="practice-card speaking-card">
+                <div className="practice-icon">🎤</div>
+                <div className="practice-content">
+                  <h4>Speaking</h4>
+                  <p>Practice pronunciation and fluency</p>
+                  <small>A1-C2 Levels</small>
+                </div>
+                <button 
+                  className="practice-btn"
+                  onClick={() => router.push("/english/speaking")}
+                >
+                  Start
+                </button>
+              </div>
             </div>
           </div>
         </div>

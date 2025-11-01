@@ -73,16 +73,33 @@ const advanced = [
     id: "grammar",
     label: "Grammar",
     href: "/english/grammar",
+    icon: (
+      <svg viewBox="0 0 20 20" fill="none">
+        <path d="M4 7H16M4 11H16M4 15H10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M2 4H18V16H2V4Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      </svg>
+    ),
   },
   {
     id: "vocabulary",
     label: "Vocabulary",
     href: "/english/vocabulary",
+    icon: (
+      <svg viewBox="0 0 20 20" fill="none">
+        <path d="M7 2H17V18H7C5.9 18 5 17.1 5 16V4C5 2.9 5.9 2 7 2Z" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M5 8H3M5 12H3M5 16H3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      </svg>
+    ),
   },
   {
     id: "functional",
     label: "Functional",
     href: "/english/functional",
+    icon: (
+      <svg viewBox="0 0 20 20" fill="none">
+        <path d="M6 10L8 12L14 6M10 18C5.6 18 2 14.4 2 10C2 5.6 5.6 2 10 2C14.4 2 18 5.6 18 10C18 14.4 14.4 18 10 18Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      </svg>
+    ),
   },
 ];
 
@@ -91,11 +108,73 @@ const evaluation = [
     id: "placement",
     label: "Placement Test",
     href: "/english/placement-test",
+    icon: (
+      <svg viewBox="0 0 20 20" fill="none">
+        <path d="M8 10H12M10 8V12M2 3H18V17H2V3Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <circle cx="5" cy="6" r="1" fill="currentColor" />
+        <circle cx="10" cy="6" r="1" fill="currentColor" />
+        <circle cx="15" cy="6" r="1" fill="currentColor" />
+      </svg>
+    ),
   },
   {
     id: "assessment",
     label: "Assessment",
     href: "/english/assessment",
+    icon: (
+      <svg viewBox="0 0 20 20" fill="none">
+        <path d="M4 3H16V17H4V3Z" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M7 7H13M7 10H13M7 13H10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M12 13L13 14L15 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      </svg>
+    ),
+  },
+];
+
+const account = [
+  {
+    id: "profile",
+    label: "Profile Settings",
+    href: "/english/profile",
+    icon: (
+      <svg viewBox="0 0 20 20" fill="none">
+        <path d="M10 10C12.7614 10 15 7.76142 15 5C15 2.23858 12.7614 0 10 0C7.23858 0 5 2.23858 5 5C5 7.76142 7.23858 10 10 10Z" fill="currentColor"/>
+        <path d="M10 12C5.58172 12 2 14.7909 2 18V20H18V18C18 14.7909 14.4183 12 10 12Z" fill="currentColor"/>
+      </svg>
+    ),
+  },
+  {
+    id: "progress",
+    label: "My Progress",
+    href: "/english/progress",
+    icon: (
+      <svg viewBox="0 0 20 20" fill="none">
+        <path d="M2 10H18V18H2V10Z" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+        <path d="M5 6L8 9L11 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
+      </svg>
+    ),
+  },
+  {
+    id: "goals",
+    label: "Goals & Targets",
+    href: "/english/goals",
+    icon: (
+      <svg viewBox="0 0 20 20" fill="none">
+        <circle cx="10" cy="10" r="9" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+        <path d="M10 4V10L13 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
+      </svg>
+    ),
+  },
+  {
+    id: "settings",
+    label: "Settings",
+    href: "/english/settings",
+    icon: (
+      <svg viewBox="0 0 20 20" fill="none">
+        <circle cx="10" cy="10" r="2" fill="currentColor"/>
+        <path d="M10 0V3M10 17V20M0 10H3M17 10H20M2.34 2.34L4.46 4.46M15.54 15.54L17.66 17.66M17.66 2.34L15.54 4.46M4.46 15.54L2.34 17.66" stroke="currentColor" strokeWidth="1.5"/>
+      </svg>
+    ),
   },
 ];
 
@@ -103,6 +182,7 @@ export default function Sidebar() {
   const pathname = usePathname();
   const { data: session, status } = useSession();
   const [isSigningOut, setIsSigningOut] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(false);
 
   const isActive = (path: string) => pathname === path;
 
@@ -117,15 +197,26 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="sidebar-v2">
-      {/* Logo */}
-      <Link href="/english/dashboard" className="sidebar-v2__logo">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-          <rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" strokeWidth="2" />
-          <path d="M9 12L11 14L15 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-        <span>English101</span>
-      </Link>
+    <aside className={`sidebar-v2 ${isMinimized ? "minimized" : ""}`}>
+      {/* Logo + Toggle */}
+      <div className="sidebar-v2__header">
+        <Link href="/english/dashboard" className="sidebar-v2__logo">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" strokeWidth="2" />
+            <path d="M9 12L11 14L15 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          {!isMinimized && <span>English101</span>}
+        </Link>
+        <button 
+          className="sidebar-v2__toggle" 
+          onClick={() => setIsMinimized(!isMinimized)}
+          aria-label={isMinimized ? "Expand sidebar" : "Minimize sidebar"}
+        >
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d={isMinimized ? "M9 18L15 12L9 6" : "M15 18L9 12L15 6"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+      </div>
 
       {/* Navigation */}
       <nav className="sidebar-v2__nav">
@@ -135,51 +226,73 @@ export default function Sidebar() {
             key={item.id}
             href={item.href}
             className={`sidebar-v2__item ${isActive(item.href) ? "active" : ""}`}
+            title={isMinimized ? item.label : undefined}
           >
             <span className="sidebar-v2__icon">{item.icon}</span>
-            <span className="sidebar-v2__label">{item.label}</span>
+            {!isMinimized && <span className="sidebar-v2__label">{item.label}</span>}
           </Link>
         ))}
 
         {/* Core Skills */}
         <div className="sidebar-v2__section">
-          <div className="sidebar-v2__section-title">Core Skills</div>
+          {!isMinimized && <div className="sidebar-v2__section-title">Core Skills</div>}
           {coreSkills.map((item) => (
             <Link
               key={item.id}
               href={item.href}
               className={`sidebar-v2__item ${isActive(item.href) ? "active" : ""}`}
+              title={isMinimized ? item.label : undefined}
             >
               <span className="sidebar-v2__icon">{item.icon}</span>
-              <span className="sidebar-v2__label">{item.label}</span>
+              {!isMinimized && <span className="sidebar-v2__label">{item.label}</span>}
             </Link>
           ))}
         </div>
 
         {/* Advanced */}
         <div className="sidebar-v2__section">
-          <div className="sidebar-v2__section-title">Advanced</div>
+          {!isMinimized && <div className="sidebar-v2__section-title">Advanced</div>}
           {advanced.map((item) => (
             <Link
               key={item.id}
               href={item.href}
               className={`sidebar-v2__item ${isActive(item.href) ? "active" : ""}`}
+              title={isMinimized ? item.label : undefined}
             >
-              <span className="sidebar-v2__label">{item.label}</span>
+              <span className="sidebar-v2__icon">{item.icon}</span>
+              {!isMinimized && <span className="sidebar-v2__label">{item.label}</span>}
             </Link>
           ))}
         </div>
 
         {/* Evaluation */}
         <div className="sidebar-v2__section">
-          <div className="sidebar-v2__section-title">Evaluation</div>
+          {!isMinimized && <div className="sidebar-v2__section-title">Evaluation</div>}
           {evaluation.map((item) => (
             <Link
               key={item.id}
               href={item.href}
               className={`sidebar-v2__item ${isActive(item.href) ? "active" : ""}`}
+              title={isMinimized ? item.label : undefined}
             >
-              <span className="sidebar-v2__label">{item.label}</span>
+              <span className="sidebar-v2__icon">{item.icon}</span>
+              {!isMinimized && <span className="sidebar-v2__label">{item.label}</span>}
+            </Link>
+          ))}
+        </div>
+
+        {/* Account */}
+        <div className="sidebar-v2__section">
+          {!isMinimized && <div className="sidebar-v2__section-title">Account</div>}
+          {account.map((item) => (
+            <Link
+              key={item.id}
+              href={item.href}
+              className={`sidebar-v2__item ${isActive(item.href) ? "active" : ""}`}
+              title={isMinimized ? item.label : undefined}
+            >
+              <span className="sidebar-v2__icon">{item.icon}</span>
+              {!isMinimized && <span className="sidebar-v2__label">{item.label}</span>}
             </Link>
           ))}
         </div>
@@ -188,43 +301,60 @@ export default function Sidebar() {
       {/* Footer */}
       <div className="sidebar-v2__footer">
         {status === "loading" ? (
-          <div className="sidebar-v2__user">
-            <div className="sidebar-v2__avatar">
+          <div className="sidebar-v2__user-card">
+            <div className="sidebar-v2__user-avatar">
               <span>...</span>
             </div>
-            <div className="sidebar-v2__user-info">
-              <div className="sidebar-v2__user-name">Loading...</div>
-              <div className="sidebar-v2__user-email">Please wait</div>
-            </div>
+            {!isMinimized && (
+              <div className="sidebar-v2__user-info">
+                <div className="sidebar-v2__user-name">Loading...</div>
+                <div className="sidebar-v2__user-email">Please wait</div>
+              </div>
+            )}
           </div>
         ) : session ? (
           <>
-            <div className="sidebar-v2__user">
-              <div className="sidebar-v2__avatar">
+            <div className="sidebar-v2__user-card">
+              <div className="sidebar-v2__user-avatar">
                 {session.user?.image ? (
-                  <img src={session.user.image} alt="" />
+                  <img src={session.user.image} alt={session.user?.name || "User"} />
                 ) : (
                   <span>{session.user?.name?.charAt(0).toUpperCase() || "U"}</span>
                 )}
               </div>
-              <div className="sidebar-v2__user-info">
-                <div className="sidebar-v2__user-name">{session.user?.name || "User"}</div>
-                <div className="sidebar-v2__user-email">{session.user?.email || "No email"}</div>
-              </div>
+              {!isMinimized && (
+                <div className="sidebar-v2__user-info">
+                  <div className="sidebar-v2__user-name">{session.user?.name || "User"}</div>
+                  <div className="sidebar-v2__user-email">{session.user?.email || "No email"}</div>
+                </div>
+              )}
             </div>
-            <button
-              className="sidebar-v2__signout"
-              onClick={handleSignOut}
-              disabled={isSigningOut}
-            >
-              {isSigningOut ? "Signing out..." : "Sign Out"}
-            </button>
+            {!isMinimized && (
+              <button
+                className="sidebar-v2__signout"
+                onClick={handleSignOut}
+                disabled={isSigningOut}
+                title="Sign out"
+              >
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M6 14H3C2.44772 14 2 13.5523 2 13V3C2 2.44772 2.44772 2 3 2H6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                  <path d="M11 11L14 8L11 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M14 8H6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                </svg>
+                {isSigningOut ? "Signing out..." : "Sign Out"}
+              </button>
+            )}
           </>
         ) : (
-          <div className="sidebar-v2__user">
-            <div className="sidebar-v2__user-info">
-              <div className="sidebar-v2__user-name">Not signed in</div>
+          <div className="sidebar-v2__user-card">
+            <div className="sidebar-v2__user-avatar">
+              <span>?</span>
             </div>
+            {!isMinimized && (
+              <div className="sidebar-v2__user-info">
+                <div className="sidebar-v2__user-name">Not signed in</div>
+              </div>
+            )}
           </div>
         )}
       </div>

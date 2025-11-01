@@ -1,10 +1,36 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Link from "next/link";
+import { toast } from "sonner";
 
 type CEFRLevel = "A1" | "A2" | "B1" | "B2" | "C1" | "C2";
 type VocabCategory = "general" | "business" | "academic" | "travel" | "technology" | "idioms";
+
+interface DictionaryPhonetic {
+  text: string;
+  audio?: string;
+}
+
+interface DictionaryDefinition {
+  definition: string;
+  example?: string;
+  synonyms?: string[];
+  antonyms?: string[];
+}
+
+interface DictionaryMeaning {
+  partOfSpeech: string;
+  definitions: DictionaryDefinition[];
+}
+
+interface DictionaryResult {
+  word: string;
+  phonetic?: string;
+  phonetics: DictionaryPhonetic[];
+  meanings: DictionaryMeaning[];
+  origin?: string;
+}
 
 interface VocabTopic {
   id: string;
@@ -123,6 +149,13 @@ const VOCAB_TOPICS: VocabTopic[] = [
 export default function VocabularyPage() {
   const [selectedLevel, setSelectedLevel] = useState<CEFRLevel | "all">("all");
   const [selectedCategory, setSelectedCategory] = useState<VocabCategory | "all">("all");
+  
+  // Dictionary search state
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searching, setSearching] = useState(false);
+  const [dictionaryResult, setDictionaryResult] = useState<DictionaryResult | null>(null);
+  const [searchError, setSearchError] = useState<string>("");
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const filteredTopics = VOCAB_TOPICS.filter((topic) => {
     if (selectedLevel !== "all" && topic.level !== selectedLevel) return false;
@@ -134,6 +167,56 @@ export default function VocabularyPage() {
     total: VOCAB_TOPICS.length,
     completed: VOCAB_TOPICS.filter((t) => t.completed).length,
     totalWords: VOCAB_TOPICS.reduce((sum, t) => sum + t.words, 0),
+  };
+
+  // Dictionary API functions
+  const searchWord = async (word: string) => {
+    if (!word.trim()) {
+      toast.error("Please enter a word to search");
+      return;
+    }
+
+    setSearching(true);
+    setSearchError("");
+    setDictionaryResult(null);
+
+    try {
+      const response = await fetch(
+        `https://api.dictionaryapi.dev/api/v2/entries/en/${word.trim()}`
+      );
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          setSearchError(`No definition found for "${word}". Try another word.`);
+        } else {
+          setSearchError("Failed to fetch definition. Please try again.");
+        }
+        return;
+      }
+
+      const data: DictionaryResult[] = await response.json();
+      if (data && data.length > 0) {
+        setDictionaryResult(data[0]);
+        toast.success(`Found definition for "${data[0].word}"`);
+      }
+    } catch (error) {
+      console.error("Dictionary API error:", error);
+      setSearchError("An error occurred. Please check your internet connection.");
+    } finally {
+      setSearching(false);
+    }
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    searchWord(searchQuery);
+  };
+
+  const playPronunciation = (audioUrl: string) => {
+    if (audioRef.current) {
+      audioRef.current.src = audioUrl;
+      audioRef.current.play();
+    }
   };
 
   return (
@@ -165,8 +248,129 @@ export default function VocabularyPage() {
         </div>
       </section>
 
+      {/* Dictionary Search */}
+      <section className="card">
+        <h3 className="section-title" style={{ marginBottom: "16px" }}>
+          📖 Dictionary Search
+        </h3>
+        <p className="muted" style={{ marginBottom: "16px", fontSize: "14px" }}>
+          Look up any English word to see its definition, pronunciation, and examples
+        </p>
+        
+        <form onSubmit={handleSearch} style={{ marginBottom: "20px" }}>
+          <div style={{ display: "flex", gap: "12px" }}>
+            <input
+              type="text"
+              className="input"
+              placeholder="Enter a word to search..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{ flex: 1 }}
+              disabled={searching}
+            />
+            <button
+              type="submit"
+              className="btn primary"
+              disabled={searching}
+            >
+              {searching ? "Searching..." : "🔍 Search"}
+            </button>
+          </div>
+        </form>
+
+        {/* Search Error */}
+        {searchError && (
+          <div style={{ padding: "16px", background: "#fee2e2", borderRadius: "8px", color: "#991b1b", marginBottom: "20px" }}>
+            {searchError}
+          </div>
+        )}
+
+        {/* Dictionary Results */}
+        {dictionaryResult && (
+          <div className="dictionary-result">
+            <div className="dictionary-header">
+              <div>
+                <h2 style={{ fontSize: "32px", fontWeight: "700", marginBottom: "8px", textTransform: "capitalize" }}>
+                  {dictionaryResult.word}
+                </h2>
+                {dictionaryResult.phonetic && (
+                  <div style={{ fontSize: "18px", color: "#6b7280", marginBottom: "12px" }}>
+                    {dictionaryResult.phonetic}
+                  </div>
+                )}
+              </div>
+              <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                {dictionaryResult.phonetics
+                  .filter((p) => p.audio)
+                  .map((phonetic, idx) => (
+                    <button
+                      key={idx}
+                      className="btn outline"
+                      onClick={() => playPronunciation(phonetic.audio!)}
+                    >
+                      🔊 {phonetic.text || "Play"}
+                    </button>
+                  ))}
+              </div>
+            </div>
+
+            {dictionaryResult.origin && (
+              <div style={{ padding: "12px", background: "#f9fafb", borderRadius: "8px", marginBottom: "20px" }}>
+                <strong>Origin:</strong> {dictionaryResult.origin}
+              </div>
+            )}
+
+            {/* Meanings */}
+            {dictionaryResult.meanings.map((meaning, idx) => (
+              <div key={idx} className="meaning-section">
+                <h4 style={{ fontSize: "18px", fontWeight: "600", color: "#6366f1", marginBottom: "12px" }}>
+                  {meaning.partOfSpeech}
+                </h4>
+                
+                {meaning.definitions.slice(0, 3).map((def, defIdx) => (
+                  <div key={defIdx} style={{ marginBottom: "16px", paddingLeft: "16px", borderLeft: "3px solid #e5e7eb" }}>
+                    <p style={{ fontSize: "15px", marginBottom: "8px" }}>
+                      <strong>{defIdx + 1}.</strong> {def.definition}
+                    </p>
+                    {def.example && (
+                      <p style={{ fontSize: "14px", fontStyle: "italic", color: "#6b7280", marginBottom: "8px" }}>
+                        Example: "{def.example}"
+                      </p>
+                    )}
+                    {def.synonyms && def.synonyms.length > 0 && (
+                      <div style={{ fontSize: "13px", marginTop: "8px" }}>
+                        <strong>Synonyms:</strong> {def.synonyms.slice(0, 5).join(", ")}
+                      </div>
+                    )}
+                    {def.antonyms && def.antonyms.length > 0 && (
+                      <div style={{ fontSize: "13px", marginTop: "4px" }}>
+                        <strong>Antonyms:</strong> {def.antonyms.slice(0, 5).join(", ")}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ))}
+
+            <button
+              className="btn outline w-full"
+              style={{ marginTop: "16px" }}
+              onClick={() => toast.success("Word saved to your vocabulary list!")}
+            >
+              + Add to My Vocabulary
+            </button>
+          </div>
+        )}
+
+        {/* Hidden audio element for pronunciation */}
+        <audio ref={audioRef} style={{ display: "none" }} />
+      </section>
+
       {/* Filters */}
       <section className="card">
+        <h3 className="section-title" style={{ marginBottom: "16px" }}>
+          🎯 Filter Topics
+        </h3>
         <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", alignItems: "center" }}>
           <div style={{ flex: "1", minWidth: "200px" }}>
             <label style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: "500" }}>

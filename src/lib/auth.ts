@@ -60,10 +60,35 @@ export const authOptions: NextAuthOptions = {
     secret: process.env.NEXTAUTH_SECRET,
     debug: process.env.NODE_ENV === "development",
     callbacks: {
-        async jwt({ token, user }) {
+        async redirect({ url, baseUrl }) {
+            // Allows relative callback URLs
+            if (url.startsWith("/")) return `${baseUrl}${url}`;
+            // Allows callback URLs on the same origin
+            else if (new URL(url).origin === baseUrl) return url;
+            return baseUrl + "/english/dashboard";
+        },
+        async jwt({ token, user, account, trigger }) {
             if (user) {
                 token.id = user.id;
                 token.role = (user as any).role || "USER";
+                token.placementTestCompleted = (user as any).placementTestCompleted || false;
+                token.cefrLevel = (user as any).cefrLevel || null;
+            }
+            // Store provider info for first-time login
+            if (account) {
+                token.provider = account.provider;
+            }
+            // Refresh token data on update
+            if (trigger === "update") {
+                const updatedUser = await prisma.user.findUnique({
+                    where: { id: token.id as string },
+                    select: { placementTestCompleted: true, cefrLevel: true, role: true }
+                });
+                if (updatedUser) {
+                    token.placementTestCompleted = updatedUser.placementTestCompleted;
+                    token.cefrLevel = updatedUser.cefrLevel;
+                    token.role = updatedUser.role;
+                }
             }
             return token;
         },
@@ -71,8 +96,14 @@ export const authOptions: NextAuthOptions = {
             if (session.user) {
                 session.user.id = token.id as string;
                 session.user.role = (token.role as "USER" | "ADMIN") || "USER";
+                (session.user as any).placementTestCompleted = token.placementTestCompleted || false;
+                (session.user as any).cefrLevel = token.cefrLevel || null;
             }
             return session;
+        },
+        async signIn({ user, account, profile }) {
+            // Always allow sign-in, database operations handled by Prisma Adapter
+            return true;
         },
     },
 };

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 type DashboardStats = {
   user: {
@@ -45,6 +46,11 @@ export default function DashboardPage() {
   const router = useRouter();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
+  
+  // Quick Dictionary
+  const [quickWord, setQuickWord] = useState("");
+  const [quickResult, setQuickResult] = useState<any>(null);
+  const [quickSearching, setQuickSearching] = useState(false);
 
   useEffect(() => {
     fetchDashboardStats();
@@ -65,6 +71,36 @@ export default function DashboardPage() {
       setStats(getMockStats());
     } finally {
       setLoading(false);
+    }
+  };
+
+  const searchQuickWord = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!quickWord.trim()) return;
+
+    setQuickSearching(true);
+    setQuickResult(null);
+
+    try {
+      const response = await fetch(
+        `https://api.dictionaryapi.dev/api/v2/entries/en/${quickWord.trim()}`
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        setQuickResult(data[0]);
+        toast.success(`Found "${data[0].word}"`);
+      } else {
+        toast.error("Word not found", {
+          description: "Try another word",
+        });
+      }
+    } catch (error) {
+      toast.error("Search failed", {
+        description: "Please check your connection",
+      });
+    } finally {
+      setQuickSearching(false);
     }
   };
 
@@ -272,6 +308,62 @@ export default function DashboardPage() {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Quick Dictionary */}
+        <div className="quick-dictionary-section" style={{ marginBottom: "32px" }}>
+          <div className="card">
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+              <div>
+                <h3 style={{ marginBottom: "8px" }}>📖 Quick Dictionary</h3>
+                <p className="muted" style={{ fontSize: "14px" }}>Look up any English word instantly</p>
+              </div>
+              <Link href="/english/vocabulary" className="btn outline">
+                Go to Vocabulary →
+              </Link>
+            </div>
+
+            <form onSubmit={searchQuickWord} style={{ marginBottom: "16px" }}>
+              <div style={{ display: "flex", gap: "12px" }}>
+                <input
+                  type="text"
+                  className="input"
+                  placeholder="Type a word..."
+                  value={quickWord}
+                  onChange={(e) => setQuickWord(e.target.value)}
+                  disabled={quickSearching}
+                  style={{ flex: 1 }}
+                />
+                <button type="submit" className="btn primary" disabled={quickSearching}>
+                  {quickSearching ? "Searching..." : "🔍 Search"}
+                </button>
+              </div>
+            </form>
+
+            {quickResult && (
+              <div style={{ padding: "16px", background: "#f9fafb", borderRadius: "8px", border: "1px solid #e5e7eb" }}>
+                <div style={{ marginBottom: "12px" }}>
+                  <h4 style={{ fontSize: "24px", fontWeight: "600", marginBottom: "4px", textTransform: "capitalize" }}>
+                    {quickResult.word}
+                  </h4>
+                  {quickResult.phonetic && (
+                    <div style={{ fontSize: "16px", color: "#6b7280" }}>{quickResult.phonetic}</div>
+                  )}
+                </div>
+
+                {quickResult.meanings.slice(0, 2).map((meaning: any, idx: number) => (
+                  <div key={idx} style={{ marginBottom: "12px" }}>
+                    <div style={{ fontSize: "14px", fontWeight: "600", color: "#6366f1", marginBottom: "6px" }}>
+                      {meaning.partOfSpeech}
+                    </div>
+                    <div style={{ fontSize: "14px", paddingLeft: "12px", borderLeft: "2px solid #e5e7eb" }}>
+                      {meaning.definitions[0].definition}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 

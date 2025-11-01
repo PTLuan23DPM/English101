@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import LanguageSelector from "@/components/LanguageSelector";
 
 export default function HeaderMinimal() {
   return (
@@ -13,6 +14,7 @@ export default function HeaderMinimal() {
 
         {/* Buttons (right) */}
         <div className="em-actions">
+          <LanguageSelector />
           <Link href="/authentication/login" className="em-btn em-btn--ghost">Log in</Link>
           <Link href="/authentication/register" className="em-btn em-btn--primary">Register</Link>
         </div>

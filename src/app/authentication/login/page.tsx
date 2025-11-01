@@ -84,7 +84,7 @@ export default function LoginPage() {
             <button
               className="google-auth-btn"
               type="button"
-              onClick={() => signIn("google", { callbackUrl: "/" })}
+              onClick={() => signIn("google", { callbackUrl: "/english/dashboard" })}
             >
               <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google" className="google-icon" />
               Continue with Google

@@ -117,12 +117,23 @@ model User {
 
   role Role @default(USER)
 
+  // Placement test & level
+  placementTestCompleted Boolean   @default(false)
+  cefrLevel              String?   // A1, A2, B1, B2, C1, C2
+  placementScore         Int?
+  lastActive             DateTime?
+  streak                 Int       @default(0)
+  longestStreak          Int       @default(0)
+
   // học tập
   progress    UserProgress[]
   attempts    Attempt[]
   submissions Submission[]   @relation("SubmissionOwner") // <-- thêm tên quan hệ
   gradedSubs  Submission[]   @relation("SubmissionGrader") // <-- mới: những bài do user này chấm
   recordings  Recording[]
+  userActivities  UserActivity[]
+  goals       UserGoal[]
+  placementTests PlacementTestResult[]
 
   // authoring
   contents   Content[]  @relation("AuthorContents")
@@ -535,4 +546,63 @@ model PasswordReset {
 
   @@index([email])
   @@index([otp])
+}
+
+// ------------------------------------------------------
+// User Activity Tracking for Progress & Streak
+// ------------------------------------------------------
+model UserActivity {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date         DateTime @default(now())
+  skill        String   // reading, writing, listening, speaking, grammar, vocabulary
+  activityType String   // exercise, practice, test
+  duration     Int?     // minutes
+  score        Float?
+  completed    Boolean  @default(false)
+  metadata     Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, date])
+  @@index([userId, skill])
+}
+
+// ------------------------------------------------------
+// User Goals
+// ------------------------------------------------------
+model UserGoal {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String    // daily_exercises, weekly_hours, target_level, skill_improvement
+  target    Int
+  current   Int       @default(0)
+  deadline  DateTime?
+  completed Boolean   @default(false)
+  metadata  Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([userId, completed])
+}
+
+// ------------------------------------------------------
+// Placement Test Results
+// ------------------------------------------------------
+model PlacementTestResult {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  score       Int
+  totalQuestions Int   @default(20)
+  cefrLevel   String
+  answers     Json     // Store all answers and questions
+  completedAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([userId, completedAt])
 }

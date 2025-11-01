@@ -6,50 +6,108 @@ import prisma from "@/lib/prisma";
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.email) {
+
+    if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
-    });
-
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    // Check if prisma is initialized
+    if (!prisma) {
+      console.error("Prisma client is not initialized");
+      return NextResponse.json(
+        { error: "Database connection error" },
+        { status: 500 }
+      );
     }
 
-    const { answers, score, totalQuestions, detectedLevel, levelScores } = await req.json();
+    const body = await req.json();
+    const { score, totalQuestions, answers } = body;
 
-    // Create a test activity record (you can create a special placement test activity)
-    // For now, we'll store it in user metadata or create a custom table
-    
-    // Option 1: Store in UserProgress with a special placement test unit
-    // Option 2: Add to user metadata
-    // For simplicity, we'll log it and return success
-    
-    console.log(`Placement test completed by ${user.email}:`, {
-      score,
-      totalQuestions,
-      detectedLevel,
-      levelScores,
+    // Validate required fields
+    if (typeof score !== "number" || score < 0) {
+      return NextResponse.json(
+        { error: "Invalid score" },
+        { status: 400 }
+      );
+    }
+
+    if (!answers || !Array.isArray(answers)) {
+      return NextResponse.json(
+        { error: "Invalid answers format" },
+        { status: 400 }
+      );
+    }
+
+    // Determine CEFR level based on score
+    let cefrLevel = "A1";
+    let description = "Beginner";
+
+    if (score >= 23) {
+      cefrLevel = "C2";
+      description = "Proficient";
+    } else if (score >= 19) {
+      cefrLevel = "C1";
+      description = "Advanced";
+    } else if (score >= 15) {
+      cefrLevel = "B2";
+      description = "Upper Intermediate";
+    } else if (score >= 11) {
+      cefrLevel = "B1";
+      description = "Intermediate";
+    } else if (score >= 6) {
+      cefrLevel = "A2";
+      description = "Elementary";
+    }
+
+    // Save test result
+    const testResult = await prisma.placementTestResult.create({
+      data: {
+        userId: session.user.id,
+        score,
+        totalQuestions,
+        cefrLevel,
+        answers,
+      },
     });
 
-    // TODO: You can create a PlacementTestResult model in schema.prisma to store this
-    // For now, just return success
+    // Update user's level and mark test as completed
+    await prisma.user.update({
+      where: { id: session.user.id },
+      data: {
+        placementTestCompleted: true,
+        cefrLevel,
+        placementScore: score,
+        lastActive: new Date(),
+      },
+    });
 
     return NextResponse.json({
       success: true,
-      level: detectedLevel,
+      cefrLevel,
+      description,
       score,
       totalQuestions,
-      percentage: Math.round((score / totalQuestions) * 100),
+      testResultId: testResult.id,
     });
-  } catch (error) {
-    console.error("Placement test submission error:", error);
+  } catch (error: any) {
+    console.error("Placement test submit error:", error);
+    
+    // Return more specific error message
+    let errorMessage = "Failed to submit test";
+    if (error instanceof Error) {
+      errorMessage = error.message;
+    }
+    
+    // Check for Prisma errors
+    if (error?.code === "P2002") {
+      errorMessage = "Test result already exists";
+    } else if (error?.code === "P2025") {
+      errorMessage = "User not found";
+    }
+    
     return NextResponse.json(
-      { error: "Failed to submit placement test" },
+      { error: errorMessage, details: error?.message },
       { status: 500 }
     );
   }
 }
-

@@ -1,54 +1,53 @@
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   try {
-    const body = await req.json();
-    const { email, otp, password } = body;
+    const { email, otp, newPassword } = await req.json();
 
-    if (!email || !otp || !password) {
+    if (!email || !otp || !newPassword) {
       return NextResponse.json(
-        { error: "Email, OTP, and password are required" },
+        { error: "Email, OTP, and new password are required" },
         { status: 400 }
       );
     }
 
-    if (password.length < 8) {
+    if (newPassword.length < 8) {
       return NextResponse.json(
-        { error: "Password must be at least 8 characters" },
+        { error: "Password must be at least 8 characters long" },
         { status: 400 }
       );
     }
 
-    // Find verified OTP record
-    const otpRecord = await prisma.passwordReset.findFirst({
+    // Find the verified password reset request
+    const resetRequest = await prisma.passwordReset.findFirst({
       where: {
         email,
         otp,
         verified: true,
       },
-      orderBy: {
-        createdAt: "desc",
-      },
     });
 
-    if (!otpRecord) {
+    if (!resetRequest) {
       return NextResponse.json(
-        { error: "Invalid or unverified OTP" },
+        { error: "Invalid or unverified reset request" },
         { status: 400 }
       );
     }
 
-    // Check if OTP is expired
-    if (new Date() > otpRecord.expiresAt) {
+    // Check if OTP has expired
+    if (new Date() > resetRequest.expiresAt) {
+      await prisma.passwordReset.delete({
+        where: { id: resetRequest.id },
+      });
       return NextResponse.json(
-        { error: "OTP has expired. Please request a new one." },
+        { error: "Reset code has expired. Please request a new one." },
         { status: 400 }
       );
     }
 
-    // Find user
+    // Check if user exists
     const user = await prisma.user.findUnique({
       where: { email },
     });
@@ -60,8 +59,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Hash new password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
 
     // Update user password
     await prisma.user.update({
@@ -69,28 +68,19 @@ export async function POST(req: NextRequest) {
       data: { password: hashedPassword },
     });
 
-    // Delete used OTP
+    // Delete the password reset request
     await prisma.passwordReset.delete({
-      where: { id: otpRecord.id },
+      where: { id: resetRequest.id },
     });
 
-    // Delete all other OTPs for this email
-    await prisma.passwordReset.deleteMany({
-      where: { email },
+    return NextResponse.json({
+      message: "Password reset successfully",
     });
-
-    return NextResponse.json(
-      {
-        message: "Password reset successfully",
-      },
-      { status: 200 }
-    );
   } catch (error) {
     console.error("Reset password error:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Failed to reset password" },
       { status: 500 }
     );
   }
 }
-

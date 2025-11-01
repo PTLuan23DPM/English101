@@ -119,7 +119,7 @@ export default function RegisterPage() {
             <button
               className="google-auth-btn"
               type="button"
-              onClick={() => signIn("google", { callbackUrl: "/" })}
+              onClick={() => signIn("google", { callbackUrl: "/english/dashboard" })}
             >
               <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google" className="google-icon" />
               Continue with Google
@@ -173,13 +173,16 @@ export default function RegisterPage() {
 
                       <div className="password-requirements">
                         <div className={`requirement ${req.length ? "ok" : ""}`}>
-                          <span className="req-icon">✓</span> 8 characters minimum
+                          <span className="req-icon"></span>
+                          <span>8 characters minimum</span>
                         </div>
                         <div className={`requirement ${req.letter ? "ok" : ""}`}>
-                          <span className="req-icon">✓</span> 1 letter
+                          <span className="req-icon"></span>
+                          <span>1 letter</span>
                         </div>
                         <div className={`requirement ${req.number ? "ok" : ""}`}>
-                          <span className="req-icon">✓</span> 1 number
+                          <span className="req-icon"></span>
+                          <span>1 number</span>
                         </div>
                       </div>
 
@@ -193,7 +196,7 @@ export default function RegisterPage() {
                     </label>
 
                     <button className="auth-submit-btn" disabled={loading}>
-                      <span className="btn-text">{loading ? "Creating..." : "Sign up for free"}</span>
+                      <span className="btn-text">{loading ? "Creating..." : "Sign Up"}</span>
                     </button>
                   </form>
                 </div>

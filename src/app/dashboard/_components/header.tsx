@@ -1,8 +1,10 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
+import LanguageSelector from "@/components/LanguageSelector";
 
 const PAGE_TITLES: Record<string, string> = {
   "/english/dashboard": "Dashboard",
@@ -11,10 +13,15 @@ const PAGE_TITLES: Record<string, string> = {
   "/english/writing": "Writing Practice",
   "/english/speaking": "Speaking Practice",
   "/english/support": "Support & Help",
+  "/english/profile": "Profile Settings",
+  "/english/progress": "My Progress",
+  "/english/goals": "Goals & Targets",
+  "/english/settings": "Settings",
 };
 
 export default function DashboardHeader() {
   const pathname = usePathname();
+  const router = useRouter();
   const { data: session } = useSession();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [streak, setStreak] = useState(7); // TODO: Fetch from API
@@ -40,6 +47,9 @@ export default function DashboardHeader() {
       </div>
       
       <div className="header-right">
+        {/* Language Selector */}
+        <LanguageSelector />
+        
         {/* Streak Display */}
         <div className="streak-badge" title="Current learning streak">
           <svg className="streak-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -95,34 +105,50 @@ export default function DashboardHeader() {
               <div className="user-dropdown-divider" />
 
               <div className="user-dropdown-menu">
-                <button className="user-dropdown-item">
+                <Link 
+                  href="/english/profile" 
+                  className="user-dropdown-item"
+                  onClick={() => setShowUserMenu(false)}
+                >
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                     <path d="M8 8C10.2091 8 12 6.20914 12 4C12 1.79086 10.2091 0 8 0C5.79086 0 4 1.79086 4 4C4 6.20914 5.79086 8 8 8Z" fill="currentColor"/>
                     <path d="M8 10C3.58172 10 0 11.7909 0 14V16H16V14C16 11.7909 12.4183 10 8 10Z" fill="currentColor"/>
                   </svg>
                   <span>Profile Settings</span>
-                </button>
-                <button className="user-dropdown-item">
+                </Link>
+                <Link 
+                  href="/english/progress" 
+                  className="user-dropdown-item"
+                  onClick={() => setShowUserMenu(false)}
+                >
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                     <path d="M2 2H14V14H2V2Z" stroke="currentColor" strokeWidth="1.5" fill="none"/>
                     <path d="M5 6L8 9L11 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
                   </svg>
                   <span>My Progress</span>
-                </button>
-                <button className="user-dropdown-item">
+                </Link>
+                <Link 
+                  href="/english/goals" 
+                  className="user-dropdown-item"
+                  onClick={() => setShowUserMenu(false)}
+                >
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                     <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.5" fill="none"/>
                     <path d="M8 4V8L11 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
                   </svg>
                   <span>Goals & Targets</span>
-                </button>
-                <button className="user-dropdown-item">
+                </Link>
+                <Link 
+                  href="/english/settings" 
+                  className="user-dropdown-item"
+                  onClick={() => setShowUserMenu(false)}
+                >
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                     <circle cx="8" cy="8" r="2" fill="currentColor"/>
                     <path d="M8 0V3M8 13V16M0 8H3M13 8H16M2.34 2.34L4.46 4.46M11.54 11.54L13.66 13.66M13.66 2.34L11.54 4.46M4.46 11.54L2.34 13.66" stroke="currentColor" strokeWidth="1.5"/>
                   </svg>
                   <span>Settings</span>
-                </button>
+                </Link>
               </div>
 
               <div className="user-dropdown-divider" />

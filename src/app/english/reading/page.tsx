@@ -1,132 +1,245 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 
-type TabKey = "stories" | "news" | "academic" | "essays" | "practical";
+interface ReadingTask {
+  id: string;
+  icon: string;
+  title: string;
+  type: string;
+  level: string;
+  description: string;
+  readMins: number;
+  words: number;
+  questions: number;
+  tags: string[];
+  recommended?: boolean;
+  attempts: number;
+  color: string;
+  body: string[];
+  vocab: Array<{ word: string; def: string; example: string }>;
+  questionList: Array<{
+    id: string;
+    text: string;
+    options: string[];
+    correctIndex: number;
+  }>;
+}
 
-// Sample articles data
-const SAMPLE_ARTICLES = [
+const READING_TASKS: ReadingTask[] = [
+  // Short Stories
   {
-    id: "1",
-      title: "The Benefits of Learning Languages",
-    description: "Discover how learning multiple languages can boost your career and cognitive abilities. Research shows bilingual individuals have improved executive function.",
-      readMins: 5,
-      words: 350,
-      questions: 8,
-    level: "B1" as const,
-      tags: ["Education", "Career"],
-    icon: "📚",
-      body: [
-        `Learning a new language is one of the most rewarding experiences you can have. Not only does it open doors to new cultures and opportunities, but it also provides numerous cognitive benefits that can enhance your daily life.`,
-        `Research has shown that bilingual individuals have improved executive function, better problem-solving skills, and enhanced creativity. These cognitive advantages extend beyond language use and can improve performance in many areas of life.`,
-        `From a career perspective, multilingual professionals often have access to better job opportunities and higher salaries. In our increasingly globalized world, companies value employees who can communicate with international clients and partners.`,
-        `Additionally, learning languages helps build empathy and cultural understanding. When you speak someone's native language, you gain deeper insights into their way of thinking and cultural values.`,
-      ],
-    vocab: [
-      { word: "rewarding", def: "giving satisfaction; worthwhile", example: "Teaching is a rewarding career." },
-      { word: "cognitive", def: "related to mental processes", example: "Cognitive abilities improve with practice." },
-      { word: "executive function", def: "mental skills for planning and focus", example: "Good executive function helps with time management." },
+    id: "story-friendship",
+    icon: "📖",
+    title: "The Power of Friendship",
+    type: "Short Story",
+    level: "A2",
+    description: "A heartwarming story about two friends who help each other through difficult times.",
+    readMins: 5,
+    words: 320,
+    questions: 6,
+    tags: ["Fiction", "Life Lessons"],
+    recommended: true,
+    attempts: 0,
+    color: "blue",
+    body: [
+      "Sarah and Emma had been best friends since elementary school. They did everything together - from studying for exams to exploring their neighborhood on weekends.",
+      "One day, Sarah's family faced financial difficulties. Her parents couldn't afford to send her on the school trip that everyone was excited about. Sarah felt sad and embarrassed.",
+      "Emma noticed her friend's sadness. Without telling anyone, Emma started doing extra chores and saved her allowance for three months. On the day before the trip, she gave Sarah an envelope with enough money for the journey.",
+      "Sarah was so moved by her friend's kindness that she started crying. 'I can't accept this,' she said. But Emma insisted, 'That's what friends are for. We'll make memories together.'",
     ],
-    questions: [
+    vocab: [
+      { word: "elementary school", def: "primary school; grades 1-6", example: "I learned to read in elementary school." },
+      { word: "allowance", def: "money given regularly to a child", example: "My weekly allowance is $10." },
+      { word: "moved", def: "emotionally affected", example: "I was moved by her kindness." },
+    ],
+    questionList: [
       {
         id: "q1",
-        text: "According to the article, what is one of the main benefits of being bilingual?",
+        text: "How long had Sarah and Emma been friends?",
         options: [
-          "Better memory skills",
-          "Improved executive function",
-          "Faster reading speed",
-          "Better handwriting"
+          "Since high school",
+          "Since elementary school",
+          "For one year",
+          "They just met"
         ],
         correctIndex: 1,
       },
       {
         id: "q2",
-        text: "What does the article say about multilingual professionals?",
+        text: "Why was Sarah sad?",
         options: [
-          "They work longer hours",
-          "They have access to better job opportunities",
-          "They must travel frequently",
-          "They prefer remote work"
+          "She failed an exam",
+          "Emma was moving away",
+          "Her family couldn't afford the school trip",
+          "She lost her homework"
         ],
-        correctIndex: 1,
+        correctIndex: 2,
       },
     ],
   },
+  // News Articles
   {
-    id: "2",
-    title: "Climate Change and Technology",
-    description: "How modern technology is helping us combat climate change. From renewable energy to smart cities, innovation is key to a sustainable future.",
-    readMins: 7,
-    words: 480,
-    questions: 10,
-    level: "B2" as const,
-    tags: ["Environment", "Technology"],
-    icon: "🌍",
-    body: [
-      `Climate change is one of the most pressing challenges of our time, but technology is offering new hope. From renewable energy sources to artificial intelligence, innovative solutions are emerging that could help us reduce our carbon footprint and protect the planet for future generations.`,
-      `Solar and wind energy have become increasingly affordable and efficient. Many countries are now investing heavily in renewable infrastructure, with some nations already generating more than 50% of their electricity from clean sources.`,
-      `Smart cities use Internet of Things (IoT) technology to optimize energy consumption, reduce waste, and improve quality of life. Sensors monitor everything from traffic flow to air quality, allowing cities to respond dynamically to changing conditions.`,
-    ],
-    vocab: [
-      { word: "pressing", def: "urgent; requiring immediate attention", example: "We must address this pressing issue." },
-      { word: "carbon footprint", def: "total greenhouse gas emissions caused by an individual or organization", example: "Reducing your carbon footprint helps the environment." },
-      { word: "dynamically", def: "in a changing or responsive way", example: "The system adjusts dynamically to user needs." },
-    ],
-    questions: [
-      {
-        id: "q1",
-        text: "What is the main topic of this article?",
-        options: [
-          "The history of technology",
-          "How technology helps fight climate change",
-          "The problems with renewable energy",
-          "Future predictions about cities"
-        ],
-        correctIndex: 1,
-      },
-    ],
-  },
-  {
-    id: "3",
-    title: "The Art of Effective Communication",
-    description: "Master the skills needed for clear and persuasive communication in professional settings. Learn how body language, tone, and timing impact your message.",
+    id: "news-green-energy",
+    icon: "🌱",
+    title: "Green Energy Revolution",
+    type: "News Article",
+    level: "B1",
+    description: "Solar and wind energy are changing how we power our homes and businesses.",
     readMins: 6,
     words: 420,
-    questions: 9,
-    level: "C1" as const,
-    tags: ["Business", "Skills"],
-    icon: "💼",
+    questions: 8,
+    tags: ["Environment", "Technology", "Current Affairs"],
+    recommended: true,
+    attempts: 0,
+    color: "green",
     body: [
-      `Effective communication is the cornerstone of professional success. Whether you're presenting to clients, collaborating with colleagues, or negotiating with partners, the ability to convey your ideas clearly and persuasively can make or break your career.`,
-      `Research indicates that only 7% of communication is verbal. The remaining 93% consists of body language (55%) and tone of voice (38%). This means that what you say is far less important than how you say it.`,
-      `Active listening is equally crucial. By fully concentrating on the speaker, understanding their message, and responding thoughtfully, you build trust and rapport. This creates an environment where open dialogue can flourish.`,
+      "The world is experiencing a green energy revolution. Solar panels and wind turbines are becoming common sights in many countries as nations work to reduce their carbon emissions.",
+      "In 2024, renewable energy sources generated more than 30% of the world's electricity for the first time. This milestone shows that clean energy is no longer just a dream but a reality.",
+      "Germany leads Europe in solar energy production, with over 2 million homes powered by rooftop solar panels. Meanwhile, Denmark gets nearly half of its electricity from wind power.",
+      "Experts predict that by 2030, renewable energy will be cheaper than fossil fuels in almost every market worldwide. This shift will not only help the environment but also create millions of new jobs.",
     ],
     vocab: [
-      { word: "cornerstone", def: "fundamental basis; essential element", example: "Trust is the cornerstone of any relationship." },
-      { word: "persuasive", def: "able to convince someone", example: "She gave a persuasive argument." },
-      { word: "rapport", def: "harmonious relationship; connection", example: "They quickly established a good rapport." },
+      { word: "milestone", def: "an important achievement or event", example: "Graduating was a milestone in my life." },
+      { word: "rooftop", def: "the top surface of a building", example: "We installed solar panels on our rooftop." },
+      { word: "fossil fuels", def: "coal, oil, and natural gas", example: "We need to reduce our dependence on fossil fuels." },
     ],
-    questions: [
+    questionList: [
       {
         id: "q1",
-        text: "According to the article, what percentage of communication is verbal?",
-        options: ["7%", "38%", "55%", "93%"],
+        text: "What percentage of world electricity came from renewable sources in 2024?",
+        options: ["More than 30%", "Less than 10%", "Exactly 50%", "About 20%"],
         correctIndex: 0,
+      },
+    ],
+  },
+  // Academic Texts
+  {
+    id: "academic-psychology",
+    icon: "🧠",
+    title: "Understanding Memory",
+    type: "Academic Text",
+    level: "B2",
+    description: "How human memory works and why we forget things.",
+    readMins: 8,
+    words: 540,
+    questions: 10,
+    tags: ["Psychology", "Science", "Academic"],
+    attempts: 0,
+    color: "purple",
+    body: [
+      "Human memory is a complex system that allows us to encode, store, and retrieve information. Understanding how memory works helps us learn more effectively and remember important information.",
+      "There are three main types of memory: sensory memory, short-term memory, and long-term memory. Sensory memory lasts only a few seconds and captures immediate sensory information. Short-term memory can hold information for about 20-30 seconds. Long-term memory can store information for years or even a lifetime.",
+      "Forgetting is a natural part of memory. Scientists have discovered that we forget information for several reasons. The 'decay theory' suggests that memories fade over time if not used. The 'interference theory' proposes that new information can interfere with old memories.",
+    ],
+    vocab: [
+      { word: "encode", def: "convert information into a form for storage", example: "The brain encodes visual information differently than sounds." },
+      { word: "retrieve", def: "get back stored information", example: "I couldn't retrieve his name from memory." },
+      { word: "interference", def: "something that blocks or disrupts", example: "There was interference with the signal." },
+    ],
+    questionList: [
+      {
+        id: "q1",
+        text: "How long does short-term memory typically last?",
+        options: ["A few seconds", "20-30 seconds", "Several hours", "Days"],
+        correctIndex: 1,
+      },
+    ],
+  },
+  // Essays & Opinions
+  {
+    id: "opinion-social-media",
+    icon: "📱",
+    title: "Social Media: Blessing or Curse?",
+    type: "Opinion Essay",
+    level: "C1",
+    description: "An analysis of how social media affects modern society and relationships.",
+    readMins: 10,
+    words: 650,
+    questions: 12,
+    tags: ["Society", "Technology", "Opinion"],
+    attempts: 0,
+    color: "indigo",
+    body: [
+      "Social media has fundamentally transformed how we communicate, share information, and perceive the world around us. While it offers unprecedented connectivity, it also raises concerns about privacy, mental health, and the quality of human relationships.",
+      "Proponents argue that social media democratizes information and gives voice to those previously unheard. A small business owner can reach global audiences without massive advertising budgets. Activists can organize movements and raise awareness about important causes instantly.",
+      "However, critics point to the 'echo chamber' effect where algorithms show us content that reinforces our existing beliefs. This can lead to polarization and make it harder to have constructive dialogue across different viewpoints.",
+    ],
+    vocab: [
+      { word: "unprecedented", def: "never done or known before", example: "The pandemic brought unprecedented challenges." },
+      { word: "democratizes", def: "makes accessible to everyone", example: "The internet democratizes knowledge." },
+      { word: "polarization", def: "division into two opposing groups", example: "Political polarization is increasing." },
+    ],
+    questionList: [
+      {
+        id: "q1",
+        text: "What is the 'echo chamber' effect?",
+        options: [
+          "Sound reflection in rooms",
+          "Algorithms showing content that reinforces existing beliefs",
+          "People talking loudly online",
+          "Sharing posts repeatedly"
+        ],
+        correctIndex: 1,
+      },
+    ],
+  },
+  // Practical Texts
+  {
+    id: "practical-recipe",
+    icon: "🍳",
+    title: "How to Make Perfect Pancakes",
+    type: "Practical Guide",
+    level: "A2",
+    description: "Step-by-step instructions for making delicious pancakes at home.",
+    readMins: 4,
+    words: 280,
+    questions: 5,
+    tags: ["Cooking", "Instructions", "Daily Life"],
+    recommended: true,
+    attempts: 0,
+    color: "amber",
+    body: [
+      "Making perfect pancakes is easier than you think! With just a few simple ingredients and these step-by-step instructions, you'll be making fluffy, delicious pancakes in no time.",
+      "Ingredients: 1 cup flour, 2 tablespoons sugar, 2 teaspoons baking powder, 1/2 teaspoon salt, 1 cup milk, 1 egg, 2 tablespoons melted butter.",
+      "Instructions: First, mix the dry ingredients (flour, sugar, baking powder, and salt) in a large bowl. In another bowl, whisk together the milk, egg, and melted butter. Pour the wet ingredients into the dry ingredients and stir gently until just combined. Don't overmix - a few lumps are okay!",
+      "Heat a pan over medium heat and add a little butter. Pour 1/4 cup of batter for each pancake. Cook until bubbles form on the surface, then flip and cook until golden brown. Serve hot with your favorite toppings!",
+    ],
+    vocab: [
+      { word: "fluffy", def: "light and soft", example: "The cake was fluffy and delicious." },
+      { word: "whisk", def: "mix quickly with a tool or fork", example: "Whisk the eggs until smooth." },
+      { word: "batter", def: "mixture of flour, liquid, etc. for cooking", example: "Pour the batter into the pan." },
+    ],
+    questionList: [
+      {
+        id: "q1",
+        text: "What should you do if the batter has a few lumps?",
+        options: [
+          "Start over",
+          "Keep mixing for 10 minutes",
+          "It's okay, don't overmix",
+          "Add more milk"
+        ],
+        correctIndex: 2,
       },
     ],
   },
 ];
 
 export default function ReadingPage() {
-  const [tab, setTab] = useState<TabKey>("stories");
-  const [selectedArticle, setSelectedArticle] = useState<typeof SAMPLE_ARTICLES[0] | null>(null);
+  const [filterType, setFilterType] = useState<string>("All types");
+  const [selectedTask, setSelectedTask] = useState<ReadingTask | null>(null);
   const [fontScale, setFontScale] = useState(1);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [showResults, setShowResults] = useState(false);
 
-  const filteredArticles = SAMPLE_ARTICLES; // In production, filter by tab
+  // Filter tasks by type
+  const filteredTasks = filterType === "All types" 
+    ? READING_TASKS 
+    : READING_TASKS.filter(task => task.type === filterType);
+
+  const uniqueTypes = ["All types", ...Array.from(new Set(READING_TASKS.map(t => t.type)))];
 
   const decFont = () => setFontScale((n) => Math.max(0.8, +(n - 0.1).toFixed(2)));
   const incFont = () => setFontScale((n) => Math.min(1.5, +(n + 0.1).toFixed(2)));
@@ -140,17 +253,18 @@ export default function ReadingPage() {
   };
 
   const calculateScore = () => {
-    if (!selectedArticle) return 0;
+    if (!selectedTask) return 0;
     let correct = 0;
-    selectedArticle.questions.forEach((q) => {
+    selectedTask.questionList.forEach((q) => {
       if (answers[q.id] === q.correctIndex) correct++;
     });
-    return Math.round((correct / selectedArticle.questions.length) * 100);
+    return Math.round((correct / selectedTask.questionList.length) * 100);
   };
 
-  if (selectedArticle) {
-    const currentQ = selectedArticle.questions[currentQuestion];
-    const totalQuestions = selectedArticle.questions.length;
+  // Article reading view
+  if (selectedTask) {
+    const currentQ = selectedTask.questionList[currentQuestion];
+    const totalQuestions = selectedTask.questionList.length;
     const progress = ((currentQuestion + 1) / totalQuestions) * 100;
 
     return (
@@ -161,7 +275,12 @@ export default function ReadingPage() {
             <div className="toolbar">
               <button 
                 className="btn sm"
-                onClick={() => setSelectedArticle(null)}
+                onClick={() => {
+                  setSelectedTask(null);
+                  setAnswers({});
+                  setShowResults(false);
+                  setCurrentQuestion(0);
+                }}
               >
                 ← Back to List
               </button>
@@ -180,18 +299,46 @@ export default function ReadingPage() {
             </div>
 
             <div className="reading" style={{ fontSize: `${fontScale}rem` }}>
-              <h2>{selectedArticle.title}</h2>
-              {selectedArticle.body.map((p, i) => (
+              <h2>{selectedTask.title}</h2>
+              {selectedTask.body.map((p, i) => (
                 <p key={i}>{p}</p>
               ))}
 
               <div className="vocab-section card soft">
                 <h4>📚 Vocabulary</h4>
-                {selectedArticle.vocab.map((v) => (
+                {selectedTask.vocab.map((v) => (
                   <div key={v.word} className="vocab-row">
-                    <div className="w">{v.word}</div>
-                    <div className="d">{v.def}</div>
-                    <button className="btn xs">+ Add to List</button>
+                    <div>
+                      <div className="w">{v.word}</div>
+                      <div className="d">{v.def}</div>
+                      <div className="example" style={{ fontSize: "13px", fontStyle: "italic", color: "#6b7280", marginTop: "4px" }}>
+                        Example: {v.example}
+                      </div>
+                    </div>
+                    <div style={{ display: "flex", gap: "8px" }}>
+                      <button 
+                        className="btn xs"
+                        onClick={async () => {
+                          try {
+                            const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${v.word}`);
+                            if (response.ok) {
+                              const data = await response.json();
+                              const audioUrl = data[0]?.phonetics?.find((p: any) => p.audio)?.audio;
+                              if (audioUrl) {
+                                const audio = new Audio(audioUrl);
+                                audio.play();
+                              }
+                            }
+                          } catch (e) {
+                            console.error("Audio error:", e);
+                          }
+                        }}
+                        title="Play pronunciation"
+                      >
+                        🔊
+                      </button>
+                      <button className="btn xs">+ Add to List</button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -208,15 +355,15 @@ export default function ReadingPage() {
                   <div className="fill" style={{ width: `${progress}%` }} />
                 </div>
 
-            <div className="qcard">
-              <div className="qhead">
+                <div className="qcard">
+                  <div className="qhead">
                     <span>Question {currentQuestion + 1} of {totalQuestions}</span>
-                <span className="muted">Multiple Choice</span>
-              </div>
+                    <span className="muted">Multiple Choice</span>
+                  </div>
                   <div className="qtext">{currentQ.text}</div>
-              <div className="opts">
+                  <div className="opts">
                     {currentQ.options.map((option, i) => (
-                  <label key={i} className="opt">
+                      <label key={i} className="opt">
                         <input
                           type="radio"
                           name={`q${currentQuestion}`}
@@ -224,10 +371,10 @@ export default function ReadingPage() {
                           onChange={() => handleAnswerSelect(currentQ.id, i)}
                         />
                         <span>{option}</span>
-                  </label>
-                ))}
-              </div>
-              <div className="qactions">
+                      </label>
+                    ))}
+                  </div>
+                  <div className="qactions">
                     <button
                       className="btn btn--outline"
                       disabled={currentQuestion === 0}
@@ -263,13 +410,13 @@ export default function ReadingPage() {
                   {calculateScore()}%
                 </div>
                 <p className="muted">
-                  You got {Object.keys(answers).filter(k => answers[k] === selectedArticle.questions.find(q => q.id === k)?.correctIndex).length} out of {totalQuestions} questions correct!
+                  You got {Object.keys(answers).filter(k => answers[k] === selectedTask.questionList.find(q => q.id === k)?.correctIndex).length} out of {totalQuestions} questions correct!
                 </p>
                 <button
                   className="btn btn--primary w-full"
                   style={{ marginTop: "20px" }}
                   onClick={() => {
-                    setSelectedArticle(null);
+                    setSelectedTask(null);
                     setAnswers({});
                     setShowResults(false);
                     setCurrentQuestion(0);
@@ -285,6 +432,7 @@ export default function ReadingPage() {
     );
   }
 
+  // Task selection view
   return (
     <div className="dashboard-content">
       {/* Page Header */}
@@ -310,62 +458,85 @@ export default function ReadingPage() {
         </div>
       </section>
 
-      {/* Tabs */}
-      <div className="card tabs">
-        {[
-          ["stories", "Short Stories", "Truyện ngắn"],
-          ["news", "News Articles", "Bài báo"],
-          ["academic", "Academic Texts", "Văn bản học thuật"],
-          ["essays", "Essays & Opinions", "Bài luận"],
-          ["practical", "Practical Texts", "Văn bản thực tế"],
-        ].map(([k, label, sub]) => (
-          <button
-            key={k}
-            className={`tab ${tab === k ? "active" : ""}`}
-            onClick={() => setTab(k as TabKey)}
+      {/* Filter dropdown */}
+      <div className="card" style={{ padding: "16px", marginBottom: "16px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <label htmlFor="type-filter" style={{ fontWeight: 600 }}>
+            Filter by type:
+          </label>
+          <select
+            id="type-filter"
+            className="select"
+            value={filterType}
+            onChange={(e) => setFilterType(e.target.value)}
+            style={{ width: "250px" }}
           >
-            {label}
-            <br />
-            <small className="tab-sub">{sub}</small>
-          </button>
-        ))}
+            {uniqueTypes.map((type) => (
+              <option key={type} value={type}>
+                {type}
+              </option>
+            ))}
+          </select>
+          <span className="muted" style={{ marginLeft: "auto" }}>
+            {filteredTasks.length} article{filteredTasks.length !== 1 ? "s" : ""} available
+          </span>
+        </div>
       </div>
 
-      {/* Articles List */}
+      {/* Task Cards Grid */}
       <section className="card">
-        <h3>Available Articles</h3>
-        <div className="articles">
-          {filteredArticles.map((article) => (
-            <article key={article.id} className="article">
-              <div className="thumb">
-                <div className="ph">{article.icon}</div>
+        <h3 className="section-title" style={{ marginBottom: "20px" }}>
+          Choose a Reading Task
+        </h3>
+        <div className="task-grid">
+          {filteredTasks.map((task) => (
+            <div key={task.id} className={`task-card task-card-${task.color}`}>
+              {task.recommended && (
+                <div className="task-badge">
+                  <span>⭐ Recommended</span>
+                </div>
+              )}
+              
+              <div className="task-icon">{task.icon}</div>
+              
+              <div className="task-content">
+                <h4 className="task-title">{task.title}</h4>
+                <span className={`task-type ${task.color}`}>{task.type}</span>
+                <p className="muted" style={{ fontSize: "13px", marginTop: "8px" }}>
+                  {task.description}
+                </p>
               </div>
-              <div className="content">
-                <h4>{article.title}</h4>
-                <p className="muted">{article.description}</p>
-                <div className="meta">
-                  <span className={`level level-${article.level.toLowerCase()}`}>
-                    {article.level}
+
+              <div className="task-meta">
+                <span className="chip">{task.level} Level</span>
+                <span className="chip">🕐 {task.readMins} min</span>
+                <span className="chip">{task.words} words</span>
+                <span className="chip">🧠 {task.questions} Qs</span>
+              </div>
+
+              <div className="tags" style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginTop: "8px" }}>
+                {task.tags.map((tag) => (
+                  <span key={tag} className="tag" style={{ fontSize: "11px", padding: "3px 8px" }}>
+                    {tag}
                   </span>
-                  <span>🕐 {article.readMins} min</span>
-                  <span>{article.words} words</span>
-                  <span>🧠 {article.questions.length} questions</span>
-                </div>
-                <div className="tags">
-                  {article.tags.map((t) => (
-                    <span key={t} className="tag">
-                      {t}
-                    </span>
-                  ))}
-                </div>
-                <button
-                  className="btn btn--primary"
-                  onClick={() => setSelectedArticle(article)}
-                >
-                  Start Reading
-                </button>
+                ))}
               </div>
-            </article>
+
+              <div className="task-status">
+                {task.attempts > 0 ? (
+                  <span className="status-text">{task.attempts} attempt{task.attempts !== 1 ? "s" : ""}</span>
+                ) : (
+                  <span className="status-text muted">No attempts yet</span>
+                )}
+              </div>
+
+              <button
+                className="btn primary w-full"
+                onClick={() => setSelectedTask(task)}
+              >
+                ▶ Start Reading
+              </button>
+            </div>
           ))}
         </div>
       </section>

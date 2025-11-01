@@ -1,0 +1,245 @@
+{
+  "questions": [
+    {
+      "id": "q1",
+      "type": "grammar",
+      "difficulty": "A1",
+      "question": "I ___ a student.",
+      "options": ["am", "is", "are", "be"],
+      "correct": 0,
+      "explanation": "Use 'am' with 'I'"
+    },
+    {
+      "id": "q2",
+      "type": "vocabulary",
+      "difficulty": "A1",
+      "question": "What is the opposite of 'hot'?",
+      "options": ["warm", "cold", "cool", "wet"],
+      "correct": 1,
+      "explanation": "Cold is the opposite of hot"
+    },
+    {
+      "id": "q3",
+      "type": "grammar",
+      "difficulty": "A1",
+      "question": "She ___ to school every day.",
+      "options": ["go", "goes", "going", "went"],
+      "correct": 1,
+      "explanation": "Use 'goes' with third person singular in present simple"
+    },
+    {
+      "id": "q4",
+      "type": "reading",
+      "difficulty": "A2",
+      "context": "Tom likes apples. He eats an apple every morning for breakfast.",
+      "question": "When does Tom eat apples?",
+      "options": ["In the evening", "In the morning", "At lunch", "At night"],
+      "correct": 1,
+      "explanation": "The text says 'every morning for breakfast'"
+    },
+    {
+      "id": "q5",
+      "type": "grammar",
+      "difficulty": "A2",
+      "question": "I ___ to London last year.",
+      "options": ["go", "goes", "went", "going"],
+      "correct": 2,
+      "explanation": "Use past simple 'went' for completed actions in the past"
+    },
+    {
+      "id": "q6",
+      "type": "vocabulary",
+      "difficulty": "A2",
+      "question": "A person who teaches students is a ___.",
+      "options": ["doctor", "teacher", "nurse", "driver"],
+      "correct": 1,
+      "explanation": "A teacher teaches students"
+    },
+    {
+      "id": "q7",
+      "type": "grammar",
+      "difficulty": "B1",
+      "question": "If I ___ rich, I would travel the world.",
+      "options": ["am", "was", "were", "will be"],
+      "correct": 2,
+      "explanation": "Use 'were' in second conditional with all subjects"
+    },
+    {
+      "id": "q8",
+      "type": "reading",
+      "difficulty": "B1",
+      "context": "Despite the heavy rain, the match continued. The players were determined to finish the game.",
+      "question": "What does 'despite' mean in this context?",
+      "options": ["Because of", "Although there was", "After", "Before"],
+      "correct": 1,
+      "explanation": "'Despite' means 'although there was' or 'in spite of'"
+    },
+    {
+      "id": "q9",
+      "type": "grammar",
+      "difficulty": "B1",
+      "question": "The book ___ by millions of people.",
+      "options": ["reads", "is read", "was reading", "has reading"],
+      "correct": 1,
+      "explanation": "Use passive voice 'is read' when the subject receives the action"
+    },
+    {
+      "id": "q10",
+      "type": "vocabulary",
+      "difficulty": "B1",
+      "question": "To 'procrastinate' means to ___.",
+      "options": ["work hard", "delay doing something", "finish quickly", "start immediately"],
+      "correct": 1,
+      "explanation": "Procrastinate means to delay or postpone something"
+    },
+    {
+      "id": "q11",
+      "type": "grammar",
+      "difficulty": "B2",
+      "question": "By the time you arrive, I ___ dinner.",
+      "options": ["will finish", "will have finished", "finish", "finished"],
+      "correct": 1,
+      "explanation": "Use future perfect for actions completed before a future time"
+    },
+    {
+      "id": "q12",
+      "type": "reading",
+      "difficulty": "B2",
+      "context": "The advent of artificial intelligence has revolutionized numerous industries, from healthcare to finance. However, concerns about job displacement and ethical implications remain prevalent.",
+      "question": "What is the main concern mentioned about AI?",
+      "options": ["Cost", "Complexity", "Job loss and ethics", "Speed"],
+      "correct": 2,
+      "explanation": "The text mentions 'job displacement and ethical implications'"
+    },
+    {
+      "id": "q13",
+      "type": "vocabulary",
+      "difficulty": "B2",
+      "question": "The word 'ubiquitous' means ___.",
+      "options": ["rare", "expensive", "everywhere", "unique"],
+      "correct": 2,
+      "explanation": "Ubiquitous means present or found everywhere"
+    },
+    {
+      "id": "q14",
+      "type": "grammar",
+      "difficulty": "B2",
+      "question": "She suggested ___ a break before continuing.",
+      "options": ["to take", "taking", "take", "taken"],
+      "correct": 1,
+      "explanation": "'Suggest' is followed by gerund (verb + -ing)"
+    },
+    {
+      "id": "q15",
+      "type": "grammar",
+      "difficulty": "C1",
+      "question": "Scarcely ___ arrived when the meeting started.",
+      "options": ["I had", "had I", "I have", "have I"],
+      "correct": 1,
+      "explanation": "Negative adverbs like 'scarcely' require inversion"
+    },
+    {
+      "id": "q16",
+      "type": "reading",
+      "difficulty": "C1",
+      "context": "The juxtaposition of modernist architecture with historical buildings creates a striking aesthetic dichotomy that exemplifies the city's evolution.",
+      "question": "What does 'juxtaposition' refer to?",
+      "options": ["Separation", "Placement side by side", "Destruction", "Renovation"],
+      "correct": 1,
+      "explanation": "Juxtaposition means placing things side by side for comparison"
+    },
+    {
+      "id": "q17",
+      "type": "vocabulary",
+      "difficulty": "C1",
+      "question": "To 'obfuscate' means to ___.",
+      "options": ["clarify", "confuse or make unclear", "simplify", "organize"],
+      "correct": 1,
+      "explanation": "Obfuscate means to make something unclear or confusing"
+    },
+    {
+      "id": "q18",
+      "type": "grammar",
+      "difficulty": "C1",
+      "question": "The company, ___ profits have soared, plans to expand.",
+      "options": ["which", "whose", "that", "who"],
+      "correct": 1,
+      "explanation": "Use 'whose' to show possession in relative clauses"
+    },
+    {
+      "id": "q19",
+      "type": "grammar",
+      "difficulty": "C2",
+      "question": "Were it not for your help, I ___ failed.",
+      "options": ["would have", "will have", "would", "will"],
+      "correct": 0,
+      "explanation": "Third conditional with inversion: 'Were it not for' = 'If it were not for'"
+    },
+    {
+      "id": "q20",
+      "type": "reading",
+      "difficulty": "C2",
+      "context": "The epistemological implications of quantum mechanics challenge our fundamental understanding of causality and determinism, forcing us to reconsider the very nature of scientific inquiry.",
+      "question": "What does 'epistemological' relate to?",
+      "options": ["Ethics", "Knowledge and understanding", "Physics", "Mathematics"],
+      "correct": 1,
+      "explanation": "Epistemology is the study of knowledge and how we know things"
+    },
+    {
+      "id": "q21",
+      "type": "vocabulary",
+      "difficulty": "C2",
+      "question": "An 'ephemeral' phenomenon is one that is ___.",
+      "options": ["permanent", "short-lived", "invisible", "ancient"],
+      "correct": 1,
+      "explanation": "Ephemeral means lasting for a very short time"
+    },
+    {
+      "id": "q22",
+      "type": "grammar",
+      "difficulty": "C2",
+      "question": "The committee's decision ___ on the proviso that funding be secured.",
+      "options": ["contingent is", "is contingent", "contingent", "being contingent"],
+      "correct": 1,
+      "explanation": "Correct word order with 'is contingent on'"
+    },
+    {
+      "id": "q23",
+      "type": "listening",
+      "difficulty": "A2",
+      "audio_text": "The train arrives at 3 PM.",
+      "question": "What time does the train arrive?",
+      "options": ["2 PM", "3 PM", "4 PM", "5 PM"],
+      "correct": 1,
+      "explanation": "The audio says '3 PM'"
+    },
+    {
+      "id": "q24",
+      "type": "listening",
+      "difficulty": "B1",
+      "audio_text": "I'm planning to visit my grandmother next weekend if the weather is good.",
+      "question": "When will the speaker visit their grandmother?",
+      "options": ["Today", "Tomorrow", "Next weekend", "Next month"],
+      "correct": 2,
+      "explanation": "The speaker says 'next weekend'"
+    },
+    {
+      "id": "q25",
+      "type": "grammar",
+      "difficulty": "A1",
+      "question": "This is ___ book.",
+      "options": ["my", "mine", "me", "I"],
+      "correct": 0,
+      "explanation": "Use 'my' before a noun to show possession"
+    }
+  ],
+  "scoring": {
+    "A1": { "min": 0, "max": 5, "cefr": "A1", "description": "Beginner" },
+    "A2": { "min": 6, "max": 10, "cefr": "A2", "description": "Elementary" },
+    "B1": { "min": 11, "max": 14, "cefr": "B1", "description": "Intermediate" },
+    "B2": { "min": 15, "max": 18, "cefr": "B2", "description": "Upper Intermediate" },
+    "C1": { "min": 19, "max": 22, "cefr": "C1", "description": "Advanced" },
+    "C2": { "min": 23, "max": 25, "cefr": "C2", "description": "Proficient" }
+  }
+}
+

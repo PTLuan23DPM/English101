@@ -5,14 +5,20 @@ import { toast } from "sonner";
 
 interface AIAssistantProps {
   text: string;
-  onSuggestionAccept?: (suggestion: string) => void;
+  textareaRef?: React.RefObject<HTMLTextAreaElement | null>;
+  onSuggestionAccept?: (replacement: string, offset: number, length: number) => void;
 }
 
 interface GrammarIssue {
   type: string;
   message: string;
+  short_message?: string;
   sentence_index: number;
   severity: "error" | "warning" | "info";
+  offset?: number;
+  length?: number;
+  context?: string;
+  replacements?: Array<{ value: string }>;
 }
 
 interface Suggestion {
@@ -21,15 +27,22 @@ interface Suggestion {
   example?: string;
 }
 
-export default function AIAssistant({ text, onSuggestionAccept }: AIAssistantProps) {
+export default function AIAssistant({ text, textareaRef, onSuggestionAccept }: AIAssistantProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [grammarIssues, setGrammarIssues] = useState<GrammarIssue[]>([]);
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [activeTab, setActiveTab] = useState<"grammar" | "suggestions">("grammar");
+  const [selectedIssue, setSelectedIssue] = useState<number | null>(null);
 
   const checkGrammar = async () => {
-    if (!text || text.trim().length < 10) {
+    // Get text directly from textarea to ensure we have the latest content
+    let currentText = text;
+    if (textareaRef?.current) {
+      currentText = textareaRef.current.value;
+    }
+
+    if (!currentText || currentText.trim().length < 10) {
       toast.error("Not enough text", {
         description: "Write at least a few sentences to check grammar",
       });
@@ -41,7 +54,7 @@ export default function AIAssistant({ text, onSuggestionAccept }: AIAssistantPro
       const response = await fetch("http://localhost:5001/grammar-check", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text }),
+        body: JSON.stringify({ text: currentText }),
       });
 
       if (!response.ok) {
@@ -49,17 +62,29 @@ export default function AIAssistant({ text, onSuggestionAccept }: AIAssistantPro
       }
 
       const data = await response.json();
-      setGrammarIssues(data.issues || []);
+      const issues = data.issues || [];
+      
+      console.log('Grammar check response:', {
+        issue_count: data.issue_count,
+        issues_length: issues.length,
+        issues: issues
+      });
+      
+      setGrammarIssues(issues);
       setActiveTab("grammar");
+      setSelectedIssue(null); // Reset selection
 
-      if (data.issues.length === 0) {
+      if (issues.length === 0) {
         toast.success("Great work!", {
           description: "No grammar issues found!",
         });
       } else {
-        toast.info(`Found ${data.issues.length} issue(s)`, {
-          description: "Check the AI Assistant panel for details",
+        toast.success(`Found ${issues.length} issue(s)`, {
+          description: `Click on any issue below to highlight it in your text. Issues are highlighted in red.`,
+          duration: 5000,
         });
+        // Don't auto-highlight first issue - let user choose
+        setSelectedIssue(null);
       }
     } catch (error) {
       console.error("Grammar check error:", error);
@@ -157,6 +182,63 @@ export default function AIAssistant({ text, onSuggestionAccept }: AIAssistantPro
       toast.error("Failed to generate suggestions");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const highlightIssue = (offset: number, length: number) => {
+    if (!textareaRef?.current) return;
+    
+    const textarea = textareaRef.current;
+    const currentText = textarea.value;
+    
+    // Validate offset is within text bounds
+    if (offset < 0 || offset >= currentText.length) {
+      console.warn(`Invalid offset: ${offset} for text length: ${currentText.length}`);
+      return;
+    }
+    
+    // Ensure length doesn't exceed text bounds
+    const validLength = Math.min(length, currentText.length - offset);
+    
+    // Add error-highlight class for visual feedback
+    textarea.classList.add('error-highlight');
+    
+    textarea.focus();
+    textarea.setSelectionRange(offset, offset + validLength);
+    
+    // Scroll into view - better calculation
+    const textBefore = currentText.substring(0, offset);
+    const linesBefore = textBefore.split('\n').length - 1;
+    
+    // Calculate scroll position more accurately
+    const lineHeight = parseInt(getComputedStyle(textarea).lineHeight) || 24;
+    const paddingTop = parseInt(getComputedStyle(textarea).paddingTop) || 16;
+    const targetScrollTop = linesBefore * lineHeight - paddingTop - 100;
+    
+    textarea.scrollTop = Math.max(0, targetScrollTop);
+    
+    // Remove highlight class after a delay to allow user to see it
+    setTimeout(() => {
+      textarea.classList.remove('error-highlight');
+    }, 2000);
+  };
+
+  const handleIssueClick = (issue: GrammarIssue, index: number) => {
+    setSelectedIssue(index);
+    if (issue.offset !== undefined && issue.length !== undefined) {
+      highlightIssue(issue.offset, issue.length);
+    }
+  };
+
+  const handleSuggestionClick = (issue: GrammarIssue, replacement: string) => {
+    if (issue.offset !== undefined && issue.length !== undefined && onSuggestionAccept) {
+      onSuggestionAccept(replacement, issue.offset, issue.length);
+      toast.success("Text replaced", {
+        description: `Replaced with: "${replacement}"`,
+      });
+      // Remove this issue from list after replacement
+      setGrammarIssues((prev) => prev.filter((item) => item !== issue));
+      setSelectedIssue(null);
     }
   };
 
@@ -278,12 +360,61 @@ export default function AIAssistant({ text, onSuggestionAccept }: AIAssistantPro
                     <span>Click "Check Grammar" to analyze your text</span>
                   </div>
                 ) : (
-                  grammarIssues.map((issue, index) => (
-                    <div key={index} className={`ai-issue ai-issue--${issue.severity}`}>
-                      <div className="ai-issue__type">{issue.type}</div>
+                  grammarIssues.map((issue, index) => {
+                    // Create unique key based on offset and index
+                    const uniqueKey = `issue-${issue.offset || 0}-${issue.length || 0}-${index}`;
+                    return (
+                    <div 
+                      key={uniqueKey}
+                      className={`ai-issue ai-issue--${issue.severity} ${selectedIssue === index ? 'ai-issue--selected' : ''}`}
+                      onClick={() => handleIssueClick(issue, index)}
+                    >
+                      <div className="ai-issue__header">
+                        <div className="ai-issue__index">#{index + 1}</div>
+                        <div className="ai-issue__type">{issue.type}</div>
+                        {issue.short_message && (
+                          <div className="ai-issue__short">{issue.short_message}</div>
+                        )}
+                      </div>
                       <div className="ai-issue__message">{issue.message}</div>
+                      {issue.offset !== undefined && (
+                        <div className="ai-issue__location">
+                          Position: {issue.offset} (length: {issue.length || 1})
+                        </div>
+                      )}
+                      {issue.context && (
+                        <div className="ai-issue__context">
+                          <span className="ai-issue__context-label">Context:</span>
+                          <code>
+                            {typeof issue.context === 'string' 
+                              ? issue.context 
+                              : (issue.context as any)?.text || JSON.stringify(issue.context)}
+                          </code>
+                        </div>
+                      )}
+                      {issue.replacements && issue.replacements.length > 0 && (
+                        <div className="ai-issue__replacements">
+                          <span className="ai-issue__replacements-label">Suggestions:</span>
+                          <div className="ai-issue__replacements-list">
+                            {issue.replacements.map((rep, idx) => (
+                              <button
+                                key={idx}
+                                className="ai-issue__replacement"
+                                onClick={(e) => {
+                                  e.stopPropagation(); // Prevent issue click
+                                  handleSuggestionClick(issue, rep.value);
+                                }}
+                                title="Click to replace the error with this suggestion"
+                              >
+                                {rep.value}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  ))
+                    );
+                  })
                 )}
               </div>
             ) : (

@@ -43,17 +43,33 @@ export async function middleware(request: NextRequest) {
 
   const isLoggedIn = !!token;
   const placementTestCompleted = token?.placementTestCompleted ?? false;
+  const userRole = (token?.role as "USER" | "ADMIN") || "USER";
 
   // Check if the current route is protected
   const isProtectedRoute = protectedRoutes.some((route) =>
     pathname.startsWith(route)
   );
 
+  // Check if the current route is an admin route
+  const isAdminRoute = pathname.startsWith("/admin-dashboard");
+
   // Check if the current route is an auth route
   const isAuthRoute = authRoutes.some((route) => pathname.startsWith(route));
 
   // Check if this is the placement test route
   const isPlacementTestRoute = pathname.startsWith("/placement-test");
+
+  // Protect admin routes - only ADMIN role can access
+  if (isAdminRoute) {
+    if (!isLoggedIn) {
+      const url = new URL("/authentication/login", request.url);
+      url.searchParams.set("callbackUrl", pathname);
+      return NextResponse.redirect(url);
+    }
+    if (userRole !== "ADMIN") {
+      return NextResponse.redirect(new URL("/english/dashboard", request.url));
+    }
+  }
 
   // If the user is not logged in and trying to access a protected route
   if (isProtectedRoute && !isLoggedIn) {

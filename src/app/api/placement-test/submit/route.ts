@@ -4,6 +4,8 @@ import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
+  let userId: string | undefined;
+  
   try {
     const session = await getServerSession(authOptions);
 
@@ -11,12 +13,27 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    userId = session.user.id;
+
     // Check if prisma is initialized
     if (!prisma) {
       console.error("Prisma client is not initialized");
       return NextResponse.json(
         { error: "Database connection error" },
         { status: 500 }
+      );
+    }
+
+    // Verify user exists in database
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      console.error(`User not found in database: ${userId}`);
+      return NextResponse.json(
+        { error: "User not found. Please sign in again." },
+        { status: 404 }
       );
     }
 
@@ -62,7 +79,7 @@ export async function POST(req: NextRequest) {
     // Save test result
     const testResult = await prisma.placementTestResult.create({
       data: {
-        userId: session.user.id,
+        userId: userId,
         score,
         totalQuestions,
         cefrLevel,
@@ -72,7 +89,7 @@ export async function POST(req: NextRequest) {
 
     // Update user's level and mark test as completed
     await prisma.user.update({
-      where: { id: session.user.id },
+      where: { id: userId },
       data: {
         placementTestCompleted: true,
         cefrLevel,
@@ -103,6 +120,10 @@ export async function POST(req: NextRequest) {
       errorMessage = "Test result already exists";
     } else if (error?.code === "P2025") {
       errorMessage = "User not found";
+    } else if (error?.code === "P2003") {
+      // Foreign key constraint violation
+      errorMessage = "Invalid user session. Please sign in again.";
+      console.error("Foreign key constraint violation - user ID may not exist in database:", userId);
     }
     
     return NextResponse.json(

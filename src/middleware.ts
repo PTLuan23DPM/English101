@@ -62,6 +62,13 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  // Placement test requires authentication - redirect to login if not logged in
+  if (isPlacementTestRoute && !isLoggedIn) {
+    const url = new URL("/authentication/login", request.url);
+    url.searchParams.set("callbackUrl", "/placement-test");
+    return NextResponse.redirect(url);
+  }
+
   // If user is logged in but hasn't completed placement test
   if (isLoggedIn && !placementTestCompleted && isProtectedRoute && !isPlacementTestRoute) {
     return NextResponse.redirect(new URL("/placement-test", request.url));
@@ -73,13 +80,13 @@ export async function middleware(request: NextRequest) {
   }
 
   // If the user is logged in and trying to access auth routes
-  if (isAuthRoute && isLoggedIn) {
-    // If they haven't completed placement test, send them there
-    if (!placementTestCompleted) {
-      return NextResponse.redirect(new URL("/placement-test", request.url));
-    }
+  // Allow them to complete the auth process first
+  // Only redirect if they're already fully authenticated and completed placement test
+  if (isAuthRoute && isLoggedIn && placementTestCompleted) {
     return NextResponse.redirect(new URL("/english/dashboard", request.url));
   }
+  // If logged in but not completed placement test, allow access to auth pages
+  // (they might be in the middle of registration/login process)
 
   // Redirect from root /english to dashboard if logged in
   if (pathname === "/english" && isLoggedIn) {

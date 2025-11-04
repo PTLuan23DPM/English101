@@ -321,8 +321,8 @@ export default function WritingPage() {
     toast.loading("Scoring your writing...", { id: "scoring" });
 
     try {
-      // Call Python scoring service
-      const response = await fetch("http://localhost:5001/score", {
+      // Call Next.js API route which proxies to Python service
+      const response = await fetch("/api/writing/score", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -332,22 +332,30 @@ export default function WritingPage() {
       });
 
       if (!response.ok) {
-        throw new Error("Scoring service unavailable");
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Scoring service unavailable");
       }
 
       const result: ScoringResult = await response.json();
       setScoringResult(result);
       setSubmitted(true);
 
-      toast.success("Scoring complete!", {
-        id: "scoring",
-        description: `Your CEFR level: ${result.cefr_level}`,
-      });
+      if (result.using_fallback || !result.service_available) {
+        toast.success("Scoring complete! (Using fallback mode)", {
+          id: "scoring",
+          description: `Your CEFR level: ${result.cefr_level}. Python service unavailable.`,
+        });
+      } else {
+        toast.success("Scoring complete!", {
+          id: "scoring",
+          description: `Your CEFR level: ${result.cefr_level}`,
+        });
+      }
     } catch (error) {
       console.error("Scoring error:", error);
       toast.error("Scoring failed", {
         id: "scoring",
-        description: "Make sure Python service is running on port 5001",
+        description: error instanceof Error ? error.message : "Please try again",
       });
 
       // Fallback to mock scoring
@@ -464,14 +472,16 @@ export default function WritingPage() {
                 </span>
             </div>
 
-              <textarea
-                ref={textareaRef}
-                className={`editor ${timerExpired ? "disabled" : ""}`}
-                placeholder="Start writing here..."
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-                disabled={timerExpired}
-              />
+              <div className="editor-wrapper" style={{ position: "relative" }}>
+                <textarea
+                  ref={textareaRef}
+                  className={`editor ${timerExpired ? "disabled" : ""}`}
+                  placeholder="Start writing here..."
+                  value={text}
+                  onChange={(e) => setText(e.target.value)}
+                  disabled={timerExpired}
+                />
+              </div>
 
             <div className="editor-footer">
               <div className="small muted">
@@ -693,17 +703,75 @@ export default function WritingPage() {
           text={text}
           textareaRef={textareaRef}
           onSuggestionAccept={(replacement, offset, length) => {
+            // Get current text from textarea (most up-to-date)
+            const currentText = textareaRef.current?.value || text;
+            
+            // Validate offset
+            if (offset < 0 || offset >= currentText.length) {
+              console.error("Invalid replacement offset:", offset, "for text length:", currentText.length);
+              return;
+            }
+            
+            // Ensure length doesn't exceed text bounds
+            const validLength = Math.min(length, currentText.length - offset);
+            
+            // Get context around replacement area
+            const textBefore = currentText.substring(0, offset);
+            const textAfter = currentText.substring(offset + validLength);
+            
+            // Note: replacement is already normalized in AIAssistant
+            // Just ensure proper spacing around it
+            let finalReplacement = replacement.trim();
+            
+            // Check if we need space before replacement
+            const charBefore = textBefore[textBefore.length - 1];
+            const needsSpaceBefore = charBefore && 
+              !/\s/.test(charBefore) && 
+              !charBefore.match(/[.,!?;:(]/) &&
+              !finalReplacement.match(/^[.,!?;:)]/);
+            
+            // Check if we need space after replacement  
+            const charAfter = textAfter[0];
+            const needsSpaceAfter = charAfter && 
+              !/\s/.test(charAfter) && 
+              !charAfter.match(/[.,!?;:)]/) &&
+              !finalReplacement.match(/[.,!?;:(]$/);
+            
+            // Add spaces if needed
+            if (needsSpaceBefore) {
+              finalReplacement = ' ' + finalReplacement;
+            }
+            if (needsSpaceAfter) {
+              finalReplacement = finalReplacement + ' ';
+            }
+            
             // Replace text at specific offset and length
-            const newText = text.substring(0, offset) + replacement + text.substring(offset + length);
+            const newText = textBefore + finalReplacement + textAfter;
             setText(newText);
             
-            // Set cursor after replaced text
+            // Set cursor after replaced text with smooth scroll
             if (textareaRef.current) {
-              setTimeout(() => {
-                const newCursorPos = offset + replacement.length;
-                textareaRef.current?.focus();
-                textareaRef.current?.setSelectionRange(newCursorPos, newCursorPos);
-              }, 0);
+              // Use requestAnimationFrame for smooth updates
+              requestAnimationFrame(() => {
+                const newCursorPos = offset + finalReplacement.length;
+                const textarea = textareaRef.current;
+                if (textarea) {
+                  textarea.focus();
+                  textarea.setSelectionRange(newCursorPos, newCursorPos);
+                  
+                  // Smooth scroll to cursor position
+                  const textBeforeCursor = newText.substring(0, newCursorPos);
+                  const linesBefore = textBeforeCursor.split('\n').length - 1;
+                  const lineHeight = parseInt(getComputedStyle(textarea).lineHeight) || 24;
+                  const paddingTop = parseInt(getComputedStyle(textarea).paddingTop) || 16;
+                  const targetScrollTop = linesBefore * lineHeight - paddingTop - 50;
+                  
+                  textarea.scrollTop = Math.max(0, targetScrollTop);
+                  
+                  // Trigger input event to update word count
+                  textarea.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+              });
             }
           }}
         />

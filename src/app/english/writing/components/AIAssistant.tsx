@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { toast } from "sonner";
 
 interface AIAssistantProps {
@@ -34,6 +34,21 @@ export default function AIAssistant({ text, textareaRef, onSuggestionAccept }: A
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [activeTab, setActiveTab] = useState<"grammar" | "suggestions">("grammar");
   const [selectedIssue, setSelectedIssue] = useState<number | null>(null);
+  const [highlightedIssue, setHighlightedIssue] = useState<{ offset: number; length: number; severity: string } | null>(null);
+  const [processingReplacement, setProcessingReplacement] = useState<string | null>(null);
+
+  // Memoize sorted issues for better performance
+  const sortedIssues = useMemo(() => {
+    return [...grammarIssues].sort((a, b) => {
+      // Sort by severity first (error > warning > info)
+      const severityOrder = { error: 0, warning: 1, info: 2 };
+      const severityDiff = (severityOrder[a.severity] ?? 1) - (severityOrder[b.severity] ?? 1);
+      if (severityDiff !== 0) return severityDiff;
+      
+      // Then sort by offset
+      return (a.offset ?? 0) - (b.offset ?? 0);
+    });
+  }, [grammarIssues]);
 
   const checkGrammar = async () => {
     // Get text directly from textarea to ensure we have the latest content
@@ -51,7 +66,7 @@ export default function AIAssistant({ text, textareaRef, onSuggestionAccept }: A
 
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:5001/grammar-check", {
+      const response = await fetch("/api/writing/grammar-check", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: currentText }),
@@ -75,12 +90,12 @@ export default function AIAssistant({ text, textareaRef, onSuggestionAccept }: A
       setSelectedIssue(null); // Reset selection
 
       if (issues.length === 0) {
-        toast.success("Great work!", {
-          description: "No grammar issues found!",
+        toast.success("Great work! ✨", {
+          description: "No grammar issues found in your text!",
         });
       } else {
         toast.success(`Found ${issues.length} issue(s)`, {
-          description: `Click on any issue below to highlight it in your text. Issues are highlighted in red.`,
+          description: `Click on any issue below to highlight it in your text.`,
           duration: 5000,
         });
         // Don't auto-highlight first issue - let user choose
@@ -185,7 +200,7 @@ export default function AIAssistant({ text, textareaRef, onSuggestionAccept }: A
     }
   };
 
-  const highlightIssue = (offset: number, length: number) => {
+  const highlightIssue = (offset: number, length: number, severity: string = "error") => {
     if (!textareaRef?.current) return;
     
     const textarea = textareaRef.current;
@@ -200,8 +215,11 @@ export default function AIAssistant({ text, textareaRef, onSuggestionAccept }: A
     // Ensure length doesn't exceed text bounds
     const validLength = Math.min(length, currentText.length - offset);
     
+    // Set highlighted issue for overlay
+    setHighlightedIssue({ offset, length: validLength, severity });
+    
     // Add error-highlight class for visual feedback
-    textarea.classList.add('error-highlight');
+    textarea.classList.add('error-highlight-active');
     
     textarea.focus();
     textarea.setSelectionRange(offset, offset + validLength);
@@ -217,30 +235,238 @@ export default function AIAssistant({ text, textareaRef, onSuggestionAccept }: A
     
     textarea.scrollTop = Math.max(0, targetScrollTop);
     
-    // Remove highlight class after a delay to allow user to see it
+    // Remove highlight after a longer delay to allow user to see it
     setTimeout(() => {
-      textarea.classList.remove('error-highlight');
-    }, 2000);
+      textarea.classList.remove('error-highlight-active');
+      setHighlightedIssue(null);
+    }, 3000);
   };
 
-  const handleIssueClick = (issue: GrammarIssue, index: number) => {
+  const handleIssueClick = useCallback((issue: GrammarIssue, index: number) => {
     setSelectedIssue(index);
     if (issue.offset !== undefined && issue.length !== undefined) {
-      highlightIssue(issue.offset, issue.length);
+      highlightIssue(issue.offset, issue.length, issue.severity);
     }
-  };
+  }, []);
 
-  const handleSuggestionClick = (issue: GrammarIssue, replacement: string) => {
-    if (issue.offset !== undefined && issue.length !== undefined && onSuggestionAccept) {
-      onSuggestionAccept(replacement, issue.offset, issue.length);
-      toast.success("Text replaced", {
-        description: `Replaced with: "${replacement}"`,
-      });
-      // Remove this issue from list after replacement
-      setGrammarIssues((prev) => prev.filter((item) => item !== issue));
-      setSelectedIssue(null);
+  /**
+   * Normalize replacement text to ensure proper spacing
+   * Handles cases where words are stuck together without spaces
+   */
+  const normalizeReplacement = useCallback((
+    replacement: string,
+    originalText: string,
+    offset: number,
+    length: number
+  ): string => {
+    // Get context around the replacement
+    const textBefore = originalText.substring(Math.max(0, offset - 1), offset);
+    const textAfter = originalText.substring(offset + length, Math.min(originalText.length, offset + length + 1));
+    
+    let normalized = replacement.trim();
+    
+    // IMPORTANT: Check if it's a simple single word - don't format it
+    const isSimpleWord = (
+      (/^[a-z]+$/i.test(normalized) || /^[A-Z]+$/.test(normalized)) && 
+      normalized.length <= 25 && 
+      !normalized.includes(' ') &&
+      !normalized.includes('-')
+    );
+    
+    // If it's a simple word, only handle spacing around it, don't format the word itself
+    if (isSimpleWord) {
+      // Just ensure proper spacing around the word
+      if (textBefore && !textBefore.match(/\s$/) && !textBefore.match(/[.,!?;:(]$/)) {
+        if (!normalized.match(/^[.,!?;:)]/)) {
+          normalized = ' ' + normalized;
+        }
+      }
+      if (textAfter && !textAfter.match(/^\s/) && !textAfter.match(/^[.,!?;:)]/)) {
+        if (!normalized.match(/[.,!?;:(]$/)) {
+          normalized = normalized + ' ';
+        }
+      }
+      return normalized.trim();
     }
-  };
+    
+    // For non-simple words, apply formatting
+    // Ensure spacing before replacement if needed
+    if (textBefore && !textBefore.match(/\s$/)) {
+      if (!normalized.startsWith(' ')) {
+        if (!normalized.match(/^[.,!?;:)]/)) {
+          normalized = ' ' + normalized;
+        }
+      }
+    }
+    
+    // Ensure spacing after replacement if needed
+    if (textAfter && !textAfter.match(/^\s/)) {
+      if (!normalized.endsWith(' ')) {
+        if (!normalized.match(/[.,!?;:(]$/)) {
+          normalized = normalized + ' ';
+        }
+      }
+    }
+    
+    // Fix common spacing issues in replacement text itself
+    // Only format if it looks like words are stuck together
+    
+    // Check if it has indicators of stuck words
+    const hasMixedCase = /[a-z].*[A-Z]|[A-Z].*[a-z]/.test(normalized);
+    const isLongWord = normalized.length > 15 && !normalized.includes(' ');
+    const hasNumbers = /\d/.test(normalized);
+    
+    // Only format if there are clear indicators
+    if ((hasMixedCase || isLongWord || hasNumbers) && !normalized.includes(' ')) {
+      // Pattern 1: lowercaseLetterUppercaseLetter -> lowercaseLetter UppercaseLetter
+      // Only if followed by at least 2 lowercase letters (to avoid splitting single letters)
+      normalized = normalized.replace(/([a-z])([A-Z][a-z]{2,})/g, '$1 $2');
+      
+      // Pattern 2: WordNumber -> Word Number (require at least 2 letters)
+      normalized = normalized.replace(/([a-zA-Z]{2,})(\d)/g, '$1 $2');
+      normalized = normalized.replace(/(\d)([a-zA-Z]{2,})/g, '$1 $2');
+      
+      // Pattern 3: Split common patterns like "wordandWord" -> "word and Word"
+      // Only if word is followed by uppercase with at least 2 letters
+      const commonWords = ['and', 'or', 'but', 'the', 'a', 'an', 'is', 'are', 'was', 'were', 'has', 'have', 'had', 
+                           'this', 'that', 'these', 'those', 'for', 'from', 'with', 'about', 'into', 'onto', 'in', 
+                           'on', 'at', 'to', 'of', 'by', 'as', 'if', 'it', 'we', 'they', 'you', 'he', 'she'];
+      commonWords.forEach(word => {
+        // Only split if word is followed by uppercase with at least 2 letters
+        const regex = new RegExp(`([a-z])(\\b${word}\\b)([A-Z][a-z]{2,})`, 'gi');
+        normalized = normalized.replace(regex, '$1 $2 $3');
+      });
+      
+      // Pattern 4: Handle cases like "iphoneorder" -> "iPhone order"
+      normalized = normalized.replace(/([a-z]{2,})([A-Z][a-z]{2,})/g, (match, p1, p2) => {
+        if (p2.match(/^[A-Z][a-z]{2,}$/)) {
+          const commonEndings = ['ing', 'ed', 'er', 'ly', 'tion', 'sion'];
+          const shouldSplit = !commonEndings.some(ending => p1.endsWith(ending));
+          if (shouldSplit) {
+            return p1 + ' ' + p2;
+          }
+        }
+        return match;
+      });
+    }
+    
+    // Normalize multiple spaces to single space
+    normalized = normalized.replace(/\s+/g, ' ');
+    
+    // Remove spaces before punctuation
+    normalized = normalized.replace(/\s+([.,!?;:)])/g, '$1');
+    
+    // Ensure space after punctuation (except at end)
+    normalized = normalized.replace(/([.,!?;:])([A-Za-z])/g, '$1 $2');
+    
+    // Final safety check: If result looks like it has spaces between single letters,
+    // it's likely a formatting error - use original value
+    const words = normalized.split(/\s+/);
+    const hasSingleLetterWords = words.some(word => word.length === 1 && /[a-zA-Z]/.test(word));
+    if (hasSingleLetterWords && words.length > 2) {
+      // Likely formatting error, use original
+      normalized = replacement.trim();
+      // Re-add spacing if needed
+      if (textBefore && !textBefore.match(/\s$/) && !textBefore.match(/[.,!?;:(]$/)) {
+        if (!normalized.match(/^[.,!?;:)]/)) {
+          normalized = ' ' + normalized;
+        }
+      }
+      if (textAfter && !textAfter.match(/^\s/) && !textAfter.match(/^[.,!?;:)]/)) {
+        if (!normalized.match(/[.,!?;:(]$/)) {
+          normalized = normalized + ' ';
+        }
+      }
+    }
+    
+    return normalized.trim();
+  }, []);
+
+  const handleSuggestionClick = useCallback((issue: GrammarIssue, replacement: string, event?: React.MouseEvent) => {
+    // Prevent default and stop propagation immediately
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+
+    // Prevent duplicate clicks
+    const replacementKey = `${issue.offset}-${issue.length}-${replacement}`;
+    if (processingReplacement === replacementKey) {
+      return; // Already processing this replacement
+    }
+
+    if (issue.offset === undefined || issue.length === undefined || !onSuggestionAccept) {
+      return;
+    }
+
+    // Set processing state immediately
+    setProcessingReplacement(replacementKey);
+
+    try {
+      // Get current text to normalize replacement properly
+      let currentText = text;
+      if (textareaRef?.current) {
+        currentText = textareaRef.current.value;
+      }
+
+      // Validate offset is still valid (text might have changed)
+      if (issue.offset < 0 || issue.offset >= currentText.length) {
+        toast.error("Error location changed", {
+          description: "The text has changed. Please check grammar again.",
+        });
+        // Remove invalid issue
+        setGrammarIssues((prev) => prev.filter((item) => item !== issue));
+        setProcessingReplacement(null);
+        return;
+      }
+
+      // Normalize the replacement to fix spacing issues
+      const normalizedReplacement = normalizeReplacement(
+        replacement,
+        currentText,
+        issue.offset,
+        issue.length
+      );
+
+      // Apply replacement immediately
+      onSuggestionAccept(normalizedReplacement, issue.offset, issue.length);
+
+      // Update remaining issues: adjust their offsets if they come after the replaced text
+      const replacementLength = normalizedReplacement.length;
+      const offsetChange = replacementLength - issue.length;
+      
+      setGrammarIssues((prev) => {
+        return prev
+          .filter((item) => item !== issue) // Remove fixed issue
+          .map((item) => {
+            // Adjust offsets for issues after the replaced text
+            if (
+              item.offset !== undefined &&
+              item.offset > issue.offset
+            ) {
+              return {
+                ...item,
+                offset: item.offset + offsetChange,
+              };
+            }
+            return item;
+          });
+      });
+
+      setSelectedIssue(null);
+      setHighlightedIssue(null);
+
+      toast.success("Text replaced ✓", {
+        description: `"${normalizedReplacement}"`,
+        duration: 2000,
+      });
+    } finally {
+      // Clear processing state after a short delay
+      setTimeout(() => {
+        setProcessingReplacement(null);
+      }, 100);
+    }
+  }, [text, textareaRef, onSuggestionAccept, normalizeReplacement]);
 
   return (
     <div className={`ai-assistant ${isOpen ? "open" : ""}`}>
@@ -354,24 +580,30 @@ export default function AIAssistant({ text, textareaRef, onSuggestionAccept }: A
               </div>
             ) : activeTab === "grammar" ? (
               <div className="ai-grammar">
-                {grammarIssues.length === 0 ? (
+                {sortedIssues.length === 0 ? (
                   <div className="ai-empty">
                     <p>✅ No grammar issues found</p>
                     <span>Click "Check Grammar" to analyze your text</span>
                   </div>
                 ) : (
-                  grammarIssues.map((issue, index) => {
+                  sortedIssues.map((issue, index) => {
+                    // Find original index in grammarIssues for selection tracking
+                    const originalIndex = grammarIssues.findIndex(
+                      item => item.offset === issue.offset && item.length === issue.length
+                    );
+                    const displayIndex = originalIndex >= 0 ? originalIndex : index;
+                    
                     // Create unique key based on offset and index
-                    const uniqueKey = `issue-${issue.offset || 0}-${issue.length || 0}-${index}`;
+                    const uniqueKey = `issue-${issue.offset || 0}-${issue.length || 0}-${displayIndex}`;
                     return (
                     <div 
                       key={uniqueKey}
-                      className={`ai-issue ai-issue--${issue.severity} ${selectedIssue === index ? 'ai-issue--selected' : ''}`}
-                      onClick={() => handleIssueClick(issue, index)}
+                      className={`ai-issue ai-issue--${issue.severity} ${selectedIssue === displayIndex ? 'ai-issue--selected' : ''}`}
+                      onClick={() => handleIssueClick(issue, displayIndex)}
                     >
                       <div className="ai-issue__header">
-                        <div className="ai-issue__index">#{index + 1}</div>
-                        <div className="ai-issue__type">{issue.type}</div>
+                        <div className="ai-issue__index">#{displayIndex + 1}</div>
+                        <div className={`ai-issue__type ai-issue__type--${issue.severity}`}>{issue.type}</div>
                         {issue.short_message && (
                           <div className="ai-issue__short">{issue.short_message}</div>
                         )}
@@ -379,7 +611,10 @@ export default function AIAssistant({ text, textareaRef, onSuggestionAccept }: A
                       <div className="ai-issue__message">{issue.message}</div>
                       {issue.offset !== undefined && (
                         <div className="ai-issue__location">
-                          Position: {issue.offset} (length: {issue.length || 1})
+                          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style={{ marginRight: "4px", display: "inline-block", verticalAlign: "middle" }}>
+                            <path d="M8 1L2 4V7C2 10.5 4.5 13.5 8 15C11.5 13.5 14 10.5 14 7V4L8 1Z" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+                          </svg>
+                          Position: {issue.offset} • Length: {issue.length || 1} chars
                         </div>
                       )}
                       {issue.context && (
@@ -396,19 +631,99 @@ export default function AIAssistant({ text, textareaRef, onSuggestionAccept }: A
                         <div className="ai-issue__replacements">
                           <span className="ai-issue__replacements-label">Suggestions:</span>
                           <div className="ai-issue__replacements-list">
-                            {issue.replacements.map((rep, idx) => (
-                              <button
-                                key={idx}
-                                className="ai-issue__replacement"
-                                onClick={(e) => {
-                                  e.stopPropagation(); // Prevent issue click
-                                  handleSuggestionClick(issue, rep.value);
-                                }}
-                                title="Click to replace the error with this suggestion"
-                              >
-                                {rep.value}
-                              </button>
-                            ))}
+                            {issue.replacements.map((rep, idx) => {
+                              // Format replacement for better display (preview only)
+                              // IMPORTANT: Don't format simple single words - show them as-is
+                              let displayValue = (rep.value || '').trim();
+                              
+                              // Check if it's a simple single word (all lowercase or all uppercase, no spaces, reasonable length)
+                              // These should NEVER be formatted
+                              const isSimpleWord = (
+                                (/^[a-z]+$/i.test(displayValue) || /^[A-Z]+$/.test(displayValue)) && 
+                                displayValue.length <= 25 && 
+                                !displayValue.includes(' ') &&
+                                !displayValue.includes('-')
+                              );
+                              
+                              // If it's a simple word, use it as-is without any formatting
+                              if (isSimpleWord) {
+                                displayValue = displayValue;
+                              } else {
+                              // Only format if NOT a simple word and has indicators of stuck words
+                                const hasMixedCase = /[a-z].*[A-Z]|[A-Z].*[a-z]/.test(displayValue);
+                                const isLongWord = displayValue.length > 15 && !displayValue.includes(' ');
+                                const hasNumbers = /\d/.test(displayValue);
+                                
+                                // Only format if there are clear indicators of stuck words
+                                if ((hasMixedCase || isLongWord || hasNumbers) && !displayValue.includes(' ')) {
+                                  // Add spaces between lowercase-uppercase transitions (e.g., "iPhoneorder" -> "iPhone order")
+                                  // Only if followed by at least 2 lowercase letters (to avoid splitting single letters)
+                                  displayValue = displayValue.replace(/([a-z])([A-Z][a-z]{2,})/g, '$1 $2');
+                                  
+                                  // Add spaces between word and number
+                                  displayValue = displayValue.replace(/([a-zA-Z]{2,})(\d)/g, '$1 $2');
+                                  displayValue = displayValue.replace(/(\d)([a-zA-Z]{2,})/g, '$1 $2');
+                                  
+                                  // Split common words stuck together (only if followed by uppercase)
+                                  const commonWords = ['and', 'or', 'but', 'the', 'a', 'an', 'is', 'are', 'was', 'were', 
+                                                       'has', 'have', 'had', 'this', 'that', 'for', 'from', 'with', 'about'];
+                                  commonWords.forEach(word => {
+                                    // Only split if word is followed by uppercase with at least 2 letters
+                                    const regex = new RegExp(`([a-z])(\\b${word}\\b)([A-Z][a-z]{2,})`, 'gi');
+                                    displayValue = displayValue.replace(regex, '$1 $2 $3');
+                                  });
+                                  
+                                  // Normalize spacing
+                                  displayValue = displayValue.replace(/\s+/g, ' ').trim();
+                                }
+                              }
+                              
+                              // Final cleanup: Remove any extra spaces that might have been accidentally added
+                              // This prevents "h a ve" type issues
+                              displayValue = displayValue.replace(/\s+/g, ' ').trim();
+                              
+                              // Final safety check: If result looks like it has spaces between single letters,
+                              // it's likely a formatting error - use original value
+                              const words = displayValue.split(/\s+/);
+                              const hasSingleLetterWords = words.some(word => word.length === 1 && /[a-zA-Z]/.test(word));
+                              if (hasSingleLetterWords && words.length > 2) {
+                                // Likely formatting error, use original
+                                displayValue = (rep.value || '').trim();
+                              }
+                              
+                              // Clean up the display value (only if it has spaces)
+                              if (displayValue.includes(' ')) {
+                                displayValue = displayValue
+                                  .replace(/\s+([.,!?;:)])/g, '$1') // Remove space before punctuation
+                                  .replace(/([.,!?;:])([A-Za-z])/g, '$1 $2'); // Add space after punctuation
+                              }
+                              
+                              // Use original value if display formatting didn't change anything meaningful
+                              const finalDisplay = displayValue || rep.value;
+                              
+                              const replacementKey = `${issue.offset}-${issue.length}-${rep.value}`;
+                              const isProcessing = processingReplacement === replacementKey;
+
+                              return (
+                                <button
+                                  key={idx}
+                                  className={`ai-issue__replacement ${isProcessing ? 'processing' : ''}`}
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    handleSuggestionClick(issue, rep.value, e);
+                                  }}
+                                  disabled={isProcessing}
+                                  title={`Click to replace with: "${finalDisplay}"`}
+                                  type="button"
+                                >
+                                  <span className="replacement-text">{finalDisplay}</span>
+                                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className="replacement-icon">
+                                    <path d="M6 4L10 8L6 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                  </svg>
+                                </button>
+                              );
+                            })}
                           </div>
                         </div>
                       )}

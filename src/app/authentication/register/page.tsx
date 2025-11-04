@@ -74,11 +74,14 @@ export default function RegisterPage() {
 
       if (result?.ok) {
         toast.success("Welcome to English101!", {
-          description: "Redirecting to your dashboard...",
+          description: "Redirecting...",
         });
+        // Wait a bit for session to be fully established after registration + auto-login
+        // Middleware will handle placement test redirect if needed
         setTimeout(() => {
+          // Force a hard redirect to ensure middleware sees the new session
           window.location.href = "/english/dashboard";
-        }, 1000);
+        }, 800);
       } else {
         // Registration successful but login failed, redirect to login
         toast.info("Please sign in", {

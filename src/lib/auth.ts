@@ -70,9 +70,26 @@ export const authOptions: NextAuthOptions = {
         async jwt({ token, user, account, trigger }) {
             if (user) {
                 token.id = user.id;
-                token.role = (user as any).role || "USER";
-                token.placementTestCompleted = (user as any).placementTestCompleted || false;
-                token.cefrLevel = (user as any).cefrLevel || null;
+                // Fetch latest user data from database to ensure accuracy
+                const dbUser = await prisma.user.findUnique({
+                    where: { id: user.id },
+                    select: { 
+                        role: true, 
+                        placementTestCompleted: true, 
+                        cefrLevel: true 
+                    }
+                });
+                
+                if (dbUser) {
+                    token.role = dbUser.role;
+                    token.placementTestCompleted = dbUser.placementTestCompleted;
+                    token.cefrLevel = dbUser.cefrLevel;
+                } else {
+                    // Fallback if user not found (shouldn't happen, but safety check)
+                    token.role = (user as any).role || "USER";
+                    token.placementTestCompleted = false;
+                    token.cefrLevel = null;
+                }
             }
             // Store provider info for first-time login
             if (account) {

@@ -2,10 +2,14 @@
 
 import Link from "next/link";
 import { signIn } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { toast } from "sonner";
 
 export default function LoginPage() {
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/english/dashboard";
+  
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
   const [emailErr, setEmailErr] = useState("");
@@ -46,12 +50,15 @@ export default function LoginPage() {
         });
       } else if (result?.ok) {
         toast.success("Login successful!", {
-          description: "Redirecting to your dashboard...",
+          description: "Redirecting...",
         });
-        // Redirect to dashboard
+        // Wait a bit for session to be fully established, then redirect
+        // Middleware will handle placement test redirect if needed
         setTimeout(() => {
-          window.location.href = "/english/dashboard";
-        }, 1000);
+          // Force a hard redirect to ensure middleware sees the new session
+          // Use callbackUrl if provided, otherwise go to dashboard
+          window.location.href = callbackUrl;
+        }, 800);
       }
     } catch (error) {
       console.error("Login error:", error);

@@ -387,8 +387,8 @@ export default function SpeakingPage() {
       };
 
       mediaRecorder.start();
-      setElapsed(0);
-      setRecording(true);
+    setElapsed(0);
+    setRecording(true);
       setMicError("");
     } catch (error: any) {
       console.error("Recording error:", error);
@@ -415,11 +415,11 @@ export default function SpeakingPage() {
 
   // Task detail view
   if (selectedTask) {
-    return (
+  return (
       <div className="dashboard-content">
         {/* Back button and header */}
-        <section className="card page-head">
-          <div>
+      <section className="card page-head">
+        <div>
             <button 
               className="btn outline" 
               onClick={() => {
@@ -431,53 +431,63 @@ export default function SpeakingPage() {
             >
               ← Back to Tasks
             </button>
-            <h1 style={{ marginTop: "12px" }}>{selectedTask.icon} {selectedTask.title}</h1>
+            <h1 style={{ marginTop: "12px" }}>{selectedTask.title}</h1>
             <p className="muted">{selectedTask.type} • {selectedTask.level} Level</p>
-          </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Main Grid */}
-        <div className="spk-grid">
-          {/* Left column */}
-          <div className="left-col">
-            {/* Prompt */}
-            <section className="card">
-              <h3 className="section-title">📝 {selectedTask.title}</h3>
-              <div className="prompt">
+      {/* Main Grid */}
+      <div className="spk-grid">
+        {/* Left column */}
+        <div className="left-col">
+          {/* Prompt */}
+          <section className="card">
+              <h3 className="section-title">{selectedTask.title}</h3>
+            <div className="prompt">
                 <p>{selectedTask.prompt}</p>
-              </div>
-              <div className="chips">
+            </div>
+            <div className="chips">
                 <span className="chip blue">Level: {selectedTask.level}</span>
                 <span className="chip amber">Time Limit: {selectedTask.timeLimit}</span>
                 <span className="chip indigo">Type: {selectedTask.type}</span>
+            </div>
+          </section>
+
+          {/* Listen example */}
+          <section className="card">
+              <h3 className="section-title">Listen to Example First</h3>
+            <div className="listen-row">
+              <button
+                  className={`btn btn-play ${listening ? "playing" : ""}`}
+                onClick={toggleListen}
+                aria-label="Play example"
+              >
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  {listening ? (
+                    <>
+                      <rect x="5" y="3" width="2" height="10" rx="1" fill="currentColor"/>
+                      <rect x="9" y="3" width="2" height="10" rx="1" fill="currentColor"/>
+                    </>
+                  ) : (
+                    <path d="M6 4L12 8L6 12V4Z" fill="currentColor"/>
+                  )}
+                </svg>
+                <span>{listening ? "Pause" : "Play"}</span>
+              </button>
+
+              <div className="wave">
+                {Array.from({ length: 16 }).map((_, i) => (
+                  <div key={i} className="bar" />
+                ))}
               </div>
-            </section>
 
-            {/* Listen example */}
-            <section className="card">
-              <h3 className="section-title">🎧 Listen to Example First</h3>
-              <div className="listen-row">
-                <button
-                  className={`btn circle primary ${listening ? "pulse" : ""}`}
-                  onClick={toggleListen}
-                  aria-label="Play example"
-                >
-                  {listening ? "⏸" : "▶️"}
-                </button>
+              <div className="mono muted">0:45</div>
+            </div>
+          </section>
 
-                <div className="wave">
-                  {Array.from({ length: 16 }).map((_, i) => (
-                    <div key={i} className="bar" />
-                  ))}
-                </div>
-
-                <div className="mono muted">0:45</div>
-              </div>
-            </section>
-
-            {/* Recording */}
-            <section className="card">
-              <h3 className="section-title">🎤 Your Recording</h3>
+          {/* Recording */}
+          <section className="card">
+              <h3 className="section-title">Your Recording</h3>
               
               {/* Microphone Status */}
               {micPermission === "checking" && (
@@ -501,31 +511,38 @@ export default function SpeakingPage() {
                 </div>
               )}
 
-              <div className="rec-wrap">
-                <button
-                  className={`rec-btn ${recording ? "rec-on" : ""}`}
-                  onClick={recording ? stopRec : startRec}
-                  aria-label="Record"
-                  title={recording ? "Stop" : "Record"}
+            <div className="rec-wrap">
+              <button
+                className={`rec-btn ${recording ? "rec-on" : ""}`}
+                onClick={recording ? stopRec : startRec}
+                aria-label="Record"
+                title={recording ? "Stop" : "Record"}
                   disabled={micPermission === "checking"}
-                >
-                  {recording ? "⏹" : "⏺"}
-                </button>
-                <div className="timer mono">{mmss}</div>
-                <div className="rec-actions">
-                  <button className="btn ghost" onClick={retry} disabled={micPermission === "checking"}>
-                    🔄 Retry
+              >
+                {recording ? "⏹" : "⏺"}
+              </button>
+              <div className="timer mono">{mmss}</div>
+              <div className="rec-actions">
+                  <button className="btn btn-retry" onClick={retry} disabled={micPermission === "checking"}>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                      <path d="M13.65 2.35C12.2 0.9 10.2 0 8 0C3.58 0 0 3.58 0 8C0 12.42 3.58 16 8 16C11.73 16 14.84 13.45 15.73 10H13.65C12.83 12.33 10.61 14 8 14C4.69 14 2 11.31 2 8C2 4.69 4.69 2 8 2C9.66 2 11.14 2.69 12.22 3.78L10 6H16V0L13.65 2.35Z" fill="currentColor"/>
+                    </svg>
+                    <span>Retry</span>
                   </button>
-                  <button className="btn primary" onClick={stopRec} disabled={!recording}>
-                    ⏹ Stop & Analyze
+                  <button className="btn btn-analyze" onClick={stopRec} disabled={!recording}>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                      <rect x="3" y="3" width="10" height="10" rx="2" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+                      <path d="M6 6L10 10M10 6L6 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                    </svg>
+                    <span>Stop & Analyze</span>
                   </button>
                 </div>
-              </div>
-            </section>
+            </div>
+          </section>
 
             {/* Transcript */}
             <section className="card">
-              <h3 className="section-title">📝 Your Transcript</h3>
+              <h3 className="section-title">Your Transcript</h3>
               <div className="transcript" style={{ color: transcript ? "inherit" : "var(--dash-muted)" }}>
                 {transcript || "Your speech will appear here after recording..."}
               </div>
@@ -537,22 +554,22 @@ export default function SpeakingPage() {
                   <p className="small muted" style={{ textAlign: "center" }}>
                     Great fluency! Minor pronunciation improvements recommended.
                   </p>
-                </div>
+            </div>
               )}
-            </section>
-          </div>
+          </section>
+        </div>
 
-          {/* Right column */}
-          <aside className="right-col">
-            {/* Vocabulary */}
-            <section className="card no-pad">
-              <div className="card-head indigo">
-                <h3>📚 Key Vocabulary</h3>
-              </div>
-              <div className="pad">
+        {/* Right column */}
+        <aside className="right-col">
+          {/* Vocabulary */}
+          <section className="card no-pad">
+            <div className="card-head indigo">
+              <h3>📚 Key Vocabulary</h3>
+            </div>
+            <div className="pad">
                 {selectedTask.vocab.map(({ word, ipa }) => (
                   <div key={word} className="vocab">
-                    <div className="row">
+                  <div className="row">
                       <span className="w">{word}</span>
                       <button 
                         className="icon-btn"
@@ -577,37 +594,37 @@ export default function SpeakingPage() {
                       >
                         🔊
                       </button>
-                    </div>
-                    <div className="ipa indigo-t">{ipa}</div>
                   </div>
-                ))}
-              </div>
-            </section>
+                  <div className="ipa indigo-t">{ipa}</div>
+                </div>
+              ))}
+            </div>
+          </section>
 
-            {/* Phrases */}
-            <section className="card no-pad">
-              <div className="card-head green">
-                <h3>💬 Useful Phrases</h3>
-              </div>
-              <div className="pad">
+          {/* Phrases */}
+          <section className="card no-pad">
+            <div className="card-head green">
+              <h3>💬 Useful Phrases</h3>
+            </div>
+            <div className="pad">
                 {selectedTask.phrases.map((p, i) => (
-                  <div key={i} className="phrase">{p}</div>
-                ))}
-              </div>
-            </section>
+                <div key={i} className="phrase">{p}</div>
+              ))}
+            </div>
+          </section>
 
-            {/* Tips */}
-            <section className="card no-pad">
-              <div className="card-head amber">
+          {/* Tips */}
+          <section className="card no-pad">
+            <div className="card-head amber">
                 <h3>💡 Speaking Tips</h3>
-              </div>
-              <div className="pad">
+            </div>
+            <div className="pad">
                 {selectedTask.tips.map((t, i) => (
-                  <div key={i} className="tip">• {t}</div>
-                ))}
-              </div>
-            </section>
-          </aside>
+                <div key={i} className="tip">• {t}</div>
+              ))}
+            </div>
+          </section>
+        </aside>
         </div>
       </div>
     );
@@ -678,7 +695,12 @@ export default function SpeakingPage() {
                 </div>
               )}
               
-              <div className="task-icon">{task.icon}</div>
+              <div className="task-header">
+                <div className={`task-level-badge task-level-${task.level.toLowerCase()}`}>
+                  {task.level}
+                </div>
+                <div className={`task-color-indicator task-color-${task.color}`}></div>
+              </div>
               
               <div className="task-content">
                 <h4 className="task-title">{task.title}</h4>

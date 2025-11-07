@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import AIAssistant from "@/components/AIAssistant";
+import AnalyticsCharts from "@/components/AnalyticsCharts";
 
 type DashboardStats = {
   user: {
@@ -49,7 +51,16 @@ export default function DashboardPage() {
   
   // Quick Dictionary
   const [quickWord, setQuickWord] = useState("");
-  const [quickResult, setQuickResult] = useState<any>(null);
+  interface DictionaryResult {
+    word: string;
+    phonetic?: string;
+    phonetics?: Array<{ audio?: string }>;
+    meanings?: Array<{
+      partOfSpeech: string;
+      definitions: Array<{ definition: string; example?: string }>;
+    }>;
+  }
+  const [quickResult, setQuickResult] = useState<DictionaryResult | null>(null);
   const [quickSearching, setQuickSearching] = useState(false);
 
   useEffect(() => {
@@ -177,46 +188,7 @@ export default function DashboardPage() {
         </div>
 
         {/* AI Chatbot Section */}
-        <div className="chatbot-section">
-          <div className="chatbot-card">
-            <div className="chatbot-header">
-              <div className="chatbot-avatar">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
-                  <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="currentColor" opacity="0.1"/>
-                  <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </div>
-              <div className="chatbot-greeting">
-                <h3 className="chatbot-title">AI Assistant</h3>
-                <p className="chatbot-subtitle">Get instant help with grammar, vocabulary, and writing</p>
-              </div>
-            </div>
-            <div className="chatbot-input-wrapper">
-              <div className="chatbot-search-box">
-                <svg className="chatbot-search-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                  <circle cx="9" cy="9" r="6" stroke="currentColor" strokeWidth="1.5"/>
-                  <path d="M13 13L17 17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-                </svg>
-                <input 
-                  type="text" 
-                  placeholder="Ask anything about English..." 
-                  className="chatbot-input-field" 
-                />
-                <button className="chatbot-send-btn">
-                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                    <path d="M18 2L9 11M18 2L12 18L9 11M18 2L2 8L9 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </button>
-              </div>
-              <div className="chatbot-quick-actions">
-                <button className="chatbot-quick-btn">Grammar Check</button>
-                <button className="chatbot-quick-btn">Vocabulary Help</button>
-                <button className="chatbot-quick-btn">Writing Tips</button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <AIAssistant />
 
         {/* Getting Started & Start Practice - Side by Side */}
         <div className="dashboard-grid-2col">
@@ -421,11 +393,11 @@ export default function DashboardPage() {
                       <div className="dictionary-phonetic">{quickResult.phonetic}</div>
                     )}
                   </div>
-                  {quickResult.phonetics?.find((p: any) => p.audio) && (
+                  {quickResult.phonetics?.find((p) => p.audio) && (
                     <button
                       className="dictionary-audio-btn"
                       onClick={() => {
-                        const audioUrl = quickResult.phonetics.find((p: any) => p.audio)?.audio;
+                        const audioUrl = quickResult.phonetics?.find((p) => p.audio)?.audio;
                         if (audioUrl) {
                           const audio = new Audio(audioUrl);
                           audio.play();
@@ -440,7 +412,7 @@ export default function DashboardPage() {
                 </div>
 
                 <div className="dictionary-meanings">
-                  {quickResult.meanings.slice(0, 2).map((meaning: any, idx: number) => (
+                  {quickResult.meanings?.slice(0, 2).map((meaning, idx: number) => (
                     <div key={idx} className="dictionary-meaning">
                       <div className="dictionary-part-of-speech">{meaning.partOfSpeech}</div>
                       <div className="dictionary-definition">
@@ -448,7 +420,7 @@ export default function DashboardPage() {
                       </div>
                       {meaning.definitions[0].example && (
                         <div className="dictionary-example">
-                          <span className="dictionary-example-label">Example:</span> "{meaning.definitions[0].example}"
+                          <span className="dictionary-example-label">Example:</span> &quot;{meaning.definitions[0].example}&quot;
                         </div>
                       )}
                     </div>
@@ -489,10 +461,7 @@ export default function DashboardPage() {
               <option>Last Week</option>
             </select>
           </div>
-          <div className="analytics-charts">
-            <div className="chart-container"><canvas id="skills-radar-chart" width={300} height={300} /></div>
-            <div className="chart-container"><canvas id="performance-radar-chart" width={300} height={300} /></div>
-          </div>
+          <AnalyticsCharts skillsBreakdown={stats?.skillsBreakdown || []} />
         </div>
       </div>
   );

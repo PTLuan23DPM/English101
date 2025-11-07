@@ -5,6 +5,18 @@ echo   IELTS Writing Scorer Service
 echo ========================================
 echo.
 
+REM Check if Python is available
+python --version >nul 2>&1
+if errorlevel 1 (
+    echo [ERROR] Python is not installed or not in PATH
+    echo Please install Python 3.8+ and try again
+    pause
+    exit /b 1
+)
+
+REM Change to script directory
+cd /d "%~dp0"
+
 REM Check if venv exists
 if not exist "venv" (
     echo [INFO] Creating virtual environment...
@@ -15,7 +27,7 @@ if not exist "venv" (
 
 REM Activate venv
 echo [INFO] Activating virtual environment...
-call venv\Scripts\activate
+call venv\Scripts\activate.bat
 
 REM Check if requirements are installed
 python -c "import flask" 2>nul
@@ -26,19 +38,11 @@ if errorlevel 1 (
     echo.
 )
 
-REM Check if model files exist
-if not exist "..\ai-models\writing-scorer\model.keras" (
-    echo [ERROR] model.keras not found!
-    echo Please run copy-models.ps1 first
-    pause
-    exit /b 1
-)
-
-if not exist "..\ai-models\writing-scorer\scaler.pkl" (
-    echo [ERROR] scaler.pkl not found!
-    echo Please run copy-models.ps1 first
-    pause
-    exit /b 1
+REM Check if models directory exists
+if not exist "..\ai-models\writing-scorer\models" (
+    echo [WARNING] Models directory not found!
+    echo Please ensure models are in: ai-models\writing-scorer\models\
+    echo.
 )
 
 REM Start service
@@ -46,7 +50,9 @@ echo [INFO] Starting Writing Scorer Service...
 echo [INFO] Service will run on: http://localhost:5001
 echo [INFO] Press Ctrl+C to stop
 echo.
+echo ========================================
+echo.
+
 python writing_scorer.py
 
 pause
-

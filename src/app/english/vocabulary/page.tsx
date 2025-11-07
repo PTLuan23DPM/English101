@@ -383,7 +383,7 @@ export default function VocabularyPage() {
                       {def.example && (
                         <div className="vocab-dictionary-example">
                           <span className="vocab-example-label">Example:</span>
-                          "{def.example}"
+                          &quot;{def.example}&quot;
                         </div>
                       )}
                       {def.synonyms && def.synonyms.length > 0 && (

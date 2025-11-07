@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const session = await getServerSession(authOptions);
 
@@ -31,10 +31,11 @@ export async function GET(req: NextRequest) {
         updatedAt: goal.updatedAt.toISOString(),
       })),
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Get goals error:", error);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
-      { error: "Failed to get goals", details: error.message },
+      { error: "Failed to get goals", details: errorMessage },
       { status: 500 }
     );
   }

@@ -1,6 +1,11 @@
 """
 IELTS Writing Scorer Service
 Uses Keras model to score IELTS writing and converts to CEFR levels
+Supports multiple model types:
+- Traditional feature-based model
+- BERT sentence transformer models
+- BERT multi-task fine-tuned
+- BERT PRO
 """
 
 from flask import Flask, request, jsonify
@@ -11,16 +16,79 @@ import re
 import os
 from pathlib import Path
 from tensorflow import keras
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Optional
+import sys
 
 app = Flask(__name__)
 CORS(app)
+
+# Try to import and initialize Swagger
+try:
+    from flasgger import Swagger
+    SWAGGER_AVAILABLE = True
+except ImportError:
+    SWAGGER_AVAILABLE = False
+    print("Warning: flasgger not available. Install with: pip install flasgger")
+    Swagger = None
 
 # Get the directory of this script
 SCRIPT_DIR = Path(__file__).parent.resolve()
 PROJECT_ROOT = SCRIPT_DIR.parent
 
-# Model paths - try multiple possible locations
+# Add ai-models directory to path for BERT model
+AI_MODELS_DIR = PROJECT_ROOT / 'ai-models' / 'writing-scorer'
+if str(AI_MODELS_DIR) not in sys.path:
+    sys.path.insert(0, str(AI_MODELS_DIR))
+
+# Import model loader
+try:
+    from model_loader import load_all_models, ModelLoader
+    MODEL_LOADER_AVAILABLE = True
+except ImportError:
+    MODEL_LOADER_AVAILABLE = False
+    print("[WARNING] Model loader not available, using legacy loading")
+
+# ==================== MULTI-MODEL SUPPORT ====================
+all_models = {}
+model_loader = None
+active_model = None
+active_model_type = None
+
+# Try to load all models using model_loader
+if MODEL_LOADER_AVAILABLE:
+    try:
+        models_base_dir = PROJECT_ROOT / 'ai-models' / 'writing-scorer'
+        all_models, model_loader = load_all_models(models_base_dir)
+        
+        # Select best available model (priority: bert_pro > bert_multi > bert > traditional)
+        if all_models.get('bert_pro', {}).get('loaded'):
+            active_model = all_models['bert_pro']
+            active_model_type = 'bert_pro'
+            print("[OK] Using BERT PRO model (best accuracy)")
+        elif all_models.get('bert_multi', {}).get('loaded'):
+            active_model = all_models['bert_multi']
+            active_model_type = 'bert_multi'
+            print("[OK] Using BERT Multi-task model")
+        elif all_models.get('bert', {}).get('loaded'):
+            active_model = all_models['bert']
+            active_model_type = 'bert'
+            print("[OK] Using BERT model")
+        elif all_models.get('traditional', {}).get('loaded'):
+            active_model = all_models['traditional']
+            active_model_type = 'traditional'
+            print("[OK] Using Traditional model")
+        
+        if active_model:
+            print(f"[OK] Active model: {active_model_type}")
+        else:
+            print("[WARNING] No models loaded, will use fallback scoring")
+    except Exception as e:
+        print(f"[ERROR] Error loading models: {e}")
+        import traceback
+        traceback.print_exc()
+        all_models = {}
+
+# ==================== TRADITIONAL MODEL (Old) ====================
 MODEL_PATHS = [
     PROJECT_ROOT / 'ai-models' / 'writing-scorer' / 'model.keras',
     SCRIPT_DIR / '../ai-models/writing-scorer/model.keras',
@@ -39,7 +107,7 @@ VECTORIZER_PATHS = [
     Path('../ai-models/writing-scorer/vectorizer.pkl'),
 ]
 
-# Find and load model
+# Find and load traditional model
 model = None
 scaler = None
 vectorizer = None
@@ -49,12 +117,12 @@ for model_path in MODEL_PATHS:
     resolved_path = model_path.resolve()
     if resolved_path.exists():
         try:
-            print(f"Loading model from: {resolved_path}")
+            print(f"Loading traditional model from: {resolved_path}")
             model = keras.models.load_model(str(resolved_path))
             model_loaded = True
             break
         except Exception as e:
-            print(f"Failed to load model from {resolved_path}: {e}")
+            print(f"Failed to load traditional model from {resolved_path}: {e}")
 
 for scaler_path in SCALER_PATHS:
     resolved_path = scaler_path.resolve()
@@ -80,11 +148,36 @@ for vectorizer_path in VECTORIZER_PATHS:
             print(f"Failed to load vectorizer from {resolved_path}: {e}")
 
 if not model_loaded:
-    print("WARNING: Model file not found! Using fallback scoring.")
+    print("WARNING: Traditional model file not found! Using fallback scoring.")
     print("Please ensure model.keras is in ai-models/writing-scorer/")
-    model = None
-    scaler = None
-    vectorizer = None
+
+# ==================== LEGACY BERT MODEL (from ml_assess.py) ====================
+bert_assessor = None
+bert_model_loaded = False
+
+# Only try legacy BERT if no active model loaded
+if not active_model:
+    try:
+        # Import BERT model assessor (legacy)
+        from ml_assess import PMCStyleIELTSAssessor, AttentionLayer
+        
+        # Try to load BERT model
+        bert_model_dir = PROJECT_ROOT / 'ai-models' / 'writing-scorer' / 'bert_ielts_model'
+        if bert_model_dir.exists() and (bert_model_dir / 'model.keras').exists():
+            try:
+                print(f"\nLoading legacy BERT model from: {bert_model_dir}")
+                bert_assessor = PMCStyleIELTSAssessor(max_length=512)
+                bert_assessor.load_model(str(bert_model_dir))
+                bert_model_loaded = True
+                if not active_model_type:
+                    active_model_type = 'bert_legacy'
+                print("[OK] Legacy BERT model loaded successfully!")
+            except Exception as e:
+                print(f"[WARNING] Failed to load legacy BERT model: {e}")
+    except ImportError:
+        pass  # ml_assess not available
+    except Exception as e:
+        print(f"[ERROR] Error initializing legacy BERT model: {e}")
 
 
 def extract_features_with_vectorizer(text: str) -> np.ndarray:
@@ -219,10 +312,56 @@ def extract_features_manual(text: str) -> np.ndarray:
     return np.array(features).reshape(1, -1)
 
 
-def score_to_scale_10(ielts_score: float) -> float:
-    """Convert IELTS score (0-9) to 10-point scale"""
+def normalize_score_by_level(base_score: float, task_level: str) -> float:
+    """
+    Normalize score based on task level to ensure fair scoring across different levels.
+    A2 level tasks should have more lenient scoring than B2+ tasks.
+    """
+    level_base_scores = {
+        'A1': 6.0,  # Base score for A1 level
+        'A2': 6.5,  # Base score for A2 level
+        'B1': 7.0,  # Base score for B1 level
+        'B2': 7.5,  # Base score for B2 level
+        'C1': 8.0,  # Base score for C1 level
+        'C2': 8.5,  # Base score for C2 level
+    }
+    
+    base_for_level = level_base_scores.get(task_level, 7.5)
+    
+    # Adjust score: if base_score is high, it's good for any level
+    # But if task is easier (lower level), we should be more lenient
+    if base_score >= 7.0:
+        # High quality writing - keep score high
+        return base_score
+    elif base_score >= 5.5:
+        # Medium quality - adjust based on level
+        # Lower level tasks get a boost
+        level_boost = {
+            'A1': 1.0, 'A2': 0.8, 'B1': 0.5, 
+            'B2': 0.2, 'C1': 0.0, 'C2': -0.2
+        }
+        boost = level_boost.get(task_level, 0.0)
+        return min(10.0, base_score + boost)
+    else:
+        # Lower quality - still apply level-based adjustment
+        level_boost = {
+            'A1': 0.8, 'A2': 0.6, 'B1': 0.4,
+            'B2': 0.2, 'C1': 0.0, 'C2': 0.0
+        }
+        boost = level_boost.get(task_level, 0.0)
+        return min(10.0, base_score + boost)
+
+
+def score_to_scale_10(ielts_score: float, task_level: Optional[str] = None) -> float:
+    """Convert IELTS score (0-9) to 10-point scale, with optional level-based normalization"""
     # Linear conversion: 0-9 -> 0-10
-    return round((ielts_score / 9.0) * 10.0, 1)
+    score_10 = round((ielts_score / 9.0) * 10.0, 1)
+    
+    # Apply level-based normalization if task level is provided
+    if task_level:
+        score_10 = normalize_score_by_level(score_10, task_level.upper())
+    
+    return score_10
 
 
 def score_to_cefr(score_10: float) -> Tuple[str, str]:
@@ -241,8 +380,72 @@ def score_to_cefr(score_10: float) -> Tuple[str, str]:
         return 'A1', 'Beginner'
 
 
-def get_detailed_feedback(text: str, score_10: float, prompt: str = "") -> Dict:
-    """Generate detailed feedback based on 10-point scale score and prompt analysis"""
+def parse_target_words(target_words_str: str) -> Tuple[int, int]:
+    """Parse target words string (e.g., '50-80 words', '250-300 words') into min and max"""
+    if not target_words_str:
+        return 0, 9999  # No limit if not specified
+    
+    # Remove 'words' and extract numbers
+    numbers = re.findall(r'\d+', target_words_str)
+    
+    if len(numbers) >= 2:
+        return int(numbers[0]), int(numbers[1])
+    elif len(numbers) == 1:
+        # If only one number, use it as minimum with 20% buffer
+        min_words = int(numbers[0])
+        return min_words, int(min_words * 1.2)
+    else:
+        return 0, 9999
+
+
+def get_task_requirements(task: Optional[Dict]) -> Dict:
+    """Get task requirements based on task type and level"""
+    if not task:
+        # Default IELTS Task 2 requirements
+        return {
+            'min_words': 250,
+            'max_words': 350,
+            'min_paragraphs': 4,
+            'recommended_paragraphs': 5,
+            'task_type': 'essay',
+        }
+    
+    task_type = task.get('type', '').lower()
+    level = task.get('level', '').upper()
+    target_words = task.get('targetWords', '')
+    
+    min_words, max_words = parse_target_words(target_words)
+    
+    # Adjust paragraph requirements based on task type
+    if 'sentence' in task_type:
+        # Sentence building tasks: 1-2 paragraphs are fine
+        min_paragraphs = 1
+        recommended_paragraphs = 2
+    elif 'paragraph' in task_type:
+        # Paragraph writing: 1-2 paragraphs
+        min_paragraphs = 1
+        recommended_paragraphs = 2
+    elif 'email' in task_type:
+        # Email: typically 3-4 paragraphs (intro, body, conclusion)
+        min_paragraphs = 2
+        recommended_paragraphs = 3
+    else:
+        # Essay tasks: 4-5 paragraphs (intro, 2-3 body, conclusion)
+        min_paragraphs = 4
+        recommended_paragraphs = 5
+    
+    return {
+        'min_words': min_words,
+        'max_words': max_words,
+        'min_paragraphs': min_paragraphs,
+        'recommended_paragraphs': recommended_paragraphs,
+        'task_type': task_type,
+        'level': level,
+    }
+
+
+def get_detailed_feedback(text: str, score_10: float, prompt: str = "", task: Optional[Dict] = None) -> Dict:
+    """Generate detailed feedback based on 10-point scale score and task requirements"""
     
     word_count = len(text.split())
     sentence_count = len(re.split(r'[.!?]+', text))
@@ -250,118 +453,229 @@ def get_detailed_feedback(text: str, score_10: float, prompt: str = "") -> Dict:
     paragraphs = [p.strip() for p in text.split('\n\n') if p.strip()]
     paragraph_count = len(paragraphs)
     
-    # Task Response - Based on prompt relevance and requirements (CEFR-based, not IELTS)
+    # Get task requirements
+    task_req = get_task_requirements(task)
+    min_words = task_req['min_words']
+    max_words = task_req['max_words']
+    min_paragraphs = task_req['min_paragraphs']
+    recommended_paragraphs = task_req['recommended_paragraphs']
+    
+    # Task Response - Based on structure and length according to task requirements
+    # Start with base score, but be more lenient and reward meeting requirements
     task_response_score_10 = score_10
     task_response_feedback = []
+    task_compliance_bonus = 0.0  # Bonus for meeting task requirements
     
-    # Analyze prompt requirements
-    prompt_lower = prompt.lower() if prompt else ""
+    # Check structure and organization based on task type
+    if paragraph_count < min_paragraphs:
+        task_response_feedback.append(f"[ERROR] Structure is unclear. This task requires at least {min_paragraphs} paragraph(s).")
+        task_response_score_10 = max(0, task_response_score_10 - 1.0)  # Reduced penalty
+    elif paragraph_count >= recommended_paragraphs:
+        task_response_feedback.append("Excellent paragraph structure!")
+        task_compliance_bonus += 0.3  # Reward good structure
+    elif paragraph_count >= min_paragraphs:
+        task_response_feedback.append("Good paragraph structure")
+        task_compliance_bonus += 0.1  # Small reward for meeting minimum
+    else:
+        task_response_feedback.append(f"Consider organizing into {recommended_paragraphs} paragraph(s) for better structure.")
+        # No penalty if close to requirement
     
-    # Check if text addresses the prompt
+    # Check word count based on task requirements - reward meeting requirements
+    word_count_ratio = word_count / max_words if max_words > 0 else 1.0
+    if word_count < min_words * 0.8:  # 20% below minimum is error
+        task_response_feedback.append(f"[ERROR] Word count is too low. This task requires {min_words}-{max_words} words. You wrote {word_count} words.")
+        task_response_score_10 = max(0, task_response_score_10 - 1.5)  # Reduced penalty
+    elif word_count < min_words:
+        task_response_feedback.append(f"Try to reach the minimum requirement of {min_words} words. Current: {word_count} words.")
+        task_response_score_10 = max(0, task_response_score_10 - 0.5)  # Reduced penalty
+    elif min_words <= word_count <= max_words:
+        # PERFECT - Reward meeting requirements!
+        task_response_feedback.append(f"Excellent! You wrote {word_count} words, perfectly within the required range ({min_words}-{max_words} words).")
+        task_compliance_bonus += 0.5  # Significant bonus for meeting word count
+    elif word_count <= max_words * 1.1:  # Within 10% above is acceptable
+        task_response_feedback.append(f"Good length! You wrote {word_count} words. Target: {min_words}-{max_words} words.")
+        task_compliance_bonus += 0.2  # Small bonus for close to target
+    elif word_count <= max_words * 1.2:  # 20% above maximum
+        task_response_feedback.append(f"Word count slightly exceeds the requirement ({max_words} words). Consider being more concise. Current: {word_count} words.")
+        # No penalty, just feedback
+    else:
+        task_response_feedback.append(f"Word count exceeds the requirement. Consider being more concise. Current: {word_count} words, Target: {min_words}-{max_words} words.")
+        task_response_score_10 = max(0, task_response_score_10 - 0.3)  # Small penalty only
+    
+    # Apply compliance bonus
+    task_response_score_10 = min(10.0, task_response_score_10 + task_compliance_bonus)
+    
+    # Optional: If prompt is provided, check relevance
     if prompt:
-        # Simple keyword matching - can be improved with NLP
-        prompt_keywords = set(prompt_lower.split())
+        prompt_lower = prompt.lower()
         text_lower = text.lower()
+        prompt_keywords = set(prompt_lower.split())
         matching_keywords = sum(1 for keyword in prompt_keywords if len(keyword) > 4 and keyword in text_lower)
         keyword_coverage = matching_keywords / len(prompt_keywords) if prompt_keywords else 0
         
         if keyword_coverage < 0.3:
-            task_response_feedback.append("❌ Your response doesn't fully address the prompt. Focus more on the given topic.")
-            task_response_score_10 = max(0, task_response_score_10 - 2.0)
-        elif keyword_coverage < 0.5:
-            task_response_feedback.append("⚠️ Try to address the prompt more directly.")
+            task_response_feedback.append("Your response may not fully address the given topic.")
             task_response_score_10 = max(0, task_response_score_10 - 1.0)
-        else:
-            task_response_feedback.append("✓ Good relevance to the prompt")
-    
-    # Check structure and organization
-    if paragraph_count < 3:
-        task_response_feedback.append("❌ Structure is unclear. Organize your ideas into paragraphs.")
-        task_response_score_10 = max(0, task_response_score_10 - 1.5)
-    elif paragraph_count < 4:
-        task_response_feedback.append("⚠️ Consider adding more paragraphs for better organization.")
-    else:
-        task_response_feedback.append("✓ Good paragraph structure")
-    
-    # Check word count based on CEFR requirements (more flexible than IELTS)
-    if word_count < 150:
-        task_response_feedback.append("❌ Word count is too low. Expand your ideas.")
-        task_response_score_10 = max(0, task_response_score_10 - 2.0)
-    elif word_count < 200:
-        task_response_feedback.append("⚠️ Try to write more to fully develop your ideas.")
-        task_response_score_10 = max(0, task_response_score_10 - 0.5)
-    elif word_count >= 250:
-        task_response_feedback.append("✓ Good length for developing your ideas")
+        elif keyword_coverage >= 0.5:
+            task_response_feedback.append("Good relevance to the topic")
     
     task_response_score_10 = min(10.0, task_response_score_10)
     
-    # Coherence and Cohesion - Convert to 10-point scale
+    # Coherence and Cohesion - adjusted based on task level
     coherence_score_10 = score_10
     coherence_feedback = []
+    coherence_bonus = 0.0
     
-    if sentence_count < 8:
-        coherence_feedback.append("❌ Too few sentences. Break your ideas into more sentences.")
-        coherence_score_10 = max(0, coherence_score_10 - 1.5)
-    elif sentence_count < 12:
-        coherence_feedback.append("⚠️ Try to vary your sentence length and structure.")
+    # Adjust expectations based on task level and type
+    task_level = task_req.get('level', 'B2')
+    if task_level in ['A1', 'A2']:
+        min_sentences = 5
+        min_linking_words = 1
+        recommended_sentences = 8
+    elif task_level == 'B1':
+        min_sentences = 8
+        min_linking_words = 2
+        recommended_sentences = 12
+    else:  # B2, C1, C2
+        min_sentences = 12
+        min_linking_words = 3
+        recommended_sentences = 15
+    
+    # More lenient sentence count checking
+    if sentence_count < min_sentences * 0.7:  # Very few sentences
+        coherence_feedback.append(f"[ERROR] Too few sentences. This {task_level} level task requires at least {min_sentences} sentences.")
+        coherence_score_10 = max(0, coherence_score_10 - 1.0)  # Reduced penalty
+    elif sentence_count >= recommended_sentences:
+        coherence_feedback.append("Excellent sentence variety!")
+        coherence_bonus += 0.2  # Reward good sentence variety
+    elif sentence_count >= min_sentences:
+        coherence_feedback.append("Good sentence variety")
+        coherence_bonus += 0.1  # Small reward
     else:
-        coherence_feedback.append("✓ Good sentence variety")
+        coherence_feedback.append(f"Try to vary your sentence length and structure. Aim for at least {recommended_sentences} sentences.")
+        # No penalty if close
     
-    # Check for linking words
-    linking_words = len(re.findall(r'\b(however|moreover|therefore|furthermore|in addition|consequently|although|because|while|whereas|and|but|or|so|yet)\b', text.lower()))
-    if linking_words < 3:
-        coherence_feedback.append("⚠️ Use more linking words to connect your ideas.")
-        coherence_score_10 = max(0, coherence_score_10 - 0.5)
+    # Check for linking words - adjusted by level, more lenient
+    linking_words = len(re.findall(r'\b(however|moreover|therefore|furthermore|in addition|consequently|although|because|while|whereas|and|but|or|so|yet|then|after that|finally|first|second|also)\b', text.lower()))
+    if linking_words >= min_linking_words:
+        coherence_feedback.append("Good use of linking words")
+        coherence_bonus += 0.1  # Reward using linking words
+    elif linking_words >= min_linking_words * 0.7:  # Close to requirement
+        coherence_feedback.append(f"Consider using more linking words. For {task_level} level, aim for at least {min_linking_words} linking words.")
+        # No penalty
     else:
-        coherence_feedback.append("✓ Good use of linking words")
+        coherence_feedback.append(f"Use more linking words to connect your ideas. For {task_level} level, aim for at least {min_linking_words} linking words.")
+        coherence_score_10 = max(0, coherence_score_10 - 0.3)  # Reduced penalty
     
-    coherence_score_10 = min(10.0, coherence_score_10)
+    coherence_score_10 = min(10.0, coherence_score_10 + coherence_bonus)
     
-    # Lexical Resource - Convert to 10-point scale
+    # Lexical Resource - adjusted based on task level, more lenient
     lexical_score_10 = score_10
     lexical_diversity = unique_words / word_count if word_count > 0 else 0
     lexical_feedback = []
+    lexical_bonus = 0.0
     
-    if lexical_diversity < 0.35:
-        lexical_feedback.append("❌ Limited vocabulary range. Use more varied words.")
-        lexical_score_10 = max(0, lexical_score_10 - 2.0)
-    elif lexical_diversity < 0.50:
-        lexical_feedback.append("⚠️ Vocabulary could be more diverse.")
-        lexical_score_10 = max(0, lexical_score_10 - 1.0)
+    # Adjust expectations based on level - more lenient thresholds
+    if task_level in ['A1', 'A2']:
+        min_diversity = 0.25  # More lenient
+        good_diversity = 0.35
+        excellent_diversity = 0.45
+    elif task_level == 'B1':
+        min_diversity = 0.30
+        good_diversity = 0.45
+        excellent_diversity = 0.55
+    else:  # B2, C1, C2
+        min_diversity = 0.35
+        good_diversity = 0.50
+        excellent_diversity = 0.60
+    
+    if lexical_diversity >= excellent_diversity:
+        lexical_feedback.append("Excellent vocabulary diversity!")
+        lexical_bonus += 0.3  # Reward excellent diversity
+    elif lexical_diversity >= good_diversity:
+        lexical_feedback.append("Good vocabulary diversity")
+        lexical_bonus += 0.2  # Reward good diversity
+    elif lexical_diversity >= min_diversity:
+        lexical_feedback.append(f"Vocabulary is acceptable. For {task_level} level, aim for {good_diversity:.0%} diversity.")
+        lexical_bonus += 0.1  # Small reward
+    elif lexical_diversity >= min_diversity * 0.8:
+        lexical_feedback.append(f"Vocabulary could be more diverse. Target diversity for {task_level}: {good_diversity:.0%}.")
+        # No penalty if close
     else:
-        lexical_feedback.append("✓ Good vocabulary diversity")
+        lexical_feedback.append(f"Limited vocabulary range. For {task_level} level, aim for more varied words.")
+        lexical_score_10 = max(0, lexical_score_10 - 1.0)  # Reduced penalty
     
-    # Check for academic/advanced vocabulary
-    advanced_words = len(re.findall(r'\b(consequently|furthermore|moreover|nevertheless|therefore|demonstrate|illustrate|analyze|significant|essential)\b', text.lower()))
-    if advanced_words < 2 and word_count > 200:
-        lexical_feedback.append("⚠️ Consider using more advanced vocabulary.")
-        lexical_score_10 = max(0, lexical_score_10 - 0.5)
+    # Check for academic/advanced vocabulary - only for B2+ tasks, optional
+    if task_level in ['B2', 'C1', 'C2'] and word_count > 150:
+        advanced_words = len(re.findall(r'\b(consequently|furthermore|moreover|nevertheless|therefore|demonstrate|illustrate|analyze|significant|essential|considerable|substantial|evident|notably)\b', text.lower()))
+        if advanced_words >= 3:
+            lexical_feedback.append("Excellent use of advanced vocabulary!")
+            lexical_bonus += 0.2
+        elif advanced_words >= 2:
+            lexical_feedback.append("Good use of advanced vocabulary")
+            lexical_bonus += 0.1
+        elif advanced_words < 2:
+            lexical_feedback.append("Consider using more advanced vocabulary appropriate for your level.")
+            # No penalty, just suggestion
     
-    lexical_score_10 = min(10.0, lexical_score_10)
+    lexical_score_10 = min(10.0, lexical_score_10 + lexical_bonus)
     
-    # Grammatical Range and Accuracy - Convert to 10-point scale
+    # Grammatical Range and Accuracy - adjusted based on task level, more lenient
     grammar_score_10 = score_10
     grammar_feedback = []
+    grammar_bonus = 0.0
     
     avg_sentence_length = word_count / sentence_count if sentence_count > 0 else 0
-    if avg_sentence_length < 8:
-        grammar_feedback.append("❌ Sentences are too short. Use more complex structures.")
-        grammar_score_10 = max(0, grammar_score_10 - 2.0)
-    elif avg_sentence_length < 12:
-        grammar_feedback.append("⚠️ Try to vary sentence complexity.")
-        grammar_score_10 = max(0, grammar_score_10 - 0.5)
-    else:
-        grammar_feedback.append("✓ Good sentence complexity")
     
-    # Check for complex structures (relative clauses, conditionals, etc.)
-    complex_structures = len(re.findall(r'\b(that|which|who|when|where|if|unless|although|because|since|while)\b', text.lower()))
-    if complex_structures < 5:
-        grammar_feedback.append("⚠️ Try to use more complex grammatical structures.")
-        grammar_score_10 = max(0, grammar_score_10 - 0.5)
-    else:
-        grammar_feedback.append("✓ Good use of complex structures")
+    # Adjust sentence length expectations by level - more lenient
+    if task_level in ['A1', 'A2']:
+        min_avg_length = 5  # More lenient
+        good_avg_length = 9
+        excellent_avg_length = 12
+        min_complex_structures = 1  # More lenient
+    elif task_level == 'B1':
+        min_avg_length = 7
+        good_avg_length = 11
+        excellent_avg_length = 15
+        min_complex_structures = 2
+    else:  # B2, C1, C2
+        min_avg_length = 10
+        good_avg_length = 16
+        excellent_avg_length = 22
+        min_complex_structures = 4
     
-    grammar_score_10 = min(10.0, grammar_score_10)
+    if avg_sentence_length >= excellent_avg_length:
+        grammar_feedback.append("Excellent sentence complexity!")
+        grammar_bonus += 0.2
+    elif avg_sentence_length >= good_avg_length:
+        grammar_feedback.append("Good sentence complexity")
+        grammar_bonus += 0.1
+    elif avg_sentence_length >= min_avg_length:
+        grammar_feedback.append(f"Sentence complexity is acceptable. Target average length for {task_level}: {good_avg_length} words.")
+        grammar_bonus += 0.05
+    elif avg_sentence_length >= min_avg_length * 0.8:
+        grammar_feedback.append(f"Try to vary sentence complexity. Target average length for {task_level}: {good_avg_length} words.")
+        # No penalty if close
+    else:
+        grammar_feedback.append(f"Sentences are quite short. For {task_level} level, aim for average {good_avg_length} words per sentence.")
+        grammar_score_10 = max(0, grammar_score_10 - 1.0)  # Reduced penalty
+    
+    # Check for complex structures - adjusted by level, more lenient
+    complex_structures = len(re.findall(r'\b(that|which|who|when|where|if|unless|although|because|since|while|as|though|even though)\b', text.lower()))
+    if complex_structures >= min_complex_structures * 1.5:
+        grammar_feedback.append("Excellent use of complex structures!")
+        grammar_bonus += 0.2
+    elif complex_structures >= min_complex_structures:
+        grammar_feedback.append("Good use of complex structures")
+        grammar_bonus += 0.1
+    elif complex_structures >= min_complex_structures * 0.7:
+        grammar_feedback.append(f"Consider using more complex grammatical structures. For {task_level} level, aim for at least {min_complex_structures} complex structures.")
+        # No penalty if close
+    else:
+        grammar_feedback.append(f"Try to use more complex grammatical structures. For {task_level} level, aim for at least {min_complex_structures} complex structures.")
+        grammar_score_10 = max(0, grammar_score_10 - 0.3)  # Reduced penalty
+    
+    grammar_score_10 = min(10.0, grammar_score_10 + grammar_bonus)
     
     return {
         'task_response': {
@@ -385,13 +699,43 @@ def get_detailed_feedback(text: str, score_10: float, prompt: str = "") -> Dict:
 
 @app.route('/health', methods=['GET'])
 def health():
-    """Health check endpoint"""
+    """Health check endpoint
+    Check service status and loaded models
+    
+    ---
+    tags:
+      - Health
+    responses:
+      200:
+        description: Service is healthy
+        schema:
+          type: object
+          properties:
+            status:
+              type: string
+              example: healthy
+            active_model:
+              type: string
+              example: bert_pro
+            models_loaded:
+              type: object
+            traditional_model_loaded:
+              type: boolean
+            bert_model_loaded:
+              type: boolean
+    """
+    loaded_models = {}
+    for name, model_info in all_models.items():
+        loaded_models[name] = model_info.get('loaded', False)
+    
     return jsonify({
         'status': 'healthy',
-        'model_loaded': model_loaded,
+        'active_model': active_model_type,
+        'models_loaded': loaded_models,
+        'traditional_model_loaded': model_loaded,
+        'bert_model_loaded': bert_model_loaded,
         'scaler_loaded': scaler is not None,
         'vectorizer_loaded': vectorizer is not None,
-        'model_path': str(MODEL_PATHS[0].resolve()) if MODEL_PATHS else None
     })
 
 
@@ -430,80 +774,154 @@ def fallback_score(text: str) -> float:
     return max(3.0, min(8.0, base_score))
 
 
+def predict_with_active_model(text: str) -> Tuple[float, str]:
+    """
+    Predict IELTS score using the active model
+    Returns: (score, model_type)
+    """
+    if active_model and model_loader:
+        try:
+            model_type = active_model_type
+            if model_type == 'bert_pro':
+                score = model_loader.predict_bert_pro(active_model, text)
+                return score, 'BERT PRO'
+            elif model_type == 'bert_multi':
+                score = model_loader.predict_bert_multi_task(active_model, text)
+                return score, 'BERT Multi-task'
+            elif model_type == 'bert':
+                score = model_loader.predict_bert_sentence_transformer(active_model, text)
+                return score, 'BERT'
+            elif model_type == 'traditional':
+                score = model_loader.predict_traditional(active_model, text, extract_features_with_vectorizer)
+                return score, 'Traditional'
+        except Exception as e:
+            print(f"Error predicting with active model: {e}")
+            import traceback
+            traceback.print_exc()
+    
+    # Fallback to legacy BERT model
+    if bert_model_loaded and bert_assessor is not None:
+        try:
+            result = bert_assessor.predict(essay=text, task_type=2, question="")
+            return result['score'], 'BERT Legacy'
+        except Exception as e:
+            print(f"Legacy BERT model prediction failed: {e}")
+    
+    # Fallback to traditional model (legacy)
+    if model_loaded and model is not None:
+        try:
+            features = extract_features_with_vectorizer(text)
+            if vectorizer is None and scaler is not None:
+                features = scaler.transform(features)
+            prediction = model.predict(features, verbose=0)
+            if isinstance(prediction, np.ndarray):
+                score = float(prediction[0][0] if prediction.ndim > 1 else prediction[0])
+            else:
+                score = float(prediction)
+            return max(0, min(9, score)), 'Traditional Legacy'
+        except Exception as e:
+            print(f"Traditional model prediction failed: {e}")
+    
+    # Ultimate fallback
+    return fallback_score(text), 'Fallback'
+
+
 @app.route('/score', methods=['POST'])
 def score_writing():
-    """Score writing submission"""
+    """Score writing essay using best available model
+    Automatically selects model in priority order: BERT PRO > BERT Multi > BERT > Traditional
+    
+    ---
+    tags:
+      - Scoring
+    parameters:
+      - in: body
+        name: body
+        required: true
+        schema:
+          type: object
+          required:
+            - text
+          properties:
+            text:
+              type: string
+              description: Essay text to score
+              example: "Climate change is one of the most pressing issues facing humanity today."
+            prompt:
+              type: string
+              description: Optional writing prompt
+              example: "Discuss the impact of climate change"
+    responses:
+      200:
+        description: Scoring successful
+        schema:
+          type: object
+          properties:
+            score_10:
+              type: number
+              example: 7.5
+            ielts_score:
+              type: number
+              example: 6.8
+            band:
+              type: string
+              example: "Good User"
+            overall_score:
+              type: number
+              example: 7.2
+            cefr_level:
+              type: string
+              example: "C1"
+            cefr_description:
+              type: string
+              example: "Advanced"
+            detailed_scores:
+              type: object
+            word_count:
+              type: integer
+              example: 250
+            statistics:
+              type: object
+            model_type:
+              type: string
+              example: "BERT PRO"
+            using_fallback:
+              type: boolean
+              example: false
+      400:
+        description: Bad request
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+      500:
+        description: Internal server error
+    """
     try:
         data = request.json
         text = data.get('text', '')
-        prompt = data.get('prompt', '')
+        prompt = data.get('prompt', '')  # Optional
+        task = data.get('task', None)  # Optional - task requirements for task-based scoring
         
         if not text:
             return jsonify({'error': 'No text provided'}), 400
         
-        # Use model if available, otherwise use fallback
-        if model_loaded and model is not None:
-            try:
-                # Extract features (use vectorizer if available)
-                features = extract_features_with_vectorizer(text)
-                
-                # Scale features - only if using manual features, not vectorizer
-                # Vectorizer output (e.g., 10000 features) is incompatible with scaler (67 features)
-                if vectorizer is None and scaler is not None:
-                    # Using manual features (67) - can use scaler
-                    features_scaled = scaler.transform(features)
-                elif vectorizer is not None:
-                    # Using vectorizer (10000+ features) - don't use scaler
-                    features_scaled = features
-                    print(f"Using vectorizer features: {features.shape}")
-                else:
-                    # No scaler available - use features as is
-                    features_scaled = features
-                
-                # Predict IELTS score
-                prediction = model.predict(features_scaled, verbose=0)
-                
-                # Handle different prediction shapes
-                if isinstance(prediction, np.ndarray):
-                    if prediction.ndim > 1:
-                        ielts_score = float(prediction[0][0] if len(prediction[0]) > 0 else prediction[0])
-                    else:
-                        ielts_score = float(prediction[0])
-                else:
-                    ielts_score = float(prediction)
-                    
-                ielts_score = max(0, min(9, ielts_score))  # Clamp to 0-9
-                print(f"Model prediction: {ielts_score}")
-            except ValueError as e:
-                # Feature mismatch or other model error - use fallback
-                print(f"Model scoring failed (likely feature mismatch): {e}")
-                import traceback
-                traceback.print_exc()
-                print("Using fallback scoring instead")
-                ielts_score = fallback_score(text)
-            except Exception as e:
-                # Any other error - use fallback
-                print(f"Error using model: {e}")
-                import traceback
-                traceback.print_exc()
-                print("Using fallback scoring instead")
-                ielts_score = fallback_score(text)
-        else:
-            # Use fallback scoring
-            print("Using fallback scoring (model not loaded)")
-            ielts_score = fallback_score(text)
+        # Predict with active model
+        ielts_score, model_type = predict_with_active_model(text)
         
-        # Convert IELTS score (0-9) to 10-point scale
-        score_10 = score_to_scale_10(ielts_score)
-        print(f"Converted to 10-point scale: {score_10}")
+        # Get band description
+        band_description = get_band_description(ielts_score)
         
-        # Convert to CEFR using 10-point scale
+        # Convert to 10-point scale with level-based normalization
+        task_level = task.get('level') if task else None
+        score_10 = score_to_scale_10(ielts_score, task_level)
         cefr_level, cefr_description = score_to_cefr(score_10)
         
-        # Get detailed feedback (using 10-point scale and prompt)
-        detailed_feedback = get_detailed_feedback(text, score_10, prompt)
+        # Get detailed feedback (prompt and task are optional, but task helps with task-based scoring)
+        detailed_feedback = get_detailed_feedback(text, score_10, prompt, task)
         
-        # Calculate overall score (average of 4 criteria) - already in 10-point scale
+        # Calculate overall score
         overall_score = (
             detailed_feedback['task_response']['score'] +
             detailed_feedback['coherence_cohesion']['score'] +
@@ -512,11 +930,13 @@ def score_writing():
         ) / 4
         
         return jsonify({
-            'score_10': round(score_10, 1),  # New: 10-point scale
-            'overall_score': round(overall_score, 1),  # Already in 10-point scale
+            'score_10': round(score_10, 1),
+            'ielts_score': round(ielts_score, 1),
+            'band': band_description,
+            'overall_score': round(overall_score, 1),
             'cefr_level': cefr_level,
             'cefr_description': cefr_description,
-            'detailed_scores': detailed_feedback,  # All scores are in 10-point scale
+            'detailed_scores': detailed_feedback,
             'word_count': len(text.split()),
             'statistics': {
                 'words': len(text.split()),
@@ -525,7 +945,8 @@ def score_writing():
                 'paragraphs': len([p.strip() for p in text.split('\n\n') if p.strip()]),
                 'unique_words': len(set(text.lower().split()))
             },
-            'using_fallback': not model_loaded
+            'model_type': model_type,
+            'using_fallback': model_type == 'Fallback'
         })
         
     except Exception as e:
@@ -535,9 +956,206 @@ def score_writing():
         return jsonify({'error': str(e)}), 500
 
 
+def get_band_description(score: float) -> str:
+    """Get IELTS band description"""
+    if score >= 9.0:
+        return 'Expert User'
+    elif score >= 8.0:
+        return 'Very Good User'
+    elif score >= 7.0:
+        return 'Good User'
+    elif score >= 6.0:
+        return 'Competent User'
+    elif score >= 5.0:
+        return 'Modest User'
+    elif score >= 4.0:
+        return 'Limited User'
+    elif score >= 3.0:
+        return 'Extremely Limited User'
+    elif score >= 2.0:
+        return 'Intermittent User'
+    else:
+        return 'Non User'
+
+
+@app.route('/score-ai', methods=['POST'])
+def score_writing_ai():
+    """Score writing using AI model - NO PROMPT REQUIRED
+    Uses best available AI model (BERT PRO > BERT Multi > BERT > Traditional)
+    
+    ---
+    tags:
+      - Scoring
+    parameters:
+      - in: body
+        name: body
+        required: true
+        schema:
+          type: object
+          required:
+            - text
+          properties:
+            text:
+              type: string
+              description: Essay text to score
+              example: "Climate change is one of the most pressing issues facing humanity today."
+            prompt:
+              type: string
+              description: Optional writing prompt
+              example: "Discuss the impact of climate change"
+    responses:
+      200:
+        description: Scoring successful
+        schema:
+          type: object
+          properties:
+            score_10:
+              type: number
+              example: 7.5
+            ielts_score:
+              type: number
+              example: 6.8
+            band:
+              type: string
+              example: "Good User"
+            overall_score:
+              type: number
+              example: 7.2
+            cefr_level:
+              type: string
+              example: "C1"
+            cefr_description:
+              type: string
+              example: "Advanced"
+            model_type:
+              type: string
+              example: "BERT PRO"
+            prompt_required:
+              type: boolean
+              example: false
+            using_ai_model:
+              type: boolean
+              example: true
+      400:
+        description: Bad request
+      503:
+        description: AI model not available
+      500:
+        description: Internal server error
+    """
+    try:
+        data = request.json
+        text = data.get('text', '')
+        prompt = data.get('prompt', '')  # Optional - for feedback only
+        task = data.get('task', None)  # Optional - task requirements for task-based scoring
+        
+        if not text:
+            return jsonify({'error': 'No text provided'}), 400
+        
+        # Check if any AI model is available (not fallback)
+        if not active_model and not bert_model_loaded:
+            return jsonify({
+                'error': 'AI model not available',
+                'message': 'No AI models loaded. Please ensure models are in ai-models/writing-scorer/models/'
+            }), 503
+        
+        # Predict with active model (no prompt needed)
+        ielts_score, model_type = predict_with_active_model(text)
+        
+        # Get band description
+        band_description = get_band_description(ielts_score)
+        
+        # Convert to 10-point scale with level-based normalization
+        task_level = task.get('level') if task else None
+        score_10 = score_to_scale_10(ielts_score, task_level)
+        cefr_level, cefr_description = score_to_cefr(score_10)
+        
+        # Get detailed feedback (prompt and task are optional, but task helps with task-based scoring)
+        detailed_feedback = get_detailed_feedback(text, score_10, prompt, task)
+        
+        # Calculate overall score
+        overall_score = (
+            detailed_feedback['task_response']['score'] +
+            detailed_feedback['coherence_cohesion']['score'] +
+            detailed_feedback['lexical_resource']['score'] +
+            detailed_feedback['grammatical_range']['score']
+        ) / 4
+        
+        return jsonify({
+            'score_10': round(score_10, 1),
+            'ielts_score': round(ielts_score, 1),
+            'band': band_description,
+            'overall_score': round(overall_score, 1),
+            'cefr_level': cefr_level,
+            'cefr_description': cefr_description,
+            'detailed_scores': detailed_feedback,
+            'word_count': len(text.split()),
+            'statistics': {
+                'words': len(text.split()),
+                'characters': len(text),
+                'sentences': len(re.split(r'[.!?]+', text)),
+                'paragraphs': len([p.strip() for p in text.split('\n\n') if p.strip()]),
+                'unique_words': len(set(text.lower().split()))
+            },
+            'model_type': model_type,
+            'prompt_required': False,
+            'using_ai_model': model_type != 'Fallback' and model_type != 'Traditional'
+        })
+        
+    except Exception as e:
+        print(f"Error scoring writing with AI model: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
+
 @app.route('/grammar-check', methods=['POST'])
 def grammar_check():
-    """Grammar checking using LanguageTool API"""
+    """Check grammar and spelling errors in text
+    Uses LanguageTool API for grammar checking
+    
+    ---
+    tags:
+      - Grammar
+    parameters:
+      - in: body
+        name: body
+        required: true
+        schema:
+          type: object
+          required:
+            - text
+          properties:
+            text:
+              type: string
+              description: Text to check for grammar errors
+              example: "I recieve the letter yesterday."
+            language:
+              type: string
+              description: Language code
+              example: "en-US"
+              default: "en-US"
+    responses:
+      200:
+        description: Grammar check successful
+        schema:
+          type: object
+          properties:
+            issues:
+              type: array
+              items:
+                type: object
+            issue_count:
+              type: integer
+              example: 1
+            language:
+              type: string
+              example: "English (US)"
+      400:
+        description: Bad request
+      500:
+        description: Internal server error
+    """
     try:
         data = request.json
         text = data.get('text', '')
@@ -563,22 +1181,33 @@ def grammar_check():
                 lt_data = lt_response.json()
                 issues = []
                 
-                # Convert LanguageTool matches to our format
-                # LanguageTool returns all matches, so we process all of them
                 matches = lt_data.get('matches', [])
                 print(f"LanguageTool found {len(matches)} issues")
                 
                 for match in matches:
+                    # Extract context text for better matching
+                    context_obj = match.get('context', {})
+                    context_text = context_obj.get('text', '') if isinstance(context_obj, dict) else str(context_obj)
+                    
+                    # Get sentence context if available
+                    sentence = match.get('sentence', '')
+                    if sentence and not context_text:
+                        context_text = sentence
+                    
                     issue = {
                         'type': match.get('rule', {}).get('category', {}).get('name', 'Grammar'),
                         'message': match.get('message', 'Grammar error'),
                         'short_message': match.get('shortMessage', ''),
                         'offset': match.get('offset', 0),
                         'length': match.get('length', 0),
-                        'context': match.get('context', {}),
-                        'sentence_index': 0,  # Can be calculated from offset if needed
+                        'context': {
+                            'text': context_text,
+                            'offset': match.get('offset', 0),
+                            'length': match.get('length', 0),
+                        } if context_text else match.get('context', {}),
+                        'sentence_index': 0,
                         'severity': 'error' if match.get('rule', {}).get('issueType') == 'misspelling' else 'warning',
-                        'replacements': [{'value': r.get('value', '')} for r in match.get('replacements', [])[:5]],  # Top 5 suggestions
+                        'replacements': [{'value': r.get('value', '')} for r in match.get('replacements', [])[:5]],
                     }
                     issues.append(issue)
                 
@@ -590,7 +1219,6 @@ def grammar_check():
                     'language': lt_data.get('language', {}).get('name', language)
                 })
             else:
-                # Fallback to basic checks if API fails
                 return basic_grammar_check(text)
                 
         except requests.exceptions.RequestException as e:
@@ -625,7 +1253,7 @@ def basic_grammar_check(text: str):
             # Check capitalization
             if sentence_text and sentence_text[0].islower():
                 offset = sentence_start_offset
-                length = 1  # Length of the character that should be capitalized
+                length = 1
                 issues.append({
                     'type': 'Capitalization',
                     'message': f'Sentence should start with capital letter: "{sentence_text[:20]}..."',
@@ -649,9 +1277,8 @@ def basic_grammar_check(text: str):
                 pos = sentence_lower.find(' i ', search_pos)
                 if pos == -1:
                     break
-                # Calculate actual offset in full text
-                offset = sentence_start_offset + pos + 1  # +1 to skip space before 'i'
-                length = 1  # Length of 'i' that should be 'I'
+                offset = sentence_start_offset + pos + 1
+                length = 1
                 issues.append({
                     'type': 'Spelling',
                     'message': 'Use "I" (capital) for first person pronoun',
@@ -671,9 +1298,9 @@ def basic_grammar_check(text: str):
             
             current_offset = sentence_start_offset + len(sentence_text) + len(punctuation)
         
-        i += 2  # Move to next sentence (skip punctuation)
+        i += 2
     
-    # Check for common misspellings and errors
+    # Check for common misspellings
     common_errors = [
         ('teh', 'the'),
         ('adn', 'and'),
@@ -689,7 +1316,6 @@ def basic_grammar_check(text: str):
             pos = text.lower().find(error_word, start)
             if pos == -1:
                 break
-            # Check if it's a whole word (not part of another word)
             if (pos == 0 or not text[pos-1].isalnum()) and \
                (pos + len(error_word) >= len(text) or not text[pos + len(error_word)].isalnum()):
                 issues.append({
@@ -714,7 +1340,87 @@ def basic_grammar_check(text: str):
     })
 
 
-if __name__ == '__main__':
-    print("Starting Writing Scorer Service on port 5001...")
-    app.run(host='0.0.0.0', port=5001, debug=True)
+# Initialize Swagger after all routes are defined
+swagger = None
+if SWAGGER_AVAILABLE:
+    try:
+        swagger_config = {
+            "headers": [],
+            "specs": [
+                {
+                    "endpoint": "apispec",
+                    "route": "/apispec.json",
+                    "rule_filter": lambda rule: True,
+                    "model_filter": lambda tag: True,
+                }
+            ],
+            "static_url_path": "/flasgger_static",
+            "swagger_ui": True,
+            "specs_route": "/api-docs"
+        }
 
+        swagger_template = {
+            "info": {
+                "title": "IELTS Writing Scorer API",
+                "description": "RESTful API for scoring IELTS writing essays using multiple AI models (BERT PRO, BERT Multi-task, BERT, Traditional). Supports automatic model selection, detailed feedback, grammar checking, and CEFR level conversion.",
+                "version": "1.0.0",
+                "contact": {
+                    "name": "API Support"
+                }
+            },
+            "tags": [
+                {
+                    "name": "Health",
+                    "description": "Service health and status endpoints"
+                },
+                {
+                    "name": "Scoring",
+                    "description": "Essay scoring endpoints"
+                },
+                {
+                    "name": "Grammar",
+                    "description": "Grammar checking endpoints"
+                }
+            ],
+            "servers": [
+                {
+                    "url": "http://localhost:5001",
+                    "description": "Development server"
+                }
+            ]
+        }
+        
+        swagger = Swagger(app, config=swagger_config, template=swagger_template)
+        print("[OK] Swagger initialized successfully")
+    except Exception as e:
+        print(f"[WARNING] Swagger initialization failed: {e}")
+        import traceback
+        traceback.print_exc()
+        swagger = None
+
+if __name__ == '__main__':
+    print("="*70)
+    print("IELTS Writing Scorer Service")
+    print("="*70)
+    print(f"\nActive Model: {active_model_type or 'None (using fallback)'}")
+    print(f"\nLoaded Models:")
+    for name, model_info in all_models.items():
+        status = '[OK] Loaded' if model_info.get('loaded') else '[FAIL] Not loaded'
+        print(f"  - {name}: {status}")
+    print(f"\nLegacy Models:")
+    print(f"  - Traditional: {'[OK] Loaded' if model_loaded else '[FAIL] Not loaded'}")
+    print(f"  - BERT Legacy: {'[OK] Loaded' if bert_model_loaded else '[FAIL] Not loaded'}")
+    print("="*70)
+    print("\nEndpoints:")
+    print("  POST /score - Score writing (uses best available model)")
+    print("  POST /score-ai - Score writing using AI model only (no prompt required)")
+    print("  POST /grammar-check - Check grammar")
+    print("  GET /health - Health check")
+    if swagger:
+        print("\n[Swagger] API Documentation:")
+        print("  http://localhost:5001/api-docs")
+    else:
+        print("\n[WARNING] Swagger documentation not available")
+    print("\nStarting server on port 5001...")
+    print("="*70)
+    app.run(host='0.0.0.0', port=5001, debug=True)

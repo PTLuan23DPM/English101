@@ -25,7 +25,7 @@ import prisma from "@/lib/prisma";
  */
 export async function GET(
   req: NextRequest,
-  { params }: { params: { activityId: string } }
+  { params }: { params: Promise<{ activityId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -33,8 +33,9 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const { activityId } = await params;
     const activity = await prisma.activity.findUnique({
-      where: { id: params.activityId },
+      where: { id: activityId },
       include: {
         unit: {
           select: {
@@ -70,7 +71,7 @@ export async function GET(
       score: q.score,
       wordCountMin: 50, // TODO: Move to schema
       wordCountMax: 300, // TODO: Move to schema
-      referenceImage: q.media?.[0]?.url, // Optional image/graph to write about
+      referenceImage: Array.isArray(q.media) ? q.media[0]?.url : undefined, // Optional image/graph to write about
     }));
 
     return NextResponse.json({

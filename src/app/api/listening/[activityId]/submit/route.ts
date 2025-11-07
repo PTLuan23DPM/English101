@@ -57,9 +57,10 @@ interface AnswerSubmission {
  */
 export async function POST(
   req: NextRequest,
-  { params }: { params: { activityId: string } }
+  { params }: { params: Promise<{ activityId: string }> }
 ) {
   try {
+    const { activityId } = await params;
     const session = await getServerSession(authOptions);
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -81,7 +82,7 @@ export async function POST(
 
     // Validate activity exists
     const activity = await prisma.activity.findUnique({
-      where: { id: params.activityId },
+      where: { id: activityId },
       include: {
         questions: {
           include: {
@@ -126,7 +127,7 @@ export async function POST(
 
       // Check if answer is correct
       let isCorrect = false;
-      
+
       if (question.type === 'SINGLE_CHOICE' || question.type === 'TRUE_FALSE') {
         // Single choice: check if chosen answer matches correct answer
         const chosenChoice = question.choices.find((c) => c.id === answer.chosenIds[0]);
@@ -204,13 +205,13 @@ export async function POST(
       listenCount,
       answers: gradedAnswers,
       feedback: {
-        overall: percentage >= 70 
-          ? 'Great job! Your listening comprehension is excellent.' 
+        overall: percentage >= 70
+          ? 'Great job! Your listening comprehension is excellent.'
           : percentage >= 50
-          ? 'Good effort! Keep practicing to improve your listening skills.'
-          : 'Keep working on your listening. Try to listen more actively and take notes.',
+            ? 'Good effort! Keep practicing to improve your listening skills.'
+            : 'Keep working on your listening. Try to listen more actively and take notes.',
         suggestions: [
-          listenCount === 1 && percentage < 60 
+          listenCount === 1 && percentage < 60
             ? 'Try listening to the audio multiple times to catch details you might have missed.'
             : null,
           percentage < 70

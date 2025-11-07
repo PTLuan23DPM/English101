@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { toast } from "sonner";
 import {
   BarChart,
   Bar,
@@ -31,7 +30,6 @@ export default function GoalsPage() {
   const { data: session } = useSession();
   const [goals, setGoals] = useState<Goal[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showCreateModal, setShowCreateModal] = useState(false);
 
   useEffect(() => {
     loadGoals();
@@ -77,7 +75,7 @@ export default function GoalsPage() {
             <h1>Goals & Targets</h1>
             <p className="subtitle">Track your learning goals and analyze your performance</p>
           </div>
-          <button className="btn primary" onClick={() => setShowCreateModal(true)}>
+          <button className="btn primary" onClick={() => {/* TODO: Implement create goal modal */}}>
             + New Goal
           </button>
         </div>
@@ -189,7 +187,7 @@ export default function GoalsPage() {
           ) : (
             <div className="empty-state">
               <p>No goals yet. Create your first goal to start tracking!</p>
-              <button className="btn primary" onClick={() => setShowCreateModal(true)}>
+              <button className="btn primary" onClick={() => {/* TODO: Implement create goal modal */}}>
                 Create Goal
               </button>
             </div>
@@ -206,8 +204,8 @@ export default function GoalsPage() {
                 <div className="prediction-title">Next Level</div>
                 <div className="prediction-value">~3 months</div>
                 <div className="prediction-desc">
-                  At your current pace, you'll reach {" "}
-                  {(session?.user as any)?.cefrLevel === "A1" ? "A2" : "next level"} in about 3 months
+                  At your current pace, you&apos;ll reach {" "}
+                  {(session?.user as { cefrLevel?: string })?.cefrLevel === "A1" ? "A2" : "next level"} in about 3 months
                 </div>
               </div>
             </div>

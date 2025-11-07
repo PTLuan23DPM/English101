@@ -323,7 +323,10 @@ export default function ReadingPage() {
                             const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${v.word}`);
                             if (response.ok) {
                               const data = await response.json();
-                              const audioUrl = data[0]?.phonetics?.find((p: any) => p.audio)?.audio;
+                              interface PhoneticData {
+                                audio?: string;
+                              }
+                              const audioUrl = data[0]?.phonetics?.find((p: PhoneticData) => p.audio)?.audio;
                               if (audioUrl) {
                                 const audio = new Audio(audioUrl);
                                 audio.play();

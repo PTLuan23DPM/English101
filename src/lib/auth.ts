@@ -49,10 +49,10 @@ export const authOptions: NextAuthOptions = {
             },
         }),
     ],
-  session: {
-    strategy: "jwt" as const,
-    maxAge: 30 * 24 * 60 * 60, // 30 days
-  },
+    session: {
+        strategy: "jwt" as const,
+        maxAge: 30 * 24 * 60 * 60, // 30 days
+    },
     pages: {
         signIn: "/authentication/login",
         error: "/authentication/login",
@@ -70,9 +70,11 @@ export const authOptions: NextAuthOptions = {
         async jwt({ token, user, account, trigger }) {
             if (user) {
                 token.id = user.id;
-                token.role = (user as any).role || "USER";
-                token.placementTestCompleted = (user as any).placementTestCompleted || false;
-                token.cefrLevel = (user as any).cefrLevel || null;
+                token.role = ((user as { role?: "USER" | "ADMIN" }).role ?? "USER") as "USER" | "ADMIN";
+                token.placementTestCompleted = (user as { placementTestCompleted?: boolean }).placementTestCompleted || false;
+                token.cefrLevel = (user as { cefrLevel?: string | null }).cefrLevel || null;
+                token.language = (user as { language?: string }).language || "en";
+                token.theme = (user as { theme?: string }).theme || "light";
             }
             // Store provider info for first-time login
             if (account) {
@@ -82,12 +84,20 @@ export const authOptions: NextAuthOptions = {
             if (trigger === "update") {
                 const updatedUser = await prisma.user.findUnique({
                     where: { id: token.id as string },
-                    select: { placementTestCompleted: true, cefrLevel: true, role: true }
+                    select: {
+                        placementTestCompleted: true,
+                        cefrLevel: true,
+                        role: true,
+                        language: true,
+                        theme: true
+                    }
                 });
                 if (updatedUser) {
                     token.placementTestCompleted = updatedUser.placementTestCompleted;
                     token.cefrLevel = updatedUser.cefrLevel;
                     token.role = updatedUser.role;
+                    token.language = updatedUser.language || "en";
+                    token.theme = updatedUser.theme || "light";
                 }
             }
             return token;
@@ -96,12 +106,14 @@ export const authOptions: NextAuthOptions = {
             if (session.user) {
                 session.user.id = token.id as string;
                 session.user.role = (token.role as "USER" | "ADMIN") || "USER";
-                (session.user as any).placementTestCompleted = token.placementTestCompleted || false;
-                (session.user as any).cefrLevel = token.cefrLevel || null;
+                (session.user as { placementTestCompleted?: boolean }).placementTestCompleted = token.placementTestCompleted || false;
+                (session.user as { cefrLevel?: string | null }).cefrLevel = token.cefrLevel || null;
+                (session.user as { language?: string }).language = (token.language as string) || "en";
+                (session.user as { theme?: string }).theme = (token.theme as string) || "light";
             }
             return session;
         },
-        async signIn({ user, account, profile }) {
+        async signIn() {
             // Always allow sign-in, database operations handled by Prisma Adapter
             return true;
         },

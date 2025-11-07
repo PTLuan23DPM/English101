@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { CEFRLevel, ActivityType } from "@prisma/client";
 
 /**
  * @swagger
@@ -40,8 +41,8 @@ export async function GET(req: NextRequest) {
     const activities = await prisma.activity.findMany({
       where: {
         skill: "WRITING",
-        ...(level && { level: level as any }),
-        ...(type && { type: type as any }),
+        ...(level && { level: level as CEFRLevel }),
+        ...(type && { type: type as ActivityType }),
       },
       include: {
         unit: {

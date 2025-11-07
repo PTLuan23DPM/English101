@@ -57,7 +57,7 @@ export default function TimerModal({ isOpen, onClose, onStart }: TimerModalProps
 
         <div className="modal-body">
           <p className="timer-modal__description">
-            Set a timer to simulate exam conditions. When time runs out, you won't be able to edit your text.
+            Set a timer to simulate exam conditions. When time runs out, you won&apos;t be able to edit your text.
           </p>
 
           {/* Preset Times */}

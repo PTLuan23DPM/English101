@@ -78,10 +78,11 @@ export async function PATCH(req: NextRequest) {
       success: true,
       message: "Password changed successfully",
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Change password error:", error);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
-      { error: "Failed to change password", details: error.message },
+      { error: "Failed to change password", details: errorMessage },
       { status: 500 }
     );
   }

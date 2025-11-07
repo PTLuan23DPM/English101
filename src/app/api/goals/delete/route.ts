@@ -45,10 +45,11 @@ export async function DELETE(req: NextRequest) {
       success: true,
       message: "Goal deleted successfully",
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Delete goal error:", error);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
-      { error: "Failed to delete goal", details: error.message },
+      { error: "Failed to delete goal", details: errorMessage },
       { status: 500 }
     );
   }

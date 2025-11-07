@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 
 interface AIAssistantProps {
@@ -17,8 +17,9 @@ interface GrammarIssue {
   severity: "error" | "warning" | "info";
   offset?: number;
   length?: number;
-  context?: string;
+  context?: string | { text?: string };
   replacements?: Array<{ value: string }>;
+  textSnapshot?: string; // Store text snapshot for offset validation
 }
 
 interface Suggestion {
@@ -35,7 +36,23 @@ export default function AIAssistant({ text, textareaRef, onSuggestionAccept }: A
   const [activeTab, setActiveTab] = useState<"grammar" | "suggestions">("grammar");
   const [selectedIssue, setSelectedIssue] = useState<number | null>(null);
 
+  // Reset state when panel is closed and reopened
+  useEffect(() => {
+    if (!isOpen) {
+      // Don't clear issues when closing, just reset selection
+      setSelectedIssue(null);
+    }
+  }, [isOpen]);
+
   const checkGrammar = async () => {
+    // Prevent multiple simultaneous checks
+    if (loading) {
+      toast.info("Grammar check in progress", {
+        description: "Please wait for the current check to complete",
+      });
+      return;
+    }
+
     // Get text directly from textarea to ensure we have the latest content
     let currentText = text;
     if (textareaRef?.current) {
@@ -49,16 +66,26 @@ export default function AIAssistant({ text, textareaRef, onSuggestionAccept }: A
       return;
     }
 
+    // Reset state before new check - clear previous results if any
     setLoading(true);
+    setSelectedIssue(null);
+    // Don't clear issues yet - let user see previous results while new check loads
+    
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+      
       const response = await fetch("http://localhost:5001/grammar-check", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: currentText }),
+        signal: controller.signal,
       });
 
+      clearTimeout(timeoutId);
+
       if (!response.ok) {
-        throw new Error("Grammar check failed");
+        throw new Error(`Grammar check failed: ${response.status} ${response.statusText}`);
       }
 
       const data = await response.json();
@@ -70,34 +97,70 @@ export default function AIAssistant({ text, textareaRef, onSuggestionAccept }: A
         issues: issues
       });
       
-      setGrammarIssues(issues);
+      // Update issues with current text snapshot for offset validation
+      const issuesWithTextSnapshot = issues.map((issue: GrammarIssue) => ({
+        ...issue,
+        textSnapshot: currentText, // Store text snapshot for later validation
+        // Ensure context is properly formatted
+        context: issue.context 
+          ? (typeof issue.context === 'string' 
+              ? issue.context 
+              : (issue.context as { text?: string })?.text || JSON.stringify(issue.context))
+          : undefined,
+      }));
+      
+      // Clear old issues and set new ones
+      setGrammarIssues(issuesWithTextSnapshot);
       setActiveTab("grammar");
-      setSelectedIssue(null); // Reset selection
+      setSelectedIssue(null);
 
       if (issues.length === 0) {
-        toast.success("Great work!", {
+        toast.success("Great work! 🎉", {
           description: "No grammar issues found!",
         });
       } else {
         toast.success(`Found ${issues.length} issue(s)`, {
-          description: `Click on any issue below to highlight it in your text. Issues are highlighted in red.`,
+          description: `Click on any issue below to highlight it in your text.`,
           duration: 5000,
         });
-        // Don't auto-highlight first issue - let user choose
-        setSelectedIssue(null);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Grammar check error:", error);
-      toast.error("Grammar check failed", {
-        description: "Make sure the Python service is running",
-      });
+      
+      // Reset loading state on error
+      setLoading(false);
+      
+      if (error.name === 'AbortError') {
+        toast.error("Request timeout", {
+          description: "Grammar check took too long. Please try again.",
+        });
+      } else {
+        toast.error("Grammar check failed", {
+          description: error.message || "Make sure the Python service is running on port 5001",
+        });
+      }
+      
+      // Clear issues on error
+      setGrammarIssues([]);
     } finally {
+      // Ensure loading is always reset
       setLoading(false);
     }
   };
 
   const getSuggestions = async () => {
-    if (!text || text.trim().length < 50) {
+    // Prevent multiple simultaneous requests
+    if (loading) {
+      return;
+    }
+
+    // Get current text from textarea
+    let currentText = text;
+    if (textareaRef?.current) {
+      currentText = textareaRef.current.value;
+    }
+
+    if (!currentText || currentText.trim().length < 50) {
       toast.error("Not enough text", {
         description: "Write at least a paragraph to get suggestions",
       });
@@ -105,6 +168,7 @@ export default function AIAssistant({ text, textareaRef, onSuggestionAccept }: A
     }
 
     setLoading(true);
+    setSelectedIssue(null);
     try {
       // Generate suggestions based on analysis
       const wordCount = text.split(" ").length;
@@ -177,10 +241,13 @@ export default function AIAssistant({ text, textareaRef, onSuggestionAccept }: A
       toast.success("Suggestions generated!", {
         description: `Found ${newSuggestions.length} ways to improve your writing`,
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Suggestions error:", error);
-      toast.error("Failed to generate suggestions");
+      toast.error("Failed to generate suggestions", {
+        description: error.message || "An error occurred while generating suggestions",
+      });
     } finally {
+      // Ensure loading is always reset
       setLoading(false);
     }
   };
@@ -230,16 +297,229 @@ export default function AIAssistant({ text, textareaRef, onSuggestionAccept }: A
     }
   };
 
-  const handleSuggestionClick = (issue: GrammarIssue, replacement: string) => {
-    if (issue.offset !== undefined && issue.length !== undefined && onSuggestionAccept) {
-      onSuggestionAccept(replacement, issue.offset, issue.length);
-      toast.success("Text replaced", {
-        description: `Replaced with: "${replacement}"`,
+  const handleSuggestionClick = async (issue: GrammarIssue, replacement: string) => {
+    if (!onSuggestionAccept || !textareaRef?.current) {
+      toast.error("Cannot replace text", {
+        description: "Textarea reference is not available",
       });
-      // Remove this issue from list after replacement
-      setGrammarIssues((prev) => prev.filter((item) => item !== issue));
-      setSelectedIssue(null);
+      return;
     }
+
+    // Get current text from textarea to ensure we have latest content
+    const currentText = textareaRef.current.value;
+    
+    // If we have offset and length, find the correct position
+    if (issue.offset === undefined || issue.length === undefined) {
+      toast.error("Invalid issue data", {
+        description: "Cannot determine text position to replace",
+      });
+      return;
+    }
+
+    // Get the original text that should be replaced (from issue context or textSnapshot)
+    const originalTextSnapshot = issue.textSnapshot || currentText;
+    const originalTextToReplace = originalTextSnapshot.substring(issue.offset, issue.offset + issue.length);
+    
+    // Extract context information for better matching
+    const contextInfo = issue.context 
+      ? (typeof issue.context === 'string' 
+          ? { text: issue.context }
+          : issue.context as { text?: string })
+      : { text: '' };
+    const contextText = contextInfo.text || '';
+    
+    // If text has changed, try to find the correct position using context
+    let actualOffset = issue.offset;
+    let actualLength = issue.length;
+    
+    // Strategy: Use context to find the correct position if available
+    if (contextText && contextText.length > originalTextToReplace.length + 10) {
+      // Context is available and meaningful, use it to locate the issue
+      // Find context in current text
+      const contextMatches: number[] = [];
+      let searchStart = 0;
+      while (true) {
+        const found = currentText.indexOf(contextText, searchStart);
+        if (found === -1) break;
+        contextMatches.push(found);
+        searchStart = found + 1;
+      }
+      
+      if (contextMatches.length > 0) {
+        // If multiple context matches, find the one closest to original offset
+        const bestMatch = contextMatches.reduce((prev, curr) => 
+          Math.abs(curr - issue.offset) < Math.abs(prev - issue.offset) ? curr : prev
+        );
+        
+        // Find the issue text within the context
+        // Calculate relative position of issue text within context in original text
+        const originalContextStart = originalTextSnapshot.indexOf(contextText);
+        if (originalContextStart !== -1) {
+          const relativeOffsetInContext = issue.offset - originalContextStart;
+          const candidateOffset = bestMatch + relativeOffsetInContext;
+          
+          // Verify the text at candidate position matches
+          if (candidateOffset >= 0 && candidateOffset + issue.length <= currentText.length) {
+            const candidateText = currentText.substring(candidateOffset, candidateOffset + issue.length);
+            
+            // Check word boundaries
+            const charBefore = candidateOffset > 0 ? currentText[candidateOffset - 1] : ' ';
+            const charAfter = candidateOffset + issue.length < currentText.length 
+              ? currentText[candidateOffset + issue.length] 
+              : ' ';
+            const isWordBoundary = !/\w/.test(charBefore) && !/\w/.test(charAfter);
+            
+            // Accept if text matches and it's at word boundary (or long enough)
+            if ((candidateText === originalTextToReplace || candidateText.toLowerCase() === originalTextToReplace.toLowerCase()) 
+                && (isWordBoundary || originalTextToReplace.length > 4)) {
+              actualOffset = candidateOffset;
+              actualLength = issue.length;
+            }
+          }
+        }
+      }
+    }
+    
+    // If context method didn't work or context not available, use direct search
+    if (actualOffset === issue.offset && currentText !== originalTextSnapshot) {
+      // Method 1: Try exact offset first (if text hasn't shifted much)
+      const textAtOffset = currentText.substring(issue.offset, issue.offset + issue.length);
+      if (textAtOffset === originalTextToReplace) {
+        // Verify it's a word boundary match (not part of another word)
+        const charBefore = issue.offset > 0 ? currentText[issue.offset - 1] : ' ';
+        const charAfter = issue.offset + issue.length < currentText.length 
+          ? currentText[issue.offset + issue.length] 
+          : ' ';
+        const isWordBoundary = !/\w/.test(charBefore) && !/\w/.test(charAfter);
+        
+        if (isWordBoundary || originalTextToReplace.length > 3) {
+          // Offset is still valid and it's a proper word boundary
+          actualOffset = issue.offset;
+          actualLength = issue.length;
+        } else {
+          // Not a word boundary - this might be replacing part of a word
+          // Search more carefully in a small window
+          actualOffset = issue.offset;
+          actualLength = issue.length;
+        }
+      } else {
+        // Method 2: Search in a window around original offset, prioritizing word boundaries
+        const searchRadius = 150;
+        const searchStart = Math.max(0, issue.offset - searchRadius);
+        const searchEnd = Math.min(currentText.length, issue.offset + issue.length + searchRadius);
+        
+        // Find all occurrences of the text in search window
+        const allMatches: Array<{ offset: number; isWordBoundary: boolean }> = [];
+        let searchPos = searchStart;
+        
+        while (searchPos < searchEnd) {
+          const foundIndex = currentText.indexOf(originalTextToReplace, searchPos);
+          if (foundIndex === -1 || foundIndex >= searchEnd) break;
+          
+          // Check word boundaries
+          const charBefore = foundIndex > 0 ? currentText[foundIndex - 1] : ' ';
+          const charAfter = foundIndex + issue.length < currentText.length 
+            ? currentText[foundIndex + issue.length] 
+            : ' ';
+          const isWordBoundary = !/\w/.test(charBefore) && !/\w/.test(charAfter);
+          
+          allMatches.push({
+            offset: foundIndex,
+            isWordBoundary
+          });
+          
+          searchPos = foundIndex + 1;
+        }
+        
+        if (allMatches.length > 0) {
+          // Prefer word boundary matches
+          const wordBoundaryMatches = allMatches.filter(m => m.isWordBoundary);
+          const candidates = wordBoundaryMatches.length > 0 ? wordBoundaryMatches : allMatches;
+          
+          // Among candidates, pick the one closest to original offset
+          const bestMatch = candidates.reduce((prev, curr) => 
+            Math.abs(curr.offset - issue.offset) < Math.abs(prev.offset - issue.offset) ? curr : prev
+          );
+          
+          actualOffset = bestMatch.offset;
+          actualLength = issue.length;
+        } else {
+          // Try case-insensitive search
+          const lowerText = currentText.toLowerCase();
+          const lowerSearch = originalTextToReplace.toLowerCase();
+          let foundIndex = -1;
+          let searchPos = searchStart;
+          
+          while (searchPos < searchEnd) {
+            const found = lowerText.indexOf(lowerSearch, searchPos);
+            if (found === -1 || found >= searchEnd) break;
+            
+            // Check word boundaries for case-insensitive match
+            const charBefore = found > 0 ? currentText[found - 1] : ' ';
+            const charAfter = found + issue.length < currentText.length 
+              ? currentText[found + issue.length] 
+              : ' ';
+            const isWordBoundary = !/\w/.test(charBefore) && !/\w/.test(charAfter);
+            
+            if (isWordBoundary) {
+              foundIndex = found;
+              break;
+            }
+            
+            searchPos = found + 1;
+          }
+          
+          if (foundIndex !== -1) {
+            actualOffset = foundIndex;
+            actualLength = issue.length;
+          } else {
+            // Cannot find the text, show error
+            toast.error("Cannot find text to replace", {
+              description: `The text "${originalTextToReplace}" could not be found at the expected position. The text may have been modified. Please check grammar again.`,
+            });
+            // Remove this issue since we can't replace it
+            setGrammarIssues((prev) => prev.filter((item) => 
+              !(item.offset === issue.offset && 
+                item.length === issue.length && 
+                item.message === issue.message)
+            ));
+            return;
+          }
+        }
+      }
+    } else if (currentText === originalTextSnapshot) {
+      // Text hasn't changed, but verify word boundaries
+      const charBefore = issue.offset > 0 ? currentText[issue.offset - 1] : ' ';
+      const charAfter = issue.offset + issue.length < currentText.length 
+        ? currentText[issue.offset + issue.length] 
+        : ' ';
+      const isWordBoundary = !/\w/.test(charBefore) && !/\w/.test(charAfter);
+      
+      // For short words, ensure it's at word boundary
+      if (!isWordBoundary && originalTextToReplace.length <= 3) {
+        // This might be replacing part of a word, warn user
+        console.warn(`Warning: Replacing "${originalTextToReplace}" that may be part of another word`);
+      }
+    }
+    
+    // Final verification: ensure we're replacing the right text
+    const finalTextToReplace = currentText.substring(actualOffset, actualOffset + actualLength);
+    
+    // Perform the replacement
+    onSuggestionAccept(replacement, actualOffset, actualLength);
+    
+    toast.success("Text replaced", {
+      description: `Replaced "${finalTextToReplace}" with "${replacement}"`,
+    });
+    
+    // Remove this issue from list after replacement
+    setGrammarIssues((prev) => prev.filter((item) => {
+      // Remove by comparing issue properties, not reference
+      return !(item.offset === issue.offset && 
+               item.length === issue.length && 
+               item.message === issue.message);
+    }));
+    setSelectedIssue(null);
   };
 
   return (
@@ -290,25 +570,43 @@ export default function AIAssistant({ text, textareaRef, onSuggestionAccept }: A
             <button
               className="ai-action-btn"
               onClick={checkGrammar}
-              disabled={loading || !text}
+              disabled={loading}
+              title={loading ? "Checking grammar..." : "Check grammar and spelling"}
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M9 11L12 14L22 4"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M21 12V19C21 20.1 20.1 21 19 21H5C3.9 21 3 20.1 3 19V5C3 3.9 3.9 3 5 3H16"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              Check Grammar
+              {loading ? (
+                <>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="spinner-mini">
+                    <path
+                      d="M21 12a9 9 0 1 1-6.219-8.56"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  Checking...
+                </>
+              ) : (
+                <>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <path
+                      d="M9 11L12 14L22 4"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M21 12V19C21 20.1 20.1 21 19 21H5C3.9 21 3 20.1 3 19V5C3 3.9 3.9 3 5 3H16"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  Check Grammar
+                </>
+              )}
             </button>
 
             <button
@@ -348,73 +646,171 @@ export default function AIAssistant({ text, textareaRef, onSuggestionAccept }: A
           {/* Content */}
           <div className="ai-assistant__content">
             {loading ? (
-              <div className="ai-loading">
-                <div className="spinner"></div>
-                <p>Analyzing your writing...</p>
+              <div className="ai-loading-state">
+                <div className="ai-loading-state__spinner">
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+                  </svg>
+                </div>
+                <h3 className="ai-loading-state__title">Analyzing your writing...</h3>
+                <p className="ai-loading-state__description">Checking grammar, spelling, and style</p>
               </div>
             ) : activeTab === "grammar" ? (
               <div className="ai-grammar">
                 {grammarIssues.length === 0 ? (
-                  <div className="ai-empty">
-                    <p>✅ No grammar issues found</p>
-                    <span>Click "Check Grammar" to analyze your text</span>
+                  <div className="ai-empty-state">
+                    <div className="ai-empty-state__icon">
+                      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                      </svg>
+                    </div>
+                    <h3 className="ai-empty-state__title">Great work! 🎉</h3>
+                    <p className="ai-empty-state__description">No grammar issues found in your text.</p>
+                    <p className="ai-empty-state__hint">Click &quot;Check Grammar&quot; to analyze your writing</p>
                   </div>
                 ) : (
-                  grammarIssues.map((issue, index) => {
-                    // Create unique key based on offset and index
-                    const uniqueKey = `issue-${issue.offset || 0}-${issue.length || 0}-${index}`;
-                    return (
-                    <div 
-                      key={uniqueKey}
-                      className={`ai-issue ai-issue--${issue.severity} ${selectedIssue === index ? 'ai-issue--selected' : ''}`}
-                      onClick={() => handleIssueClick(issue, index)}
-                    >
-                      <div className="ai-issue__header">
-                        <div className="ai-issue__index">#{index + 1}</div>
-                        <div className="ai-issue__type">{issue.type}</div>
-                        {issue.short_message && (
-                          <div className="ai-issue__short">{issue.short_message}</div>
-                        )}
+                  <div>
+                    <div className="ai-grammar-summary">
+                      <div className="ai-grammar-summary__badge">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <line x1="12" y1="16" x2="12" y2="12"></line>
+                          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                        </svg>
+                        Found {grammarIssues.length} {grammarIssues.length === 1 ? 'issue' : 'issues'}
                       </div>
-                      <div className="ai-issue__message">{issue.message}</div>
-                      {issue.offset !== undefined && (
-                        <div className="ai-issue__location">
-                          Position: {issue.offset} (length: {issue.length || 1})
-                        </div>
-                      )}
-                      {issue.context && (
-                        <div className="ai-issue__context">
-                          <span className="ai-issue__context-label">Context:</span>
-                          <code>
-                            {typeof issue.context === 'string' 
-                              ? issue.context 
-                              : (issue.context as any)?.text || JSON.stringify(issue.context)}
-                          </code>
-                        </div>
-                      )}
-                      {issue.replacements && issue.replacements.length > 0 && (
-                        <div className="ai-issue__replacements">
-                          <span className="ai-issue__replacements-label">Suggestions:</span>
-                          <div className="ai-issue__replacements-list">
-                            {issue.replacements.map((rep, idx) => (
-                              <button
-                                key={idx}
-                                className="ai-issue__replacement"
-                                onClick={(e) => {
-                                  e.stopPropagation(); // Prevent issue click
-                                  handleSuggestionClick(issue, rep.value);
-                                }}
-                                title="Click to replace the error with this suggestion"
-                              >
-                                {rep.value}
-                              </button>
-                            ))}
+                    </div>
+                    {grammarIssues.map((issue, index) => {
+                      // Create unique key based on offset and index
+                      const uniqueKey = `issue-${issue.offset || 0}-${issue.length || 0}-${index}`;
+                      const getIssueIcon = () => {
+                        switch (issue.severity) {
+                          case 'error':
+                            return (
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="8" x2="12" y2="12"></line>
+                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                              </svg>
+                            );
+                          case 'warning':
+                            return (
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                                <line x1="12" y1="9" x2="12" y2="13"></line>
+                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                              </svg>
+                            );
+                          default:
+                            return (
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="16" x2="12" y2="12"></line>
+                                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                              </svg>
+                            );
+                        }
+                      };
+
+                      const getIssueTypeLabel = () => {
+                        const typeMap: Record<string, string> = {
+                          'Spelling': 'Spelling Error',
+                          'Grammar': 'Grammar Error',
+                          'Punctuation': 'Punctuation',
+                          'Style': 'Style Issue',
+                          'Typographical': 'Typo',
+                          'Typography': 'Typography',
+                        };
+                        return typeMap[issue.type] || issue.type || 'Issue';
+                      };
+
+                      return (
+                        <div 
+                          key={uniqueKey}
+                          className={`ai-issue-card ai-issue-card--${issue.severity} ${selectedIssue === index ? 'ai-issue-card--selected' : ''}`}
+                          onClick={() => handleIssueClick(issue, index)}
+                        >
+                          <div className="ai-issue-card__header">
+                            <div className="ai-issue-card__icon">
+                              {getIssueIcon()}
+                            </div>
+                            <div className="ai-issue-card__info">
+                              <div className="ai-issue-card__type">{getIssueTypeLabel()}</div>
+                              {issue.short_message && (
+                                <div className="ai-issue-card__short">{issue.short_message}</div>
+                              )}
+                            </div>
+                            <div className="ai-issue-card__number">#{index + 1}</div>
+                          </div>
+                          
+                          <div className="ai-issue-card__message">
+                            {issue.message}
+                          </div>
+
+                          {issue.context && (
+                            <div className="ai-issue-card__context">
+                              <div className="ai-issue-card__context-label">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                  <polyline points="14 2 14 8 20 8"></polyline>
+                                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                                  <line x1="16" y1="17" x2="8" y2="17"></line>
+                                  <polyline points="10 9 9 9 8 9"></polyline>
+                                </svg>
+                                Context
+                              </div>
+                              <div className="ai-issue-card__context-text">
+                                {typeof issue.context === 'string' 
+                                  ? issue.context 
+                                  : (issue.context as { text?: string })?.text || JSON.stringify(issue.context)}
+                              </div>
+                            </div>
+                          )}
+
+                          {issue.replacements && issue.replacements.length > 0 && (
+                            <div className="ai-issue-card__replacements">
+                              <div className="ai-issue-card__replacements-label">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                </svg>
+                                Suggestions
+                              </div>
+                              <div className="ai-issue-card__replacements-list">
+                                {issue.replacements.map((rep, idx) => (
+                                  <button
+                                    key={idx}
+                                    className="ai-issue-card__replacement-btn"
+                                    onClick={(e) => {
+                                      e.stopPropagation(); // Prevent issue click
+                                      handleSuggestionClick(issue, rep.value);
+                                    }}
+                                    title={`Click to replace with: ${rep.value}`}
+                                  >
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                      <polyline points="17 8 12 3 7 8"></polyline>
+                                      <line x1="12" y1="3" x2="12" y2="15"></line>
+                                    </svg>
+                                    {rep.value}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          <div className="ai-issue-card__action-hint">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <circle cx="12" cy="12" r="10"></circle>
+                              <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                            Click to highlight in text
                           </div>
                         </div>
-                      )}
-                    </div>
-                    );
-                  })
+                      );
+                    })}
+                  </div>
                 )}
               </div>
             ) : (
@@ -422,7 +818,7 @@ export default function AIAssistant({ text, textareaRef, onSuggestionAccept }: A
                 {suggestions.length === 0 ? (
                   <div className="ai-empty">
                     <p>💡 No suggestions yet</p>
-                    <span>Click "Get Suggestions" to improve your writing</span>
+                    <span>Click &quot;Get Suggestions&quot; to improve your writing</span>
                   </div>
                 ) : (
                   suggestions.map((suggestion, index) => (

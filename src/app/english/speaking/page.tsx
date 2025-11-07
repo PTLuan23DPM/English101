@@ -320,13 +320,13 @@ export default function SpeakingPage() {
       setMicError("");
       stream.getTracks().forEach(track => track.stop());
       return true;
-    } catch (error: any) {
+    } catch (error) {
       console.error("Microphone access error:", error);
-      
-      if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+      const errorObj = error as { name?: string };
+      if (errorObj.name === 'NotAllowedError' || errorObj.name === 'PermissionDeniedError') {
         setMicPermission("denied");
         setMicError("Microphone access denied. Please allow microphone access in your browser settings.");
-      } else if (error.name === 'NotFoundError') {
+      } else if (errorObj.name === 'NotFoundError') {
         setMicError("No microphone found. Please connect a microphone and try again.");
       } else {
         setMicError("Could not access microphone. Please check your device settings.");
@@ -390,7 +390,7 @@ export default function SpeakingPage() {
     setElapsed(0);
     setRecording(true);
       setMicError("");
-    } catch (error: any) {
+    } catch (error) {
       console.error("Recording error:", error);
       setMicError("Failed to start recording. Please check your microphone.");
     }
@@ -578,7 +578,8 @@ export default function SpeakingPage() {
                             const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
                             if (response.ok) {
                               const data = await response.json();
-                              const audioUrl = data[0]?.phonetics?.find((p: any) => p.audio)?.audio;
+                              interface PhoneticData { audio?: string; }
+                              const audioUrl = data[0]?.phonetics?.find((p: PhoneticData) => p.audio)?.audio;
                               if (audioUrl) {
                                 const audio = new Audio(audioUrl);
                                 audio.play();

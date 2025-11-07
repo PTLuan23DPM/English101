@@ -67,8 +67,9 @@ export default function ProfilePage() {
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
-    } catch (error: any) {
-      toast.error(error.message || "Failed to change password");
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to change password";
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -109,7 +110,7 @@ export default function ProfilePage() {
               <label>CEFR Level</label>
               <input
                 type="text"
-                value={(session?.user as any)?.cefrLevel || "Not set"}
+                value={(session?.user as { cefrLevel?: string })?.cefrLevel || "Not set"}
                 disabled
                 className="disabled"
               />

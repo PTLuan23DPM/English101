@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { handleError } from "@/lib/error-handler";
 
 interface AnswerSubmission {
   questionId: string;
@@ -18,9 +19,10 @@ interface AnswerSubmission {
  */
 export async function POST(
   req: NextRequest,
-  { params }: { params: { activityId: string } }
+  { params }: { params: Promise<{ activityId: string }> }
 ) {
   try {
+    const { activityId } = await params;
     const session = await getServerSession(authOptions);
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -41,7 +43,7 @@ export async function POST(
 
     // Validate activity exists
     const activity = await prisma.activity.findUnique({
-      where: { id: params.activityId },
+      where: { id: activityId },
       include: {
         questions: {
           include: {
@@ -83,7 +85,7 @@ export async function POST(
 
       // Check if answer is correct
       let isCorrect = false;
-      
+
       if (question.type === 'SINGLE_CHOICE' || question.type === 'TRUE_FALSE') {
         // Single choice: check if chosen answer matches correct answer
         const chosenChoice = question.choices.find((c) => c.id === answer.chosenIds[0]);
@@ -107,7 +109,7 @@ export async function POST(
       totalScore += scoreEarned;
 
       // Create submission
-      const submission = await prisma.submission.create({
+      await prisma.submission.create({
         data: {
           attemptId: attempt.id,
           userId: user.id,
@@ -153,11 +155,7 @@ export async function POST(
       answers: gradedAnswers,
     });
   } catch (error) {
-    console.error("Error submitting reading activity:", error);
-    return NextResponse.json(
-      { error: "Failed to submit activity" },
-      { status: 500 }
-    );
+    return handleError(error);
   }
 }
 

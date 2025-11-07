@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { handleError } from "@/lib/error-handler";
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const session = await getServerSession(authOptions);
 
@@ -64,16 +65,16 @@ export async function GET(req: NextRequest) {
     const attemptsWithScore = user.attempts.filter((a) => a.score !== null);
     const avgScore = attemptsWithScore.length > 0
       ? Math.round(
-          attemptsWithScore.reduce((sum, a) => sum + (a.score || 0), 0) /
-            attemptsWithScore.length
-        )
+        attemptsWithScore.reduce((sum, a) => sum + (a.score || 0), 0) /
+        attemptsWithScore.length
+      )
       : 0;
 
     // Calculate streak (simplified - count consecutive days with activity)
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     let streak = 0;
-    let checkDate = new Date(today);
+    const checkDate = new Date(today);
 
     // Get all activity dates
     const activityDates = user.attempts
@@ -162,11 +163,7 @@ export async function GET(req: NextRequest) {
       })),
     });
   } catch (error) {
-    console.error("Dashboard stats error:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return handleError(error);
   }
 }
 

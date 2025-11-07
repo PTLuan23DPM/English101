@@ -71,10 +71,11 @@ export async function GET(req: NextRequest) {
       skillBreakdown,
       recentActivities,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Get progress stats error:", error);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
-      { error: "Failed to get progress stats", details: error.message },
+      { error: "Failed to get progress stats", details: errorMessage },
       { status: 500 }
     );
   }
@@ -161,10 +162,11 @@ export async function POST(req: NextRequest) {
       activity,
       streak: newStreak,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Record activity error:", error);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
-      { error: "Failed to record activity", details: error.message },
+      { error: "Failed to record activity", details: errorMessage },
       { status: 500 }
     );
   }

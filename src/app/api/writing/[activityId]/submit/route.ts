@@ -42,9 +42,10 @@ import prisma from "@/lib/prisma";
  */
 export async function POST(
   req: NextRequest,
-  { params }: { params: { activityId: string } }
+  { params }: { params: Promise<{ activityId: string }> }
 ) {
   try {
+    const { activityId } = await params;
     const session = await getServerSession(authOptions);
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -58,7 +59,7 @@ export async function POST(
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    const { questionId, text, startTime, timeTaken } = await req.json();
+    const { questionId, text, startTime } = await req.json();
 
     if (!text || text.trim().length === 0) {
       return NextResponse.json({ error: "No text provided" }, { status: 400 });
@@ -66,7 +67,7 @@ export async function POST(
 
     // Validate activity and question
     const activity = await prisma.activity.findUnique({
-      where: { id: params.activityId },
+      where: { id: activityId },
       include: {
         questions: true,
       },
@@ -103,7 +104,7 @@ export async function POST(
 
     // TODO: Integrate AI grading (OpenAI GPT-4, custom model, etc.)
     // For now, we'll use mock grading
-    const feedback = await mockGradeWriting(text, question.prompt, activity.level);
+    const feedback = await mockGradeWriting(text);
 
     // Save submission
     await prisma.submission.create({
@@ -153,9 +154,7 @@ export async function POST(
 // Mock grading function
 // TODO: Replace with real AI grading
 async function mockGradeWriting(
-  text: string,
-  prompt: string,
-  level: string
+  text: string
 ): Promise<{
   score: number;
   taskResponse: number;
@@ -174,16 +173,16 @@ async function mockGradeWriting(
   const wordCount = text.split(/\s+/).length;
   const sentenceCount = text.split(/[.!?]+/).filter(s => s.trim()).length;
   const avgWordsPerSentence = wordCount / Math.max(sentenceCount, 1);
-  
+
   // Mock scoring based on basic metrics
   const hasGoodLength = wordCount >= 50 && wordCount <= 300;
   const hasGoodStructure = avgWordsPerSentence >= 8 && avgWordsPerSentence <= 25;
-  
+
   const taskResponse = Math.floor(Math.random() * 20) + (hasGoodLength ? 75 : 60);
   const coherence = Math.floor(Math.random() * 20) + (hasGoodStructure ? 70 : 60);
   const lexicalResource = Math.floor(Math.random() * 20) + 70;
   const grammaticalRange = Math.floor(Math.random() * 20) + 65;
-  
+
   const totalScore = Math.round((taskResponse + coherence + lexicalResource + grammaticalRange) / 4);
 
   return {
@@ -195,10 +194,10 @@ async function mockGradeWriting(
     overallFeedback: totalScore >= 80
       ? "Excellent writing! Your response is well-structured and addresses the prompt effectively."
       : totalScore >= 70
-      ? "Good work! Your writing is clear, but there's room for improvement in vocabulary and grammar."
-      : totalScore >= 60
-      ? "Fair effort. Focus on task response and coherence. Practice writing more complex sentences."
-      : "Keep practicing! Review grammar basics and try to organize your ideas more clearly.",
+        ? "Good work! Your writing is clear, but there's room for improvement in vocabulary and grammar."
+        : totalScore >= 60
+          ? "Fair effort. Focus on task response and coherence. Practice writing more complex sentences."
+          : "Keep practicing! Review grammar basics and try to organize your ideas more clearly.",
     strengths: [
       taskResponse >= 75 ? "Clear response to the prompt" : null,
       coherence >= 75 ? "Well-organized paragraphs" : null,

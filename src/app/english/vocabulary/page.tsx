@@ -249,115 +249,167 @@ export default function VocabularyPage() {
       </section>
 
       {/* Dictionary Search */}
-      <section className="card">
-        <h3 className="section-title" style={{ marginBottom: "16px" }}>
-          📖 Dictionary Search
-        </h3>
-        <p className="muted" style={{ marginBottom: "16px", fontSize: "14px" }}>
-          Look up any English word to see its definition, pronunciation, and examples
-        </p>
-        
-        <form onSubmit={handleSearch} style={{ marginBottom: "20px" }}>
-          <div style={{ display: "flex", gap: "12px" }}>
+      <section className="card vocab-dictionary-card">
+        <div className="vocab-dictionary-header">
+          <div className="vocab-dictionary-title-section">
+            <div className="vocab-dictionary-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+            <div>
+              <h3 className="vocab-dictionary-title">Dictionary Search</h3>
+              <p className="vocab-dictionary-subtitle">Look up any English word instantly</p>
+            </div>
+          </div>
+        </div>
+
+        <form onSubmit={handleSearch} className="vocab-dictionary-search-form">
+          <div className="vocab-dictionary-search-wrapper">
+            <svg className="vocab-dictionary-search-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <circle cx="9" cy="9" r="6" stroke="currentColor" strokeWidth="1.5"/>
+              <path d="M13 13L17 17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+            </svg>
             <input
               type="text"
-              className="input"
-              placeholder="Enter a word to search..."
+              className="vocab-dictionary-search-input"
+              placeholder="Type a word to search..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              style={{ flex: 1 }}
               disabled={searching}
             />
+            {searchQuery && (
+              <button
+                type="button"
+                className="vocab-dictionary-clear-btn"
+                onClick={() => {
+                  setSearchQuery("");
+                  setDictionaryResult(null);
+                  setSearchError("");
+                }}
+              >
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                </svg>
+              </button>
+            )}
             <button
               type="submit"
-              className="btn primary"
-              disabled={searching}
+              className="vocab-dictionary-search-btn"
+              disabled={searching || !searchQuery.trim()}
             >
-              {searching ? "Searching..." : "🔍 Search"}
+              {searching ? (
+                <>
+                  <svg className="vocab-spinner-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="2" strokeDasharray="24" strokeDashoffset="12" strokeLinecap="round"/>
+                  </svg>
+                  Searching...
+                </>
+              ) : (
+                <>
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <circle cx="7" cy="7" r="5" stroke="currentColor" strokeWidth="1.5"/>
+                    <path d="M11 11L14 14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                  </svg>
+                  Search
+                </>
+              )}
             </button>
           </div>
         </form>
 
         {/* Search Error */}
         {searchError && (
-          <div style={{ padding: "16px", background: "#fee2e2", borderRadius: "8px", color: "#991b1b", marginBottom: "20px" }}>
-            {searchError}
+          <div className="vocab-dictionary-error">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <circle cx="10" cy="10" r="8" stroke="currentColor" strokeWidth="1.5"/>
+              <path d="M10 6V10M10 14H10.01" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+            </svg>
+            <span>{searchError}</span>
           </div>
         )}
 
         {/* Dictionary Results */}
         {dictionaryResult && (
-          <div className="dictionary-result">
-            <div className="dictionary-header">
+          <div className="vocab-dictionary-result">
+            <div className="vocab-dictionary-result-header">
               <div>
-                <h2 style={{ fontSize: "32px", fontWeight: "700", marginBottom: "8px", textTransform: "capitalize" }}>
-                  {dictionaryResult.word}
-                </h2>
+                <h4 className="vocab-dictionary-word">{dictionaryResult.word}</h4>
                 {dictionaryResult.phonetic && (
-                  <div style={{ fontSize: "18px", color: "#6b7280", marginBottom: "12px" }}>
-                    {dictionaryResult.phonetic}
-                  </div>
+                  <div className="vocab-dictionary-phonetic">{dictionaryResult.phonetic}</div>
                 )}
               </div>
-              <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-                {dictionaryResult.phonetics
-                  .filter((p) => p.audio)
-                  .map((phonetic, idx) => (
-                    <button
-                      key={idx}
-                      className="btn outline"
-                      onClick={() => playPronunciation(phonetic.audio!)}
-                    >
-                      🔊 {phonetic.text || "Play"}
-                    </button>
-                  ))}
-              </div>
+              {dictionaryResult.phonetics.find((p) => p.audio) && (
+                <button
+                  className="vocab-dictionary-audio-btn"
+                  onClick={() => {
+                    const audioUrl = dictionaryResult.phonetics.find((p) => p.audio)?.audio;
+                    if (audioUrl) {
+                      playPronunciation(audioUrl);
+                    }
+                  }}
+                >
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M10 2V10L13 12M10 18C5 18 1 14 1 9C1 4 5 0 10 0C15 0 19 4 19 9C19 14 15 18 10 18Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                  </svg>
+                </button>
+              )}
             </div>
 
             {dictionaryResult.origin && (
-              <div style={{ padding: "12px", background: "#f9fafb", borderRadius: "8px", marginBottom: "20px" }}>
-                <strong>Origin:</strong> {dictionaryResult.origin}
+              <div className="vocab-dictionary-origin">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M8 0L10 6L16 8L10 10L8 16L6 10L0 8L6 6L8 0Z" fill="currentColor"/>
+                </svg>
+                <div>
+                  <strong>Origin:</strong> {dictionaryResult.origin}
+                </div>
               </div>
             )}
 
             {/* Meanings */}
-            {dictionaryResult.meanings.map((meaning, idx) => (
-              <div key={idx} className="meaning-section">
-                <h4 style={{ fontSize: "18px", fontWeight: "600", color: "#6366f1", marginBottom: "12px" }}>
-                  {meaning.partOfSpeech}
-                </h4>
-                
-                {meaning.definitions.slice(0, 3).map((def, defIdx) => (
-                  <div key={defIdx} style={{ marginBottom: "16px", paddingLeft: "16px", borderLeft: "3px solid #e5e7eb" }}>
-                    <p style={{ fontSize: "15px", marginBottom: "8px" }}>
-                      <strong>{defIdx + 1}.</strong> {def.definition}
-                    </p>
-                    {def.example && (
-                      <p style={{ fontSize: "14px", fontStyle: "italic", color: "#6b7280", marginBottom: "8px" }}>
-                        Example: "{def.example}"
-                      </p>
-                    )}
-                    {def.synonyms && def.synonyms.length > 0 && (
-                      <div style={{ fontSize: "13px", marginTop: "8px" }}>
-                        <strong>Synonyms:</strong> {def.synonyms.slice(0, 5).join(", ")}
+            <div className="vocab-dictionary-meanings">
+              {dictionaryResult.meanings.slice(0, 3).map((meaning, idx) => (
+                <div key={idx} className="vocab-dictionary-meaning">
+                  <div className="vocab-dictionary-part-of-speech">{meaning.partOfSpeech}</div>
+                  {meaning.definitions.slice(0, 2).map((def, defIdx) => (
+                    <div key={defIdx} className="vocab-dictionary-definition">
+                      <div className="vocab-dictionary-definition-text">
+                        <span className="vocab-def-number">{defIdx + 1}.</span>
+                        {def.definition}
                       </div>
-                    )}
-                    {def.antonyms && def.antonyms.length > 0 && (
-                      <div style={{ fontSize: "13px", marginTop: "4px" }}>
-                        <strong>Antonyms:</strong> {def.antonyms.slice(0, 5).join(", ")}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            ))}
+                      {def.example && (
+                        <div className="vocab-dictionary-example">
+                          <span className="vocab-example-label">Example:</span>
+                          "{def.example}"
+                        </div>
+                      )}
+                      {def.synonyms && def.synonyms.length > 0 && (
+                        <div className="vocab-dictionary-synonyms">
+                          <strong>Synonyms:</strong> {def.synonyms.slice(0, 5).join(", ")}
+                        </div>
+                      )}
+                      {def.antonyms && def.antonyms.length > 0 && (
+                        <div className="vocab-dictionary-antonyms">
+                          <strong>Antonyms:</strong> {def.antonyms.slice(0, 5).join(", ")}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
 
             <button
-              className="btn outline w-full"
-              style={{ marginTop: "16px" }}
+              className="vocab-dictionary-add-btn"
               onClick={() => toast.success("Word saved to your vocabulary list!")}
             >
-              + Add to My Vocabulary
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M8 2V14M2 8H14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+              </svg>
+              <span>Add to My Vocabulary</span>
             </button>
           </div>
         )}

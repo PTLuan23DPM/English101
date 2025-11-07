@@ -17,6 +17,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/english/progress": "My Progress",
   "/english/goals": "Goals & Targets",
   "/english/settings": "Settings",
+  "/english/test": "Level Test",
 };
 
 export default function DashboardHeader() {

@@ -140,9 +140,24 @@ export default function DashboardPage() {
         {/* Welcome & Usage Stats */}
         <div className="welcome-section">
           <div className="welcome-card">
-            <div className="welcome-text">
-              <h2>🔥 <span id="current-streak">{stats?.stats.streak || 0}</span> days streak!</h2>
-              <button className="upgrade-btn">Keep up your streak</button>
+            <div className="streak-badge-card">
+              <div className="streak-icon-wrapper">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 2L15 8L22 9L17 14L18 21L12 18L6 21L7 14L2 9L9 8L12 2Z" fill="url(#streak-gradient)" stroke="url(#streak-gradient)" strokeWidth="1"/>
+                  <defs>
+                    <linearGradient id="streak-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#f59e0b" />
+                      <stop offset="100%" stopColor="#ef4444" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
+              <div className="streak-content">
+                <div className="streak-label">Current Streak</div>
+                <div className="streak-value">{stats?.stats.streak || 0} days</div>
+                <div className="streak-message">Keep practicing daily!</div>
+              </div>
+              <button className="streak-action-btn">Continue</button>
             </div>
             <div className="usage-stats">
               <div className="stat">
@@ -165,18 +180,39 @@ export default function DashboardPage() {
         <div className="chatbot-section">
           <div className="chatbot-card">
             <div className="chatbot-header">
-              <div className="bot-avatar">🤖</div>
-              <div className="bot-greeting">
-                <h3>Hey, I&apos;m LearnBot!</h3>
-                <p>I&apos;m here to make English learning fun and effective for you ✨</p>
+              <div className="chatbot-avatar">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="currentColor" opacity="0.1"/>
+                  <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+              <div className="chatbot-greeting">
+                <h3 className="chatbot-title">AI Assistant</h3>
+                <p className="chatbot-subtitle">Get instant help with grammar, vocabulary, and writing</p>
               </div>
             </div>
-            <div className="chatbot-input">
-              <input type="text" placeholder="Ask anything in your language" className="chat-input" />
-              <div className="chat-actions">
-                <button className="chat-btn">Ask</button>
-                <button className="chat-btn">Learn</button>
-                <button className="chat-btn">Support</button>
+            <div className="chatbot-input-wrapper">
+              <div className="chatbot-search-box">
+                <svg className="chatbot-search-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <circle cx="9" cy="9" r="6" stroke="currentColor" strokeWidth="1.5"/>
+                  <path d="M13 13L17 17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                </svg>
+                <input 
+                  type="text" 
+                  placeholder="Ask anything about English..." 
+                  className="chatbot-input-field" 
+                />
+                <button className="chatbot-send-btn">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M18 2L9 11M18 2L12 18L9 11M18 2L2 8L9 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
+              </div>
+              <div className="chatbot-quick-actions">
+                <button className="chatbot-quick-btn">Grammar Check</button>
+                <button className="chatbot-quick-btn">Vocabulary Help</button>
+                <button className="chatbot-quick-btn">Writing Tips</button>
               </div>
             </div>
           </div>
@@ -313,55 +349,111 @@ export default function DashboardPage() {
 
         {/* Quick Dictionary */}
         <div className="quick-dictionary-section" style={{ marginBottom: "32px" }}>
-          <div className="card">
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
-              <div>
-                <h3 style={{ marginBottom: "8px" }}>📖 Quick Dictionary</h3>
-                <p className="muted" style={{ fontSize: "14px" }}>Look up any English word instantly</p>
+          <div className="card dictionary-card">
+            <div className="dictionary-header">
+              <div className="dictionary-title-section">
+                <div className="dictionary-icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="dictionary-title">Quick Dictionary</h3>
+                  <p className="dictionary-subtitle">Look up any English word instantly</p>
+                </div>
               </div>
-              <Link href="/english/vocabulary" className="btn outline">
-                Go to Vocabulary →
+              <Link href="/english/vocabulary" className="btn outline sm">
+                Vocabulary →
               </Link>
             </div>
 
-            <form onSubmit={searchQuickWord} style={{ marginBottom: "16px" }}>
-              <div style={{ display: "flex", gap: "12px" }}>
+            <form onSubmit={searchQuickWord} className="dictionary-search-form">
+              <div className="dictionary-search-wrapper">
+                <svg className="dictionary-search-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <circle cx="9" cy="9" r="6" stroke="currentColor" strokeWidth="1.5"/>
+                  <path d="M13 13L17 17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                </svg>
                 <input
                   type="text"
-                  className="input"
-                  placeholder="Type a word..."
+                  className="dictionary-search-input"
+                  placeholder="Type a word to search..."
                   value={quickWord}
                   onChange={(e) => setQuickWord(e.target.value)}
                   disabled={quickSearching}
-                  style={{ flex: 1 }}
                 />
-                <button type="submit" className="btn primary" disabled={quickSearching}>
-                  {quickSearching ? "Searching..." : "🔍 Search"}
+                {quickWord && (
+                  <button
+                    type="button"
+                    className="dictionary-clear-btn"
+                    onClick={() => {
+                      setQuickWord("");
+                      setQuickResult(null);
+                    }}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                      <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                    </svg>
+                  </button>
+                )}
+                <button type="submit" className="dictionary-search-btn" disabled={quickSearching || !quickWord.trim()}>
+                  {quickSearching ? (
+                    <>
+                      <svg className="spinner-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="2" strokeDasharray="24" strokeDashoffset="12" strokeLinecap="round"/>
+                      </svg>
+                      Searching...
+                    </>
+                  ) : (
+                    "Search"
+                  )}
                 </button>
               </div>
             </form>
 
             {quickResult && (
-              <div style={{ padding: "16px", background: "#f9fafb", borderRadius: "8px", border: "1px solid #e5e7eb" }}>
-                <div style={{ marginBottom: "12px" }}>
-                  <h4 style={{ fontSize: "24px", fontWeight: "600", marginBottom: "4px", textTransform: "capitalize" }}>
-                    {quickResult.word}
-                  </h4>
-                  {quickResult.phonetic && (
-                    <div style={{ fontSize: "16px", color: "#6b7280" }}>{quickResult.phonetic}</div>
+              <div className="dictionary-result">
+                <div className="dictionary-result-header">
+                  <div>
+                    <h4 className="dictionary-word">{quickResult.word}</h4>
+                    {quickResult.phonetic && (
+                      <div className="dictionary-phonetic">{quickResult.phonetic}</div>
+                    )}
+                  </div>
+                  {quickResult.phonetics?.find((p: any) => p.audio) && (
+                    <button
+                      className="dictionary-audio-btn"
+                      onClick={() => {
+                        const audioUrl = quickResult.phonetics.find((p: any) => p.audio)?.audio;
+                        if (audioUrl) {
+                          const audio = new Audio(audioUrl);
+                          audio.play();
+                        }
+                      }}
+                    >
+                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M10 2V10L13 12M10 18C5 18 1 14 1 9C1 4 5 0 10 0C15 0 19 4 19 9C19 14 15 18 10 18Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                      </svg>
+                    </button>
                   )}
                 </div>
 
-                {quickResult.meanings.slice(0, 2).map((meaning: any, idx: number) => (
-                  <div key={idx} style={{ marginBottom: "12px" }}>
-                    <div style={{ fontSize: "14px", fontWeight: "600", color: "#6366f1", marginBottom: "6px" }}>
-                      {meaning.partOfSpeech}
+                <div className="dictionary-meanings">
+                  {quickResult.meanings.slice(0, 2).map((meaning: any, idx: number) => (
+                    <div key={idx} className="dictionary-meaning">
+                      <div className="dictionary-part-of-speech">{meaning.partOfSpeech}</div>
+                      <div className="dictionary-definition">
+                        {meaning.definitions[0].definition}
+                      </div>
+                      {meaning.definitions[0].example && (
+                        <div className="dictionary-example">
+                          <span className="dictionary-example-label">Example:</span> "{meaning.definitions[0].example}"
+                        </div>
+                      )}
                     </div>
-                    <div style={{ fontSize: "14px", paddingLeft: "12px", borderLeft: "2px solid #e5e7eb" }}>
-                      {meaning.definitions[0].definition}
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             )}
           </div>

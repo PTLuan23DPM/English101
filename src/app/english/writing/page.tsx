@@ -774,7 +774,12 @@ export default function WritingPage() {
                 </div>
               )}
               
-              <div className="task-icon">{task.icon}</div>
+              <div className="task-header">
+                <div className={`task-level-badge task-level-${task.level.toLowerCase()}`}>
+                  {task.level}
+                </div>
+                <div className={`task-color-indicator task-color-${task.color}`}></div>
+              </div>
               
               <div className="task-content">
                 <h4 className="task-title">{task.title}</h4>

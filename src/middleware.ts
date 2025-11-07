@@ -16,6 +16,7 @@ const protectedRoutes = [
   "/english/mediation",
   "/english/culture",
   "/english/assessment",
+  "/english/test",
   "/english/support",
   "/english/progress",
   "/english/goals",

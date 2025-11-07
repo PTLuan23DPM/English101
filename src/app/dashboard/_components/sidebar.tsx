@@ -105,15 +105,14 @@ const advanced = [
 
 const evaluation = [
   {
-    id: "placement",
-    label: "Placement Test",
-    href: "/english/placement-test",
+    id: "test",
+    label: "Test",
+    href: "/english/test",
     icon: (
       <svg viewBox="0 0 20 20" fill="none">
-        <path d="M8 10H12M10 8V12M2 3H18V17H2V3Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-        <circle cx="5" cy="6" r="1" fill="currentColor" />
-        <circle cx="10" cy="6" r="1" fill="currentColor" />
-        <circle cx="15" cy="6" r="1" fill="currentColor" />
+        <path d="M4 3H16V17H4V3Z" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M7 7H13M7 10H13M7 13H10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M12 13L13 14L15 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
       </svg>
     ),
   },

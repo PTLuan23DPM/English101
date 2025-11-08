@@ -22,10 +22,9 @@ const PAGE_TITLES: Record<string, string> = {
 
 export default function DashboardHeader() {
   const pathname = usePathname();
-  const router = useRouter();
   const { data: session } = useSession();
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [streak, setStreak] = useState(7); // TODO: Fetch from API
+  const [streak] = useState(7); // TODO: Fetch from API
   const menuRef = useRef<HTMLDivElement>(null);
 
   const pageTitle = PAGE_TITLES[pathname] || "English101";

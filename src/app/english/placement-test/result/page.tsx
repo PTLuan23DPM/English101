@@ -97,7 +97,7 @@ function ResultContent() {
           Congratulations!
         </h1>
         <p style={{ fontSize: "20px", opacity: 0.95, marginBottom: "32px" }}>
-          You've completed the CEFR Placement Test
+          You&apos;ve completed the CEFR Placement Test
         </p>
         
         <div style={{ display: "inline-block", padding: "20px 40px", background: "rgba(255,255,255,0.2)", borderRadius: "16px", backdropFilter: "blur(10px)" }}>

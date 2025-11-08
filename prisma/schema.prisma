@@ -125,6 +125,10 @@ model User {
   streak                 Int       @default(0)
   longestStreak          Int       @default(0)
 
+  // User preferences
+  language               String    @default("en") // en, vi
+  theme                  String    @default("light") // light, dark
+
   // học tập
   progress    UserProgress[]
   attempts    Attempt[]

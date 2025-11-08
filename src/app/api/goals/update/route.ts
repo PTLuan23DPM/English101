@@ -37,6 +37,7 @@ export async function PATCH(req: NextRequest) {
     }
 
     // Prepare update data
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const updateData: any = {};
 
     if (current !== undefined) {
@@ -73,10 +74,11 @@ export async function PATCH(req: NextRequest) {
         metadata: updatedGoal.metadata,
       },
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Update goal error:", error);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
-      { error: "Failed to update goal", details: error.message },
+      { error: "Failed to update goal", details: errorMessage },
       { status: 500 }
     );
   }

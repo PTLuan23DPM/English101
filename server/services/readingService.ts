@@ -4,7 +4,7 @@
  * Naming Convention: camelCase for files and functions
  */
 
-import { Exercise } from '@/types/exerciseTypes';
+import { Exercise } from '../../types/exerciseTypes';
 import { promises as fs } from 'fs';
 import path from 'path';
 import prisma from '@/lib/prisma';

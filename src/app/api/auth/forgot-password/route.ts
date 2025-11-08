@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { sendPasswordResetEmail } from "@/lib/email";
 
 // Generate a random 6-digit OTP
 function generateOTP(): string {
@@ -21,9 +22,9 @@ export async function POST(req: Request) {
 
     if (!user) {
       // For security, don't reveal if email exists or not
-      return NextResponse.json({ 
-        message: "If an account with that email exists, we've sent a reset code." 
-      });
+      return NextResponse.json({
+        message: "If an account with that email exists, we've sent a reset code."
+      }, { status: 200 });
     }
 
     // Check for password auth (not Google OAuth)
@@ -53,16 +54,35 @@ export async function POST(req: Request) {
       },
     });
 
-    // TODO: Send email with OTP
-    // For now, log it to console (in production, use a proper email service)
-    console.log(`Password Reset OTP for ${email}: ${otp}`);
-    console.log(`OTP expires at: ${expiresAt.toISOString()}`);
+    // Send email with OTP
+    const emailSent = await sendPasswordResetEmail(email, otp);
 
-    return NextResponse.json({
+    // In development, include OTP in response for testing
+    interface ResponseType {
+      message: string;
+      dev_otp?: string;
+      dev_note?: string;
+    }
+    const response: ResponseType = {
       message: "Reset code sent successfully",
-      // In development, you might want to include the OTP for testing
-      ...(process.env.NODE_ENV === "development" && { dev_otp: otp }),
-    });
+    };
+
+    if (process.env.NODE_ENV === "development") {
+      response.dev_otp = otp;
+      if (!emailSent) {
+        response.dev_note = "Email service not configured. OTP logged in console above.";
+      } else {
+        response.dev_note = "Email sent successfully (check your email inbox).";
+      }
+    } else {
+      // In production, always return success for security (don't reveal if email was sent)
+      // But log errors for debugging
+      if (!emailSent) {
+        console.error(`[PRODUCTION] Failed to send password reset email to ${email}`);
+      }
+    }
+
+    return NextResponse.json(response);
   } catch (error) {
     console.error("Forgot password error:", error);
     return NextResponse.json(

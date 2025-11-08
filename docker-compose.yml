@@ -8,8 +8,32 @@ services:
       POSTGRES_PASSWORD: app
       POSTGRES_DB: english_app
     ports:
-      - "5432:5432"   # nếu cổng 5432 máy bạn đang bận, đổi bên trái thành 15432:5432
+      - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U app" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  python-service:
+    build:
+      context: ./python-services
+      dockerfile: Dockerfile
+    container_name: english_app_python
+    restart: unless-stopped
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./python-services/ai-models:/app/ai-models
+      - ./ai-models:/app/ai-models:ro
+    environment:
+      - FLASK_ENV=production
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      db:
+        condition: service_healthy
+
 volumes:
   pgdata:

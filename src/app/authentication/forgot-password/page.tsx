@@ -9,8 +9,10 @@ export default function ForgotPasswordPage() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) {
+      e.preventDefault();
+    }
 
     if (!email) {
       toast.error("Please enter your email address");
@@ -57,100 +59,162 @@ export default function ForgotPasswordPage() {
 
   if (success) {
     return (
-      <div className="auth-container">
-        <div className="auth-card">
+      <main className="auth-page">
+        <div className="auth-container">
           <div className="auth-header">
-            <div className="auth-icon success">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
-                <path d="M8 12l2 2 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
+            <Link href="/" className="auth-back-btn">← Back to Home</Link>
+          </div>
+
+          <div className="auth-card">
+            <div className="auth-logo">
+              <span className="auth-logo-icon">🎓</span>
+              <h1>EnglishMaster</h1>
             </div>
-            <h1>Check Your Email</h1>
-            <p className="muted">
-              We've sent a 6-digit reset code to <strong>{email}</strong>
-            </p>
-          </div>
 
-          <div className="auth-info">
-            <p>Please check your email and use the code to reset your password.</p>
-            <p className="muted" style={{ marginTop: "8px", fontSize: "14px" }}>
-              The code will expire in 15 minutes.
-            </p>
-          </div>
+            <div className="auth-form active">
+              <div style={{ textAlign: "center", marginBottom: "24px" }}>
+                <div style={{ 
+                  width: "64px", 
+                  height: "64px", 
+                  margin: "0 auto 16px",
+                  borderRadius: "50%",
+                  background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center"
+                }}>
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+                    <path 
+                      d="M8 12l2 2 4-4" 
+                      stroke="white" 
+                      strokeWidth="3" 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round" 
+                    />
+                    <circle 
+                      cx="12" 
+                      cy="12" 
+                      r="10" 
+                      stroke="white" 
+                      strokeWidth="2" 
+                    />
+                  </svg>
+                </div>
+                <h2>Check Your Email</h2>
+                <p className="auth-subtitle">
+                  We&apos;ve sent a 6-digit reset code to <strong>{email}</strong>
+                </p>
+              </div>
 
-          <Link href="/authentication/reset-password" className="btn primary w-full">
-            Enter Reset Code →
-          </Link>
+              <div style={{ 
+                background: "#f9fafb", 
+                padding: "16px", 
+                borderRadius: "8px", 
+                marginBottom: "24px",
+                fontSize: "14px",
+                color: "#6b7280"
+              }}>
+                <p style={{ margin: "0 0 8px 0" }}>
+                  Please check your email and use the code to reset your password.
+                </p>
+                <p style={{ margin: 0 }}>
+                  The code will expire in <strong>15 minutes</strong>.
+                </p>
+              </div>
 
-          <div className="auth-footer">
-            <p className="muted">
-              Didn't receive the email?{" "}
-              <button
-                onClick={() => {
-                  setSuccess(false);
-                  handleSubmit(new Event("submit") as any);
-                }}
-                className="link"
-                disabled={loading}
+              <Link 
+                href="/authentication/reset-password" 
+                className="auth-submit-btn"
+                style={{ textDecoration: "none", display: "block", textAlign: "center" }}
               >
-                Resend code
-              </button>
-            </p>
-            <Link href="/authentication/login" className="link">
-              ← Back to login
-            </Link>
+                <span className="btn-text">Enter Reset Code →</span>
+              </Link>
+
+              <div className="auth-footer" style={{ marginTop: "24px" }}>
+                <p className="muted" style={{ textAlign: "center", marginBottom: "12px" }}>
+                    Didn&apos;t receive the email?{" "}
+                  <button
+                    onClick={() => {
+                      handleSubmit();
+                    }}
+                    className="link"
+                    disabled={loading}
+                    style={{ 
+                      background: "none", 
+                      border: "none", 
+                      color: "inherit",
+                      cursor: loading ? "not-allowed" : "pointer",
+                      textDecoration: "underline"
+                    }}
+                  >
+                    {loading ? "Sending..." : "Resend code"}
+                  </button>
+                </p>
+                <Link href="/authentication/login" className="link" style={{ display: "block", textAlign: "center" }}>
+                  ← Back to login
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      </main>
     );
   }
 
   return (
-    <div className="auth-container">
-      <div className="auth-card">
+    <main className="auth-page">
+      <div className="auth-container">
         <div className="auth-header">
-          <div className="auth-icon">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" fill="currentColor" />
-            </svg>
-          </div>
-          <h1>Forgot Password?</h1>
-          <p className="muted">
-            No worries! Enter your email address and we'll send you a code to reset your password.
-          </p>
+          <Link href="/" className="auth-back-btn">← Back to Home</Link>
         </div>
 
-        <form onSubmit={handleSubmit} className="auth-form">
-          <div className="form-group">
-            <label htmlFor="email">Email Address</label>
-            <input
-              id="email"
-              type="email"
-              className="input"
-              placeholder="your.email@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={loading}
-              autoFocus
-            />
+        <div className="auth-card">
+          <div className="auth-logo">
+            <span className="auth-logo-icon">🎓</span>
+            <h1>EnglishMaster</h1>
           </div>
 
-          <button
-            type="submit"
-            className="btn primary w-full"
-            disabled={loading}
-          >
-            {loading ? "Sending..." : "Send Reset Code"}
-          </button>
-        </form>
+          <div className="auth-form active">
+            <h2>Forgot Password?</h2>
+            <p className="auth-subtitle">
+              No worries! Enter your email address and we&apos;ll send you a code to reset your password.
+            </p>
 
-        <div className="auth-footer">
-          <Link href="/authentication/login" className="link">
-            ← Back to login
-          </Link>
+            <form className="auth-fields" onSubmit={handleSubmit}>
+              <div className="form-group">
+                <label className="form-label">Email Address</label>
+                <input
+                  name="email"
+                  type="email"
+                  className="form-control"
+                  placeholder="Enter your email address"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={loading}
+                  autoFocus
+                  required
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="auth-submit-btn"
+                disabled={loading || !email.trim()}
+              >
+                <span className="btn-text">
+                  {loading ? "Sending..." : "Send Reset Code"}
+                </span>
+              </button>
+            </form>
+
+            <div className="auth-footer">
+              <Link href="/authentication/login" className="link">
+                ← Back to login
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

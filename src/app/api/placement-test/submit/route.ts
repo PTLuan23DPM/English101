@@ -89,24 +89,28 @@ export async function POST(req: NextRequest) {
       totalQuestions,
       testResultId: testResult.id,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Placement test submit error:", error);
-    
+
     // Return more specific error message
     let errorMessage = "Failed to submit test";
     if (error instanceof Error) {
       errorMessage = error.message;
     }
-    
+
     // Check for Prisma errors
-    if (error?.code === "P2002") {
-      errorMessage = "Test result already exists";
-    } else if (error?.code === "P2025") {
-      errorMessage = "User not found";
+    if (error && typeof error === "object" && "code" in error) {
+      const prismaError = error as { code?: string };
+      if (prismaError.code === "P2002") {
+        errorMessage = "Test result already exists";
+      } else if (prismaError.code === "P2025") {
+        errorMessage = "User not found";
+      }
     }
-    
+
+    const details = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
-      { error: errorMessage, details: error?.message },
+      { error: errorMessage, details },
       { status: 500 }
     );
   }

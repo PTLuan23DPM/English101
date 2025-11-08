@@ -25,7 +25,7 @@ import prisma from "@/lib/prisma";
  */
 export async function GET(
   req: NextRequest,
-  { params }: { params: { activityId: string } }
+  { params }: { params: Promise<{ activityId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -33,8 +33,9 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const { activityId } = await params;
     const activity = await prisma.activity.findUnique({
-      where: { id: params.activityId },
+      where: { id: activityId },
       include: {
         unit: {
           select: {
@@ -88,8 +89,8 @@ export async function GET(
       type: q.type,
       prompt: q.prompt,
       score: q.score,
-      audioUrl: q.media?.[0]?.url, // Audio specific to this question
-      audioDuration: q.media?.[0]?.durationS,
+      audioUrl: Array.isArray(q.media) ? q.media[0]?.url : undefined, // Audio specific to this question
+      audioDuration: Array.isArray(q.media) ? q.media[0]?.durationS : undefined,
       choices: q.choices,
     }));
 

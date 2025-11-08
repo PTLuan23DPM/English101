@@ -74,10 +74,11 @@ export async function POST(req: NextRequest) {
         metadata: goal.metadata,
       },
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Create goal error:", error);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
-      { error: "Failed to create goal", details: error.message },
+      { error: "Failed to create goal", details: errorMessage },
       { status: 500 }
     );
   }

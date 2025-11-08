@@ -120,7 +120,7 @@ function VerifyOTPContent() {
               </button>
 
               <div className="auth-switch">
-                <span>Didn't receive the code?</span>
+                <span>Didn&apos;t receive the code?</span>
                 <button
                   type="button"
                   className="switch-btn"

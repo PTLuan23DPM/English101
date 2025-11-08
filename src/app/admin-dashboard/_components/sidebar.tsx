@@ -43,7 +43,6 @@ const navItems = [
 
 export default function AdminSidebar() {
   const pathname = usePathname();
-  const { data: session } = useSession();
   const [isSigningOut, setIsSigningOut] = useState(false);
 
   const isActive = (path: string) => pathname === path;

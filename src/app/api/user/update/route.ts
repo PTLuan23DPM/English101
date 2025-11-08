@@ -38,10 +38,11 @@ export async function PATCH(req: NextRequest) {
       success: true,
       user: updatedUser,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Update user error:", error);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
-      { error: "Failed to update user", details: error.message },
+      { error: "Failed to update user", details: errorMessage },
       { status: 500 }
     );
   }

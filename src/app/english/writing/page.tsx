@@ -3,8 +3,19 @@
 import { useMemo, useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
+import { useSession } from "next-auth/react";
 import TimerModal from "./components/TimerModal";
 import AIAssistant from "./components/AIAssistant";
+import OutlineGenerator from "./components/OutlineGenerator";
+import BrainstormPanel from "./components/BrainstormPanel";
+import LanguagePackPanel from "./components/LanguagePackPanel";
+import RephraseMenu from "./components/RephraseMenu";
+import ThesisGenerator from "./components/ThesisGenerator";
+import SentenceExpander from "./components/SentenceExpander";
+import SelfReviewModal from "./components/SelfReviewModal";
+import NextTaskCard from "./components/NextTaskCard";
+import { WRITING_TASKS, WritingTask } from "./data/writingTasks";
+import "./components/llm-features.css";
 
 interface DetailedScore {
   score: number;
@@ -32,214 +43,9 @@ interface ScoringResult {
   };
 }
 
-interface WritingTask {
-  id: string;
-  icon: string;
-  title: string;
-  type: string;
-  level: string;
-  prompt: string;
-  targetWords: string;
-  tips: string[];
-  recommended?: boolean;
-  attempts: number;
-  color: string;
-}
-
-const WRITING_TASKS: WritingTask[] = [
-  // Sentence Building
-  {
-    id: "sentence-daily",
-    icon: "📝",
-    title: "Daily Routine",
-    type: "Sentence Building",
-    level: "A2",
-    prompt: "Write 5-7 sentences about your daily morning routine. Use simple present tense and time expressions.",
-    targetWords: "50-80 words",
-    tips: [
-      "Use time expressions: in the morning, at 7 AM, after breakfast",
-      "Use simple present tense: I wake up, I have breakfast",
-      "Connect sentences with: then, after that, finally",
-    ],
-    recommended: true,
-    attempts: 0,
-    color: "blue",
-  },
-  {
-    id: "sentence-weekend",
-    icon: "☀️",
-    title: "Weekend Activities",
-    type: "Sentence Building",
-    level: "A2",
-    prompt: "Describe what you usually do on weekends. Write 5-7 complete sentences.",
-    targetWords: "50-80 words",
-    tips: [
-      "Use frequency adverbs: usually, sometimes, often",
-      "Mention different activities",
-      "Use linking words to connect ideas",
-    ],
-    attempts: 0,
-    color: "blue",
-  },
-  // Paragraph Writing
-  {
-    id: "para-hobby",
-    icon: "🎨",
-    title: "My Favorite Hobby",
-    type: "Paragraph Writing",
-    level: "B1",
-    prompt: "Describe your favorite hobby and explain why you enjoy it. Include details about how you got started and what you have learned.",
-    targetWords: "100-150 words",
-    tips: [
-      "Start with a topic sentence introducing your hobby",
-      "Use specific examples and details",
-      "End with a concluding sentence",
-    ],
-    recommended: true,
-    attempts: 0,
-    color: "green",
-  },
-  {
-    id: "para-travel",
-    icon: "✈️",
-    title: "A Memorable Trip",
-    type: "Paragraph Writing",
-    level: "B1",
-    prompt: "Write about a memorable trip or vacation. Describe where you went, what you did, and why it was special.",
-    targetWords: "120-150 words",
-    tips: [
-      "Use past tense to describe events",
-      "Include sensory details (what you saw, heard, felt)",
-      "Explain why this experience was meaningful",
-    ],
-    attempts: 0,
-    color: "green",
-  },
-  // Email Writing
-  {
-    id: "email-formal",
-    icon: "📧",
-    title: "Extension Request",
-    type: "Email Writing",
-    level: "B1",
-    prompt: "Write a formal email to your professor requesting an extension for your assignment. Explain your situation politely.",
-    targetWords: "120-180 words",
-    tips: [
-      "Start with: Dear Professor [Name],",
-      "Be polite and professional",
-      "End with: Best regards, [Your name]",
-    ],
-    attempts: 0,
-    color: "purple",
-  },
-  {
-    id: "email-complaint",
-    icon: "💼",
-    title: "Product Complaint",
-    type: "Email Writing",
-    level: "B2",
-    prompt: "Write a formal complaint email to a company about a defective product you purchased. Request a refund or replacement.",
-    targetWords: "150-200 words",
-    tips: [
-      "State the problem clearly",
-      "Include relevant details (order number, date)",
-      "Be firm but polite",
-      "Clearly state what you want",
-    ],
-    attempts: 0,
-    color: "purple",
-  },
-  // Essay Writing - Task 2 Types
-  {
-    id: "essay-discussion",
-    icon: "💬",
-    title: "Work From Home vs Office",
-    type: "Discussion",
-    level: "B2",
-    prompt: "Some people prefer to work from home, while others prefer to work in an office. Discuss both views and give your opinion.",
-    targetWords: "250-300 words",
-    tips: [
-      "Introduction: state the topic and your thesis",
-      "Body paragraph 1: advantages of working from home",
-      "Body paragraph 2: advantages of office work",
-      "Conclusion: summarize and state your opinion",
-    ],
-    recommended: true,
-    attempts: 0,
-    color: "teal",
-  },
-  {
-    id: "essay-advantage",
-    icon: "⚖️",
-    title: "Online Shopping",
-    type: "Advantage-Disadvantage",
-    level: "B2",
-    prompt: "Online shopping is becoming increasingly popular. Discuss the advantages and disadvantages of buying products online.",
-    targetWords: "250-300 words",
-    tips: [
-      "Introduction: introduce the topic",
-      "Body 1: discuss advantages with examples",
-      "Body 2: discuss disadvantages with examples",
-      "Conclusion: balanced summary",
-    ],
-    recommended: true,
-    attempts: 0,
-    color: "teal",
-  },
-  {
-    id: "essay-opinion",
-    icon: "📊",
-    title: "University Education",
-    type: "Opinion",
-    level: "B2",
-    prompt: "Some people believe university education should be free for all students. To what extent do you agree or disagree?",
-    targetWords: "250-300 words",
-    tips: [
-      "Introduction: clearly state your position",
-      "Body: provide 2-3 main arguments",
-      "Use examples and evidence",
-      "Conclusion: restate your opinion",
-    ],
-    attempts: 0,
-    color: "teal",
-  },
-  {
-    id: "essay-problem",
-    icon: "🌍",
-    title: "Environmental Pollution",
-    type: "Problem-Solution",
-    level: "C1",
-    prompt: "Environmental pollution is a growing concern. What are the main causes of this problem and what solutions can you suggest?",
-    targetWords: "250-300 words",
-    tips: [
-      "Introduction: present the problem",
-      "Body 1: discuss main causes",
-      "Body 2: propose practical solutions",
-      "Conclusion: summarize key points",
-    ],
-    attempts: 0,
-    color: "teal",
-  },
-  {
-    id: "essay-two-part",
-    icon: "❓",
-    title: "Technology and Children",
-    type: "Multi-Part",
-    level: "B2",
-    prompt: "Many children spend several hours per day on screens. Why is this the case? What are the effects on their development?",
-    targetWords: "250-300 words",
-    tips: [
-      "Introduction: acknowledge both questions",
-      "Body 1: answer first question (reasons)",
-      "Body 2: answer second question (effects)",
-      "Conclusion: brief summary",
-    ],
-    attempts: 0,
-    color: "teal",
-  },
-];
 
 export default function WritingPage() {
+  const { data: session } = useSession();
   const [filterType, setFilterType] = useState<string>("All types");
   const [selectedTask, setSelectedTask] = useState<WritingTask | null>(null);
   const [text, setText] = useState("");
@@ -247,11 +53,19 @@ export default function WritingPage() {
   const [submitted, setSubmitted] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [scoringResult, setScoringResult] = useState<ScoringResult | null>(null);
+  const [serviceAvailable, setServiceAvailable] = useState<boolean | null>(null);
 
   // Timer state
   const [showTimerModal, setShowTimerModal] = useState(false);
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [timerExpired, setTimerExpired] = useState(false);
+
+  // LLM Features state
+  const [selectedText, setSelectedText] = useState("");
+  const [selectionPosition, setSelectionPosition] = useState({ top: 0, left: 0 });
+  const [showRephraseMenu, setShowRephraseMenu] = useState(false);
+  const [showExpandMenu, setShowExpandMenu] = useState(false);
+  const [showSelfReview, setShowSelfReview] = useState(false);
 
   // Filter tasks by type
   const filteredTasks = filterType === "All types" 
@@ -267,6 +81,37 @@ export default function WritingPage() {
     return t ? t.split(/\s+/).length : 0;
   }, [text]);
   const charCount = text.length;
+
+  // Check service availability on mount
+  useEffect(() => {
+    const checkService = async () => {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
+        
+        const response = await fetch("http://localhost:5001/health", {
+          method: "GET",
+          signal: controller.signal,
+        });
+        
+        clearTimeout(timeoutId);
+        
+        if (response.ok) {
+          setServiceAvailable(true);
+        } else {
+          setServiceAvailable(false);
+        }
+      } catch (error) {
+        console.log("Python service not available:", error);
+        setServiceAvailable(false);
+      }
+    };
+
+    checkService();
+    // Check service every 30 seconds
+    const interval = setInterval(checkService, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Timer countdown effect
   useEffect(() => {
@@ -315,24 +160,79 @@ export default function WritingPage() {
       return;
     }
 
-    if (!selectedTask) return;
-
     setSubmitting(true);
     toast.loading("Scoring your writing...", { id: "scoring" });
 
     try {
-      // Call Python scoring service
-      const response = await fetch("http://localhost:5001/score", {
+      // Try Gemini scoring first (more accurate and doesn't require Python service)
+      let response = await fetch("/api/writing/score-gemini", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           text: text,
-          prompt: selectedTask.prompt,
+          prompt: selectedTask?.prompt || "",
+          task: selectedTask ? {
+            id: selectedTask.id,
+            type: selectedTask.type,
+            level: selectedTask.level,
+            targetWords: selectedTask.targetWords,
+          } : null,
         }),
       });
 
+      // If Gemini scoring fails, try Python service as fallback
       if (!response.ok) {
-        throw new Error("Scoring service unavailable");
+        console.log("Gemini scoring unavailable, trying Python service...");
+        try {
+          response = await fetch("http://localhost:5001/score-ai", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              text: text,
+              prompt: selectedTask?.prompt || "",
+              task: selectedTask ? {
+                id: selectedTask.id,
+                type: selectedTask.type,
+                level: selectedTask.level,
+                targetWords: selectedTask.targetWords,
+              } : null,
+            }),
+          });
+
+          // If AI endpoint not available, fallback to regular endpoint
+          if (!response.ok && response.status === 503) {
+            console.log("AI model not available, using traditional model...");
+            response = await fetch("http://localhost:5001/score", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                text: text,
+                prompt: selectedTask?.prompt || "",
+                task: selectedTask ? {
+                  id: selectedTask.id,
+                  type: selectedTask.type,
+                  level: selectedTask.level,
+                  targetWords: selectedTask.targetWords,
+                } : null,
+              }),
+            });
+          }
+
+          if (response.ok) {
+            setServiceAvailable(true);
+          } else {
+            throw new Error("Python scoring service unavailable");
+          }
+        } catch (pythonError) {
+          console.error("Python service error:", pythonError);
+          setServiceAvailable(false);
+          throw new Error("All scoring services unavailable. Please check Gemini API key or Python service.");
+        }
+      }
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || "Scoring service unavailable");
       }
 
       const result: ScoringResult = await response.json();
@@ -341,52 +241,89 @@ export default function WritingPage() {
 
       toast.success("Scoring complete!", {
         id: "scoring",
-        description: `Your CEFR level: ${result.cefr_level}`,
+        description: `Your score: ${result.score_10}/10`,
       });
+      
+      // Show self-review modal after scoring
+      setShowSelfReview(true);
     } catch (error) {
       console.error("Scoring error:", error);
+      setServiceAvailable(false);
       toast.error("Scoring failed", {
         id: "scoring",
-        description: "Make sure Python service is running on port 5001",
+        description: error instanceof Error ? error.message : "Failed to score your writing. Please try again.",
       });
-
-      // Fallback to mock scoring
-      setScoringResult({
-        score_10: 7.2,
-        overall_score: 7.0,
-        cefr_level: "B2",
-        cefr_description: "Upper Intermediate",
-        detailed_scores: {
-          task_response: {
-            score: 7.5,
-            feedback: ["✓ Good word count", "Consider adding more examples"],
-          },
-          coherence_cohesion: {
-            score: 7.2,
-            feedback: ["✓ Good organization", "Use more linking words"],
-          },
-          lexical_resource: {
-            score: 6.9,
-            feedback: ["✓ Adequate vocabulary", "Try more academic words"],
-          },
-          grammatical_range: {
-            score: 6.7,
-            feedback: ["✓ Good variety", "Watch for minor errors"],
-          },
-        },
-        word_count: wordCount,
-        statistics: {
-          words: wordCount,
-          characters: charCount,
-          sentences: text.split(/[.!?]+/).length,
-          paragraphs: text.split("\n\n").filter((p) => p.trim()).length,
-          unique_words: new Set(text.toLowerCase().split(/\s+/)).size,
-        },
-      });
-      setSubmitted(true);
+      // Don't set scoring result or submitted state if service is unavailable
+      setScoringResult(null);
+      setSubmitted(false);
     } finally {
       setSubmitting(false);
     }
+  };
+
+  // Text selection handlers for Rephrase and Expand features
+  const handleTextSelection = () => {
+    const selection = window.getSelection();
+    const selected = selection?.toString().trim() || "";
+    
+    if (selected && selected.length > 5) {
+      setSelectedText(selected);
+      
+      // Get selection position
+      const range = selection?.getRangeAt(0);
+      const rect = range?.getBoundingClientRect();
+      
+      if (rect) {
+        setSelectionPosition({
+          top: rect.bottom + window.scrollY + 5,
+          left: rect.left + window.scrollX,
+        });
+      }
+    } else {
+      setSelectedText("");
+      setShowRephraseMenu(false);
+      setShowExpandMenu(false);
+    }
+  };
+
+  const insertText = (newText: string) => {
+    if (!textareaRef.current) return;
+    
+    const currentText = textareaRef.current.value;
+    const cursorPos = textareaRef.current.selectionStart;
+    
+    const before = currentText.substring(0, cursorPos);
+    const after = currentText.substring(cursorPos);
+    
+    const updatedText = before + newText + after;
+    setText(updatedText);
+    
+    // Update textarea and cursor position
+    setTimeout(() => {
+      if (textareaRef.current) {
+        textareaRef.current.value = updatedText;
+        const newPos = cursorPos + newText.length;
+        textareaRef.current.focus();
+        textareaRef.current.setSelectionRange(newPos, newPos);
+      }
+    }, 0);
+  };
+
+  const replaceSelectedText = (newText: string) => {
+    if (!textareaRef.current || !selectedText) return;
+    
+    const currentText = textareaRef.current.value;
+    const updatedText = currentText.replace(selectedText, newText);
+    setText(updatedText);
+    
+    setTimeout(() => {
+      if (textareaRef.current) {
+        textareaRef.current.value = updatedText;
+        textareaRef.current.focus();
+      }
+    }, 0);
+    
+    setSelectedText("");
   };
 
   const handleReset = () => {
@@ -448,6 +385,73 @@ export default function WritingPage() {
             </div>
           </section>
 
+          {/* LLM Features Toolbar */}
+          <section className="card llm-toolbar">
+            <div className="toolbar-title">
+              <h4>🤖 AI Writing Assistant</h4>
+              <small>Click features below to get AI-powered help</small>
+            </div>
+            <div className="llm-features-grid">
+              <OutlineGenerator
+                level={selectedTask.level}
+                type={selectedTask.type}
+                topic={selectedTask.prompt}
+                onInsert={insertText}
+              />
+              <BrainstormPanel
+                level={selectedTask.level}
+                type={selectedTask.type}
+                topic={selectedTask.prompt}
+                onInsert={insertText}
+              />
+              <ThesisGenerator
+                level={selectedTask.level}
+                type={selectedTask.type}
+                topic={selectedTask.prompt}
+                onInsert={insertText}
+              />
+              <LanguagePackPanel
+                level={selectedTask.level}
+                type={selectedTask.type}
+                onInsert={insertText}
+              />
+              <button
+                onClick={() => {
+                  if (selectedText) {
+                    setShowRephraseMenu(true);
+                    setShowExpandMenu(false);
+                  } else {
+                    toast.info("Select some text first to rephrase it");
+                  }
+                }}
+                className="ai-feature-btn rephrase-btn"
+                title="Select text then click to rephrase"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Rephrase
+              </button>
+              <button
+                onClick={() => {
+                  if (selectedText) {
+                    setShowExpandMenu(true);
+                    setShowRephraseMenu(false);
+                  } else {
+                    toast.info("Select a sentence first to expand it");
+                  }
+                }}
+                className="ai-feature-btn expand-btn"
+                title="Select a sentence then click to expand"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                </svg>
+                Expand
+              </button>
+            </div>
+          </section>
+
           {/* Editor */}
           <section className="card">
             <div className="editor-toolbar">
@@ -464,14 +468,15 @@ export default function WritingPage() {
                 </span>
             </div>
 
-              <textarea
+            <textarea
                 ref={textareaRef}
                 className={`editor ${timerExpired ? "disabled" : ""}`}
-                placeholder="Start writing here..."
-                value={text}
-                onChange={(e) => setText(e.target.value)}
+              placeholder="Start writing here..."
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              onMouseUp={handleTextSelection}
                 disabled={timerExpired}
-              />
+            />
 
             <div className="editor-footer">
               <div className="small muted">
@@ -500,38 +505,52 @@ export default function WritingPage() {
                   <button
                     className="btn primary"
                     onClick={handleSubmit}
-                    disabled={submitting || submitted || wordCount < 10}
+                    disabled={submitting || submitted || wordCount < 10 || serviceAvailable === false}
+                    title={serviceAvailable === false ? "Python service is not available. Please start the service on port 5001" : ""}
                   >
                     {submitting ? "Scoring..." : submitted ? "Submitted ✓" : "Submit for AI Review"}
                   </button>
                 </div>
+                {serviceAvailable === false && (
+                  <div style={{ 
+                    marginTop: "12px", 
+                    padding: "12px", 
+                    background: "#fef3c7", 
+                    border: "1px solid #f59e0b",
+                    borderRadius: "8px",
+                    color: "#92400e",
+                    fontSize: "14px"
+                  }}>
+                    ⚠️ Python scoring service is not available. Please start the service to enable AI scoring.
+              </div>
+                )}
             </div>
           </section>
 
-            {/* Scoring Results */}
-            {submitted && scoringResult && (
+            {/* Scoring Results - Only show if service is available and result exists */}
+            {submitted && scoringResult && serviceAvailable && (
           <section className="card">
                 <h3 className="section-title">🎯 Scoring Results</h3>
 
-                {/* CEFR Level Display */}
+                {/* Score Display */}
                 <div style={{ textAlign: "center", marginBottom: "32px" }}>
                   <div
                     style={{
                       display: "inline-block",
-                      padding: "24px 48px",
+                      padding: "32px 64px",
                       background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
                       borderRadius: "16px",
                       color: "white",
                     }}
                   >
-                    <div style={{ fontSize: "48px", fontWeight: "bold", marginBottom: "8px" }}>
-                      {scoringResult.cefr_level}
+                    <div style={{ fontSize: "20px", opacity: 0.9, marginBottom: "12px" }}>
+                      Overall Score
                     </div>
-                    <div style={{ fontSize: "16px", opacity: 0.9, marginBottom: "8px" }}>
-                      {scoringResult.cefr_description}
+                    <div style={{ fontSize: "64px", fontWeight: "bold", lineHeight: "1" }}>
+                      {scoringResult.score_10.toFixed(1)}
                     </div>
-                    <div style={{ fontSize: "24px", fontWeight: "600", opacity: 0.95 }}>
-                      Score: {scoringResult.score_10}/10
+                    <div style={{ fontSize: "18px", opacity: 0.8, marginTop: "8px" }}>
+                      / 10
                     </div>
                   </div>
                 </div>
@@ -688,21 +707,93 @@ export default function WritingPage() {
           onStart={startTimer}
         />
 
+        {/* Rephrase Menu */}
+        {showRephraseMenu && selectedText && selectedTask && (
+          <RephraseMenu
+            selectedText={selectedText}
+            level={selectedTask.level}
+            position={selectionPosition}
+            onReplace={replaceSelectedText}
+            onClose={() => setShowRephraseMenu(false)}
+          />
+        )}
+
+        {/* Sentence Expander */}
+        {showExpandMenu && selectedText && (
+          <SentenceExpander
+            selectedSentence={selectedText}
+            position={selectionPosition}
+            onInsert={insertText}
+            onClose={() => setShowExpandMenu(false)}
+          />
+        )}
+
+        {/* Self-Review Modal */}
+        {selectedTask && (
+          <SelfReviewModal
+            text={text}
+            topic={selectedTask.prompt}
+            isOpen={showSelfReview}
+            onClose={() => setShowSelfReview(false)}
+          />
+        )}
+
+        {/* Next Task Recommendation */}
+        {submitted && scoringResult && session?.user && (
+          <NextTaskCard
+            userId={session.user.email || ""}
+            level={selectedTask?.level || "B2"}
+            lastScore={scoringResult.overall_score}
+            errorProfile={{
+              taskResponse: scoringResult.detailed_scores.task_response.score,
+              coherence: scoringResult.detailed_scores.coherence_cohesion.score,
+              lexical: scoringResult.detailed_scores.lexical_resource.score,
+              grammar: scoringResult.detailed_scores.grammatical_range.score,
+            }}
+          />
+        )}
+
         {/* AI Assistant */}
         <AIAssistant 
           text={text}
           textareaRef={textareaRef}
           onSuggestionAccept={(replacement, offset, length) => {
-            // Replace text at specific offset and length
-            const newText = text.substring(0, offset) + replacement + text.substring(offset + length);
+            // Get current text from textarea (most up-to-date)
+            if (!textareaRef.current) return;
+            
+            const currentText = textareaRef.current.value;
+            
+            // Validate offset is within bounds
+            if (offset < 0 || offset >= currentText.length) {
+              toast.error("Invalid position", {
+                description: "The text position is no longer valid. Please check grammar again.",
+              });
+              return;
+            }
+            
+            // Ensure length doesn't exceed text bounds
+            const validLength = Math.min(length, currentText.length - offset);
+            
+            // Get the text that will be replaced for verification
+            const textToReplace = currentText.substring(offset, offset + validLength);
+            
+            // Perform replacement
+            const newText = currentText.substring(0, offset) + replacement + currentText.substring(offset + validLength);
             setText(newText);
             
-            // Set cursor after replaced text
+            // Update textarea value directly to ensure consistency
             if (textareaRef.current) {
+              textareaRef.current.value = newText;
+              
+              // Set cursor after replaced text
               setTimeout(() => {
                 const newCursorPos = offset + replacement.length;
                 textareaRef.current?.focus();
                 textareaRef.current?.setSelectionRange(newCursorPos, newCursorPos);
+                
+                // Trigger input event to update any listeners
+                const event = new Event('input', { bubbles: true });
+                textareaRef.current?.dispatchEvent(event);
               }, 0);
             }
           }}
@@ -718,7 +809,7 @@ export default function WritingPage() {
       <section className="card page-head">
         <div>
           <h1>📝 Writing Practice</h1>
-          <p className="muted">AI-powered writing assessment with CEFR scoring</p>
+          <p className="muted">AI-powered writing assessment</p>
         </div>
 
         <div className="head-actions">
@@ -728,8 +819,8 @@ export default function WritingPage() {
               <span className="stat-lbl">Completed</span>
             </div>
             <div className="stat">
-              <span className="stat-val">B2</span>
-              <span className="stat-lbl">Avg Level</span>
+              <span className="stat-val">7.5</span>
+              <span className="stat-lbl">Avg Score</span>
             </div>
           </div>
             </div>

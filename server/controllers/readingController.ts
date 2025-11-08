@@ -4,7 +4,7 @@
  * Naming Convention: camelCase for files, PascalCase for classes
  */
 
-import { Exercise, SubmissionRequest, SubmissionResponse } from '@/types/exerciseTypes';
+import { Exercise, SubmissionRequest, SubmissionResponse } from '../../types/exerciseTypes';
 import { readingService } from '../services/readingService';
 import { gradingService } from '../services/gradingService';
 
@@ -117,7 +117,7 @@ export class ReadingController {
                 choices: q.choices?.map((c) => ({
                     id: c.id,
                     text: c.text,
-                    // Remove isCorrect
+                    isCorrect: false, // Hide correct answer from client
                 })),
                 // Remove correctAnswer and correctAnswers
                 correctAnswer: undefined,

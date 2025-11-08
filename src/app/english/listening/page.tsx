@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import { useSession } from "next-auth/react";
 
 interface ListeningTask {
@@ -226,7 +226,6 @@ const LISTENING_TASKS: ListeningTask[] = [
 ];
 
 export default function ListeningPage() {
-  const { data: session } = useSession();
   const [filterType, setFilterType] = useState<string>("All types");
   const [selectedTask, setSelectedTask] = useState<ListeningTask | null>(null);
   const [showPlayer, setShowPlayer] = useState(false);
@@ -235,7 +234,6 @@ export default function ListeningPage() {
   const [volume, setVolume] = useState(75);
   
   const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
   const audioRef = useRef<HTMLAudioElement>(null);
 
   // Filter tasks by type
@@ -256,11 +254,6 @@ export default function ListeningPage() {
     }
   };
 
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
-  };
 
   // Player view
   if (showPlayer && selectedTask) {

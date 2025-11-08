@@ -9,7 +9,8 @@ import {
     SubmissionRequest,
     SubmissionResponse,
     QuestionResult,
-} from '@/types/exerciseTypes';
+    QuestionType,
+} from '../../types/exerciseTypes';
 
 export class GradingService {
     /**
@@ -183,11 +184,11 @@ export class GradingService {
         // Specific feedback based on question types
         const questionTypes = new Set(exercise.questions.map((q) => q.type));
 
-        if (questionTypes.has('READ_MAIN_IDEA')) {
-            const mainIdeaScore = this.getTypeScore(exercise, results, 'READ_MAIN_IDEA');
-            if (mainIdeaScore < 70) {
-                weaknesses.push('Identifying main ideas');
-                suggestions.push('Focus on topic sentences and conclusions');
+        if (questionTypes.has('SINGLE_CHOICE')) {
+            const choiceScore = this.getTypeScore(exercise, results, 'SINGLE_CHOICE');
+            if (choiceScore < 70) {
+                weaknesses.push('Multiple choice comprehension');
+                suggestions.push('Practice identifying key information');
             }
         }
 
@@ -202,7 +203,7 @@ export class GradingService {
     /**
      * Calculate score for specific question type
      */
-    private getTypeScore(exercise: Exercise, results: QuestionResult[], type: string): number {
+    private getTypeScore(exercise: Exercise, results: QuestionResult[], type: QuestionType): number {
         const typeQuestions = exercise.questions.filter((q) => q.type === type);
         if (typeQuestions.length === 0) return 100;
 

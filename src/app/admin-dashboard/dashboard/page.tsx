@@ -43,7 +43,7 @@ export default function AdminDashboardPage() {
           <div className="word-sets-grid">
             <div className="word-set-card word-set-card--purple-teal"><h3 className="word-set-card__title">Books and Library</h3></div>
             <div className="word-set-card word-set-card--purple-blue"><h3 className="word-set-card__title">Countries and cities</h3></div>
-            <div className="word-set-card word-set-card--blue-pink"><h3 className="word-set-card__title">What is o'clock now?</h3></div>
+            <div className="word-set-card word-set-card--blue-pink"><h3 className="word-set-card__title">What is o&apos;clock now?</h3></div>
           </div>
         </section>
         <section className="admin-section">

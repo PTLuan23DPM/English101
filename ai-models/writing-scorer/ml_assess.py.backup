@@ -28,7 +28,7 @@ except ImportError:
 
 class AttentionLayer(layers.Layer):
     """
-    Self-attention layer 
+    Self-attention layer
     Computes attention scores over sequence and returns weighted sum
     """
     def __init__(self, units, **kwargs):
@@ -37,7 +37,7 @@ class AttentionLayer(layers.Layer):
         self.W = None
         
     def build(self, input_shape):
-        # weight matrix for attention
+        # Learnable weight matrix for attention
         self.W = self.add_weight(
             name='attention_weight',
             shape=(input_shape[-1], self.units),
@@ -62,6 +62,7 @@ class AttentionLayer(layers.Layer):
         # inputs shape: (batch_size, sequence_length, features)
         
         # Compute attention scores
+        # Shape: (batch_size, sequence_length, units)
         score = tf.nn.tanh(tf.tensordot(inputs, self.W, axes=1) + self.b)
         
         # Shape: (batch_size, sequence_length)
@@ -83,19 +84,19 @@ class AttentionLayer(layers.Layer):
         return config
 
 
-class QuestionAssessor:
+class PMCStyleIELTSAssessor:
     """
-    IELTS Assessment 
+    IELTS Assessment using BERT + BiLSTM + Attention
+    "Automated essay scoring with SBERT embeddings and LSTM-Attention networks" (Nie, 2025)
     """
     
-    def __init__(self, max_length=512, bert_model='bert-base-uncased', use_question=True):
+    def __init__(self, max_length=512, bert_model='bert-base-uncased'):
         """
         Initialize with BERT tokenizer and model
         
         Args:
             max_length: Maximum sequence length (default 512 for BERT)
             bert_model: BERT model name
-            use_question: Whether to use question in scoring
         """
         print(f"Loading BERT model: {bert_model}")
         self.tokenizer = BertTokenizer.from_pretrained(bert_model)
@@ -103,13 +104,11 @@ class QuestionAssessor:
         self.bert_model.eval()  # Set to evaluation mode
         
         self.max_length = max_length
-        self.use_question = use_question
         self.model = None
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.bert_model.to(self.device)
         
         print(f"Using device: {self.device}")
-        print(f"Question awareness: {'ENABLED' if use_question else 'DISABLED'}")
         
     def load_data(self, csv_path: str) -> pd.DataFrame:
         """Load IELTS essay data from CSV"""
@@ -131,20 +130,20 @@ class QuestionAssessor:
         
         return df
     
-    def extract_bert_features(self, text: str) -> np.ndarray:
+    def extract_bert_features(self, essay: str) -> np.ndarray:
         """
-        Extract BERT token embeddings for text
+        Extract BERT token embeddings for an essay
         Returns token-level embeddings (sequence_length, 768)
         
         Args:
-            text: Input text
+            essay: Essay text
             
         Returns:
             Token embeddings from BERT's last hidden state
         """
         # Tokenize with BERT tokenizer
         encoded = self.tokenizer.encode_plus(
-            text,
+            essay,
             add_special_tokens=True,
             max_length=self.max_length,
             padding='max_length',
@@ -170,58 +169,23 @@ class QuestionAssessor:
         mask = attention_mask.cpu().numpy()[0]  # (sequence_length,)
         
         # Only return embeddings for actual tokens (not padding)
+        # Keep at least 1 token
         actual_length = max(1, int(mask.sum()))
         
         return embeddings[:actual_length, :]
     
-    def extract_features_with_question(self, essay: str, question: str) -> np.ndarray:
-        """
-        Extract features
-        
-        Args:
-            essay: Essay text
-            question: Question text
-            
-        Returns:
-            Combined features (sequence_length, 1536)
-            - First 768 dims: Essay embeddings
-            - Last 768 dims: Question representation (repeated for each token)
-        """
-        # Extract essay features
-        essay_features = self.extract_bert_features(essay)  # (seq_len, 768)
-        
-        if not self.use_question or not question or not question.strip():
-            # If not using question, return essay features only
-            return essay_features
-        
-        # Extract question features
-        question_features = self.extract_bert_features(question)  # (q_len, 768)
-        
-        # Get question representation via mean pooling
-        question_repr = np.mean(question_features, axis=0)  # (768,)
-        
-        # Expand question to match essay length
-        question_expanded = np.tile(question_repr, (essay_features.shape[0], 1))  # (seq_len, 768)
-        
-        # Concatenate essay and question features
-        combined = np.concatenate([essay_features, question_expanded], axis=1)  # (seq_len, 1536)
-        
-        return combined
-    
     def prepare_training_data(self, df: pd.DataFrame, max_samples=None) -> Tuple:
         """
-        Extract BERT token embeddings from all essays with optional questions
+        Extract BERT token embeddings from all essays
         
         Args:
-            df: DataFrame with essays and optional questions
+            df: DataFrame with essays
             max_samples: Limit number of samples for memory efficiency
             
         Returns:
             X_train, X_test, y_train, y_test, y_train_orig, y_test_orig
         """
-        print("\nExtracting BERT features from essays...")
-        if self.use_question:
-            print("Including question awareness...")
+        print("\nExtracting BERT token embeddings from essays...")
         print("This will take some time (processing with BERT)...")
         
         if max_samples:
@@ -231,20 +195,13 @@ class QuestionAssessor:
         features_list = []
         scores = []
         
-        has_questions = 'Question' in df.columns
-        
         for idx, row in df.iterrows():
             if idx % 50 == 0:
                 print(f"Processing essay {idx + 1}/{len(df)}")
             
             try:
-                question = row.get('Question', '') if has_questions else ''
-                
-                if self.use_question and question:
-                    features = self.extract_features_with_question(row['Essay'], question)
-                else:
-                    features = self.extract_bert_features(row['Essay'])
-                
+                # Extract token-level BERT embeddings
+                features = self.extract_bert_features(row['Essay'])
                 features_list.append(features)
                 scores.append(row['Overall'])
             except Exception as e:
@@ -256,9 +213,7 @@ class QuestionAssessor:
         
         # Pad sequences to same length
         max_seq_length = max(f.shape[0] for f in features_list)
-        feature_dim = features_list[0].shape[1]
         print(f"  Max sequence length: {max_seq_length}")
-        print(f"  Feature dimension: {feature_dim}")
         
         X_padded = []
         for features in features_list:
@@ -273,7 +228,7 @@ class QuestionAssessor:
         X = np.array(X_padded)
         y = np.array(scores)
         
-        print(f"  Feature shape: {X.shape}")
+        print(f"  Feature shape: {X.shape}")  # (n_essays, max_seq_length, 768)
         
         # Show score distribution
         print("\nScore distribution:")
@@ -304,36 +259,37 @@ class QuestionAssessor:
         
         return X_train, X_test, y_train_scaled, y_test_scaled, y_train, y_test
     
-    def build_model(self, sequence_length: int, feature_dim: int) -> keras.Model:
+    def build_model(self, sequence_length: int, feature_dim: int = 768) -> keras.Model:
         """
+        BERT embeddings → BiLSTM → Attention → FC
+        
         Args:
             sequence_length: Maximum sequence length
-            feature_dim: Feature dimension (768 without question, 1536 with question)
+            feature_dim: BERT embedding dimension (768)
             
         Returns:
             Compiled Keras model
-        """        
-        print(f"\nInput dimension: {feature_dim}")
-        if feature_dim == 1536:
-            print("  → Using essay (768) + question (768) features")
-        else:
-            print("  → Using essay features only")
+        """
+        print("\n" + "="*70)
+        print("BUILDING PMC-STYLE MODEL")
+        print("="*70)
         
         # Input: (sequence_length, feature_dim)
         inputs = layers.Input(shape=(sequence_length, feature_dim), name='bert_embeddings')
         
         # Bidirectional LSTM layer
+        # 128 LSTM units
         bilstm = layers.Bidirectional(
             layers.LSTM(128, return_sequences=True, dropout=0.2),
             name='bilstm'
         )(inputs)
-        # Output: (sequence_length, 256)
+        # Output: (sequence_length, 256) - 128*2 for bidirectional
         
         # Attention layer
         attention = AttentionLayer(units=256, name='attention')(bilstm)
-        # Output: (256,)
+        # Output: (256,) - weighted sum over sequence
         
-        # Fully connected layer
+        # Fully connected layer (140 units)
         fc = layers.Dense(140, activation='relu', name='fc_layer')(attention)
         
         # Output layer (linear activation for regression)
@@ -342,31 +298,62 @@ class QuestionAssessor:
         # Build model
         model = keras.Model(inputs=inputs, outputs=outputs)
         
-        # Compile
+        # Compile with MSE loss 
         model.compile(
-            optimizer=keras.optimizers.Adam(learning_rate=0.001),
+            optimizer=keras.optimizers.Adam(learning_rate=0.001),  
             loss='mse',
             metrics=['mae']
         )
         
         return model
     
-    def train(self, X_train, y_train, X_val, y_val, epochs=50, batch_size=32, use_combined_loss=False):
+    def cosine_similarity_loss(self, y_true, y_pred):
         """
-        Train the model
+        Cosine similarity loss 
+        Encourages similar essays to have similar predictions
+        """
+        # Normalize vectors
+        y_true_norm = tf.nn.l2_normalize(y_true, axis=-1)
+        y_pred_norm = tf.nn.l2_normalize(y_pred, axis=-1)
+        
+        # Cosine similarity
+        cos_sim = tf.reduce_sum(y_true_norm * y_pred_norm, axis=-1)
+        
+        # Loss is 1 - cosine_similarity
+        return 1.0 - cos_sim
+    
+    def combined_loss(self, alpha=0.7, beta=0.3):
+        """
+        Combined MSE + Cosine Similarity loss
         
         Args:
-            X_train: Training features
+            alpha: Weight for MSE loss
+            beta: Weight for cosine similarity loss
+        """
+        def loss(y_true, y_pred):
+            mse = tf.keras.losses.mean_squared_error(y_true, y_pred)
+            cos_loss = self.cosine_similarity_loss(y_true, y_pred)
+            return alpha * mse + beta * cos_loss
+        return loss
+    
+    def train(self, X_train, y_train, X_val, y_val, epochs=50, batch_size=32, use_combined_loss=False):
+        """
+        Args:
+            X_train: Training features (token embeddings)
             y_train: Training scores (0-1 scaled)
             X_val: Validation features
             y_val: Validation scores
-            epochs: Number of training epochs
+            epochs: Number of training epochs (PMC uses 50)
             batch_size: Batch size
             use_combined_loss: Whether to use combined MSE+Cosine loss
             
         Returns:
             Training history
         """
+        print("\n" + "="*70)
+        print("TRAINING PMC-STYLE MODEL")
+        print("="*70)
+        
         # Build model
         self.model = self.build_model(
             sequence_length=X_train.shape[1],
@@ -375,6 +362,15 @@ class QuestionAssessor:
         
         print(f"\nModel architecture:")
         self.model.summary()
+        
+        # Optionally use combined loss
+        if use_combined_loss:
+            print("\nUsing combined MSE + Cosine Similarity loss")
+            self.model.compile(
+                optimizer=keras.optimizers.Adam(learning_rate=0.001),
+                loss=self.combined_loss(alpha=0.7, beta=0.3),
+                metrics=['mae']
+            )
         
         # Callbacks
         early_stop = callbacks.EarlyStopping(
@@ -411,12 +407,12 @@ class QuestionAssessor:
     
     def predict(self, essay: str, task_type: int = 2, question: str = "") -> Dict:
         """
-        Predict IELTS band score with optional question awareness
+        Predict IELTS band score
         
         Args:
             essay: Essay text
             task_type: 1 or 2 (for word count validation)
-            question: Question text (used if use_question=True)
+            question: Question text (not used in PMC approach, kept for compatibility)
             
         Returns:
             Dictionary with score and feedback
@@ -448,11 +444,8 @@ class QuestionAssessor:
                 }
             }
         
-        # Extract features
-        if self.use_question and question:
-            features = self.extract_features_with_question(essay, question)
-        else:
-            features = self.extract_bert_features(essay)
+        # Extract BERT features
+        features = self.extract_bert_features(essay)
         
         # Pad to match training sequence length
         if features.shape[0] < self.model.input_shape[1]:
@@ -485,7 +478,7 @@ class QuestionAssessor:
         return {
             'score': float(score),
             'band': self.get_band_description(score),
-            'feedback': self.generate_feedback(essay, score, question)
+            'feedback': self.generate_feedback(essay, score)
         }
     
     def get_band_description(self, score: float) -> str:
@@ -511,7 +504,7 @@ class QuestionAssessor:
         }
         return descriptions.get(score, 'Unknown')
     
-    def generate_feedback(self, essay: str, score: float, question: str = "") -> Dict:
+    def generate_feedback(self, essay: str, score: float) -> Dict:
         """Generate feedback based on prediction"""
         feedback = {
             'overall': [],
@@ -533,9 +526,6 @@ class QuestionAssessor:
             feedback['overall'].append("Limited writing ability demonstrated")
         
         feedback['overall'].append(f"Word count: {word_count}")
-        
-        if self.use_question and question:
-            feedback['interpretation'].append("Question relevance considered in scoring")
         
         return feedback
     
@@ -583,7 +573,7 @@ class QuestionAssessor:
             'within_10': within_10
         }
     
-    def save_model(self, model_dir='./bert_question_model'):
+    def save_model(self, model_dir='./bert_ielts_model'):
         """Save model"""
         Path(model_dir).mkdir(exist_ok=True)
         
@@ -592,16 +582,15 @@ class QuestionAssessor:
         # Save metadata
         metadata = {
             'max_length': self.max_length,
-            'bert_model': 'bert-base-uncased',
-            'use_question': self.use_question
+            'bert_model': 'bert-base-uncased'
         }
         
         with open(f'{model_dir}/metadata.pkl', 'wb') as f:
             pickle.dump(metadata, f)
         
-        print(f"\nModel saved to {model_dir}/")
+        print(f"\n✓ Model saved to {model_dir}/")
     
-    def load_model(self, model_dir='./bert_question_model'):
+    def load_model(self, model_dir='./bert_ielts_model'):
         """Load saved model"""
         import os
         
@@ -610,7 +599,6 @@ class QuestionAssessor:
             metadata = pickle.load(f)
         
         self.max_length = metadata['max_length']
-        self.use_question = metadata.get('use_question', False)
         
         # Load model with custom objects
         self.model = keras.models.load_model(
@@ -618,57 +606,47 @@ class QuestionAssessor:
             custom_objects={'AttentionLayer': AttentionLayer}
         )
         
-        print(f"Model loaded from {model_dir}/")
-        print(f"  Question awareness: {'ENABLED' if self.use_question else 'DISABLED'}")
+        print(f"✓ Model loaded from {model_dir}/")
 
 
 # MAIN EXECUTION
 if __name__ == '__main__':
-    # Initialize assessor WITH question awareness
-    print("="*70)
-    print("MODEL WITH QUESTION AWARENESS")
-    print("="*70)
-    
-    assessor = QuestionAssessor(
-        max_length=512,
-        use_question=True  
-    )
+    # Initialize assessor
+    assessor = PMCStyleIELTSAssessor(max_length=512)
     
     # Load data
     csv_path = r'C:\Users\Admin\Downloads\Documents\ielts_writing_dataset.csv'
     df = assessor.load_data(csv_path)
     
-    # Prepare training data 
+    # Prepare training data (limit samples for memory efficiency during testing)
+    # Remove max_samples parameter to use full dataset
     X_train, X_test, y_train, y_test, y_train_orig, y_test_orig = \
-        assessor.prepare_training_data(df, max_samples=None)
+        assessor.prepare_training_data(df, max_samples=500)  # Remove this limit for full training
     
     # Train model
     history = assessor.train(
         X_train, y_train,
         X_test, y_test,
-        epochs=50,
-        batch_size=32
+        epochs=50,  
+        batch_size=32,
+        use_combined_loss=False  # Set to True to use combined loss
     )
     
     # Evaluate
-    # metrics = assessor.evaluate(X_test, y_test_orig, y_test)
+    metrics = assessor.evaluate(X_test, y_test_orig, y_test)
     
     # Save model
-    assessor.save_model('./bert_question_model')
+    assessor.save_model('./bert_ielts_model')
     
     # Test with sample essay
-    print("\n" + "="*70)
-    print("TESTING ON SAMPLE ESSAY")
-    print("="*70)
-    
     sample_essay = df.iloc[0]['Essay']
-    sample_question = df.iloc[0]['Question'] if 'Question' in df.columns else ""
     actual_score = df.iloc[0]['Overall']
     
-    result = assessor.predict(sample_essay, task_type=2, question=sample_question)
+    result = assessor.predict(sample_essay, task_type=2)
     
-    if sample_question:
-        print(f"\nQuestion: {sample_question[:100]}...")
+    print(f"\n{'='*70}")
+    print("SAMPLE PREDICTION")
+    print('='*70)
     print(f"\nEssay preview: {sample_essay[:200]}...")
     print(f"\nActual score: {actual_score}")
     print(f"Predicted score: {result['score']}")

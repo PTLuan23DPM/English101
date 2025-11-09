@@ -1,33 +1,77 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 
 type CEFRLevel = "A1" | "A2" | "B1" | "B2" | "C1" | "C2";
 
-interface MediationTopic {
+interface MediationActivity {
   id: string;
   title: string;
   level: CEFRLevel;
-  description: string;
-  exercises: number;
-  completed: boolean;
+  instruction: string | null;
+  type: string;
+  unitTitle: string;
+  moduleTitle: string;
+  questionCount: number;
 }
 
-const MEDIATION_TOPICS: MediationTopic[] = [
-  { id: "1", title: "Summarizing Short Texts", level: "B1", description: "Extract and present key information", exercises: 10, completed: false },
-  { id: "2", title: "Relaying Information", level: "B1", description: "Pass on messages accurately", exercises: 8, completed: false },
-  { id: "3", title: "Explaining Data & Visuals", level: "B2", description: "Describe charts and graphs clearly", exercises: 12, completed: false },
-  { id: "4", title: "Translating Simple Texts", level: "B2", description: "Transfer meaning between languages", exercises: 10, completed: false },
-  { id: "5", title: "Facilitating Communication", level: "C1", description: "Bridge understanding between speakers", exercises: 15, completed: false },
-  { id: "6", title: "Interpreting Complex Concepts", level: "C1", description: "Explain technical or abstract ideas", exercises: 14, completed: false },
-  { id: "7", title: "Note-taking & Summarizing", level: "B2", description: "Capture essential information efficiently", exercises: 12, completed: false },
+// Fallback static data
+const FALLBACK_TOPICS = [
+  { id: "1", title: "Summarizing Short Texts", level: "B1" as CEFRLevel, description: "Extract and present key information", exercises: 10, completed: false },
+  { id: "2", title: "Relaying Information", level: "B1" as CEFRLevel, description: "Pass on messages accurately", exercises: 8, completed: false },
+  { id: "3", title: "Explaining Data & Visuals", level: "B2" as CEFRLevel, description: "Describe charts and graphs clearly", exercises: 12, completed: false },
+  { id: "4", title: "Translating Simple Texts", level: "B2" as CEFRLevel, description: "Transfer meaning between languages", exercises: 10, completed: false },
+  { id: "5", title: "Facilitating Communication", level: "C1" as CEFRLevel, description: "Bridge understanding between speakers", exercises: 15, completed: false },
+  { id: "6", title: "Interpreting Complex Concepts", level: "C1" as CEFRLevel, description: "Explain technical or abstract ideas", exercises: 14, completed: false },
+  { id: "7", title: "Note-taking & Summarizing", level: "B2" as CEFRLevel, description: "Capture essential information efficiently", exercises: 12, completed: false },
 ];
 
 export default function MediationPage() {
+  const { data: session } = useSession();
   const [selectedLevel, setSelectedLevel] = useState<CEFRLevel | "all">("all");
-  const filteredTopics = MEDIATION_TOPICS.filter(t => selectedLevel === "all" || t.level === selectedLevel);
-  const stats = { total: MEDIATION_TOPICS.length, completed: MEDIATION_TOPICS.filter(t => t.completed).length };
+  const [activities, setActivities] = useState<MediationActivity[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [useFallback, setUseFallback] = useState(false);
+
+  useEffect(() => {
+    if (session?.user) {
+      fetchActivities();
+    } else {
+      setUseFallback(true);
+      setLoading(false);
+    }
+  }, [session, selectedLevel]);
+
+  const fetchActivities = async () => {
+    try {
+      setLoading(true);
+      const levelParam = selectedLevel !== "all" ? `?level=${selectedLevel}` : "";
+      const response = await fetch(`/api/mediation/activities${levelParam}`);
+      if (response.ok) {
+        const data = await response.json();
+        setActivities(data.activities || []);
+        setUseFallback(data.activities?.length === 0);
+      } else {
+        setUseFallback(true);
+      }
+    } catch (error) {
+      console.error("Error fetching mediation activities:", error);
+      setUseFallback(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const displayActivities = useFallback
+    ? FALLBACK_TOPICS.filter(t => selectedLevel === "all" || t.level === selectedLevel)
+    : activities.filter(a => selectedLevel === "all" || a.level === selectedLevel);
+
+  const stats = {
+    total: displayActivities.length,
+    completed: 0, // TODO: Track completion from user progress
+  };
 
   return (
     <div className="dashboard-content">
@@ -52,23 +96,51 @@ export default function MediationPage() {
         </select>
       </section>
 
-      <div className="module-grid">
-        {filteredTopics.map(topic => (
-          <Link href={`/english/mediation/${topic.id}`} key={topic.id} className="module-card" style={{ textDecoration: "none" }}>
-            <div className="module-card-header">
-              <div className="module-meta">
-                <span className={`level-badge level-${topic.level.toLowerCase()}`}>{topic.level}</span>
-              </div>
-              {topic.completed && <span className="completion-badge">✓ Completed</span>}
-            </div>
-            <h3 className="module-title">{topic.title}</h3>
-            <p className="module-description">{topic.description}</p>
-            <div className="module-stats">
-              <div className="module-stat"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="1.5" fill="none"/><path d="M6 8L7.5 9.5L10 6.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg><span>{topic.exercises} exercises</span></div>
-            </div>
-          </Link>
-        ))}
-      </div>
+      {loading ? (
+        <section className="card">
+          <p>Loading activities...</p>
+        </section>
+      ) : (
+        <div className="module-grid">
+          {displayActivities.map((item) => {
+            const isFallback = useFallback && 'description' in item;
+            return (
+              <Link 
+                href={useFallback ? `/english/mediation/${item.id}` : `/english/mediation/activity/${item.id}`} 
+                key={item.id} 
+                className="module-card" 
+                style={{ textDecoration: "none" }}
+              >
+                <div className="module-card-header">
+                  <div className="module-meta">
+                    <span className={`level-badge level-${item.level.toLowerCase()}`}>{item.level}</span>
+                  </div>
+                </div>
+                <h3 className="module-title">{item.title}</h3>
+                <p className="module-description">
+                  {isFallback 
+                    ? (item as any).description 
+                    : item.instruction || item.moduleTitle || "Practice mediation skills"}
+                </p>
+                <div className="module-stats">
+                  <div className="module-stat">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                      <circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+                      <path d="M6 8L7.5 9.5L10 6.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                    <span>{isFallback ? (item as any).exercises : item.questionCount} {isFallback ? 'exercises' : 'questions'}</span>
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
+          {displayActivities.length === 0 && !loading && (
+            <section className="card">
+              <p>No activities available. Check back later or contact support.</p>
+            </section>
+          )}
+        </div>
+      )}
     </div>
   );
 }

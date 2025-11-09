@@ -18,14 +18,24 @@ interface Props {
   type: string;
   topic: string;
   onInsert: (text: string) => void;
+  isAvailable?: boolean;
+  remaining?: number;
+  onUsage?: () => void;
 }
 
-export default function OutlineGenerator({ level, type, topic, onInsert }: Props) {
+export default function OutlineGenerator({ level, type, topic, onInsert, isAvailable = true, remaining = 0, onUsage }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [outline, setOutline] = useState<OutlineData | null>(null);
 
   const generateOutline = async () => {
+    if (!isAvailable) {
+      toast.error("Usage limit reached", {
+        description: "You have already used this feature. This feature can only be used once per task.",
+      });
+      return;
+    }
+
     setLoading(true);
     try {
       const response = await fetch("/api/writing/outline", {
@@ -42,10 +52,31 @@ export default function OutlineGenerator({ level, type, topic, onInsert }: Props
       const data: OutlineData = await response.json();
       setOutline(data);
       setIsOpen(true);
+      
+      // Record usage
+      if (onUsage) {
+        onUsage();
+      }
+      
       toast.success("Outline generated!");
     } catch (error) {
       console.error("Outline generation error:", error);
-      toast.error(error instanceof Error ? error.message : "Failed to generate outline");
+      const errorMessage = error instanceof Error ? error.message : "Failed to generate outline";
+      
+      // Provide helpful error messages with requirements
+      if (errorMessage.includes("Gemini API is not configured") || errorMessage.includes("GEMINI_API_KEY")) {
+        toast.error("Gemini API not configured", {
+          description: "Please add GEMINI_API_KEY to your .env.local file and restart the server.",
+        });
+      } else if (errorMessage.includes("level") || errorMessage.includes("type") || errorMessage.includes("topic")) {
+        toast.error("Missing information", {
+          description: "This feature requires a selected writing task with level, type, and topic. Please select a task first.",
+        });
+      } else {
+        toast.error("Failed to generate outline", {
+          description: errorMessage,
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -74,9 +105,9 @@ export default function OutlineGenerator({ level, type, topic, onInsert }: Props
     <>
       <button
         onClick={generateOutline}
-        disabled={loading}
-        className="ai-feature-btn outline-btn"
-        title="Generate essay outline"
+        disabled={loading || !isAvailable}
+        className={`ai-feature-btn outline-btn ${!isAvailable ? "disabled" : ""}`}
+        title={!isAvailable ? "Usage limit reached (1 use per task)" : "Generate essay outline"}
       >
         {loading ? (
           <>
@@ -91,6 +122,7 @@ export default function OutlineGenerator({ level, type, topic, onInsert }: Props
               <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
             </svg>
             Generate Outline
+            {!isAvailable && <span className="usage-badge">Used</span>}
           </>
         )}
       </button>

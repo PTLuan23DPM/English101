@@ -138,6 +138,7 @@ model User {
   userActivities  UserActivity[]
   goals       UserGoal[]
   placementTests PlacementTestResult[]
+  writingLLMUsage WritingLLMUsage[]
 
   // authoring
   contents   Content[]  @relation("AuthorContents")
@@ -609,4 +610,23 @@ model PlacementTestResult {
 
   @@index([userId])
   @@index([userId, completedAt])
+}
+
+// ------------------------------------------------------
+// Writing LLM Feature Usage Tracking
+// ------------------------------------------------------
+model WritingLLMUsage {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  taskId    String?  // Writing task ID (optional, for per-task tracking)
+  feature   String   // outline, brainstorm, thesis, language-pack, rephrase, expand
+  usedAt    DateTime @default(now())
+  metadata  Json?    // Additional data (task level, etc.)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, taskId, feature])
+  @@index([userId, feature])
+  @@index([usedAt])
 }

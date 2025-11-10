@@ -10,9 +10,16 @@ interface RecommendedTask {
   reasoning: string;
 }
 
+interface Feedback {
+  strengths: string[];
+  weaknesses: string[];
+  overallComment: string;
+}
+
 interface NextTaskData {
   recommendedTask: RecommendedTask;
   specificSuggestions: string[];
+  feedback?: Feedback;
 }
 
 interface Props {
@@ -25,9 +32,15 @@ interface Props {
     lexical?: number;
     grammar?: number;
   };
+  scoringFeedback?: {
+    taskResponse?: string[];
+    coherence?: string[];
+    lexical?: string[];
+    grammar?: string[];
+  };
 }
 
-export default function NextTaskCard({ userId, level, lastScore, errorProfile }: Props) {
+export default function NextTaskCard({ userId, level, lastScore, errorProfile, scoringFeedback }: Props) {
   const [loading, setLoading] = useState(false);
   const [recommendation, setRecommendation] = useState<NextTaskData | null>(null);
 
@@ -48,6 +61,7 @@ export default function NextTaskCard({ userId, level, lastScore, errorProfile }:
           level,
           lastScore,
           errorProfile,
+          scoringFeedback,
         }),
       });
 
@@ -77,6 +91,11 @@ export default function NextTaskCard({ userId, level, lastScore, errorProfile }:
             reasoning: "This task will help you improve your writing skills based on your performance.",
           },
           specificSuggestions: data.specificSuggestions || [],
+          feedback: data.feedback ? {
+            strengths: Array.isArray(data.feedback.strengths) ? data.feedback.strengths : [],
+            weaknesses: Array.isArray(data.feedback.weaknesses) ? data.feedback.weaknesses : [],
+            overallComment: data.feedback.overallComment || "",
+          } : undefined,
         };
         setRecommendation(defaultData);
         return;
@@ -95,12 +114,26 @@ export default function NextTaskCard({ userId, level, lastScore, errorProfile }:
         specificSuggestions: Array.isArray(data.specificSuggestions) 
           ? data.specificSuggestions 
           : [],
+        feedback: data.feedback ? {
+          strengths: Array.isArray(data.feedback.strengths) ? data.feedback.strengths : [],
+          weaknesses: Array.isArray(data.feedback.weaknesses) ? data.feedback.weaknesses : [],
+          overallComment: data.feedback.overallComment || "",
+        } : undefined,
       };
       
       setRecommendation(validatedData);
     } catch (error) {
       console.error("Next task error:", error);
-      toast.error(error instanceof Error ? error.message : "Failed to get recommendation");
+      const errorMessage = error instanceof Error ? error.message : "Failed to get recommendation";
+      
+      // Handle MAX_TOKENS error specifically
+      if (errorMessage.includes("MAX_TOKENS") || errorMessage.includes("token limit")) {
+        toast.error("Response too long. Please try again with a shorter writing sample.", {
+          duration: 5000,
+        });
+      } else {
+        toast.error(errorMessage);
+      }
     } finally {
       setLoading(false);
     }
@@ -119,7 +152,7 @@ export default function NextTaskCard({ userId, level, lastScore, errorProfile }:
 
   if (!recommendation || !recommendation.recommendedTask) return null;
 
-  const { recommendedTask, specificSuggestions } = recommendation;
+  const { recommendedTask, specificSuggestions, feedback } = recommendation;
 
   if (!recommendedTask.type || !recommendedTask.level) {
     console.error("Invalid recommendation data:", recommendation);
@@ -162,6 +195,40 @@ export default function NextTaskCard({ userId, level, lastScore, errorProfile }:
                 <li key={idx}>{suggestion}</li>
               ))}
             </ul>
+          </div>
+        )}
+
+        {feedback && (
+          <div className="feedback-section">
+            <h4>📝 Performance Feedback</h4>
+            
+            {feedback.overallComment && (
+              <div className="feedback-overall">
+                <p>{feedback.overallComment}</p>
+              </div>
+            )}
+
+            {feedback.strengths && feedback.strengths.length > 0 && (
+              <div className="feedback-strengths">
+                <h5>✅ Strengths:</h5>
+                <ul>
+                  {feedback.strengths.map((strength, idx) => (
+                    <li key={idx}>{strength}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {feedback.weaknesses && feedback.weaknesses.length > 0 && (
+              <div className="feedback-weaknesses">
+                <h5>💪 Areas to Improve:</h5>
+                <ul>
+                  {feedback.weaknesses.map((weakness, idx) => (
+                    <li key={idx}>{weakness}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         )}
       </div>

@@ -15,17 +15,26 @@ interface RephraseData {
 interface Props {
   selectedText: string;
   level: string;
-  position: { top: number; left: number };
   onReplace: (newText: string) => void;
   onClose: () => void;
+  isAvailable?: boolean;
+  remaining?: number;
+  onUsage?: () => void;
 }
 
-export default function RephraseMenu({ selectedText, level, position, onReplace, onClose }: Props) {
+export default function RephraseMenu({ selectedText, level, onReplace, onClose, isAvailable = true, remaining = 0, onUsage }: Props) {
   const [loading, setLoading] = useState(false);
   const [options, setOptions] = useState<RephraseOption[] | null>(null);
   const [activeStyle, setActiveStyle] = useState<"simple" | "academic" | "formal" | null>(null);
 
   const rephrase = async (style: "simple" | "academic" | "formal") => {
+    if (!isAvailable) {
+      toast.error("Usage limit reached", {
+        description: `You have used all ${remaining === 0 ? "available" : remaining} uses of this feature.`,
+      });
+      return;
+    }
+
     setActiveStyle(style);
     setLoading(true);
     try {
@@ -46,10 +55,41 @@ export default function RephraseMenu({ selectedText, level, position, onReplace,
 
       const data: RephraseData = await response.json();
       setOptions(data.options);
+      
+      // Record usage
+      if (onUsage) {
+        onUsage();
+      }
+      
       toast.success("Rephrase options generated!");
     } catch (error) {
       console.error("Rephrase error:", error);
-      toast.error(error instanceof Error ? error.message : "Failed to rephrase");
+      const errorMessage = error instanceof Error ? error.message : "Failed to rephrase";
+      
+      // Provide helpful error messages with requirements
+      if (errorMessage.includes("Gemini API is not configured") || errorMessage.includes("GEMINI_API_KEY")) {
+        toast.error("Gemini API not configured", {
+          description: "Please add GEMINI_API_KEY to your .env.local file and restart the server.",
+        });
+      } else if (errorMessage.includes("MAX_TOKENS") || errorMessage.includes("truncated") || errorMessage.includes("token limit")) {
+        toast.error("Text too long", {
+          description: "The selected text is too long for rephrasing. Please select shorter text (under 150 characters) and try again.",
+        });
+      } else if (errorMessage.includes("text") || errorMessage.includes("selectedText")) {
+        toast.error("No text selected", {
+          description: "Please select some text in your writing before using the Rephrase feature.",
+        });
+      } else if (errorMessage.includes("level")) {
+        toast.error("Missing level information", {
+          description: "This feature requires a selected writing task. Please select a task first.",
+        });
+      } else {
+        toast.error("Failed to rephrase", {
+          description: errorMessage.includes("Failed to parse") 
+            ? "Unable to process the AI response. Please try again with shorter or simpler text."
+            : errorMessage,
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -62,90 +102,113 @@ export default function RephraseMenu({ selectedText, level, position, onReplace,
   };
 
   return (
-    <div
-      className="rephrase-menu"
-      style={{
-        top: `${position.top}px`,
-        left: `${position.left}px`,
-      }}
-      onClick={(e) => e.stopPropagation()}
-    >
-      {!options ? (
-        <div className="rephrase-styles">
-          <div className="rephrase-header">
-            <h4>Rephrase as:</h4>
-            <button onClick={onClose} className="close-btn-sm">
-              ×
-            </button>
-          </div>
-          <button
-            onClick={() => rephrase("simple")}
-            disabled={loading}
-            className="rephrase-style-btn"
-          >
-            {loading && activeStyle === "simple" ? (
-              <svg className="spinner-sm" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10" />
-              </svg>
-            ) : (
-              "📝"
-            )}
-            Simple
-          </button>
-          <button
-            onClick={() => rephrase("academic")}
-            disabled={loading}
-            className="rephrase-style-btn"
-          >
-            {loading && activeStyle === "academic" ? (
-              <svg className="spinner-sm" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10" />
-              </svg>
-            ) : (
-              "🎓"
-            )}
-            Academic
-          </button>
-          <button
-            onClick={() => rephrase("formal")}
-            disabled={loading}
-            className="rephrase-style-btn"
-          >
-            {loading && activeStyle === "formal" ? (
-              <svg className="spinner-sm" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10" />
-              </svg>
-            ) : (
-              "👔"
-            )}
-            Formal
+    <div className="ai-modal-overlay" onClick={onClose}>
+      <div className="ai-modal rephrase-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="ai-modal-header">
+          <h3>🔄 Rephrase Text</h3>
+          <button onClick={onClose} className="close-btn">
+            ×
           </button>
         </div>
-      ) : (
-        <div className="rephrase-options">
-          <div className="rephrase-header">
-            <h4>Choose option:</h4>
-            <button
-              onClick={() => {
-                setOptions(null);
-                setActiveStyle(null);
-              }}
-              className="back-btn-sm"
-            >
-              ← Back
-            </button>
+
+        <div className="ai-modal-content">
+          {/* Show selected text */}
+          <div className="selected-text-preview">
+            <h4>Selected Text:</h4>
+            <p>"{selectedText}"</p>
           </div>
-          {options.map((option, idx) => (
-            <div key={idx} className="rephrase-option">
-              <p className="option-text">{option.text}</p>
-              <small className="option-notes">{option.notes}</small>
-              <button onClick={() => handleReplace(option.text)} className="replace-btn">
-                Replace
-              </button>
+
+          {!options ? (
+            <div className="rephrase-styles">
+              <h4>Rephrase as:</h4>
+              {!isAvailable && (
+                <div className="usage-warning">
+                  <p>⚠️ Usage limit reached. You have used all available uses of this feature.</p>
+                </div>
+              )}
+              {isAvailable && remaining > 0 && (
+                <div className="usage-info">
+                  <p>Remaining uses: <strong>{remaining}</strong></p>
+                </div>
+              )}
+              <div className="style-buttons">
+                <button
+                  onClick={() => rephrase("simple")}
+                  disabled={loading || !isAvailable}
+                  className={`rephrase-style-btn ${!isAvailable ? "disabled" : ""}`}
+                >
+                  {loading && activeStyle === "simple" ? (
+                    <svg className="spinner" viewBox="0 0 24 24">
+                      <circle cx="12" cy="12" r="10" />
+                    </svg>
+                  ) : (
+                    "📝"
+                  )}
+                  Simple (A2-B1)
+                </button>
+                <button
+                  onClick={() => rephrase("academic")}
+                  disabled={loading || !isAvailable}
+                  className={`rephrase-style-btn ${!isAvailable ? "disabled" : ""}`}
+                >
+                  {loading && activeStyle === "academic" ? (
+                    <svg className="spinner" viewBox="0 0 24 24">
+                      <circle cx="12" cy="12" r="10" />
+                    </svg>
+                  ) : (
+                    "🎓"
+                  )}
+                  Academic (B2-C1)
+                </button>
+                <button
+                  onClick={() => rephrase("formal")}
+                  disabled={loading || !isAvailable}
+                  className={`rephrase-style-btn ${!isAvailable ? "disabled" : ""}`}
+                >
+                  {loading && activeStyle === "formal" ? (
+                    <svg className="spinner" viewBox="0 0 24 24">
+                      <circle cx="12" cy="12" r="10" />
+                    </svg>
+                  ) : (
+                    "👔"
+                  )}
+                  Formal (C1+)
+                </button>
+              </div>
             </div>
-          ))}
+          ) : (
+            <div className="rephrase-options">
+              <div className="options-header">
+                <h4>Choose an option:</h4>
+                <button
+                  onClick={() => {
+                    setOptions(null);
+                    setActiveStyle(null);
+                  }}
+                  className="secondary-btn"
+                >
+                  ← Back
+                </button>
+              </div>
+              {options.map((option, idx) => (
+                <div key={idx} className="rephrase-option-card">
+                  <p className="option-text">{option.text}</p>
+                  <small className="option-notes">{option.notes}</small>
+                  <button onClick={() => handleReplace(option.text)} className="primary-btn">
+                    Replace
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-      )}
+
+        <div className="ai-modal-footer">
+          <button onClick={onClose} className="secondary-btn">
+            Close
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

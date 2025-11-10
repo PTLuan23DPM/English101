@@ -19,6 +19,14 @@ from tensorflow import keras
 from typing import Dict, List, Tuple, Optional
 import sys
 
+# Import task response analyzer
+try:
+    from task_response_analyzer import analyze_task_response_semantic
+    TASK_RESPONSE_ANALYZER_AVAILABLE = True
+except ImportError:
+    TASK_RESPONSE_ANALYZER_AVAILABLE = False
+    print("[WARNING] Task response analyzer not available, using basic keyword matching")
+
 app = Flask(__name__)
 CORS(app)
 
@@ -151,33 +159,51 @@ if not model_loaded:
     print("WARNING: Traditional model file not found! Using fallback scoring.")
     print("Please ensure model.keras is in ai-models/writing-scorer/")
 
-# ==================== LEGACY BERT MODEL (from ml_assess.py) ====================
+# ==================== BERT MODEL WITH QUESTION AWARENESS (from ml_assess.py) ====================
 bert_assessor = None
 bert_model_loaded = False
 
-# Only try legacy BERT if no active model loaded
+# Only try BERT model if no active model loaded
 if not active_model:
     try:
-        # Import BERT model assessor (legacy)
-        from ml_assess import PMCStyleIELTSAssessor, AttentionLayer
+        # Import BERT model assessor with question awareness
+        from ml_assess import QuestionAssessor, AttentionLayer
         
-        # Try to load BERT model
-        bert_model_dir = PROJECT_ROOT / 'ai-models' / 'writing-scorer' / 'bert_ielts_model'
+        # Try to load BERT model with question awareness (new model)
+        bert_model_dir = PROJECT_ROOT / 'ai-models' / 'writing-scorer' / 'bert_question_model'
         if bert_model_dir.exists() and (bert_model_dir / 'model.keras').exists():
             try:
-                print(f"\nLoading legacy BERT model from: {bert_model_dir}")
-                bert_assessor = PMCStyleIELTSAssessor(max_length=512)
+                print(f"\nLoading BERT model with question awareness from: {bert_model_dir}")
+                bert_assessor = QuestionAssessor(max_length=512, use_question=True)
                 bert_assessor.load_model(str(bert_model_dir))
                 bert_model_loaded = True
                 if not active_model_type:
-                    active_model_type = 'bert_legacy'
-                print("[OK] Legacy BERT model loaded successfully!")
+                    active_model_type = 'bert_question_aware'
+                print("[OK] BERT model with question awareness loaded successfully!")
             except Exception as e:
-                print(f"[WARNING] Failed to load legacy BERT model: {e}")
-    except ImportError:
-        pass  # ml_assess not available
+                print(f"[WARNING] Failed to load BERT question-aware model: {e}")
+        
+        # Fallback to legacy model directory if new model not found
+        if not bert_model_loaded:
+            bert_model_dir_legacy = PROJECT_ROOT / 'ai-models' / 'writing-scorer' / 'bert_ielts_model'
+            if bert_model_dir_legacy.exists() and (bert_model_dir_legacy / 'model.keras').exists():
+                try:
+                    print(f"\nLoading legacy BERT model from: {bert_model_dir_legacy}")
+                    # Try with question awareness disabled for legacy models
+                    bert_assessor = QuestionAssessor(max_length=512, use_question=False)
+                    bert_assessor.load_model(str(bert_model_dir_legacy))
+                    bert_model_loaded = True
+                    if not active_model_type:
+                        active_model_type = 'bert_legacy'
+                    print("[OK] Legacy BERT model loaded successfully!")
+                except Exception as e:
+                    print(f"[WARNING] Failed to load legacy BERT model: {e}")
+    except ImportError as e:
+        print(f"[WARNING] ml_assess module not available: {e}")
     except Exception as e:
-        print(f"[ERROR] Error initializing legacy BERT model: {e}")
+        print(f"[ERROR] Error initializing BERT model: {e}")
+        import traceback
+        traceback.print_exc()
 
 
 def extract_features_with_vectorizer(text: str) -> np.ndarray:
@@ -314,54 +340,93 @@ def extract_features_manual(text: str) -> np.ndarray:
 
 def normalize_score_by_level(base_score: float, task_level: str) -> float:
     """
-    Normalize score based on task level to ensure fair scoring across different levels.
-    A2 level tasks should have more lenient scoring than B2+ tasks.
+    Normalize score based on CEFR task level to ensure fair scoring.
+    Lower levels (A1-A2) should be more lenient, higher levels (C1-C2) should be stricter.
+    This ensures that a B2-level essay gets appropriate score for B2 task, not IELTS standard.
     """
-    level_base_scores = {
-        'A1': 6.0,  # Base score for A1 level
-        'A2': 6.5,  # Base score for A2 level
-        'B1': 7.0,  # Base score for B1 level
-        'B2': 7.5,  # Base score for B2 level
-        'C1': 8.0,  # Base score for C1 level
-        'C2': 8.5,  # Base score for C2 level
+    task_level_upper = task_level.upper() if task_level else 'B2'
+    
+    # CEFR-appropriate scoring ranges for each level
+    # Lower levels: More lenient (higher base scores for same quality)
+    # Higher levels: Stricter (lower base scores for same quality)
+    level_expectations = {
+        'A1': {'min': 5.0, 'good': 7.0, 'excellent': 8.5},  # Very lenient
+        'A2': {'min': 5.5, 'good': 7.5, 'excellent': 9.0},  # Lenient
+        'B1': {'min': 6.0, 'good': 7.5, 'excellent': 9.0},  # Moderate
+        'B2': {'min': 6.5, 'good': 7.5, 'excellent': 9.0},  # Standard (IELTS-like)
+        'C1': {'min': 7.0, 'good': 8.0, 'excellent': 9.5},  # Stricter
+        'C2': {'min': 7.5, 'good': 8.5, 'excellent': 9.5},  # Very strict
     }
     
-    base_for_level = level_base_scores.get(task_level, 7.5)
+    expectations = level_expectations.get(task_level_upper, level_expectations['B2'])
     
-    # Adjust score: if base_score is high, it's good for any level
-    # But if task is easier (lower level), we should be more lenient
-    if base_score >= 7.0:
-        # High quality writing - keep score high
+    # If base score is already high (excellent), keep it high for any level
+    if base_score >= 8.5:
+        return min(10.0, base_score)
+    
+    # For lower levels, be more lenient - boost scores
+    # For higher levels, be stricter - reduce scores slightly
+    if task_level_upper in ['A1', 'A2']:
+        # Very lenient: Boost scores by 0.5-1.0 points
+        if base_score >= expectations['good']:
+            return min(10.0, base_score + 0.3)
+        elif base_score >= expectations['min']:
+            return min(10.0, base_score + 0.5)
+        else:
+            return min(10.0, base_score + 0.8)
+    elif task_level_upper == 'B1':
+        # Lenient: Boost scores slightly
+        if base_score >= expectations['good']:
+            return min(10.0, base_score + 0.2)
+        elif base_score >= expectations['min']:
+            return min(10.0, base_score + 0.3)
+        else:
+            return min(10.0, base_score + 0.5)
+    elif task_level_upper in ['B2']:
+        # Standard: Keep scores as-is (IELTS-like)
         return base_score
-    elif base_score >= 5.5:
-        # Medium quality - adjust based on level
-        # Lower level tasks get a boost
-        level_boost = {
-            'A1': 1.0, 'A2': 0.8, 'B1': 0.5, 
-            'B2': 0.2, 'C1': 0.0, 'C2': -0.2
-        }
-        boost = level_boost.get(task_level, 0.0)
-        return min(10.0, base_score + boost)
-    else:
-        # Lower quality - still apply level-based adjustment
-        level_boost = {
-            'A1': 0.8, 'A2': 0.6, 'B1': 0.4,
-            'B2': 0.2, 'C1': 0.0, 'C2': 0.0
-        }
-        boost = level_boost.get(task_level, 0.0)
-        return min(10.0, base_score + boost)
+    elif task_level_upper in ['C1', 'C2']:
+        # Stricter: Slightly reduce scores for lower quality, keep high scores
+        if base_score >= expectations['good']:
+            return base_score  # Keep high scores
+        elif base_score >= expectations['min']:
+            return max(0.0, base_score - 0.2)  # Slight reduction
+        else:
+            return max(0.0, base_score - 0.5)  # More reduction for low quality
+    
+    return base_score
 
 
-def score_to_scale_10(ielts_score: float, task_level: Optional[str] = None) -> float:
-    """Convert IELTS score (0-9) to 10-point scale, with optional level-based normalization"""
+def score_to_scale_10(ielts_score: float, task_level: Optional[str] = None, task_type: Optional[str] = None) -> float:
+    """Convert IELTS score (0-9) to 10-point scale, with CEFR-based normalization
+    This ensures scoring is appropriate for the task level, not just IELTS standard
+    For simple tasks (sentence/paragraph), applies additional boost"""
     # Linear conversion: 0-9 -> 0-10
     score_10 = round((ielts_score / 9.0) * 10.0, 1)
     
-    # Apply level-based normalization if task level is provided
+    # Check if this is a simple task that needs extra boost
+    is_simple_task = task_type and ('sentence' in task_type.lower() or 'paragraph' in task_type.lower())
+    task_level_upper = task_level.upper() if task_level else 'B2'
+    is_lower_level = task_level_upper in ['A1', 'A2']
+    
+    # For simple tasks at lower levels, model severely underestimates quality
+    # Model is trained on IELTS essays, so simple tasks get unfairly low scores
+    if is_simple_task and is_lower_level:
+        # Significant boost: +2.0 points (model thinks it's 5.8, but it's actually 7.8+)
+        score_10 = min(10.0, score_10 + 2.0)
+    elif is_simple_task:
+        # Moderate boost for simple tasks
+        score_10 = min(10.0, score_10 + 1.5)
+    elif is_lower_level:
+        # Small boost for lower level tasks
+        score_10 = min(10.0, score_10 + 1.0)
+    
+    # Apply CEFR-based normalization if task level is provided
+    # This adjusts the score to be appropriate for the task's CEFR level
     if task_level:
         score_10 = normalize_score_by_level(score_10, task_level.upper())
     
-    return score_10
+    return round(score_10, 1)
 
 
 def score_to_cefr(score_10: float) -> Tuple[str, str]:
@@ -445,7 +510,9 @@ def get_task_requirements(task: Optional[Dict]) -> Dict:
 
 
 def get_detailed_feedback(text: str, score_10: float, prompt: str = "", task: Optional[Dict] = None) -> Dict:
-    """Generate detailed feedback based on 10-point scale score and task requirements"""
+    """Generate detailed feedback based on 10-point scale score and task requirements
+    Uses CEFR-based scoring instead of pure IELTS criteria
+    For sentence/paragraph tasks, uses task-specific scoring (much more lenient)"""
     
     word_count = len(text.split())
     sentence_count = len(re.split(r'[.!?]+', text))
@@ -459,223 +526,561 @@ def get_detailed_feedback(text: str, score_10: float, prompt: str = "", task: Op
     max_words = task_req['max_words']
     min_paragraphs = task_req['min_paragraphs']
     recommended_paragraphs = task_req['recommended_paragraphs']
+    task_level = task_req.get('level', 'B2')
+    task_type = task_req.get('task_type', 'essay')
     
-    # Task Response - Based on structure and length according to task requirements
-    # Start with base score, but be more lenient and reward meeting requirements
-    task_response_score_10 = score_10
+    # Check if this is a simple task (sentence/paragraph) that needs special handling
+    is_simple_task = 'sentence' in task_type.lower() or 'paragraph' in task_type.lower()
+    task_level_upper = task_level.upper() if task_level else 'B2'
+    is_lower_level = task_level_upper in ['A1', 'A2']
+    
+    # ========== TASK RESPONSE SCORING (CEFR-based, task-specific) ==========
+    # For simple tasks (sentence/paragraph) at lower levels, start with higher base score
+    # Model is trained on IELTS essays, so it underestimates simple tasks
+    if is_simple_task and is_lower_level:
+        # Boost base score significantly for simple tasks at A1-A2 level
+        # These tasks are much easier than IELTS essays, so they deserve higher scores
+        task_response_score_10 = min(10.0, score_10 + 1.5)  # Significant boost
+    elif is_simple_task:
+        # Simple tasks at higher levels also need boost
+        task_response_score_10 = min(10.0, score_10 + 1.0)
+    elif is_lower_level:
+        # Lower level tasks need moderate boost
+        task_response_score_10 = min(10.0, score_10 + 0.8)
+    else:
+        task_response_score_10 = score_10  # Start with base score from model
+    
     task_response_feedback = []
-    task_compliance_bonus = 0.0  # Bonus for meeting task requirements
+    task_compliance_bonus = 0.0
+    task_compliance_penalty = 0.0
     
-    # Check structure and organization based on task type
-    if paragraph_count < min_paragraphs:
-        task_response_feedback.append(f"[ERROR] Structure is unclear. This task requires at least {min_paragraphs} paragraph(s).")
-        task_response_score_10 = max(0, task_response_score_10 - 1.0)  # Reduced penalty
-    elif paragraph_count >= recommended_paragraphs:
-        task_response_feedback.append("Excellent paragraph structure!")
-        task_compliance_bonus += 0.3  # Reward good structure
-    elif paragraph_count >= min_paragraphs:
-        task_response_feedback.append("Good paragraph structure")
-        task_compliance_bonus += 0.1  # Small reward for meeting minimum
-    else:
-        task_response_feedback.append(f"Consider organizing into {recommended_paragraphs} paragraph(s) for better structure.")
-        # No penalty if close to requirement
-    
-    # Check word count based on task requirements - reward meeting requirements
-    word_count_ratio = word_count / max_words if max_words > 0 else 1.0
-    if word_count < min_words * 0.8:  # 20% below minimum is error
-        task_response_feedback.append(f"[ERROR] Word count is too low. This task requires {min_words}-{max_words} words. You wrote {word_count} words.")
-        task_response_score_10 = max(0, task_response_score_10 - 1.5)  # Reduced penalty
-    elif word_count < min_words:
-        task_response_feedback.append(f"Try to reach the minimum requirement of {min_words} words. Current: {word_count} words.")
-        task_response_score_10 = max(0, task_response_score_10 - 0.5)  # Reduced penalty
-    elif min_words <= word_count <= max_words:
-        # PERFECT - Reward meeting requirements!
-        task_response_feedback.append(f"Excellent! You wrote {word_count} words, perfectly within the required range ({min_words}-{max_words} words).")
-        task_compliance_bonus += 0.5  # Significant bonus for meeting word count
-    elif word_count <= max_words * 1.1:  # Within 10% above is acceptable
-        task_response_feedback.append(f"Good length! You wrote {word_count} words. Target: {min_words}-{max_words} words.")
-        task_compliance_bonus += 0.2  # Small bonus for close to target
-    elif word_count <= max_words * 1.2:  # 20% above maximum
-        task_response_feedback.append(f"Word count slightly exceeds the requirement ({max_words} words). Consider being more concise. Current: {word_count} words.")
-        # No penalty, just feedback
-    else:
-        task_response_feedback.append(f"Word count exceeds the requirement. Consider being more concise. Current: {word_count} words, Target: {min_words}-{max_words} words.")
-        task_response_score_10 = max(0, task_response_score_10 - 0.3)  # Small penalty only
-    
-    # Apply compliance bonus
-    task_response_score_10 = min(10.0, task_response_score_10 + task_compliance_bonus)
-    
-    # Optional: If prompt is provided, check relevance
+    # Check task-specific requirements from prompt (sentence count, tense, etc.)
     if prompt:
         prompt_lower = prompt.lower()
-        text_lower = text.lower()
-        prompt_keywords = set(prompt_lower.split())
-        matching_keywords = sum(1 for keyword in prompt_keywords if len(keyword) > 4 and keyword in text_lower)
-        keyword_coverage = matching_keywords / len(prompt_keywords) if prompt_keywords else 0
         
-        if keyword_coverage < 0.3:
-            task_response_feedback.append("Your response may not fully address the given topic.")
-            task_response_score_10 = max(0, task_response_score_10 - 1.0)
-        elif keyword_coverage >= 0.5:
+        # Check for sentence count requirement (e.g., "5-7 sentences")
+        sentence_count_match = re.search(r'(\d+)\s*[-–—]\s*(\d+)\s*sentences?', prompt_lower)
+        if sentence_count_match:
+            min_sentences_req = int(sentence_count_match.group(1))
+            max_sentences_req = int(sentence_count_match.group(2))
+            
+            if min_sentences_req <= sentence_count <= max_sentences_req:
+                task_response_feedback.append(f"Excellent! You wrote {sentence_count} sentences, perfectly within the required range ({min_sentences_req}-{max_sentences_req} sentences).")
+                task_compliance_bonus += 0.8  # Significant bonus for meeting sentence count
+            elif sentence_count < min_sentences_req:
+                task_response_feedback.append(f"Try to write more sentences. Requirement: {min_sentences_req}-{max_sentences_req} sentences. You wrote {sentence_count} sentences.")
+                task_compliance_penalty += 0.5  # Moderate penalty
+            elif sentence_count > max_sentences_req:
+                task_response_feedback.append(f"You wrote {sentence_count} sentences, slightly more than required ({min_sentences_req}-{max_sentences_req}). That's okay, but try to stay within the range.")
+                # No penalty for slightly over
+        
+        # Check for tense requirement (e.g., "simple present tense")
+        if 'simple present' in prompt_lower or 'present simple' in prompt_lower:
+            # Check if text uses present simple (basic check)
+            present_indicators = re.findall(r'\b(wake|wakes|get|gets|brush|brushes|wash|washes|have|has|go|goes|leave|leaves|help|helps|start|starts|check|checks)\b', text.lower())
+            past_indicators = re.findall(r'\b(woke|got|brushed|washed|had|went|left|helped|started|checked|was|were)\b', text.lower())
+            
+            if len(present_indicators) > len(past_indicators) * 2:
+                task_response_feedback.append("✓ Good use of simple present tense")
+                task_compliance_bonus += 0.5
+            elif len(past_indicators) > len(present_indicators):
+                task_response_feedback.append("The prompt asks for simple present tense, but you used past tense in some places. Try to use present tense (e.g., 'I wake up' instead of 'I woke up').")
+                task_compliance_penalty += 0.3
+        
+        # Check for time expressions requirement
+        if 'time expressions' in prompt_lower or 'time expression' in prompt_lower:
+            time_expressions = re.findall(r'\b(at\s+\d+|every\s+\w+|in\s+the\s+\w+|after\s+\w+|before\s+\w+|around\s+\d+|usually|always|sometimes|often|never|then|next|first|finally)\b', text.lower())
+            if len(time_expressions) >= 3:
+                task_response_feedback.append(f"✓ Excellent use of time expressions ({len(time_expressions)} found: {', '.join(time_expressions[:3])})")
+                task_compliance_bonus += 0.5
+            elif len(time_expressions) >= 2:
+                task_response_feedback.append(f"✓ Good use of time expressions ({len(time_expressions)} found)")
+                task_compliance_bonus += 0.3
+            elif len(time_expressions) >= 1:
+                task_response_feedback.append("You used some time expressions. Try to use more (e.g., 'at 6:00', 'every morning', 'after breakfast', 'then').")
+                # No penalty, just suggestion
+            else:
+                task_response_feedback.append("The prompt asks for time expressions. Try adding phrases like 'at 6:00', 'every morning', 'after breakfast', 'then', 'usually'.")
+                task_compliance_penalty += 0.2
+    
+    # Use semantic analysis for task response if available
+    semantic_analysis_success = False
+    if TASK_RESPONSE_ANALYZER_AVAILABLE and prompt:
+        try:
+            # Get task type from task requirements
+            task_type_from_req = task_req.get('task_type', 'essay')
+            # Normalize task type
+            if 'sentence' in task_type_from_req:
+                task_type_normalized = 'sentence'
+            elif 'paragraph' in task_type_from_req:
+                task_type_normalized = 'paragraph'
+            elif 'email' in task_type_from_req:
+                task_type_normalized = 'email'
+            elif 'essay' in task_type_from_req:
+                task_type_normalized = 'essay'
+            else:
+                task_type_normalized = 'essay'  # Default
+            
+            task_analysis = analyze_task_response_semantic(
+                essay=text,
+                prompt=prompt,
+                task_level=task_level,
+                task_type=task_type_normalized,
+                use_gemini=True
+            )
+            
+            # Get semantic relevance scores
+            relevance_score = task_analysis.get('relevance_score', 7.0)
+            coverage_score = task_analysis.get('coverage_score', 7.0)
+            
+            # Combine relevance and coverage (weighted average)
+            semantic_task_score = (relevance_score * 0.6 + coverage_score * 0.4)
+            
+            # Adjust base score based on semantic analysis
+            # Trust semantic analysis more for task response (it understands context better)
+            # But don't penalize too harshly - be lenient
+            score_diff = semantic_task_score - task_response_score_10
+            if abs(score_diff) > 1.5:
+                # Significant difference - trust semantic analysis more
+                # But if semantic is much lower, be cautious (might be false negative)
+                if semantic_task_score < task_response_score_10:
+                    # Semantic says lower - use weighted average (don't penalize too much)
+                    task_response_score_10 = semantic_task_score * 0.4 + task_response_score_10 * 0.6
+                else:
+                    # Semantic says higher - trust it more
+                    task_response_score_10 = semantic_task_score * 0.7 + task_response_score_10 * 0.3
+            elif abs(score_diff) > 0.5:
+                # Moderate difference - use balanced average
+                task_response_score_10 = semantic_task_score * 0.6 + task_response_score_10 * 0.4
+            else:
+                # Similar scores - use weighted average favoring semantic
+                task_response_score_10 = semantic_task_score * 0.55 + task_response_score_10 * 0.45
+            
+            # Add semantic analysis feedback
+            task_response_feedback.extend(task_analysis.get('feedback', []))
+            
+            # Add strengths and weaknesses from semantic analysis (encouraging format)
+            strengths = task_analysis.get('strengths', [])
+            weaknesses = task_analysis.get('weaknesses', [])
+            if strengths:
+                # Add strengths as positive feedback
+                for strength in strengths[:2]:
+                    task_response_feedback.append(f"✓ {strength}")
+            if weaknesses:
+                # Add weaknesses as constructive suggestions (not harsh criticism)
+                for weakness in weaknesses[:2]:
+                    task_response_feedback.append(f"💡 {weakness}")
+            
+            # Mark semantic analysis as successful
+            semantic_analysis_success = True
+                
+        except Exception as e:
+            print(f"[Scoring] Error in semantic task response analysis: {e}")
+            import traceback
+            traceback.print_exc()
+            semantic_analysis_success = False
+    
+    # Fallback to keyword matching if semantic analysis not available or failed
+    if not semantic_analysis_success and prompt:
+        # Basic keyword matching (fallback)
+        prompt_lower = prompt.lower()
+        text_lower = text.lower()
+        prompt_keywords = set([w for w in prompt_lower.split() if len(w) > 4])
+        matching_keywords = sum(1 for kw in prompt_keywords if kw in text_lower)
+        keyword_coverage = matching_keywords / len(prompt_keywords) if prompt_keywords else 0.5
+        
+        # More lenient keyword matching (reduce false positives)
+        if keyword_coverage < 0.2:
+            # Only mark as off-topic if very low overlap
+            task_response_feedback.append("Try to connect your ideas more directly to the prompt topic.")
+            task_response_score_10 = max(0, task_response_score_10 - 1.0)  # Reduced penalty
+        elif keyword_coverage >= 0.4:
+            # Be generous - if 40%+ overlap, consider it relevant
             task_response_feedback.append("Good relevance to the topic")
+            task_compliance_bonus += 0.3
+        elif keyword_coverage >= 0.2:
+            # Low but not zero - give benefit of doubt
+            task_response_feedback.append("Your response addresses the topic - try using more specific vocabulary from the prompt")
+            # No penalty, just suggestion
     
-    task_response_score_10 = min(10.0, task_response_score_10)
+    # Check structure and organization based on task type (CEFR-appropriate)
+    # For simple tasks, don't penalize paragraph structure heavily
+    if is_simple_task:
+        # Sentence/paragraph tasks don't need strict paragraph structure
+        if paragraph_count >= 1:
+            task_response_feedback.append("Good structure for this task type")
+            task_compliance_bonus += 0.2
+        # No penalty for simple tasks
+    else:
+        # Essay tasks need proper paragraph structure
+        if paragraph_count < min_paragraphs:
+            task_response_feedback.append(f"Structure needs improvement. This {task_level} level task requires at least {min_paragraphs} paragraph(s).")
+            task_compliance_penalty += 1.0
+        elif paragraph_count >= recommended_paragraphs:
+            task_response_feedback.append("Excellent paragraph structure!")
+            task_compliance_bonus += 0.3
+        elif paragraph_count >= min_paragraphs:
+            task_response_feedback.append("Good paragraph structure")
+            task_compliance_bonus += 0.1
     
-    # Coherence and Cohesion - adjusted based on task level
-    coherence_score_10 = score_10
+    # Check word count based on task requirements (CEFR-appropriate penalties)
+    # For simple tasks, be more lenient with word count
+    if is_simple_task:
+        # Simple tasks: focus on sentence count, not word count
+        # Only check word count if it's extremely short or long
+        if word_count < 20:
+            task_response_feedback.append(f"Your response is quite short ({word_count} words). Try to write more to fully address the prompt.")
+            task_compliance_penalty += 0.3  # Reduced penalty
+        elif word_count > 200:
+            task_response_feedback.append(f"Your response is quite long ({word_count} words). For this task type, try to be more concise.")
+            # No penalty, just feedback
+        else:
+            # Word count is reasonable for simple tasks
+            task_response_feedback.append(f"Good length for this task type ({word_count} words)")
+            task_compliance_bonus += 0.2
+    else:
+        # Essay tasks: strict word count requirements
+        if word_count < min_words * 0.8:
+            task_response_feedback.append(f"Word count is too low. This task requires {min_words}-{max_words} words. You wrote {word_count} words.")
+            task_compliance_penalty += 1.5
+        elif word_count < min_words:
+            task_response_feedback.append(f"Try to reach the minimum requirement of {min_words} words. Current: {word_count} words.")
+            task_compliance_penalty += 0.5
+        elif min_words <= word_count <= max_words:
+            task_response_feedback.append(f"Excellent! You wrote {word_count} words, perfectly within the required range ({min_words}-{max_words} words).")
+            task_compliance_bonus += 0.5
+        elif word_count <= max_words * 1.1:
+            task_response_feedback.append(f"Good length! You wrote {word_count} words. Target: {min_words}-{max_words} words.")
+            task_compliance_bonus += 0.2
+        elif word_count <= max_words * 1.2:
+            task_response_feedback.append(f"Word count slightly exceeds the requirement. Consider being more concise. Current: {word_count} words.")
+        else:
+            task_response_feedback.append(f"Word count exceeds the requirement. Consider being more concise. Current: {word_count} words, Target: {min_words}-{max_words} words.")
+            task_compliance_penalty += 0.3
+    
+    # Apply compliance adjustments
+    task_response_score_10 = task_response_score_10 + task_compliance_bonus - task_compliance_penalty
+    task_response_score_10 = max(0.0, min(10.0, task_response_score_10))
+    
+    # Coherence and Cohesion - CEFR-appropriate expectations
+    # For simple tasks, start with higher base score and be very lenient
+    if is_simple_task and is_lower_level:
+        coherence_score_10 = min(10.0, score_10 + 1.2)  # Significant boost
+    elif is_simple_task:
+        coherence_score_10 = min(10.0, score_10 + 0.8)  # Moderate boost
+    elif is_lower_level:
+        coherence_score_10 = min(10.0, score_10 + 0.6)  # Small boost
+    else:
+        coherence_score_10 = score_10
+    
     coherence_feedback = []
     coherence_bonus = 0.0
+    coherence_penalty = 0.0
     
-    # Adjust expectations based on task level and type
-    task_level = task_req.get('level', 'B2')
-    if task_level in ['A1', 'A2']:
-        min_sentences = 5
+    # CEFR-appropriate expectations (more lenient for lower levels and simple tasks)
+    if is_simple_task:
+        # Simple tasks: very lenient expectations
+        if task_level in ['A1', 'A2']:
+            min_sentences = 3  # Very lenient for sentence tasks
+            min_linking_words = 0  # Not required for simple tasks
+            recommended_sentences = 6
+            excellent_sentences = 8
+        else:
+            min_sentences = 4
+            min_linking_words = 1
+            recommended_sentences = 7
+            excellent_sentences = 10
+    elif task_level in ['A1', 'A2']:
+        min_sentences = 4  # Very lenient
         min_linking_words = 1
-        recommended_sentences = 8
+        recommended_sentences = 6
+        excellent_sentences = 8
     elif task_level == 'B1':
-        min_sentences = 8
+        min_sentences = 6
         min_linking_words = 2
-        recommended_sentences = 12
-    else:  # B2, C1, C2
-        min_sentences = 12
+        recommended_sentences = 10
+        excellent_sentences = 12
+    elif task_level == 'B2':
+        min_sentences = 10
         min_linking_words = 3
-        recommended_sentences = 15
+        recommended_sentences = 14
+        excellent_sentences = 16
+    else:  # C1, C2
+        min_sentences = 12
+        min_linking_words = 4
+        recommended_sentences = 16
+        excellent_sentences = 20
     
-    # More lenient sentence count checking
-    if sentence_count < min_sentences * 0.7:  # Very few sentences
-        coherence_feedback.append(f"[ERROR] Too few sentences. This {task_level} level task requires at least {min_sentences} sentences.")
-        coherence_score_10 = max(0, coherence_score_10 - 1.0)  # Reduced penalty
-    elif sentence_count >= recommended_sentences:
-        coherence_feedback.append("Excellent sentence variety!")
-        coherence_bonus += 0.2  # Reward good sentence variety
-    elif sentence_count >= min_sentences:
-        coherence_feedback.append("Good sentence variety")
-        coherence_bonus += 0.1  # Small reward
+    # CEFR-appropriate sentence count checking
+    # For simple tasks, be very lenient (they often have specific sentence count requirements)
+    if is_simple_task:
+        # Simple tasks: sentence count is usually specified in prompt, so be lenient
+        if sentence_count >= min_sentences:
+            coherence_feedback.append(f"✓ Good number of sentences ({sentence_count}) for this task")
+            coherence_bonus += 0.3
+        elif sentence_count >= min_sentences * 0.8:
+            coherence_feedback.append(f"Acceptable number of sentences ({sentence_count}). Try to write a bit more if possible.")
+            coherence_bonus += 0.1
+        else:
+            coherence_feedback.append(f"You wrote {sentence_count} sentences. Try to write a few more to fully address the prompt.")
+            coherence_penalty += 0.3  # Reduced penalty
     else:
-        coherence_feedback.append(f"Try to vary your sentence length and structure. Aim for at least {recommended_sentences} sentences.")
-        # No penalty if close
+        # Essay tasks: standard sentence count checking
+        if sentence_count < min_sentences * 0.7:
+            coherence_feedback.append(f"Too few sentences. For {task_level} level, aim for at least {min_sentences} sentences.")
+            coherence_penalty += 1.0
+        elif sentence_count >= excellent_sentences:
+            coherence_feedback.append("Excellent sentence variety and structure!")
+            coherence_bonus += 0.3
+        elif sentence_count >= recommended_sentences:
+            coherence_feedback.append("Good sentence variety")
+            coherence_bonus += 0.2
+        elif sentence_count >= min_sentences:
+            coherence_feedback.append(f"Acceptable sentence count. For {task_level} level, aim for {recommended_sentences} sentences for better variety.")
+            coherence_bonus += 0.1
+        else:
+            coherence_feedback.append(f"Try to write more sentences. For {task_level} level, aim for at least {recommended_sentences} sentences.")
+            coherence_penalty += 0.5
     
-    # Check for linking words - adjusted by level, more lenient
-    linking_words = len(re.findall(r'\b(however|moreover|therefore|furthermore|in addition|consequently|although|because|while|whereas|and|but|or|so|yet|then|after that|finally|first|second|also)\b', text.lower()))
-    if linking_words >= min_linking_words:
-        coherence_feedback.append("Good use of linking words")
-        coherence_bonus += 0.1  # Reward using linking words
-    elif linking_words >= min_linking_words * 0.7:  # Close to requirement
-        coherence_feedback.append(f"Consider using more linking words. For {task_level} level, aim for at least {min_linking_words} linking words.")
-        # No penalty
+    # Check for linking words - CEFR-appropriate
+    # For simple tasks, linking words are optional (especially for A1-A2)
+    linking_words = len(re.findall(r'\b(however|moreover|therefore|furthermore|in addition|consequently|although|because|while|whereas|and|but|or|so|yet|then|after that|finally|first|second|also|furthermore|additionally|meanwhile|similarly|likewise|on the other hand|in contrast|nevertheless|nonetheless)\b', text.lower()))
+    
+    if is_simple_task:
+        # Simple tasks: linking words are nice but not required
+        if linking_words >= 2:
+            coherence_feedback.append("Good use of connecting words")
+            coherence_bonus += 0.2
+        elif linking_words >= 1:
+            coherence_feedback.append("Some use of connecting words - good!")
+            coherence_bonus += 0.1
+        # No penalty for simple tasks if no linking words
     else:
-        coherence_feedback.append(f"Use more linking words to connect your ideas. For {task_level} level, aim for at least {min_linking_words} linking words.")
-        coherence_score_10 = max(0, coherence_score_10 - 0.3)  # Reduced penalty
+        # Essay tasks: linking words are expected
+        if linking_words >= min_linking_words * 1.5:
+            coherence_feedback.append("Excellent use of linking words and transitions!")
+            coherence_bonus += 0.3
+        elif linking_words >= min_linking_words:
+            coherence_feedback.append("Good use of linking words")
+            coherence_bonus += 0.2
+        elif linking_words >= min_linking_words * 0.7:
+            coherence_feedback.append(f"Consider using more linking words. For {task_level} level, aim for at least {min_linking_words} linking words.")
+            coherence_penalty += 0.2
+        else:
+            coherence_feedback.append(f"Use more linking words to connect your ideas. For {task_level} level, aim for at least {min_linking_words} linking words.")
+            coherence_penalty += 0.5
     
-    coherence_score_10 = min(10.0, coherence_score_10 + coherence_bonus)
+    coherence_score_10 = coherence_score_10 + coherence_bonus - coherence_penalty
+    coherence_score_10 = max(0.0, min(10.0, coherence_score_10))
     
-    # Lexical Resource - adjusted based on task level, more lenient
-    lexical_score_10 = score_10
+    # Lexical Resource - CEFR-appropriate expectations
+    # For simple tasks at lower levels, be very lenient (vocabulary is simple by design)
+    if is_simple_task and is_lower_level:
+        lexical_score_10 = min(10.0, score_10 + 1.0)  # Significant boost
+    elif is_simple_task:
+        lexical_score_10 = min(10.0, score_10 + 0.6)  # Moderate boost
+    elif is_lower_level:
+        lexical_score_10 = min(10.0, score_10 + 0.5)  # Small boost
+    else:
+        lexical_score_10 = score_10
+    
     lexical_diversity = unique_words / word_count if word_count > 0 else 0
     lexical_feedback = []
     lexical_bonus = 0.0
+    lexical_penalty = 0.0
     
-    # Adjust expectations based on level - more lenient thresholds
-    if task_level in ['A1', 'A2']:
-        min_diversity = 0.25  # More lenient
-        good_diversity = 0.35
-        excellent_diversity = 0.45
+    # CEFR-appropriate lexical diversity expectations
+    # For simple tasks, vocabulary diversity is less important
+    if is_simple_task:
+        # Simple tasks: focus on accuracy, not diversity
+        if lexical_diversity >= 0.25:
+            lexical_feedback.append("Good vocabulary use for this task type")
+            lexical_bonus += 0.3
+        elif lexical_diversity >= 0.20:
+            lexical_feedback.append("Acceptable vocabulary for this task")
+            lexical_bonus += 0.1
+        # No penalty for simple tasks - they use simple vocabulary by design
+        min_diversity = 0.15  # Very lenient
+        good_diversity = 0.25
+        excellent_diversity = 0.35
+    elif task_level in ['A1', 'A2']:
+        min_diversity = 0.20  # Very lenient for beginners
+        good_diversity = 0.30
+        excellent_diversity = 0.40
     elif task_level == 'B1':
+        min_diversity = 0.25
+        good_diversity = 0.40
+        excellent_diversity = 0.50
+    elif task_level == 'B2':
         min_diversity = 0.30
         good_diversity = 0.45
         excellent_diversity = 0.55
-    else:  # B2, C1, C2
+    else:  # C1, C2
         min_diversity = 0.35
         good_diversity = 0.50
         excellent_diversity = 0.60
     
     if lexical_diversity >= excellent_diversity:
         lexical_feedback.append("Excellent vocabulary diversity!")
-        lexical_bonus += 0.3  # Reward excellent diversity
+        lexical_bonus += 0.4
     elif lexical_diversity >= good_diversity:
         lexical_feedback.append("Good vocabulary diversity")
-        lexical_bonus += 0.2  # Reward good diversity
+        lexical_bonus += 0.3
     elif lexical_diversity >= min_diversity:
-        lexical_feedback.append(f"Vocabulary is acceptable. For {task_level} level, aim for {good_diversity:.0%} diversity.")
-        lexical_bonus += 0.1  # Small reward
+        lexical_feedback.append(f"Vocabulary is acceptable for {task_level} level. Aim for {good_diversity:.0%} diversity for improvement.")
+        lexical_bonus += 0.1
     elif lexical_diversity >= min_diversity * 0.8:
-        lexical_feedback.append(f"Vocabulary could be more diverse. Target diversity for {task_level}: {good_diversity:.0%}.")
-        # No penalty if close
+        lexical_feedback.append(f"Vocabulary could be more diverse. For {task_level} level, aim for {good_diversity:.0%} diversity.")
+        lexical_penalty += 0.3
     else:
-        lexical_feedback.append(f"Limited vocabulary range. For {task_level} level, aim for more varied words.")
-        lexical_score_10 = max(0, lexical_score_10 - 1.0)  # Reduced penalty
+        lexical_feedback.append(f"Limited vocabulary range. For {task_level} level, aim for more varied words (target: {good_diversity:.0%} diversity).")
+        lexical_penalty += 1.0
     
-    # Check for academic/advanced vocabulary - only for B2+ tasks, optional
+    # Check for academic/advanced vocabulary - CEFR-appropriate
     if task_level in ['B2', 'C1', 'C2'] and word_count > 150:
-        advanced_words = len(re.findall(r'\b(consequently|furthermore|moreover|nevertheless|therefore|demonstrate|illustrate|analyze|significant|essential|considerable|substantial|evident|notably)\b', text.lower()))
-        if advanced_words >= 3:
+        advanced_words = len(re.findall(r'\b(consequently|furthermore|moreover|nevertheless|therefore|demonstrate|illustrate|analyze|significant|essential|considerable|substantial|evident|notably|furthermore|additionally|subsequently|hence|thus|whereas|nevertheless|nonetheless|notwithstanding)\b', text.lower()))
+        expected_advanced = 3 if task_level == 'B2' else (4 if task_level == 'C1' else 5)
+        if advanced_words >= expected_advanced:
             lexical_feedback.append("Excellent use of advanced vocabulary!")
-            lexical_bonus += 0.2
-        elif advanced_words >= 2:
+            lexical_bonus += 0.3
+        elif advanced_words >= expected_advanced * 0.7:
             lexical_feedback.append("Good use of advanced vocabulary")
-            lexical_bonus += 0.1
-        elif advanced_words < 2:
-            lexical_feedback.append("Consider using more advanced vocabulary appropriate for your level.")
-            # No penalty, just suggestion
+            lexical_bonus += 0.2
+        else:
+            lexical_feedback.append(f"For {task_level} level, consider using more advanced vocabulary (aim for {expected_advanced}+ advanced words).")
+            lexical_penalty += 0.2
+    elif task_level in ['A1', 'A2', 'B1']:
+        # Lower levels: Don't penalize for lack of advanced vocabulary
+        if word_count > 100:
+            simple_but_varied = unique_words >= word_count * 0.3
+            if simple_but_varied:
+                lexical_feedback.append("Good use of vocabulary appropriate for your level")
+                lexical_bonus += 0.1
     
-    lexical_score_10 = min(10.0, lexical_score_10 + lexical_bonus)
+    lexical_score_10 = lexical_score_10 + lexical_bonus - lexical_penalty
+    lexical_score_10 = max(0.0, min(10.0, lexical_score_10))
     
-    # Grammatical Range and Accuracy - adjusted based on task level, more lenient
-    grammar_score_10 = score_10
+    # Grammatical Range and Accuracy - CEFR-appropriate expectations
+    # For simple tasks at lower levels, be very lenient (simple sentences are expected)
+    if is_simple_task and is_lower_level:
+        grammar_score_10 = min(10.0, score_10 + 1.2)  # Significant boost
+    elif is_simple_task:
+        grammar_score_10 = min(10.0, score_10 + 0.8)  # Moderate boost
+    elif is_lower_level:
+        grammar_score_10 = min(10.0, score_10 + 0.6)  # Small boost
+    else:
+        grammar_score_10 = score_10
+    
     grammar_feedback = []
     grammar_bonus = 0.0
+    grammar_penalty = 0.0
     
     avg_sentence_length = word_count / sentence_count if sentence_count > 0 else 0
     
-    # Adjust sentence length expectations by level - more lenient
-    if task_level in ['A1', 'A2']:
-        min_avg_length = 5  # More lenient
-        good_avg_length = 9
+    # CEFR-appropriate sentence length and complexity expectations
+    # For simple tasks, simple sentences are expected and correct
+    if is_simple_task:
+        # Simple tasks: simple sentences are perfect
+        if avg_sentence_length >= 8:
+            grammar_feedback.append("Good sentence length for this task type")
+            grammar_bonus += 0.2
+        elif avg_sentence_length >= 6:
+            grammar_feedback.append("Appropriate sentence length")
+            grammar_bonus += 0.1
+        # No penalty for shorter sentences in simple tasks
+        min_avg_length = 5  # Very lenient
+        good_avg_length = 8
         excellent_avg_length = 12
-        min_complex_structures = 1  # More lenient
+        min_complex_structures = 0  # Not required
+        good_complex_structures = 1
+    elif task_level in ['A1', 'A2']:
+        min_avg_length = 4  # Very lenient for beginners
+        good_avg_length = 7
+        excellent_avg_length = 10
+        min_complex_structures = 0  # No requirement for beginners
+        good_complex_structures = 1
     elif task_level == 'B1':
-        min_avg_length = 7
-        good_avg_length = 11
-        excellent_avg_length = 15
+        min_avg_length = 6
+        good_avg_length = 10
+        excellent_avg_length = 14
+        min_complex_structures = 1
+        good_complex_structures = 2
+    elif task_level == 'B2':
+        min_avg_length = 8
+        good_avg_length = 14
+        excellent_avg_length = 18
         min_complex_structures = 2
-    else:  # B2, C1, C2
+        good_complex_structures = 4
+    else:  # C1, C2
         min_avg_length = 10
         good_avg_length = 16
         excellent_avg_length = 22
         min_complex_structures = 4
+        good_complex_structures = 6
     
-    if avg_sentence_length >= excellent_avg_length:
-        grammar_feedback.append("Excellent sentence complexity!")
-        grammar_bonus += 0.2
-    elif avg_sentence_length >= good_avg_length:
-        grammar_feedback.append("Good sentence complexity")
-        grammar_bonus += 0.1
-    elif avg_sentence_length >= min_avg_length:
-        grammar_feedback.append(f"Sentence complexity is acceptable. Target average length for {task_level}: {good_avg_length} words.")
-        grammar_bonus += 0.05
-    elif avg_sentence_length >= min_avg_length * 0.8:
-        grammar_feedback.append(f"Try to vary sentence complexity. Target average length for {task_level}: {good_avg_length} words.")
-        # No penalty if close
+    # Sentence length checking (very lenient for simple tasks)
+    if is_simple_task:
+        # Simple tasks: sentence length is less important
+        if avg_sentence_length >= good_avg_length:
+            grammar_feedback.append("Good sentence length for this task")
+            grammar_bonus += 0.2
+        elif avg_sentence_length >= min_avg_length:
+            grammar_feedback.append("Appropriate sentence length")
+            grammar_bonus += 0.1
+        # No penalty for simple tasks - they should have simple sentences
     else:
-        grammar_feedback.append(f"Sentences are quite short. For {task_level} level, aim for average {good_avg_length} words per sentence.")
-        grammar_score_10 = max(0, grammar_score_10 - 1.0)  # Reduced penalty
+        # Essay tasks: standard sentence length checking
+        if avg_sentence_length >= excellent_avg_length:
+            grammar_feedback.append("Excellent sentence complexity and variety!")
+            grammar_bonus += 0.3
+        elif avg_sentence_length >= good_avg_length:
+            grammar_feedback.append("Good sentence complexity")
+            grammar_bonus += 0.2
+        elif avg_sentence_length >= min_avg_length:
+            grammar_feedback.append(f"Sentence complexity is acceptable for {task_level} level. Aim for {good_avg_length} words average for improvement.")
+            grammar_bonus += 0.1
+        elif avg_sentence_length >= min_avg_length * 0.8:
+            grammar_feedback.append(f"Try to vary sentence complexity. For {task_level} level, aim for average {good_avg_length} words per sentence.")
+            grammar_penalty += 0.3
+        else:
+            grammar_feedback.append(f"Sentences are quite short. For {task_level} level, aim for average {good_avg_length} words per sentence.")
+            grammar_penalty += 0.8
     
-    # Check for complex structures - adjusted by level, more lenient
-    complex_structures = len(re.findall(r'\b(that|which|who|when|where|if|unless|although|because|since|while|as|though|even though)\b', text.lower()))
-    if complex_structures >= min_complex_structures * 1.5:
-        grammar_feedback.append("Excellent use of complex structures!")
+    # Check for complex structures - CEFR-appropriate
+    complex_structures = len(re.findall(r'\b(that|which|who|whom|whose|when|where|if|unless|although|because|since|while|as|though|even though|provided that|in case|so that|in order that|despite|in spite of)\b', text.lower()))
+    
+    # For simple tasks, complex structures are NOT expected (simple sentences are correct)
+    if is_simple_task:
+        # Simple tasks: simple sentences are perfect, no complex structures needed
+        grammar_feedback.append("Good use of simple sentences - perfect for this task type")
         grammar_bonus += 0.2
-    elif complex_structures >= min_complex_structures:
-        grammar_feedback.append("Good use of complex structures")
-        grammar_bonus += 0.1
-    elif complex_structures >= min_complex_structures * 0.7:
-        grammar_feedback.append(f"Consider using more complex grammatical structures. For {task_level} level, aim for at least {min_complex_structures} complex structures.")
-        # No penalty if close
+        # No penalty for simple tasks - they should use simple structures
+    elif task_level in ['A1', 'A2']:
+        # For A1-A2 essay tasks, complex structures are optional
+        if complex_structures >= good_complex_structures:
+            grammar_feedback.append("Good use of complex structures for your level!")
+            grammar_bonus += 0.2
+        elif complex_structures >= min_complex_structures:
+            grammar_feedback.append("Some use of complex structures - good progress!")
+            grammar_bonus += 0.1
+        # No penalty for A1-A2 if no complex structures
     else:
-        grammar_feedback.append(f"Try to use more complex grammatical structures. For {task_level} level, aim for at least {min_complex_structures} complex structures.")
-        grammar_score_10 = max(0, grammar_score_10 - 0.3)  # Reduced penalty
+        # For B1+ essay tasks, complex structures are expected
+        if complex_structures >= good_complex_structures:
+            grammar_feedback.append("Excellent use of complex grammatical structures!")
+            grammar_bonus += 0.3
+        elif complex_structures >= min_complex_structures:
+            grammar_feedback.append("Good use of complex structures")
+            grammar_bonus += 0.2
+        elif complex_structures >= min_complex_structures * 0.7:
+            grammar_feedback.append(f"Consider using more complex structures. For {task_level} level, aim for at least {good_complex_structures} complex structures.")
+            grammar_penalty += 0.3
+        else:
+            grammar_feedback.append(f"Try to use more complex grammatical structures. For {task_level} level, aim for at least {good_complex_structures} complex structures.")
+            grammar_penalty += 0.6
     
-    grammar_score_10 = min(10.0, grammar_score_10 + grammar_bonus)
+    grammar_score_10 = grammar_score_10 + grammar_bonus - grammar_penalty
+    grammar_score_10 = max(0.0, min(10.0, grammar_score_10))
     
     return {
         'task_response': {
@@ -774,9 +1179,12 @@ def fallback_score(text: str) -> float:
     return max(3.0, min(8.0, base_score))
 
 
-def predict_with_active_model(text: str) -> Tuple[float, str]:
+def predict_with_active_model(text: str, prompt: str = "") -> Tuple[float, str]:
     """
     Predict IELTS score using the active model
+    Args:
+        text: Essay text to score
+        prompt: Optional prompt/question text (used by question-aware models)
     Returns: (score, model_type)
     """
     if active_model and model_loader:
@@ -799,13 +1207,18 @@ def predict_with_active_model(text: str) -> Tuple[float, str]:
             import traceback
             traceback.print_exc()
     
-    # Fallback to legacy BERT model
+    # Fallback to BERT model with question awareness
     if bert_model_loaded and bert_assessor is not None:
         try:
-            result = bert_assessor.predict(essay=text, task_type=2, question="")
-            return result['score'], 'BERT Legacy'
+            # Use prompt as question if available
+            question = prompt if prompt else ""
+            result = bert_assessor.predict(essay=text, task_type=2, question=question)
+            model_name = 'BERT Question-Aware' if bert_assessor.use_question else 'BERT Legacy'
+            return result['score'], model_name
         except Exception as e:
-            print(f"Legacy BERT model prediction failed: {e}")
+            print(f"BERT model prediction failed: {e}")
+            import traceback
+            traceback.print_exc()
     
     # Fallback to traditional model (legacy)
     if model_loaded and model is not None:
@@ -907,27 +1320,39 @@ def score_writing():
         if not text:
             return jsonify({'error': 'No text provided'}), 400
         
-        # Predict with active model
-        ielts_score, model_type = predict_with_active_model(text)
+        # Predict with active model (pass prompt if available)
+        ielts_score, model_type = predict_with_active_model(text, prompt)
         
         # Get band description
         band_description = get_band_description(ielts_score)
         
         # Convert to 10-point scale with level-based normalization
         task_level = task.get('level') if task else None
-        score_10 = score_to_scale_10(ielts_score, task_level)
+        task_type = task.get('type') if task else None
+        score_10 = score_to_scale_10(ielts_score, task_level, task_type)
         cefr_level, cefr_description = score_to_cefr(score_10)
         
         # Get detailed feedback (prompt and task are optional, but task helps with task-based scoring)
         detailed_feedback = get_detailed_feedback(text, score_10, prompt, task)
         
-        # Calculate overall score
+        # Calculate overall score with weighted average
+        # Task Response is most important (30%), then Coherence (25%), Lexical (25%), Grammar (20%)
+        # This better reflects the importance of addressing the prompt correctly
+        task_response_score = detailed_feedback['task_response']['score']
+        coherence_score = detailed_feedback['coherence_cohesion']['score']
+        lexical_score = detailed_feedback['lexical_resource']['score']
+        grammar_score = detailed_feedback['grammatical_range']['score']
+        
+        # Weighted average
         overall_score = (
-            detailed_feedback['task_response']['score'] +
-            detailed_feedback['coherence_cohesion']['score'] +
-            detailed_feedback['lexical_resource']['score'] +
-            detailed_feedback['grammatical_range']['score']
-        ) / 4
+            task_response_score * 0.30 +
+            coherence_score * 0.25 +
+            lexical_score * 0.25 +
+            grammar_score * 0.20
+        )
+        
+        # Ensure overall score is within valid range
+        overall_score = max(0.0, min(10.0, overall_score))
         
         return jsonify({
             'score_10': round(score_10, 1),
@@ -1059,27 +1484,39 @@ def score_writing_ai():
                 'message': 'No AI models loaded. Please ensure models are in ai-models/writing-scorer/models/'
             }), 503
         
-        # Predict with active model (no prompt needed)
-        ielts_score, model_type = predict_with_active_model(text)
+        # Predict with active model (pass prompt if available for question-aware models)
+        ielts_score, model_type = predict_with_active_model(text, prompt)
         
         # Get band description
         band_description = get_band_description(ielts_score)
         
         # Convert to 10-point scale with level-based normalization
         task_level = task.get('level') if task else None
-        score_10 = score_to_scale_10(ielts_score, task_level)
+        task_type = task.get('type') if task else None
+        score_10 = score_to_scale_10(ielts_score, task_level, task_type)
         cefr_level, cefr_description = score_to_cefr(score_10)
         
         # Get detailed feedback (prompt and task are optional, but task helps with task-based scoring)
         detailed_feedback = get_detailed_feedback(text, score_10, prompt, task)
         
-        # Calculate overall score
+        # Calculate overall score with weighted average
+        # Task Response is most important (30%), then Coherence (25%), Lexical (25%), Grammar (20%)
+        # This better reflects the importance of addressing the prompt correctly
+        task_response_score = detailed_feedback['task_response']['score']
+        coherence_score = detailed_feedback['coherence_cohesion']['score']
+        lexical_score = detailed_feedback['lexical_resource']['score']
+        grammar_score = detailed_feedback['grammatical_range']['score']
+        
+        # Weighted average
         overall_score = (
-            detailed_feedback['task_response']['score'] +
-            detailed_feedback['coherence_cohesion']['score'] +
-            detailed_feedback['lexical_resource']['score'] +
-            detailed_feedback['grammatical_range']['score']
-        ) / 4
+            task_response_score * 0.30 +
+            coherence_score * 0.25 +
+            lexical_score * 0.25 +
+            grammar_score * 0.20
+        )
+        
+        # Ensure overall score is within valid range
+        overall_score = max(0.0, min(10.0, overall_score))
         
         return jsonify({
             'score_10': round(score_10, 1),

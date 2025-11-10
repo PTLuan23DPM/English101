@@ -54,6 +54,37 @@ async function main() {
             update: {},
             create: { slug: 'travel', title: 'Travel & Tourism', description: 'Travel-related vocabulary and phrases' },
         }),
+        // Culture & Topics categories
+        prisma.topic.upsert({
+            where: { slug: 'culture' },
+            update: {},
+            create: { slug: 'culture', title: 'Culture', description: 'Cultural differences and English-speaking countries' },
+        }),
+        prisma.topic.upsert({
+            where: { slug: 'society' },
+            update: {},
+            create: { slug: 'society', title: 'Society', description: 'Social issues and modern life' },
+        }),
+        prisma.topic.upsert({
+            where: { slug: 'science' },
+            update: {},
+            create: { slug: 'science', title: 'Science', description: 'Scientific topics and discoveries' },
+        }),
+        prisma.topic.upsert({
+            where: { slug: 'environment' },
+            update: {},
+            create: { slug: 'environment', title: 'Environment', description: 'Environmental issues and sustainability' },
+        }),
+        prisma.topic.upsert({
+            where: { slug: 'technology' },
+            update: {},
+            create: { slug: 'technology', title: 'Technology', description: 'Technology and innovation' },
+        }),
+        prisma.topic.upsert({
+            where: { slug: 'history' },
+            update: {},
+            create: { slug: 'history', title: 'History', description: 'Historical events and civilization' },
+        }),
     ]);
 
     const tags = await Promise.all([
@@ -121,7 +152,33 @@ async function main() {
         },
     });
 
-    console.log('✅ Created 4 modules');
+    const mediationModule = await prisma.module.upsert({
+        where: { code: 'MEDIATE_101' },
+        update: {},
+        create: {
+            code: 'MEDIATE_101',
+            type: ModuleType.MEDIATION_TRANSLATION,
+            title: 'Mediation & Translation',
+            description: 'Develop skills to relay, summarize, and interpret information between languages',
+            levelMin: CEFRLevel.B1,
+            levelMax: CEFRLevel.C2,
+        },
+    });
+
+    const cultureModule = await prisma.module.upsert({
+        where: { code: 'CULTURE_101' },
+        update: {},
+        create: {
+            code: 'CULTURE_101',
+            type: ModuleType.CULTURE_TOPICS_CONTENT,
+            title: 'Culture & Topics',
+            description: 'Explore authentic content on culture, society, science, and more',
+            levelMin: CEFRLevel.A2,
+            levelMax: CEFRLevel.C2,
+        },
+    });
+
+    console.log('✅ Created 6 modules');
 
     // ===== 4. CREATE UNITS =====
     console.log('📖 Creating units...');
@@ -170,7 +227,75 @@ async function main() {
         },
     });
 
-    console.log('✅ Created 4 units');
+    // Mediation units
+    const mediationUnit1 = await prisma.unit.create({
+        data: {
+            moduleId: mediationModule.id,
+            order: 1,
+            title: 'Summarizing Short Texts',
+            overview: 'Extract and present key information from texts',
+            level: CEFRLevel.B1,
+            skill: Skill.MEDIATION,
+        },
+    });
+
+    const mediationUnit2 = await prisma.unit.create({
+        data: {
+            moduleId: mediationModule.id,
+            order: 2,
+            title: 'Relaying Information',
+            overview: 'Pass on messages accurately between speakers',
+            level: CEFRLevel.B1,
+            skill: Skill.MEDIATION,
+        },
+    });
+
+    const mediationUnit3 = await prisma.unit.create({
+        data: {
+            moduleId: mediationModule.id,
+            order: 3,
+            title: 'Translating Simple Texts',
+            overview: 'Transfer meaning between languages',
+            level: CEFRLevel.B2,
+            skill: Skill.MEDIATION,
+        },
+    });
+
+    // Culture units
+    const cultureUnit1 = await prisma.unit.create({
+        data: {
+            moduleId: cultureModule.id,
+            order: 1,
+            title: 'British vs American English',
+            overview: 'Differences in vocabulary, spelling, and pronunciation',
+            level: CEFRLevel.B1,
+            skill: Skill.CULTURE,
+        },
+    });
+
+    const cultureUnit2 = await prisma.unit.create({
+        data: {
+            moduleId: cultureModule.id,
+            order: 2,
+            title: 'Climate Change & Sustainability',
+            overview: 'Global environmental challenges and solutions',
+            level: CEFRLevel.B2,
+            skill: Skill.CULTURE,
+        },
+    });
+
+    const cultureUnit3 = await prisma.unit.create({
+        data: {
+            moduleId: cultureModule.id,
+            order: 3,
+            title: 'Technology & Innovation',
+            overview: 'Latest tech trends and innovations',
+            level: CEFRLevel.B2,
+            skill: Skill.CULTURE,
+        },
+    });
+
+    console.log('✅ Created 10 units');
 
     // ===== 5. CREATE CONTENT =====
     console.log('📝 Creating content...');
@@ -199,6 +324,73 @@ async function main() {
     });
 
     console.log('✅ Created reading content');
+
+    // Find topic IDs for culture content
+    const cultureTopic = topics.find(t => t.slug === 'culture');
+    const environmentTopic = topics.find(t => t.slug === 'environment');
+    const scienceTopic = topics.find(t => t.slug === 'science');
+    const technologyTopic = topics.find(t => t.slug === 'technology');
+    const societyTopic = topics.find(t => t.slug === 'society');
+
+    // Culture content
+    const cultureContent1Data: any = {
+        unitId: cultureUnit1.id,
+        authorId: adminUser.id,
+        title: 'British vs American English: Key Differences',
+        summary: 'Exploring vocabulary, spelling, and pronunciation differences',
+        level: CEFRLevel.B1,
+        skill: Skill.CULTURE,
+        html: `<p>English is spoken in many countries around the world, and each country has its own version. The two most well-known varieties are British English (BrE) and American English (AmE).</p>
+         <p><strong>Vocabulary Differences:</strong> Many everyday words are different. For example, in British English, people say "lift" for "elevator", "boot" for "trunk" of a car, and "biscuit" for "cookie". Americans use "truck" while British use "lorry".</p>
+         <p><strong>Spelling Differences:</strong> British English often uses "-our" (colour, favour) while American uses "-or" (color, favor). British uses "-ise" (realise, organise) while American uses "-ize" (realize, organize).</p>
+         <p><strong>Pronunciation:</strong> There are also pronunciation differences. For example, the word "schedule" is pronounced "SHED-yool" in British English but "SKED-yool" in American English.</p>
+         <p>Despite these differences, British and American speakers can usually understand each other perfectly. Both varieties are correct - it's just a matter of where you learned English!</p>`,
+        plainText: 'English is spoken in many countries around the world, and each country has its own version...',
+    };
+    if (cultureTopic) {
+        cultureContent1Data.topics = { connect: [{ id: cultureTopic.id }] };
+    }
+    const cultureContent1 = await prisma.content.create({ data: cultureContent1Data });
+
+    const cultureContent2Data: any = {
+        unitId: cultureUnit2.id,
+        authorId: adminUser.id,
+        title: 'Climate Change: A Global Challenge',
+        summary: 'Understanding climate change and sustainable solutions',
+        level: CEFRLevel.B2,
+        skill: Skill.CULTURE,
+        html: `<p>Climate change is one of the most pressing issues of our time. It refers to long-term changes in global temperatures and weather patterns.</p>
+         <p><strong>Causes:</strong> The main cause is the increase in greenhouse gases, especially carbon dioxide, from human activities like burning fossil fuels, deforestation, and industrial processes.</p>
+         <p><strong>Effects:</strong> We're seeing rising sea levels, more extreme weather events, melting ice caps, and changes in precipitation patterns. These changes affect ecosystems, agriculture, and human communities worldwide.</p>
+         <p><strong>Solutions:</strong> To address climate change, we need to reduce greenhouse gas emissions by using renewable energy, improving energy efficiency, protecting forests, and adopting sustainable practices in agriculture and transportation.</p>
+         <p>Individual actions matter too: reducing energy consumption, using public transport, recycling, and supporting companies that prioritize sustainability can all make a difference.</p>`,
+        plainText: 'Climate change is one of the most pressing issues of our time...',
+    };
+    if (environmentTopic && scienceTopic) {
+        cultureContent2Data.topics = { connect: [{ id: environmentTopic.id }, { id: scienceTopic.id }] };
+    }
+    const cultureContent2 = await prisma.content.create({ data: cultureContent2Data });
+
+    const cultureContent3Data: any = {
+        unitId: cultureUnit3.id,
+        authorId: adminUser.id,
+        title: 'Artificial Intelligence: Transforming Our World',
+        summary: 'How AI is changing technology and society',
+        level: CEFRLevel.B2,
+        skill: Skill.CULTURE,
+        html: `<p>Artificial Intelligence (AI) is revolutionizing how we live and work. From smartphones to self-driving cars, AI technology is becoming increasingly integrated into our daily lives.</p>
+         <p><strong>What is AI?</strong> AI refers to computer systems that can perform tasks that typically require human intelligence, such as recognizing speech, making decisions, and learning from experience.</p>
+         <p><strong>Applications:</strong> AI is used in healthcare for diagnosing diseases, in transportation for autonomous vehicles, in education for personalized learning, and in business for data analysis and customer service.</p>
+         <p><strong>Benefits:</strong> AI can help solve complex problems, increase efficiency, and improve quality of life. It can process vast amounts of data quickly and identify patterns humans might miss.</p>
+         <p><strong>Challenges:</strong> However, AI also raises concerns about job displacement, privacy, bias, and the need for regulation. It's important to develop AI responsibly and ensure it benefits all of society.</p>`,
+        plainText: 'Artificial Intelligence (AI) is revolutionizing how we live and work...',
+    };
+    if (technologyTopic && societyTopic) {
+        cultureContent3Data.topics = { connect: [{ id: technologyTopic.id }, { id: societyTopic.id }] };
+    }
+    const cultureContent3 = await prisma.content.create({ data: cultureContent3Data });
+
+    console.log('✅ Created culture content');
 
     // ===== 6. CREATE ACTIVITIES =====
     console.log('🎯 Creating activities...');
@@ -263,7 +455,93 @@ async function main() {
         },
     });
 
-    console.log('✅ Created 4 activities');
+    // MEDIATION ACTIVITIES
+    const mediationActivity1 = await prisma.activity.create({
+        data: {
+            unitId: mediationUnit1.id,
+            authorId: adminUser.id,
+            type: ActivityType.MEDIATION_SUMMARIZE,
+            title: 'Summarize a News Article',
+            instruction: 'Read the article and write a summary in 50-80 words. Focus on the main points and key information.',
+            maxScore: 10,
+            timeLimitSec: 600,
+            level: CEFRLevel.B1,
+            skill: Skill.MEDIATION,
+        },
+    });
+
+    const mediationActivity2 = await prisma.activity.create({
+        data: {
+            unitId: mediationUnit2.id,
+            authorId: adminUser.id,
+            type: ActivityType.MEDIATION_REPHRASE,
+            title: 'Relay a Message',
+            instruction: 'Read the message and rewrite it in your own words for a different audience. Maintain the essential information.',
+            maxScore: 10,
+            timeLimitSec: 600,
+            level: CEFRLevel.B1,
+            skill: Skill.MEDIATION,
+        },
+    });
+
+    const mediationActivity3 = await prisma.activity.create({
+        data: {
+            unitId: mediationUnit3.id,
+            authorId: adminUser.id,
+            type: ActivityType.MEDIATION_SUMMARIZE,
+            title: 'Translate Key Concepts',
+            instruction: 'Read the text and explain the main concepts in simpler English, as if explaining to someone learning the language.',
+            maxScore: 10,
+            timeLimitSec: 900,
+            level: CEFRLevel.B2,
+            skill: Skill.MEDIATION,
+        },
+    });
+
+    // CULTURE ACTIVITIES
+    const cultureActivity1 = await prisma.activity.create({
+        data: {
+            unitId: cultureUnit1.id,
+            authorId: adminUser.id,
+            type: ActivityType.READ_MAIN_IDEA,
+            title: 'British vs American English - Reading',
+            instruction: 'Read the article about British and American English differences and answer the questions',
+            maxScore: 10,
+            timeLimitSec: 600,
+            level: CEFRLevel.B1,
+            skill: Skill.CULTURE,
+        },
+    });
+
+    const cultureActivity2 = await prisma.activity.create({
+        data: {
+            unitId: cultureUnit2.id,
+            authorId: adminUser.id,
+            type: ActivityType.READ_INFER,
+            title: 'Climate Change - Discussion',
+            instruction: 'Read the article about climate change and discuss the main points. Then answer comprehension questions.',
+            maxScore: 10,
+            timeLimitSec: 900,
+            level: CEFRLevel.B2,
+            skill: Skill.CULTURE,
+        },
+    });
+
+    const cultureActivity3 = await prisma.activity.create({
+        data: {
+            unitId: cultureUnit3.id,
+            authorId: adminUser.id,
+            type: ActivityType.READ_SKIMMING,
+            title: 'AI Technology - Reading & Discussion',
+            instruction: 'Read the article about artificial intelligence and participate in a discussion about its impact on society',
+            maxScore: 10,
+            timeLimitSec: 900,
+            level: CEFRLevel.B2,
+            skill: Skill.CULTURE,
+        },
+    });
+
+    console.log('✅ Created 10 activities');
 
     // ===== 7. CREATE QUESTIONS FOR READING =====
     console.log('❓ Creating questions...');
@@ -339,6 +617,105 @@ async function main() {
     });
 
     console.log('✅ Created 3 questions for reading');
+
+    // ===== 7b. CREATE QUESTIONS FOR CULTURE =====
+    const cultureQuestion1 = await prisma.question.create({
+        data: {
+            activityId: cultureActivity1.id,
+            authorId: adminUser.id,
+            order: 1,
+            type: QuestionType.SINGLE_CHOICE,
+            prompt: 'Which word is used in British English for "elevator"?',
+            explanation: 'British English uses "lift" while American English uses "elevator"',
+            score: 2,
+            contentId: cultureContent1.id,
+            choices: {
+                create: [
+                    { order: 1, text: 'Elevator', value: 'A', isCorrect: false },
+                    { order: 2, text: 'Lift', value: 'B', isCorrect: true },
+                    { order: 3, text: 'Riser', value: 'C', isCorrect: false },
+                    { order: 4, text: 'Hoist', value: 'D', isCorrect: false },
+                ],
+            },
+            answers: {
+                create: [{ key: 'B' }],
+            },
+        },
+    });
+
+    const cultureQuestion2 = await prisma.question.create({
+        data: {
+            activityId: cultureActivity1.id,
+            authorId: adminUser.id,
+            order: 2,
+            type: QuestionType.SINGLE_CHOICE,
+            prompt: 'How is "schedule" pronounced in British English?',
+            explanation: 'British English pronounces it "SHED-yool" while American English says "SKED-yool"',
+            score: 2,
+            contentId: cultureContent1.id,
+            choices: {
+                create: [
+                    { order: 1, text: 'SKED-yool', value: 'A', isCorrect: false },
+                    { order: 2, text: 'SHED-yool', value: 'B', isCorrect: true },
+                    { order: 3, text: 'SKEH-dool', value: 'C', isCorrect: false },
+                    { order: 4, text: 'SHEH-dool', value: 'D', isCorrect: false },
+                ],
+            },
+            answers: {
+                create: [{ key: 'B' }],
+            },
+        },
+    });
+
+    const cultureQuestion3 = await prisma.question.create({
+        data: {
+            activityId: cultureActivity2.id,
+            authorId: adminUser.id,
+            order: 1,
+            type: QuestionType.SINGLE_CHOICE,
+            prompt: 'What is the main cause of climate change?',
+            explanation: 'The main cause is the increase in greenhouse gases from human activities',
+            score: 2,
+            contentId: cultureContent2.id,
+            choices: {
+                create: [
+                    { order: 1, text: 'Natural weather patterns', value: 'A', isCorrect: false },
+                    { order: 2, text: 'Increase in greenhouse gases', value: 'B', isCorrect: true },
+                    { order: 3, text: 'Ocean currents', value: 'C', isCorrect: false },
+                    { order: 4, text: 'Solar activity', value: 'D', isCorrect: false },
+                ],
+            },
+            answers: {
+                create: [{ key: 'B' }],
+            },
+        },
+    });
+
+    const cultureQuestion4 = await prisma.question.create({
+        data: {
+            activityId: cultureActivity3.id,
+            authorId: adminUser.id,
+            order: 1,
+            type: QuestionType.SINGLE_CHOICE,
+            prompt: 'What does AI stand for?',
+            explanation: 'AI stands for Artificial Intelligence',
+            score: 2,
+            contentId: cultureContent3.id,
+            choices: {
+                create: [
+                    { order: 1, text: 'Automated Information', value: 'A', isCorrect: false },
+                    { order: 2, text: 'Artificial Intelligence', value: 'B', isCorrect: true },
+                    { order: 3, text: 'Advanced Integration', value: 'C', isCorrect: false },
+                    { order: 4, text: 'Analytical Interface', value: 'D', isCorrect: false },
+                ],
+            },
+            answers: {
+                create: [{ key: 'B' }],
+            },
+        },
+    });
+
+    console.log('✅ Created 4 questions for culture');
 
     // ===== 8. CREATE USER PROGRESS =====
     console.log('📊 Creating user progress...');

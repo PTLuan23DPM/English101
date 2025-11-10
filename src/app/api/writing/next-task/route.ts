@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        const { userId, level, lastScore, errorProfile } = await req.json();
+        const { userId, level, lastScore, errorProfile, scoringFeedback } = await req.json();
 
         if (!userId || !level || lastScore === undefined || !errorProfile) {
             return NextResponse.json(
@@ -20,10 +20,10 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        const prompt = buildNextTaskPrompt(userId, level, lastScore, errorProfile);
+        const prompt = buildNextTaskPrompt(userId, level, lastScore, errorProfile, scoringFeedback);
         const response = await callGemini(prompt, SYSTEM_INSTRUCTIONS.NEXT_TASK, {
             temperature: 0.6,
-            maxTokens: 1500, // Increased to ensure complete response
+            maxTokens: 4000, // Increased significantly to accommodate detailed feedback
         });
 
         console.log("[Next Task API] Raw Gemini response:", response);
@@ -36,6 +36,11 @@ export async function POST(req: NextRequest) {
                 reasoning?: string;
             };
             specificSuggestions?: string[];
+            feedback?: {
+                strengths?: string[];
+                weaknesses?: string[];
+                overallComment?: string;
+            };
         }>(response);
 
         console.log("[Next Task API] Parsed result:", JSON.stringify(result, null, 2));
@@ -61,6 +66,11 @@ export async function POST(req: NextRequest) {
                     "Review your previous mistakes",
                     "Focus on the areas where you scored lowest",
                 ],
+                feedback: {
+                    strengths: ["You completed the writing task", "Keep practicing to improve"],
+                    weaknesses: ["Focus on the areas where you scored lowest", "Continue working on your writing skills"],
+                    overallComment: `Based on your score of ${lastScore}/10, keep practicing to improve your writing skills. Focus on the areas where you need the most improvement.`,
+                },
             };
 
             console.warn("[Next Task API] Using default recommendation:", defaultRecommendation);
@@ -80,6 +90,19 @@ export async function POST(req: NextRequest) {
             specificSuggestions: Array.isArray(result.specificSuggestions)
                 ? result.specificSuggestions
                 : [],
+            feedback: result.feedback ? {
+                strengths: Array.isArray(result.feedback.strengths) && result.feedback.strengths.length > 0
+                    ? result.feedback.strengths
+                    : ["You completed the writing task", "Keep practicing to improve"],
+                weaknesses: Array.isArray(result.feedback.weaknesses) && result.feedback.weaknesses.length > 0
+                    ? result.feedback.weaknesses
+                    : ["Focus on the areas where you scored lowest", "Continue working on your writing skills"],
+                overallComment: result.feedback.overallComment || `Based on your score of ${lastScore}/10, keep practicing to improve your writing skills.`,
+            } : {
+                strengths: ["You completed the writing task", "Keep practicing to improve"],
+                weaknesses: ["Focus on the areas where you scored lowest", "Continue working on your writing skills"],
+                overallComment: `Based on your score of ${lastScore}/10, keep practicing to improve your writing skills.`,
+            },
         };
 
         return NextResponse.json(validatedResult);

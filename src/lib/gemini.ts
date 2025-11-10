@@ -460,20 +460,33 @@ export async function callGemini(
                     if (candidate.content?.parts?.[0]?.text) {
                         console.warn("[Gemini API] Response was blocked but partial content available, using it");
                     } else {
-                        throw new Error(`Response blocked by safety filters: ${candidate.finishReason}`);
+                        // Check if there are other candidates that might have content
+                        let foundContent = false;
+                        if (data.candidates.length > 1) {
+                            for (let i = 1; i < data.candidates.length; i++) {
+                                const altCandidate = data.candidates[i];
+                                if (altCandidate.content?.parts?.[0]?.text &&
+                                    altCandidate.finishReason !== "SAFETY" &&
+                                    altCandidate.finishReason !== "RECITATION") {
+                                    console.warn(`[Gemini API] Using candidate ${i + 1} instead (candidate 1 was blocked)`);
+                                    // Use this candidate instead
+                                    const altText = altCandidate.content.parts[0].text;
+                                    if (altText) {
+                                        extractedText = altText;
+                                        foundContent = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        if (!foundContent) {
+                            throw new Error(`Response blocked by safety filters: ${candidate.finishReason}. Please try rephrasing your request.`);
+                        }
                     }
                 }
 
-                // Log finish reason for debugging
-                if (candidate.finishReason && candidate.finishReason !== "STOP") {
-                    console.warn(`[Gemini API] Finish reason: ${candidate.finishReason}`);
-                    // MAX_TOKENS means response was truncated but still usable
-                    if (candidate.finishReason === "MAX_TOKENS") {
-                        console.warn("[Gemini API] Response truncated due to token limit, but content may still be usable");
-                    }
-                }
-
-                // Try to extract text from candidate
+                // Try to extract text from candidate FIRST (before checking finish reason)
+                // This is important because MAX_TOKENS responses may still have usable partial content
                 let extractedText: string | null = null;
 
                 // Method 1: Standard structure (content.parts[0].text)
@@ -486,10 +499,10 @@ export async function callGemini(
                     for (const part of candidate.content.parts) {
                         if (part && typeof part === 'object') {
                             // Try different possible field names
-                            if ('text' in part && typeof part.text === 'string') {
+                            if ('text' in part && typeof part.text === 'string' && part.text.length > 0) {
                                 extractedText = part.text;
                                 break;
-                            } else if ('content' in part && typeof part.content === 'string') {
+                            } else if ('content' in part && typeof part.content === 'string' && part.content.length > 0) {
                                 extractedText = part.content;
                                 break;
                             }
@@ -497,31 +510,113 @@ export async function callGemini(
                     }
                 }
                 // Method 3: Check if content itself is a string
-                else if (candidate.content && typeof candidate.content === 'string') {
+                else if (candidate.content && typeof candidate.content === 'string' && candidate.content.length > 0) {
                     extractedText = candidate.content;
                 }
                 // Method 4: Check if candidate has text directly
-                else if ('text' in candidate && typeof candidate.text === 'string') {
+                else if ('text' in candidate && typeof candidate.text === 'string' && candidate.text.length > 0) {
                     extractedText = candidate.text;
                 }
 
-                if (!extractedText) {
+                // Log finish reason for debugging (after trying to extract text)
+                if (candidate.finishReason && candidate.finishReason !== "STOP") {
+                    console.warn(`[Gemini API] Finish reason: ${candidate.finishReason}`);
+                    // MAX_TOKENS means response was truncated but may still be usable
+                    if (candidate.finishReason === "MAX_TOKENS") {
+                        if (extractedText) {
+                            console.warn("[Gemini API] Response truncated due to token limit, but partial content is available and will be used");
+                        } else {
+                            console.warn("[Gemini API] Response truncated due to token limit and no content was extracted");
+                        }
+                    }
+                }
+
+                // If we have text even with MAX_TOKENS, use it (it's better than nothing)
+                if (extractedText && extractedText.length > 0) {
+                    // Even if MAX_TOKENS, we have some content to work with
+                    if (candidate.finishReason === "MAX_TOKENS") {
+                        console.log("[Gemini API] Using truncated response with partial content");
+                    }
+                }
+
+                if (!extractedText || extractedText.length === 0) {
                     console.error("[Gemini API] Could not extract text from response:");
-                    console.error("[Gemini API] Candidate structure:", JSON.stringify(candidate, null, 2));
-                    console.error("[Gemini API] Full response:", JSON.stringify(data, null, 2));
+                    console.error("[Gemini API] Candidate finishReason:", candidate.finishReason);
+                    console.error("[Gemini API] Candidate has content:", !!candidate.content);
+                    console.error("[Gemini API] Candidate content parts:", candidate.content?.parts?.length || 0);
+
+                    // Log full candidate structure for debugging (truncated)
+                    if (candidate.content) {
+                        console.error("[Gemini API] Candidate content structure (first 1000 chars):", JSON.stringify(candidate.content, null, 2).substring(0, 1000));
+                    }
+
+                    // Special handling for MAX_TOKENS - response might be empty because it was truncated before any content
+                    if (candidate.finishReason === "MAX_TOKENS") {
+                        console.error("[Gemini API] MAX_TOKENS finish reason detected - response was truncated");
+
+                        // Check if there's ANY partial content we can use
+                        // Sometimes MAX_TOKENS responses have partial content in a different structure
+                        if (candidate.content) {
+                            // Try one more time to extract ANY text from content
+                            const contentStr = JSON.stringify(candidate.content);
+                            const textMatch = contentStr.match(/"text"\s*:\s*"([^"]*(?:\\.[^"]*)*)"/);
+                            if (textMatch && textMatch[1]) {
+                                console.warn("[Gemini API] Found partial text in MAX_TOKENS response, using it");
+                                extractedText = textMatch[1].replace(/\\"/g, '"').replace(/\\n/g, '\n');
+                            }
+                        }
+
+                        // If still no text, throw error with helpful message
+                        if (!extractedText || extractedText.length === 0) {
+                            throw new Error("Response was truncated due to token limit (MAX_TOKENS). The input may be too long or maxTokens too low. Please try with shorter text (under 150 characters) or the response may have been cut off before any content was generated.");
+                        }
+                    }
 
                     // Try next candidate if available
                     if (data.candidates.length > 1) {
                         console.warn("[Gemini API] Trying next candidate...");
-                        const nextCandidate = data.candidates[1];
-                        if (nextCandidate.content?.parts?.[0]?.text) {
-                            extractedText = nextCandidate.content.parts[0].text;
-                            console.log("[Gemini API] Successfully extracted text from next candidate");
+                        for (let i = 1; i < data.candidates.length; i++) {
+                            const nextCandidate = data.candidates[i];
+                            // Try all extraction methods for next candidate
+                            if (nextCandidate.content?.parts?.[0]?.text) {
+                                extractedText = nextCandidate.content.parts[0].text;
+                                console.log(`[Gemini API] Successfully extracted text from candidate ${i + 1}`);
+                                break;
+                            } else if (nextCandidate.content?.parts && Array.isArray(nextCandidate.content.parts)) {
+                                for (const part of nextCandidate.content.parts) {
+                                    if (part && typeof part === 'object' && 'text' in part && typeof part.text === 'string' && part.text.length > 0) {
+                                        extractedText = part.text;
+                                        console.log(`[Gemini API] Successfully extracted text from candidate ${i + 1} (alternative structure)`);
+                                        break;
+                                    }
+                                }
+                                if (extractedText) break;
+                            }
                         }
                     }
 
-                    if (!extractedText) {
-                        throw new Error("Invalid response structure from Gemini API - could not extract text from response");
+                    if (!extractedText || extractedText.length === 0) {
+                        // Provide more detailed error message
+                        const errorDetails = [];
+                        if (candidate.finishReason) {
+                            if (candidate.finishReason === "MAX_TOKENS") {
+                                errorDetails.push(`Finish reason: MAX_TOKENS - Response was truncated before any content could be generated. Consider reducing input size or increasing maxTokens.`);
+                            } else {
+                                errorDetails.push(`Finish reason: ${candidate.finishReason}`);
+                            }
+                        }
+                        if (candidate.safetyRatings && candidate.safetyRatings.length > 0) {
+                            errorDetails.push(`Safety ratings: ${JSON.stringify(candidate.safetyRatings)}`);
+                        }
+                        if (data.promptFeedback) {
+                            errorDetails.push(`Prompt feedback: ${JSON.stringify(data.promptFeedback)}`);
+                        }
+
+                        const errorMessage = errorDetails.length > 0
+                            ? `Invalid response structure from Gemini API - could not extract text from response. ${errorDetails.join(". ")}`
+                            : "Invalid response structure from Gemini API - could not extract text from response. The API may have returned an empty or unexpected response format.";
+
+                        throw new Error(errorMessage);
                     }
                 }
 
@@ -564,8 +659,10 @@ function fixUnterminatedStrings(jsonString: string): string {
     let escapeNext = false;
     const unterminatedStrings: Array<{ start: number; end: number }> = [];
     let currentStringStart = -1;
+    let bracketDepth = 0;
+    let inObject = false;
 
-    // Find all unterminated strings
+    // First pass: Find all unterminated strings and track bracket depth
     for (let i = 0; i < fixed.length; i++) {
         const char = fixed[i];
 
@@ -577,6 +674,17 @@ function fixUnterminatedStrings(jsonString: string): string {
         if (char === '\\') {
             escapeNext = true;
             continue;
+        }
+
+        // Track bracket depth (only when not in string)
+        if (!inString) {
+            if (char === '{') {
+                bracketDepth++;
+                inObject = true;
+            } else if (char === '}') {
+                bracketDepth--;
+                if (bracketDepth === 0) inObject = false;
+            }
         }
 
         if (char === '"') {
@@ -595,21 +703,52 @@ function fixUnterminatedStrings(jsonString: string): string {
         unterminatedStrings.push({ start: currentStringStart, end: fixed.length });
     }
 
-    // Fix unterminated strings from end to start (to preserve indices)
-    for (let i = unterminatedStrings.length - 1; i >= 0; i--) {
-        const { start, end } = unterminatedStrings[i];
-        const stringContent = fixed.substring(start + 1, end);
+    // Close all unterminated strings
+    if (unterminatedStrings.length > 0) {
+        console.log(`[Gemini API] Found ${unterminatedStrings.length} unterminated string(s), attempting to fix...`);
 
-        // Escape special characters in the string content
-        const escapedContent = stringContent
-            .replace(/\\/g, "\\\\")  // Escape backslashes first
-            .replace(/"/g, '\\"')     // Escape quotes
-            .replace(/\n/g, "\\n")    // Escape newlines
-            .replace(/\r/g, "\\r")    // Escape carriage returns
-            .replace(/\t/g, "\\t");   // Escape tabs
+        // Fix unterminated strings from end to start (to preserve indices)
+        for (let i = unterminatedStrings.length - 1; i >= 0; i--) {
+            const { start, end } = unterminatedStrings[i];
+            const stringContent = fixed.substring(start + 1, end); // +1 to skip opening quote
 
-        // Close the string
-        fixed = fixed.substring(0, start + 1) + escapedContent + '"' + fixed.substring(end);
+            // Escape special characters in the string content
+            const escapedContent = stringContent
+                .replace(/\\/g, "\\\\")  // Escape backslashes first
+                .replace(/"/g, '\\"')     // Escape quotes
+                .replace(/\n/g, "\\n")    // Escape newlines
+                .replace(/\r/g, "\\r")    // Escape carriage returns
+                .replace(/\t/g, "\\t");   // Escape tabs
+
+            // Get context BEFORE modifying the string
+            const beforeString = fixed.substring(0, start);
+            const afterString = fixed.substring(end);
+
+            // Count brackets to see if we need to close structures
+            const openBraces = (beforeString.match(/\{/g) || []).length;
+            const closeBraces = (beforeString.match(/\}/g) || []).length;
+            const openBrackets = (beforeString.match(/\[/g) || []).length;
+            const closeBrackets = (beforeString.match(/\]/g) || []).length;
+
+            // Close the string first
+            fixed = fixed.substring(0, start + 1) + escapedContent + '"' + afterString;
+
+            // If this was the last unterminated string and we're at/near the end, close any unclosed structures
+            if (i === 0 && (end >= fixed.length - 10 || afterString.trim().length === 0)) {
+                const neededBrackets = openBrackets - closeBrackets;
+                const neededBraces = openBraces - closeBraces;
+
+                // Only add closing brackets/braces if they're actually needed
+                if (neededBrackets > 0) {
+                    fixed += ']'.repeat(neededBrackets);
+                }
+                if (neededBraces > 0) {
+                    fixed += '}'.repeat(neededBraces);
+                }
+            }
+        }
+
+        console.log("[Gemini API] Fixed unterminated strings, result length:", fixed.length);
     }
 
     return fixed;
@@ -680,6 +819,24 @@ function extractValidJSON(text: string): string | null {
 }
 
 /**
+ * Fix common JSON syntax errors
+ */
+function fixJSONSyntax(jsonString: string): string {
+    let fixed = jsonString;
+
+    // Fix smart quotes first (before other processing)
+    fixed = fixed.replace(/[""]/g, '"').replace(/['']/g, "'");
+
+    // Fix trailing commas before closing brackets/braces
+    fixed = fixed.replace(/,(\s*[}\]])/g, '$1');
+
+    // Remove any whitespace-only lines that might cause issues
+    fixed = fixed.split('\n').filter(line => line.trim().length > 0 || line.match(/^\s*$/)).join('\n');
+
+    return fixed;
+}
+
+/**
  * Parse JSON from Gemini response (handles markdown code blocks, extra text, and common JSON issues)
  */
 export function parseGeminiJSON<T>(text: string): T {
@@ -694,19 +851,28 @@ export function parseGeminiJSON<T>(text: string): T {
     cleaned = cleaned.replace(/^```json\s*/i, "").replace(/^```\s*/, "").replace(/```\s*$/g, "");
 
     // Try to extract JSON if there's text before/after
-    // Look for JSON object/array boundaries (use non-greedy matching first)
-    let jsonMatch = cleaned.match(/\{[\s\S]*?\}|\[[\s\S]*?\]/);
-    if (!jsonMatch) {
-        // If no match, try greedy matching
-        jsonMatch = cleaned.match(/\{[\s\S]*\}|\[[\s\S]*\]/);
-    }
+    // Use extractValidJSON for better extraction
+    let extractedJSON = extractValidJSON(cleaned);
+    if (extractedJSON) {
+        cleaned = extractedJSON;
+    } else {
+        // Fallback: Look for JSON object/array boundaries (use non-greedy matching first)
+        let jsonMatch = cleaned.match(/\{[\s\S]*?\}|\[[\s\S]*?\]/);
+        if (!jsonMatch) {
+            // If no match, try greedy matching
+            jsonMatch = cleaned.match(/\{[\s\S]*\}|\[[\s\S]*\]/);
+        }
 
-    if (jsonMatch) {
-        cleaned = jsonMatch[0];
+        if (jsonMatch) {
+            cleaned = jsonMatch[0];
+        }
     }
 
     // Clean up common issues
     cleaned = cleaned.trim();
+
+    // Fix common JSON syntax errors
+    cleaned = fixJSONSyntax(cleaned);
 
     // Try parsing first time
     try {
@@ -714,6 +880,50 @@ export function parseGeminiJSON<T>(text: string): T {
     } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error);
         console.warn("[Gemini API] First parse attempt failed:", errorMessage);
+
+        // If error mentions comma or brace, try more aggressive fixes
+        if (errorMessage.includes("Expected ','") || errorMessage.includes("Expected '}'") || errorMessage.includes("after property value")) {
+            console.log("[Gemini API] Attempting to fix JSON syntax errors...");
+            try {
+                // More aggressive fixes for comma/brace issues
+                let fixed = cleaned;
+
+                // Remove trailing commas before closing braces/brackets (more thorough)
+                fixed = fixed.replace(/,(\s*[}\]])/g, '$1');
+
+                // More aggressive fix for missing commas
+                // Pattern 1: "value" "key": -> "value", "key":
+                // Match: closing quote of value, whitespace, opening quote of next key with colon
+                fixed = fixed.replace(/(")\s+("\s*[^"]*"\s*:)/g, '$1,$2');
+
+                // Pattern 2: "value" } or "value" ] -> need to check if there's more content
+                // This is handled by trailing comma removal above
+
+                // Pattern 3: } "key": or ] "key": -> }, "key": or ], "key":
+                // This shouldn't happen in valid JSON, but handle it anyway
+                fixed = fixed.replace(/([}\])\s*("\s*[^"]*"\s*:)/g, '$1,$2');
+
+                // Pattern 4: Fix cases where array/object values are not separated
+                // "value1" "value2" in array -> "value1", "value2"
+                fixed = fixed.replace(/(\]\s*,\s*\[)|(")\s+(")(?=\s*[,\]}])/g, (match, p1, p2, p3) => {
+                    if (p1) return p1; // Don't modify array separators
+                    return p2 + ',' + p3; // Add comma between string values
+                });
+
+                // Fix smart quotes
+                fixed = fixed.replace(/[""]/g, '"').replace(/['']/g, "'");
+
+                // Remove any duplicate commas
+                fixed = fixed.replace(/,\s*,/g, ',');
+
+                // Try parsing again
+                const parsed = JSON.parse(fixed);
+                console.log("[Gemini API] Successfully fixed JSON syntax errors");
+                return parsed;
+            } catch (fixError) {
+                console.warn("[Gemini API] Syntax fix attempt failed:", fixError instanceof Error ? fixError.message : String(fixError));
+            }
+        }
 
         // If error mentions unterminated string, try to fix it
         if (errorMessage.includes("Unterminated string") || errorMessage.includes("unterminated")) {

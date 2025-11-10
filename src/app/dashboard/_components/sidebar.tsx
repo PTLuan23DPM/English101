@@ -101,6 +101,29 @@ const advanced = [
       </svg>
     ),
   },
+  {
+    id: "mediation",
+    label: "Mediation",
+    href: "/english/mediation",
+    icon: (
+      <svg viewBox="0 0 20 20" fill="none">
+        <path d="M10 2L12 8L18 10L12 12L10 18L8 12L2 10L8 8L10 2Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M10 6L11 9L14 10L11 11L10 14L9 11L6 10L9 9L10 6Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    ),
+  },
+  {
+    id: "culture",
+    label: "Culture & Topics",
+    href: "/english/culture",
+    icon: (
+      <svg viewBox="0 0 20 20" fill="none">
+        <circle cx="10" cy="10" r="8" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M10 2V6M10 14V18M2 10H6M14 10H18" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <circle cx="10" cy="10" r="3" stroke="currentColor" strokeWidth="1.5" />
+      </svg>
+    ),
+  },
 ];
 
 const evaluation = [

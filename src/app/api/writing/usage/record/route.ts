@@ -1,29 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import prisma from "@/lib/prisma";
+import { requireAuth, unauthorizedResponse } from "@/server/utils/auth";
+import { writingController } from "@/server/controllers/writingController";
 
+/**
+ * Record usage of a writing LLM feature
+ * POST /api/writing/usage/record
+ */
 export async function POST(req: NextRequest) {
     try {
-        const session = await getServerSession(authOptions);
+        const session = await requireAuth();
+        const userId = session.user.id;
 
-        if (!session) {
-            console.error("[Usage Record] No session found");
-            return NextResponse.json({ error: "Unauthorized: No session" }, { status: 401 });
-        }
-
-        if (!session.user) {
-            console.error("[Usage Record] No user in session");
-            return NextResponse.json({ error: "Unauthorized: No user in session" }, { status: 401 });
-        }
-
-        const userId = (session.user as { id?: string }).id;
-        if (!userId) {
-            console.error("[Usage Record] No user ID in session");
-            return NextResponse.json({ error: "Unauthorized: No user ID" }, { status: 401 });
-        }
-
-        const { taskId, feature, metadata } = await req.json();
+        const { feature, taskId } = await req.json();
 
         if (!feature) {
             return NextResponse.json(
@@ -32,39 +20,18 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        // Validate feature name
-        const validFeatures = ["outline", "brainstorm", "thesis", "language-pack", "rephrase", "expand"];
-        if (!validFeatures.includes(feature)) {
-            return NextResponse.json(
-                { error: `Invalid feature. Must be one of: ${validFeatures.join(", ")}` },
-                { status: 400 }
-            );
+        const result = await writingController.recordUsage(userId, feature, taskId);
+
+        return NextResponse.json(result, { status: 201 });
+    } catch (error: any) {
+        if (error.message === "Unauthorized") {
+            return unauthorizedResponse();
         }
 
-        // Record usage
-        const usage = await prisma.writingLLMUsage.create({
-            data: {
-                userId: userId,
-                taskId: taskId || null,
-                feature: feature,
-                metadata: metadata || null,
-            },
-        });
-
-        return NextResponse.json({
-            success: true,
-            usage: {
-                id: usage.id,
-                feature: usage.feature,
-                usedAt: usage.usedAt,
-            },
-        });
-    } catch (error) {
         console.error("Usage record error:", error);
         return NextResponse.json(
-            { error: error instanceof Error ? error.message : "Failed to record usage" },
+            { error: error.message || "Failed to record usage" },
             { status: 500 }
         );
     }
 }
-

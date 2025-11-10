@@ -25,10 +25,10 @@ interface DetailedScore {
 }
 
 interface ScoringResult {
-  score_10: number;
+  score_10?: number;
   overall_score: number;
   cefr_level: string;
-  cefr_description: string;
+  cefr_description?: string;
   detailed_scores: {
     // Traditional scoring system
     task_response?: DetailedScore;
@@ -41,9 +41,13 @@ interface ScoringResult {
     content_depth?: DetailedScore;
     fluency_readability?: DetailedScore;
     mechanics?: DetailedScore;
+    // New intelligent scoring system
+    vocabulary?: DetailedScore;
+    grammar?: DetailedScore;
+    coherence?: DetailedScore;
   };
   word_count: number;
-  statistics: {
+  statistics?: {
     words: number;
     characters: number;
     sentences: number;
@@ -51,6 +55,7 @@ interface ScoringResult {
     unique_words: number;
   };
   scoring_system?: 'traditional' | 'modern';
+  scoring_method?: string;
 }
 
 
@@ -245,29 +250,23 @@ export default function WritingPage() {
       //   }
       // }
 
-      // Use Python service directly (original behavior)
-      // Enable modern scoring system by default
-      let response = await fetch("http://localhost:5001/score-ai", {
+      // Use NEW intelligent scoring system (v2)
+      // This system is prompt-aware and scalable for any new prompt
+      let response = await fetch("http://localhost:5001/score-v2", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           text: text,
-          // Prompt is optional - only used for task_response feedback if provided
           prompt: selectedTask?.prompt || "",
-          // Task requirements for task-based scoring
-          task: selectedTask ? {
-            id: selectedTask.id,
-            type: selectedTask.type,
-            level: selectedTask.level,
-            targetWords: selectedTask.targetWords,
-          } : null,
+          level: selectedTask?.level || "B2",
+          task_type: selectedTask?.type || null,
         }),
       });
 
-      // If AI endpoint not available, fallback to regular endpoint
+      // If v2 not available, fallback to old scoring system
       if (!response.ok && response.status === 503) {
-        console.log("AI model not available, using traditional model...");
-        response = await fetch("http://localhost:5001/score", {
+        console.log("Intelligent scoring (v2) not available, using traditional scoring...");
+        response = await fetch("http://localhost:5001/score-ai", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -291,7 +290,30 @@ export default function WritingPage() {
       setServiceAvailable(true); // Update service status on success
 
       const result: ScoringResult = await response.json();
-      setScoringResult(result);
+      
+      // Normalize result format - handle both old and new scoring systems
+      const normalizedResult: ScoringResult = {
+        ...result,
+        // Ensure score_10 exists (use overall_score if not)
+        score_10: result.score_10 ?? result.overall_score,
+        // Calculate statistics if missing (for new scoring system)
+        statistics: result.statistics || (() => {
+          const words = text.trim().split(/\s+/).filter(w => w.length > 0);
+          const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+          const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim().length > 0);
+          const uniqueWords = new Set(words.map(w => w.toLowerCase()));
+          
+          return {
+            words: words.length,
+            characters: text.length,
+            sentences: sentences.length || 1,
+            paragraphs: paragraphs.length || 1,
+            unique_words: uniqueWords.size,
+          };
+        })(),
+      };
+      
+      setScoringResult(normalizedResult);
       setSubmitted(true);
 
       // Save completion to database
@@ -304,16 +326,16 @@ export default function WritingPage() {
             taskTitle: selectedTask?.title,
             taskType: selectedTask?.type,
             targetWords: selectedTask?.targetWords,
-            score: result.overall_score,
+            score: normalizedResult.overall_score,
             level: selectedTask?.level,
             duration: null, // Can add timer tracking later
             text: text,
             scoringDetails: {
-              cefr_level: result.cefr_level,
-              task_response: result.detailed_scores.task_response?.score,
-              coherence: result.detailed_scores.coherence_cohesion?.score,
-              lexical: result.detailed_scores.lexical_resource?.score,
-              grammar: result.detailed_scores.grammatical_range?.score,
+              cefr_level: normalizedResult.cefr_level,
+              task_response: normalizedResult.detailed_scores.task_response?.score || normalizedResult.detailed_scores.task_achievement?.score,
+              coherence: normalizedResult.detailed_scores.coherence_cohesion?.score || normalizedResult.detailed_scores.coherence?.score,
+              lexical: normalizedResult.detailed_scores.lexical_resource?.score || normalizedResult.detailed_scores.vocabulary?.score,
+              grammar: normalizedResult.detailed_scores.grammatical_range?.score || normalizedResult.detailed_scores.grammar?.score,
             },
           }),
         });
@@ -336,7 +358,7 @@ export default function WritingPage() {
 
       toast.success("Scoring complete!", {
         id: "scoring",
-        description: `Your score: ${result.overall_score}/10`,
+        description: `Your score: ${normalizedResult.overall_score}/10`,
       });
       
       // Show self-review modal after scoring
@@ -779,7 +801,62 @@ export default function WritingPage() {
 
                 {/* Detailed Scores */}
                 <div className="scoring-grid">
-                  {scoringResult.scoring_system === 'modern' ? (
+                  {scoringResult.scoring_method === 'intelligent_v2' ? (
+                    <>
+                      {/* Intelligent Scoring System v2 */}
+                      {/* Task Response */}
+                      {scoringResult.detailed_scores.task_response && (
+                        <div className="score-card">
+                          <h4>📝 Task Response</h4>
+                          <div className="score-value">{scoringResult.detailed_scores.task_response.score}/10</div>
+                          <div className="score-feedback">
+                            {scoringResult.detailed_scores.task_response.feedback.map((item, i) => (
+                              <div key={i}>{item}</div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Vocabulary */}
+                      {scoringResult.detailed_scores.vocabulary && (
+                        <div className="score-card">
+                          <h4>📚 Vocabulary</h4>
+                          <div className="score-value">{scoringResult.detailed_scores.vocabulary.score}/10</div>
+                          <div className="score-feedback">
+                            {scoringResult.detailed_scores.vocabulary.feedback.map((item, i) => (
+                              <div key={i}>{item}</div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Grammar */}
+                      {scoringResult.detailed_scores.grammar && (
+                        <div className="score-card">
+                          <h4>✏️ Grammar</h4>
+                          <div className="score-value">{scoringResult.detailed_scores.grammar.score}/10</div>
+                          <div className="score-feedback">
+                            {scoringResult.detailed_scores.grammar.feedback.map((item, i) => (
+                              <div key={i}>{item}</div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Coherence */}
+                      {scoringResult.detailed_scores.coherence && (
+                        <div className="score-card">
+                          <h4>🔗 Coherence</h4>
+                          <div className="score-value">{scoringResult.detailed_scores.coherence.score}/10</div>
+                          <div className="score-feedback">
+                            {scoringResult.detailed_scores.coherence.feedback.map((item, i) => (
+                              <div key={i}>{item}</div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  ) : scoringResult.scoring_system === 'modern' ? (
                     <>
                       {/* Modern Scoring System */}
                       {/* Task Achievement */}
@@ -906,33 +983,37 @@ export default function WritingPage() {
                 </div>
 
                 {/* Statistics */}
-                <div style={{ marginTop: "24px", padding: "16px", background: "#f9fafb", borderRadius: "12px" }}>
-                  <h4 style={{ marginBottom: "12px" }}>📊 Statistics</h4>
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "16px" }}>
-                    <div>
-                      <div style={{ fontSize: "24px", fontWeight: "600" }}>{scoringResult.statistics.words}</div>
-                      <div style={{ fontSize: "12px", color: "#6b7280" }}>Words</div>
-                    </div>
-                    <div>
-                      <div style={{ fontSize: "24px", fontWeight: "600" }}>{scoringResult.statistics.sentences}</div>
-                      <div style={{ fontSize: "12px", color: "#6b7280" }}>Sentences</div>
-                    </div>
-                    <div>
-                      <div style={{ fontSize: "24px", fontWeight: "600" }}>{scoringResult.statistics.paragraphs}</div>
-                      <div style={{ fontSize: "12px", color: "#6b7280" }}>Paragraphs</div>
-                    </div>
-                    <div>
-                      <div style={{ fontSize: "24px", fontWeight: "600" }}>{scoringResult.statistics.unique_words}</div>
-                      <div style={{ fontSize: "12px", color: "#6b7280" }}>Unique Words</div>
-                    </div>
-                    <div>
-                      <div style={{ fontSize: "24px", fontWeight: "600" }}>
-                        {Math.round((scoringResult.statistics.unique_words / scoringResult.statistics.words) * 100)}%
+                {scoringResult.statistics && (
+                  <div style={{ marginTop: "24px", padding: "16px", background: "#f9fafb", borderRadius: "12px" }}>
+                    <h4 style={{ marginBottom: "12px" }}>📊 Statistics</h4>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "16px" }}>
+                      <div>
+                        <div style={{ fontSize: "24px", fontWeight: "600" }}>{scoringResult.statistics.words}</div>
+                        <div style={{ fontSize: "12px", color: "#6b7280" }}>Words</div>
                       </div>
-                      <div style={{ fontSize: "12px", color: "#6b7280" }}>Lexical Diversity</div>
+                      <div>
+                        <div style={{ fontSize: "24px", fontWeight: "600" }}>{scoringResult.statistics.sentences}</div>
+                        <div style={{ fontSize: "12px", color: "#6b7280" }}>Sentences</div>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: "24px", fontWeight: "600" }}>{scoringResult.statistics.paragraphs}</div>
+                        <div style={{ fontSize: "12px", color: "#6b7280" }}>Paragraphs</div>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: "24px", fontWeight: "600" }}>{scoringResult.statistics.unique_words}</div>
+                        <div style={{ fontSize: "12px", color: "#6b7280" }}>Unique Words</div>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: "24px", fontWeight: "600" }}>
+                          {scoringResult.statistics.words > 0 
+                            ? Math.round((scoringResult.statistics.unique_words / scoringResult.statistics.words) * 100)
+                            : 0}%
+                        </div>
+                        <div style={{ fontSize: "12px", color: "#6b7280" }}>Lexical Diversity</div>
+                      </div>
                     </div>
                   </div>
-            </div>
+                )}
 
                 <button
                   className="btn primary w-full"

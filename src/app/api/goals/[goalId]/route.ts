@@ -1,7 +1,37 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import prisma from "@/lib/prisma";
+import { requireAuth, unauthorizedResponse, createResponse } from "@/server/utils/auth";
+import { goalsController } from "@/server/controllers/goalsController";
+import { createErrorResponse } from "@/server/utils/response";
+
+/**
+ * Get goal by ID
+ * GET /api/goals/[goalId]
+ */
+export async function GET(
+    req: NextRequest,
+    { params }: { params: Promise<{ goalId: string }> }
+) {
+    try {
+        const session = await requireAuth();
+        const userId = session.user.id;
+        const { goalId } = await params;
+
+        const result = await goalsController.getGoalById(goalId, userId);
+
+        return createResponse(result.data);
+    } catch (error: any) {
+        if (error.message === "Unauthorized") {
+            return unauthorizedResponse();
+        }
+
+        if (error.message === "Goal not found") {
+            return createErrorResponse(error.message, 404);
+        }
+
+        console.error("[Goals GET API] Error:", error);
+        return createErrorResponse(error.message || "Failed to fetch goal", 500);
+    }
+}
 
 /**
  * Update goal
@@ -9,59 +39,37 @@ import prisma from "@/lib/prisma";
  */
 export async function PUT(
     req: NextRequest,
-    { params }: { params: { goalId: string } }
+    { params }: { params: Promise<{ goalId: string }> }
 ) {
     try {
-        const session = await getServerSession(authOptions);
-        if (!session || !session.user || !session.user.id) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-        }
-
+        const session = await requireAuth();
         const userId = session.user.id;
-        const { goalId } = params;
+        const { goalId } = await params;
+
         const data = await req.json();
+        const { type, target, current, deadline, completed, metadata } = data;
 
-        // Verify goal belongs to user
-        const existingGoal = await prisma.userGoal.findUnique({
-            where: { id: goalId },
+        const result = await goalsController.updateGoal(goalId, userId, {
+            type,
+            target: target ? parseInt(target) : undefined,
+            current: current ? parseInt(current) : undefined,
+            deadline: deadline ? new Date(deadline) : deadline,
+            completed,
+            metadata,
         });
 
-        if (!existingGoal || existingGoal.userId !== userId) {
-            return NextResponse.json(
-                { error: "Goal not found" },
-                { status: 404 }
-            );
+        return createResponse(result.data);
+    } catch (error: any) {
+        if (error.message === "Unauthorized") {
+            return unauthorizedResponse();
         }
 
-        // Update goal
-        const updateData: any = {};
-        if (data.current !== undefined) updateData.current = data.current;
-        if (data.target !== undefined) updateData.target = data.target;
-        if (data.completed !== undefined) updateData.completed = data.completed;
-        if (data.deadline !== undefined)
-            updateData.deadline = data.deadline ? new Date(data.deadline) : null;
-
-        // Check if goal is completed
-        if (updateData.current && updateData.current >= existingGoal.target) {
-            updateData.completed = true;
+        if (error.message === "Goal not found") {
+            return createErrorResponse(error.message, 404);
         }
 
-        const goal = await prisma.userGoal.update({
-            where: { id: goalId },
-            data: updateData,
-        });
-
-        return NextResponse.json({
-            success: true,
-            goal,
-            message: "Goal updated successfully",
-        });
-    } catch (error) {
-        console.error("[Goal Update API] Error:", error);
-        return NextResponse.json(
-            { error: "Failed to update goal" },
-            { status: 500 }
-        );
+        console.error("[Goals PUT API] Error:", error);
+        return createErrorResponse(error.message || "Failed to update goal", 500);
     }
 }
 
@@ -71,43 +79,26 @@ export async function PUT(
  */
 export async function DELETE(
     req: NextRequest,
-    { params }: { params: { goalId: string } }
+    { params }: { params: Promise<{ goalId: string }> }
 ) {
     try {
-        const session = await getServerSession(authOptions);
-        if (!session || !session.user || !session.user.id) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-        }
-
+        const session = await requireAuth();
         const userId = session.user.id;
-        const { goalId } = params;
+        const { goalId } = await params;
 
-        // Verify goal belongs to user
-        const existingGoal = await prisma.userGoal.findUnique({
-            where: { id: goalId },
-        });
+        const result = await goalsController.deleteGoal(goalId, userId);
 
-        if (!existingGoal || existingGoal.userId !== userId) {
-            return NextResponse.json(
-                { error: "Goal not found" },
-                { status: 404 }
-            );
+        return createResponse(result, 200);
+    } catch (error: any) {
+        if (error.message === "Unauthorized") {
+            return unauthorizedResponse();
         }
 
-        await prisma.userGoal.delete({
-            where: { id: goalId },
-        });
+        if (error.message === "Goal not found") {
+            return createErrorResponse(error.message, 404);
+        }
 
-        return NextResponse.json({
-            success: true,
-            message: "Goal deleted successfully",
-        });
-    } catch (error) {
-        console.error("[Goal Delete API] Error:", error);
-        return NextResponse.json(
-            { error: "Failed to delete goal" },
-            { status: 500 }
-        );
+        console.error("[Goals DELETE API] Error:", error);
+        return createErrorResponse(error.message || "Failed to delete goal", 500);
     }
 }
-

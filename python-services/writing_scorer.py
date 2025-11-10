@@ -54,7 +54,14 @@ except ImportError as e:
     CEFR_RUBRIC_AVAILABLE = False
     print(f"[WARNING] CEFR rubric not available: {e}")
 
-# Modern scoring system removed - using traditional system only
+# Import intelligent scorer (new system)
+try:
+    from intelligent_scorer import score_essay_intelligent
+    INTELLIGENT_SCORER_AVAILABLE = True
+    print("[OK] Intelligent scorer available")
+except ImportError as e:
+    INTELLIGENT_SCORER_AVAILABLE = False
+    print(f"[WARNING] Intelligent scorer not available: {e}")
 
 app = Flask(__name__)
 CORS(app)
@@ -2986,6 +2993,110 @@ def grammar_check():
         
     except Exception as e:
         print(f"Grammar check error: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/score-v2', methods=['POST'])
+def score_writing_v2():
+    """
+    Score writing using NEW intelligent prompt-aware system
+    This system:
+    - Analyzes prompt to understand requirements
+    - Validates content relevance semantically
+    - Assesses quality (vocab, grammar, coherence)
+    - Produces accurate scores for ANY prompt
+    ---
+    tags:
+      - Scoring
+    parameters:
+      - in: body
+        name: body
+        required: true
+        schema:
+          type: object
+          properties:
+            text:
+              type: string
+              description: Essay text to score
+            prompt:
+              type: string
+              description: Writing prompt/task description
+            level:
+              type: string
+              description: Target CEFR level (A1-C2)
+              default: B2
+            task_type:
+              type: string
+              description: Optional task type override
+    responses:
+      200:
+        description: Scoring result
+        schema:
+          type: object
+          properties:
+            overall_score:
+              type: number
+              example: 7.5
+            cefr_level:
+              type: string
+              example: B2
+            detailed_scores:
+              type: object
+            is_off_topic:
+              type: boolean
+    """
+    try:
+        data = request.json
+        text = data.get('text', '')
+        prompt = data.get('prompt', '')
+        task_level = data.get('level', 'B2')
+        task_type = data.get('task_type')
+        
+        if not text:
+            return jsonify({'error': 'No text provided'}), 400
+        
+        if not prompt:
+            return jsonify({'error': 'No prompt provided'}), 400
+        
+        # Check if intelligent scorer is available
+        if not INTELLIGENT_SCORER_AVAILABLE:
+            return jsonify({
+                'error': 'Intelligent scorer not available',
+                'message': 'Please use /score endpoint instead'
+            }), 503
+        
+        print(f"\n{'='*80}")
+        print(f"[Score V2] Starting intelligent scoring...")
+        print(f"[Score V2] Prompt: {prompt[:100]}...")
+        print(f"[Score V2] Level: {task_level}")
+        print(f"[Score V2] Essay length: {len(text.split())} words")
+        print(f"{'='*80}\n")
+        
+        # Use intelligent scorer
+        result = score_essay_intelligent(
+            essay=text,
+            prompt=prompt,
+            task_level=task_level.upper(),
+            task_type=task_type
+        )
+        
+        if 'error' in result:
+            print(f"[Score V2] Error: {result['error']}")
+            return jsonify(result), 500
+        
+        print(f"\n{'='*80}")
+        print(f"[Score V2] ✓ Scoring complete!")
+        print(f"[Score V2] Overall Score: {result.get('overall_score')}/10")
+        print(f"[Score V2] CEFR Level: {result.get('cefr_level')}")
+        print(f"[Score V2] Off-topic: {result.get('is_off_topic', False)}")
+        print(f"{'='*80}\n")
+        
+        return jsonify(result)
+        
+    except Exception as e:
+        print(f"[Score V2] Error: {e}")
         import traceback
         traceback.print_exc()
         return jsonify({'error': str(e)}), 500

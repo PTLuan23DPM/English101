@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import prisma from "@/lib/prisma";
+import { requireAuth, unauthorizedResponse, createResponse } from "@/server/utils/auth";
+import { goalsController } from "@/server/controllers/goalsController";
+import { createErrorResponse } from "@/server/utils/response";
 
 /**
  * Get user goals
@@ -9,28 +9,19 @@ import prisma from "@/lib/prisma";
  */
 export async function GET(req: NextRequest) {
     try {
-        const session = await getServerSession(authOptions);
-        if (!session || !session.user || !session.user.id) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-        }
-
+        const session = await requireAuth();
         const userId = session.user.id;
 
-        const goals = await prisma.userGoal.findMany({
-            where: { userId },
-            orderBy: [{ completed: "asc" }, { createdAt: "desc" }],
-        });
+        const result = await goalsController.getGoals(userId);
 
-        return NextResponse.json({
-            success: true,
-            goals,
-        });
-    } catch (error) {
+        return createResponse(result.data);
+    } catch (error: any) {
+        if (error.message === "Unauthorized") {
+            return unauthorizedResponse();
+        }
+
         console.error("[Goals GET API] Error:", error);
-        return NextResponse.json(
-            { error: "Failed to fetch goals" },
-            { status: 500 }
-        );
+        return createErrorResponse(error.message || "Failed to fetch goals", 500);
     }
 }
 
@@ -40,45 +31,31 @@ export async function GET(req: NextRequest) {
  */
 export async function POST(req: NextRequest) {
     try {
-        const session = await getServerSession(authOptions);
-        if (!session || !session.user || !session.user.id) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-        }
-
+        const session = await requireAuth();
         const userId = session.user.id;
+
         const data = await req.json();
         const { type, target, deadline, metadata } = data;
 
-        if (!type || !target) {
-            return NextResponse.json(
-                { error: "Missing required fields: type, target" },
-                { status: 400 }
-            );
+        const result = await goalsController.createGoal(userId, {
+            type,
+            target: parseInt(target),
+            deadline: deadline ? new Date(deadline) : null,
+            metadata,
+        });
+
+        return createResponse(result.data, 201);
+    } catch (error: any) {
+        if (error.message === "Unauthorized") {
+            return unauthorizedResponse();
         }
 
-        const goal = await prisma.userGoal.create({
-            data: {
-                userId,
-                type,
-                target: parseInt(target),
-                deadline: deadline ? new Date(deadline) : null,
-                current: 0,
-                completed: false,
-                metadata: metadata || {},
-            },
-        });
+        if (error.message === "Missing required fields: type, target") {
+            return createErrorResponse(error.message, 400);
+        }
 
-        return NextResponse.json({
-            success: true,
-            goal,
-            message: "Goal created successfully",
-        });
-    } catch (error) {
         console.error("[Goals POST API] Error:", error);
-        return NextResponse.json(
-            { error: "Failed to create goal" },
-            { status: 500 }
-        );
+        return createErrorResponse(error.message || "Failed to create goal", 500);
     }
 }
 

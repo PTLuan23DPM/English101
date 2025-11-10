@@ -30,10 +30,17 @@ interface ScoringResult {
   cefr_level: string;
   cefr_description: string;
   detailed_scores: {
-    task_response: DetailedScore;
-    coherence_cohesion: DetailedScore;
-    lexical_resource: DetailedScore;
-    grammatical_range: DetailedScore;
+    // Traditional scoring system
+    task_response?: DetailedScore;
+    coherence_cohesion?: DetailedScore;
+    lexical_resource?: DetailedScore;
+    grammatical_range?: DetailedScore;
+    // Modern scoring system
+    task_achievement?: DetailedScore;
+    language_quality?: DetailedScore;
+    content_depth?: DetailedScore;
+    fluency_readability?: DetailedScore;
+    mechanics?: DetailedScore;
   };
   word_count: number;
   statistics: {
@@ -43,6 +50,7 @@ interface ScoringResult {
     paragraphs: number;
     unique_words: number;
   };
+  scoring_system?: 'traditional' | 'modern';
 }
 
 
@@ -238,6 +246,7 @@ export default function WritingPage() {
       // }
 
       // Use Python service directly (original behavior)
+      // Enable modern scoring system by default
       let response = await fetch("http://localhost:5001/score-ai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -284,6 +293,46 @@ export default function WritingPage() {
       const result: ScoringResult = await response.json();
       setScoringResult(result);
       setSubmitted(true);
+
+      // Save completion to database
+      try {
+        const saveResponse = await fetch("/api/writing/complete", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            taskId: selectedTask?.id,
+            taskTitle: selectedTask?.title,
+            taskType: selectedTask?.type,
+            targetWords: selectedTask?.targetWords,
+            score: result.overall_score,
+            level: selectedTask?.level,
+            duration: null, // Can add timer tracking later
+            text: text,
+            scoringDetails: {
+              cefr_level: result.cefr_level,
+              task_response: result.detailed_scores.task_response?.score,
+              coherence: result.detailed_scores.coherence_cohesion?.score,
+              lexical: result.detailed_scores.lexical_resource?.score,
+              grammar: result.detailed_scores.grammatical_range?.score,
+            },
+          }),
+        });
+
+        if (!saveResponse.ok) {
+          const errorData = await saveResponse.json().catch(() => ({}));
+          console.error("Failed to save completion:", {
+            status: saveResponse.status,
+            statusText: saveResponse.statusText,
+            error: errorData.error || "Unknown error",
+          });
+        } else {
+          const saveData = await saveResponse.json();
+          console.log("Completion saved successfully:", saveData);
+        }
+      } catch (saveError) {
+        console.error("Error saving completion:", saveError);
+        // Don't show error to user, just log it
+      }
 
       toast.success("Scoring complete!", {
         id: "scoring",
@@ -730,49 +779,130 @@ export default function WritingPage() {
 
                 {/* Detailed Scores */}
                 <div className="scoring-grid">
-                  {/* Task Response */}
-                  <div className="score-card">
-                    <h4>📝 Task Response</h4>
-                    <div className="score-value">{scoringResult.detailed_scores.task_response.score}/10</div>
-                    <div className="score-feedback">
-                      {scoringResult.detailed_scores.task_response.feedback.map((item, i) => (
-                        <div key={i}>{item}</div>
-                      ))}
-                    </div>
-                  </div>
+                  {scoringResult.scoring_system === 'modern' ? (
+                    <>
+                      {/* Modern Scoring System */}
+                      {/* Task Achievement */}
+                      {scoringResult.detailed_scores.task_achievement && (
+                        <div className="score-card">
+                          <h4>🎯 Task Achievement</h4>
+                          <div className="score-value">{scoringResult.detailed_scores.task_achievement.score}/10</div>
+                          <div className="score-feedback">
+                            {scoringResult.detailed_scores.task_achievement.feedback.map((item, i) => (
+                              <div key={i}>{item}</div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
 
-                  {/* Coherence & Cohesion */}
-                  <div className="score-card">
-                    <h4>🔗 Coherence & Cohesion</h4>
-                    <div className="score-value">{scoringResult.detailed_scores.coherence_cohesion.score}/10</div>
-                    <div className="score-feedback">
-                      {scoringResult.detailed_scores.coherence_cohesion.feedback.map((item, i) => (
-                        <div key={i}>{item}</div>
-                      ))}
-                    </div>
-                  </div>
+                      {/* Language Quality */}
+                      {scoringResult.detailed_scores.language_quality && (
+                        <div className="score-card">
+                          <h4>💬 Language Quality</h4>
+                          <div className="score-value">{scoringResult.detailed_scores.language_quality.score}/10</div>
+                          <div className="score-feedback">
+                            {scoringResult.detailed_scores.language_quality.feedback.map((item, i) => (
+                              <div key={i}>{item}</div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
 
-                  {/* Lexical Resource */}
-                  <div className="score-card">
-                    <h4>📚 Lexical Resource</h4>
-                    <div className="score-value">{scoringResult.detailed_scores.lexical_resource.score}/10</div>
-                    <div className="score-feedback">
-                      {scoringResult.detailed_scores.lexical_resource.feedback.map((item, i) => (
-                        <div key={i}>{item}</div>
-                      ))}
-                    </div>
-                  </div>
+                      {/* Content Depth */}
+                      {scoringResult.detailed_scores.content_depth && (
+                        <div className="score-card">
+                          <h4>📖 Content Depth</h4>
+                          <div className="score-value">{scoringResult.detailed_scores.content_depth.score}/10</div>
+                          <div className="score-feedback">
+                            {scoringResult.detailed_scores.content_depth.feedback.map((item, i) => (
+                              <div key={i}>{item}</div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
 
-                  {/* Grammatical Range */}
-                  <div className="score-card">
-                    <h4>✍️ Grammatical Range</h4>
-                    <div className="score-value">{scoringResult.detailed_scores.grammatical_range.score}/10</div>
-                    <div className="score-feedback">
-                      {scoringResult.detailed_scores.grammatical_range.feedback.map((item, i) => (
-                        <div key={i}>{item}</div>
-                      ))}
-                    </div>
-                  </div>
+                      {/* Fluency & Readability */}
+                      {scoringResult.detailed_scores.fluency_readability && (
+                        <div className="score-card">
+                          <h4>🌊 Fluency & Readability</h4>
+                          <div className="score-value">{scoringResult.detailed_scores.fluency_readability.score}/10</div>
+                          <div className="score-feedback">
+                            {scoringResult.detailed_scores.fluency_readability.feedback.map((item, i) => (
+                              <div key={i}>{item}</div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Mechanics */}
+                      {scoringResult.detailed_scores.mechanics && (
+                        <div className="score-card">
+                          <h4>✏️ Mechanics</h4>
+                          <div className="score-value">{scoringResult.detailed_scores.mechanics.score}/10</div>
+                          <div className="score-feedback">
+                            {scoringResult.detailed_scores.mechanics.feedback.map((item, i) => (
+                              <div key={i}>{item}</div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      {/* Traditional Scoring System */}
+                      {/* Task Response */}
+                      {scoringResult.detailed_scores.task_response && (
+                        <div className="score-card">
+                          <h4>📝 Task Response</h4>
+                          <div className="score-value">{scoringResult.detailed_scores.task_response.score}/10</div>
+                          <div className="score-feedback">
+                            {scoringResult.detailed_scores.task_response.feedback.map((item, i) => (
+                              <div key={i}>{item}</div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Coherence & Cohesion */}
+                      {scoringResult.detailed_scores.coherence_cohesion && (
+                        <div className="score-card">
+                          <h4>🔗 Coherence & Cohesion</h4>
+                          <div className="score-value">{scoringResult.detailed_scores.coherence_cohesion.score}/10</div>
+                          <div className="score-feedback">
+                            {scoringResult.detailed_scores.coherence_cohesion.feedback.map((item, i) => (
+                              <div key={i}>{item}</div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Lexical Resource */}
+                      {scoringResult.detailed_scores.lexical_resource && (
+                        <div className="score-card">
+                          <h4>📚 Lexical Resource</h4>
+                          <div className="score-value">{scoringResult.detailed_scores.lexical_resource.score}/10</div>
+                          <div className="score-feedback">
+                            {scoringResult.detailed_scores.lexical_resource.feedback.map((item, i) => (
+                              <div key={i}>{item}</div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Grammatical Range */}
+                      {scoringResult.detailed_scores.grammatical_range && (
+                        <div className="score-card">
+                          <h4>✍️ Grammatical Range</h4>
+                          <div className="score-value">{scoringResult.detailed_scores.grammatical_range.score}/10</div>
+                          <div className="score-feedback">
+                            {scoringResult.detailed_scores.grammatical_range.feedback.map((item, i) => (
+                              <div key={i}>{item}</div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  )}
                 </div>
 
                 {/* Statistics */}
@@ -933,16 +1063,16 @@ export default function WritingPage() {
             level={selectedTask?.level || "B2"}
             lastScore={scoringResult.overall_score}
             errorProfile={{
-              taskResponse: scoringResult.detailed_scores.task_response.score,
-              coherence: scoringResult.detailed_scores.coherence_cohesion.score,
-              lexical: scoringResult.detailed_scores.lexical_resource.score,
-              grammar: scoringResult.detailed_scores.grammatical_range.score,
+              taskResponse: scoringResult.detailed_scores.task_response?.score || scoringResult.detailed_scores.task_achievement?.score || 0,
+              coherence: scoringResult.detailed_scores.coherence_cohesion?.score || scoringResult.detailed_scores.language_quality?.score || 0,
+              lexical: scoringResult.detailed_scores.lexical_resource?.score || scoringResult.detailed_scores.language_quality?.score || 0,
+              grammar: scoringResult.detailed_scores.grammatical_range?.score || scoringResult.detailed_scores.language_quality?.score || 0,
             }}
             scoringFeedback={{
-              taskResponse: scoringResult.detailed_scores.task_response.feedback,
-              coherence: scoringResult.detailed_scores.coherence_cohesion.feedback,
-              lexical: scoringResult.detailed_scores.lexical_resource.feedback,
-              grammar: scoringResult.detailed_scores.grammatical_range.feedback,
+              taskResponse: scoringResult.detailed_scores.task_response?.feedback || scoringResult.detailed_scores.task_achievement?.feedback || [],
+              coherence: scoringResult.detailed_scores.coherence_cohesion?.feedback || scoringResult.detailed_scores.language_quality?.feedback || [],
+              lexical: scoringResult.detailed_scores.lexical_resource?.feedback || scoringResult.detailed_scores.language_quality?.feedback || [],
+              grammar: scoringResult.detailed_scores.grammatical_range?.feedback || scoringResult.detailed_scores.language_quality?.feedback || [],
             }}
           />
         )}

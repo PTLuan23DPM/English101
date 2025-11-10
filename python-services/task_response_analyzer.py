@@ -156,17 +156,40 @@ CRITICAL: Return ONLY valid JSON with this EXACT structure:
   ]
 }}
 
-IMPORTANT SCORING GUIDELINES:
-- Relevance: Default to 7-8 if topic is addressed (even if not perfectly)
-- Only give relevance < 6 if clearly off-topic or unrelated
+IMPORTANT SCORING GUIDELINES - OFF-TOPIC DETECTION:
+- Relevance: Be EXTREMELY STRICT about topic matching
+- If essay is about a DIFFERENT TOPIC, give relevance < 5 (be strict!)
+- Examples of off-topic (ALL should get relevance < 5):
+  * Prompt: "weekend activities" → Essay: "daily routine, work" → relevance < 5
+  * Prompt: "last vacation" → Essay: "usually I study every day" → relevance < 5
+  * Prompt: "online shopping" → Essay: "work from home vs office" → relevance < 5
+  * Prompt: "university education" → Essay: "work from home benefits" → relevance < 5
+  * Prompt: "environmental pollution" → Essay: "remote work advantages" → relevance < 5
+  * Prompt: "technology and children" → Essay: "office vs home work" → relevance < 5
+- CRITICAL: Check if essay's MAIN TOPIC matches prompt's MAIN TOPIC
+- Only give relevance >= 7 if essay clearly addresses the SAME TOPIC as the prompt
+- If essay is off-topic (different topic entirely), give relevance 1-4
 - Coverage: Be reasonable - {task_type} tasks don't need exhaustive coverage
+- Level-based strictness: {task_level} level requires higher quality - be stricter than lower levels
 - All scores must be numbers between 0 and 10
 - "feedback" should have 3-5 constructive, encouraging points
 - "strengths" should highlight what the student did well (2-4 items)
 - "weaknesses" should be suggestions for improvement, not harsh criticism (2-4 items)
 - All string values must be properly escaped
 - Return ONLY the JSON object, no additional text
-- Remember: This is a {task_level} level {task_type} task - adjust expectations accordingly"""
+- Remember: This is a {task_level} level {task_type} task - adjust expectations accordingly
+
+CRITICAL OFF-TOPIC RULES (MUST FOLLOW STRICTLY):
+1. Weekend/Saturday/Sunday prompt but essay about work/office/weekday/daily → relevance < 5
+2. Past/memory prompt but essay uses habitual present (every/usually/always) → relevance < 5
+3. Vacation/holiday/trip prompt but essay about work/school/class → relevance < 5
+4. Online shopping prompt but essay about work/office/remote work → relevance < 5
+5. Education/university prompt but essay about workplace/office → relevance < 5
+6. Environment/pollution prompt but essay about work/technology without environmental focus → relevance < 5
+7. Technology/children prompt but essay about workplace/office → relevance < 5
+8. Check MAIN TOPIC NOUNS: if prompt's main nouns (shopping, education, pollution, children, etc.) are missing or barely mentioned in essay → relevance < 5
+9. YOU MUST give relevance_score < 5.0 if the essay's MAIN TOPIC is COMPLETELY DIFFERENT from the prompt's MAIN TOPIC
+10. Be STRICT: if essay discusses Topic A but prompt asks about Topic B (even if both are valid topics), give relevance < 5"""
     
     try:
         # Call Gemini API

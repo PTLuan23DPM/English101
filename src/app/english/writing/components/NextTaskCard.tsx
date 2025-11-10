@@ -66,8 +66,53 @@ export default function NextTaskCard({ userId, level, lastScore, errorProfile, s
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Failed to get recommendation");
+        let errorMessage = "Failed to get recommendation";
+        const statusCode = response.status;
+        
+        try {
+          const error = await response.json();
+          errorMessage = error.error?.message || error.error || errorMessage;
+        } catch (e) {
+          // If response is not JSON, use status text
+          errorMessage = response.statusText || errorMessage;
+        }
+        
+        // Handle specific error cases - don't throw, just set recommendation to null
+        if (statusCode === 503 || 
+            statusCode === 502 || 
+            statusCode === 504 ||
+            errorMessage.toLowerCase().includes("unavailable") || 
+            errorMessage.toLowerCase().includes("overloaded") ||
+            errorMessage.toLowerCase().includes("service unavailable") ||
+            errorMessage.toLowerCase().includes("bad gateway") ||
+            errorMessage.toLowerCase().includes("gateway timeout")) {
+          // Don't throw - just set recommendation to null and show toast
+          setRecommendation(null);
+          toast.error("AI service is temporarily unavailable. Please try again in a moment.", {
+            duration: 5000,
+            description: "The recommendation feature will be available shortly.",
+          });
+          return;
+        }
+        
+        if (statusCode === 429 || 
+            errorMessage.toLowerCase().includes("quota") || 
+            errorMessage.toLowerCase().includes("rate limit") ||
+            errorMessage.toLowerCase().includes("too many requests")) {
+          // Don't throw - just set recommendation to null and show toast
+          setRecommendation(null);
+          toast.error("Too many requests. Please wait a moment and try again.", {
+            duration: 5000,
+          });
+          return;
+        }
+        
+        // For other errors, also don't throw - just set to null
+        setRecommendation(null);
+        toast.error("Unable to get recommendation at this time. Please try again later.", {
+          duration: 4000,
+        });
+        return;
       }
 
       const data: NextTaskData = await response.json();
@@ -125,15 +170,46 @@ export default function NextTaskCard({ userId, level, lastScore, errorProfile, s
     } catch (error) {
       console.error("Next task error:", error);
       const errorMessage = error instanceof Error ? error.message : "Failed to get recommendation";
+      const errorMessageLower = errorMessage.toLowerCase();
       
-      // Handle MAX_TOKENS error specifically
-      if (errorMessage.includes("MAX_TOKENS") || errorMessage.includes("token limit")) {
+      // Handle specific error cases with user-friendly messages
+      if (errorMessageLower.includes("temporarily unavailable") || 
+          errorMessageLower.includes("unavailable") ||
+          errorMessageLower.includes("overloaded") || 
+          errorMessageLower.includes("service unavailable") ||
+          errorMessageLower.includes("bad gateway") ||
+          errorMessageLower.includes("gateway timeout")) {
+        toast.error("AI service is temporarily unavailable. Please try again in a moment.", {
+          duration: 5000,
+          description: "The recommendation feature will be available shortly.",
+        });
+      } else if (errorMessageLower.includes("too many requests") || 
+                 errorMessageLower.includes("quota") || 
+                 errorMessageLower.includes("rate limit")) {
+        toast.error("Too many requests. Please wait a moment and try again.", {
+          duration: 5000,
+        });
+      } else if (errorMessageLower.includes("max_tokens") || 
+                 errorMessageLower.includes("token limit") ||
+                 errorMessageLower.includes("truncated")) {
         toast.error("Response too long. Please try again with a shorter writing sample.", {
           duration: 5000,
         });
+      } else if (errorMessageLower.includes("not configured") ||
+                 errorMessageLower.includes("api key")) {
+        toast.error("AI service is not configured. Please contact support.", {
+          duration: 5000,
+        });
       } else {
-        toast.error(errorMessage);
+        // Generic error - show user-friendly message
+        toast.error("Unable to get recommendation at this time. Please try again later.", {
+          duration: 4000,
+          description: errorMessage.length > 100 ? errorMessage.substring(0, 100) + "..." : errorMessage,
+        });
       }
+      
+      // Don't show the card if there's an error
+      setRecommendation(null);
     } finally {
       setLoading(false);
     }

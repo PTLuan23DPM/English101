@@ -60,8 +60,17 @@ export async function GET(req: NextRequest) {
     try {
         const session = await getServerSession(authOptions);
 
-        if (!session?.user?.id) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        if (!session) {
+            return NextResponse.json({ error: "Unauthorized: No session" }, { status: 401 });
+        }
+
+        if (!session.user) {
+            return NextResponse.json({ error: "Unauthorized: No user in session" }, { status: 401 });
+        }
+
+        const userId = (session.user as { id?: string }).id;
+        if (!userId) {
+            return NextResponse.json({ error: "Unauthorized: No user ID" }, { status: 401 });
         }
 
         const { searchParams } = new URL(req.url);
@@ -77,7 +86,7 @@ export async function GET(req: NextRequest) {
 
         // Get user's CEFR level
         const user = await prisma.user.findUnique({
-            where: { id: session.user.id },
+            where: { id: userId },
             select: { cefrLevel: true },
         });
 
@@ -87,7 +96,7 @@ export async function GET(req: NextRequest) {
         // Get current usage count for this feature and task
         const usageCount = await prisma.writingLLMUsage.count({
             where: {
-                userId: session.user.id,
+                userId: userId,
                 feature: feature,
                 ...(taskId && { taskId: taskId }),
             },
@@ -120,17 +129,24 @@ export async function POST(req: NextRequest) {
     try {
         const session = await getServerSession(authOptions);
 
-        if (!session?.user?.id) {
+        if (!session?.user?.email) {
+            console.error("[Usage Check] No session or email found");
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        const { taskId } = await req.json();
-
-        // Get user's CEFR level
+        // Get user from database using email (more reliable than session.user.id)
         const user = await prisma.user.findUnique({
-            where: { id: session.user.id },
-            select: { cefrLevel: true },
+            where: { email: session.user.email },
+            select: { id: true, cefrLevel: true },
         });
+
+        if (!user) {
+            console.error("[Usage Check] User not found in database");
+            return NextResponse.json({ error: "User not found" }, { status: 404 });
+        }
+
+        const userId = user.id;
+        const { taskId } = await req.json();
 
         // Get usage limits based on level
         const limits = getUsageLimits(user?.cefrLevel);
@@ -139,7 +155,7 @@ export async function POST(req: NextRequest) {
         const features = ["outline", "brainstorm", "thesis", "language-pack", "rephrase", "expand"];
         const usage = await prisma.writingLLMUsage.findMany({
             where: {
-                userId: session.user.id,
+                userId: userId,
                 ...(taskId && { taskId: taskId }),
                 feature: {
                     in: features,

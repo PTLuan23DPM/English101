@@ -7,8 +7,20 @@ export async function POST(req: NextRequest) {
     try {
         const session = await getServerSession(authOptions);
 
-        if (!session?.user?.id) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        if (!session) {
+            console.error("[Usage Record] No session found");
+            return NextResponse.json({ error: "Unauthorized: No session" }, { status: 401 });
+        }
+
+        if (!session.user) {
+            console.error("[Usage Record] No user in session");
+            return NextResponse.json({ error: "Unauthorized: No user in session" }, { status: 401 });
+        }
+
+        const userId = (session.user as { id?: string }).id;
+        if (!userId) {
+            console.error("[Usage Record] No user ID in session");
+            return NextResponse.json({ error: "Unauthorized: No user ID" }, { status: 401 });
         }
 
         const { taskId, feature, metadata } = await req.json();
@@ -32,7 +44,7 @@ export async function POST(req: NextRequest) {
         // Record usage
         const usage = await prisma.writingLLMUsage.create({
             data: {
-                userId: session.user.id,
+                userId: userId,
                 taskId: taskId || null,
                 feature: feature,
                 metadata: metadata || null,

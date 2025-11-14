@@ -4,6 +4,7 @@
  */
 
 import prisma from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 
 export class WritingService {
     /**
@@ -62,44 +63,61 @@ export class WritingService {
      * Get usage count for a feature
      */
     async getUsageCount(userId: string, feature: string, taskId?: string) {
-        return await prisma.writingLLMUsage.count({
-            where: {
-                userId,
-                feature,
-                ...(taskId && { taskId }),
-            },
-        });
+        try {
+            return await prisma.writingLLMUsage.count({
+                where: {
+                    userId,
+                    feature,
+                    ...(taskId && { taskId }),
+                },
+            });
+        } catch (error) {
+            console.error("[WritingService] Error getting usage count:", error);
+            // Return 0 if there's an error (e.g., table doesn't exist yet)
+            return 0;
+        }
     }
 
     /**
      * Get all usage counts for a task
      */
     async getAllUsageCounts(userId: string, taskId?: string) {
-        const features = ["outline", "brainstorm", "thesis", "language-pack", "rephrase", "expand"];
+        try {
+            const features = ["outline", "brainstorm", "thesis", "language-pack", "rephrase", "expand"];
 
-        const usage = await prisma.writingLLMUsage.findMany({
-            where: {
-                userId,
-                ...(taskId && { taskId }),
-                feature: {
-                    in: features,
+            const usage = await prisma.writingLLMUsage.findMany({
+                where: {
+                    userId,
+                    ...(taskId && { taskId }),
+                    feature: {
+                        in: features,
+                    },
                 },
-            },
-            select: {
-                feature: true,
-            },
-        });
+                select: {
+                    feature: true,
+                },
+            });
 
-        const usageCounts: Record<string, number> = {};
-        features.forEach((f) => {
-            usageCounts[f] = 0;
-        });
+            const usageCounts: Record<string, number> = {};
+            features.forEach((f) => {
+                usageCounts[f] = 0;
+            });
 
-        usage.forEach((u) => {
-            usageCounts[u.feature] = (usageCounts[u.feature] || 0) + 1;
-        });
+            usage.forEach((u) => {
+                usageCounts[u.feature] = (usageCounts[u.feature] || 0) + 1;
+            });
 
-        return usageCounts;
+            return usageCounts;
+        } catch (error) {
+            console.error("[WritingService] Error getting all usage counts:", error);
+            // Return empty counts if there's an error
+            const features = ["outline", "brainstorm", "thesis", "language-pack", "rephrase", "expand"];
+            const usageCounts: Record<string, number> = {};
+            features.forEach((f) => {
+                usageCounts[f] = 0;
+            });
+            return usageCounts;
+        }
     }
 
     /**
@@ -129,29 +147,34 @@ export class WritingService {
             level?: string;
             duration?: number | null;
             text?: string;
-            scoringDetails?: any;
+            scoringDetails?: Record<string, unknown>;
         }
     ) {
-        return await prisma.userActivity.create({
-            data: {
-                userId,
-                skill: "writing",
-                activityType: "exercise",
-                completed: true,
-                score: parseFloat(data.score.toString()),
-                duration: data.duration || null,
-                date: new Date(),
-                metadata: {
-                    taskId: data.taskId,
-                    taskTitle: data.taskTitle,
-                    taskType: data.taskType,
-                    targetWords: data.targetWords,
-                    level: data.level,
-                    wordCount: data.text?.split(/\s+/).length || 0,
-                    scoringDetails: data.scoringDetails || {},
+        try {
+            return await prisma.userActivity.create({
+                data: {
+                    userId,
+                    skill: "writing",
+                    activityType: "exercise",
+                    completed: true,
+                    score: parseFloat(data.score.toString()),
+                    duration: data.duration || null,
+                    date: new Date(),
+                    metadata: {
+                        taskId: data.taskId,
+                        taskTitle: data.taskTitle,
+                        taskType: data.taskType,
+                        targetWords: data.targetWords,
+                        level: data.level,
+                        wordCount: data.text?.split(/\s+/).length || 0,
+                        scoringDetails: (data.scoringDetails || {}) as Prisma.InputJsonValue,
+                    },
                 },
-            },
-        });
+            });
+        } catch (error) {
+            console.error("[WritingService] Error saving completion:", error);
+            throw error;
+        }
     }
 }
 

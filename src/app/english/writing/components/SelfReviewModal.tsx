@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { fetchWithRetry, handleLLMError } from "@/lib/utils/llm-retry";
 
 interface ReviewData {
   summary: string;
@@ -31,14 +32,28 @@ export default function SelfReviewModal({ text, topic, isOpen, onClose }: Props)
   const generateReview = async () => {
     setLoading(true);
     try {
-      const response = await fetch("/api/writing/summarize", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text, topic }),
-      });
+      const response = await fetchWithRetry(
+        "/api/writing/summarize",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text, topic }),
+        },
+        {
+          maxRetries: 3,
+          baseDelay: 1000,
+          maxDelay: 10000,
+          onRetry: (attempt, delay) => {
+            toast.info("Service busy, retrying...", {
+              description: `Attempt ${attempt}/3. Waiting ${delay / 1000}s...`,
+              duration: delay,
+            });
+          },
+        }
+      );
 
       if (!response.ok) {
-        const error = await response.json();
+        const error = await response.json().catch(() => ({ error: "Unknown error" }));
         throw new Error(error.error || "Failed to generate review");
       }
 
@@ -61,7 +76,8 @@ export default function SelfReviewModal({ text, topic, isOpen, onClose }: Props)
       setReview(validatedData);
     } catch (error) {
       console.error("Review error:", error);
-      toast.error(error instanceof Error ? error.message : "Failed to generate review");
+      const { title, description } = handleLLMError(error, "generate review");
+      toast.error(title, { description });
     } finally {
       setLoading(false);
     }

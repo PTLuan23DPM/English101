@@ -12,7 +12,11 @@ interface Activity {
   score: number;
   completed: boolean;
   date: string;
-  metadata: any;
+  metadata?: Record<string, unknown> & {
+    taskId?: string;
+    level?: string;
+    wordCount?: number;
+  };
 }
 
 export default function ReportsPage() {
@@ -144,9 +148,9 @@ export default function ReportsPage() {
                 <div className="report-title">
                   {activity.metadata?.taskId || "Practice Activity"}
                 </div>
-                {activity.metadata?.level && (
-                  <span className="level-badge">{activity.metadata.level}</span>
-                )}
+                  {activity.metadata?.level && (
+                    <span className="level-badge">{activity.metadata.level}</span>
+                  )}
               </div>
               <div className="report-footer">
                 <div className={`score-badge-large ${getScoreBadgeClass(activity.score * 10)}`}>

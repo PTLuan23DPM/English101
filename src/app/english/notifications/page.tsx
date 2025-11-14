@@ -114,7 +114,7 @@ export default function NotificationsPage() {
         <div className="notifications-empty">
           <div className="empty-icon">🔔</div>
           <h3>No notifications yet</h3>
-          <p>We'll notify you when something important happens</p>
+          <p>We&apos;ll notify you when something important happens</p>
         </div>
       ) : (
         <div className="notifications-list">

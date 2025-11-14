@@ -108,7 +108,7 @@ export class UserService {
                 name: data.name,
                 email: data.email,
                 password: hashedPassword,
-                role: data.role || "USER",
+                role: (data.role || "USER") as "USER" | "ADMIN" | undefined,
             },
         });
 

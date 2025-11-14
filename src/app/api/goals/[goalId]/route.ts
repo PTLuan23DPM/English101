@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireAuth, unauthorizedResponse, createResponse } from "@/server/utils/auth";
+import { requireAuth, unauthorizedResponse } from "@/server/utils/auth";
 import { goalsController } from "@/server/controllers/goalsController";
 import { createErrorResponse } from "@/server/utils/response";
 
@@ -18,18 +18,20 @@ export async function GET(
 
         const result = await goalsController.getGoalById(goalId, userId);
 
-        return createResponse(result.data);
-    } catch (error: any) {
-        if (error.message === "Unauthorized") {
+        return NextResponse.json(result.data);
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        
+        if (errorMessage === "Unauthorized") {
             return unauthorizedResponse();
         }
 
-        if (error.message === "Goal not found") {
-            return createErrorResponse(error.message, 404);
+        if (errorMessage === "Goal not found") {
+            return createErrorResponse(errorMessage, 404);
         }
 
         console.error("[Goals GET API] Error:", error);
-        return createErrorResponse(error.message || "Failed to fetch goal", 500);
+        return createErrorResponse(errorMessage || "Failed to fetch goal", 500);
     }
 }
 
@@ -58,18 +60,20 @@ export async function PUT(
             metadata,
         });
 
-        return createResponse(result.data);
-    } catch (error: any) {
-        if (error.message === "Unauthorized") {
+        return NextResponse.json(result.data);
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        
+        if (errorMessage === "Unauthorized") {
             return unauthorizedResponse();
         }
 
-        if (error.message === "Goal not found") {
-            return createErrorResponse(error.message, 404);
+        if (errorMessage === "Goal not found") {
+            return createErrorResponse(errorMessage, 404);
         }
 
         console.error("[Goals PUT API] Error:", error);
-        return createErrorResponse(error.message || "Failed to update goal", 500);
+        return createErrorResponse(errorMessage || "Failed to update goal", 500);
     }
 }
 
@@ -88,17 +92,19 @@ export async function DELETE(
 
         const result = await goalsController.deleteGoal(goalId, userId);
 
-        return createResponse(result, 200);
-    } catch (error: any) {
-        if (error.message === "Unauthorized") {
+        return NextResponse.json(result, { status: 200 });
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        
+        if (errorMessage === "Unauthorized") {
             return unauthorizedResponse();
         }
 
-        if (error.message === "Goal not found") {
-            return createErrorResponse(error.message, 404);
+        if (errorMessage === "Goal not found") {
+            return createErrorResponse(errorMessage, 404);
         }
 
         console.error("[Goals DELETE API] Error:", error);
-        return createErrorResponse(error.message || "Failed to delete goal", 500);
+        return createErrorResponse(errorMessage || "Failed to delete goal", 500);
     }
 }

@@ -41,6 +41,7 @@ type DashboardStats = {
     score: number | null;
     maxScore: number | null;
     submittedAt: Date | null;
+    metadata?: { taskTitle?: string; taskType?: string; targetWords?: string };
   }>;
 };
 
@@ -88,21 +89,28 @@ export default function DashboardPage() {
               totalAttempts: data.stats.totalActivities || 0,
               avgScore: data.stats.avgScore || 0,
             },
-            skillsBreakdown: Object.entries(data.stats.skillScores || {}).map(([skill, scoreData]: [string, any]) => ({
-              skill: skill.toUpperCase(),
-              completed: scoreData.count,
-              avgScore: Math.round(scoreData.avg * 10), // Convert to percentage
-            })),
+            skillsBreakdown: Object.entries(data.stats.skillScores || {}).map(([skill, scoreData]) => {
+                const score = scoreData as { count?: number; avg?: number };
+                return {
+                    skill: skill.toUpperCase(),
+                    completed: score.count || 0,
+                    avgScore: Math.round((score.avg || 0) * 10), // Convert to percentage
+                };
+            }),
             recentProgress: [],
-            recentAttempts: data.stats.recentActivities?.map((act: any) => ({
-              id: act.id,
-              activityTitle: act.metadata?.taskId || "Practice Activity",
-              skill: act.skill,
-              level: act.metadata?.level || "B1",
-              score: act.score ? Math.round(act.score * 10) : null,
-              maxScore: 100,
-              submittedAt: act.date,
-            })) || [],
+            recentAttempts: data.stats.recentActivities?.map((act: unknown) => {
+                const activity = act as { id?: string; metadata?: { taskId?: string; level?: string; taskTitle?: string; taskType?: string; targetWords?: string }; skill?: string; score?: number; date?: string };
+                return {
+                    id: activity.id,
+                    activityTitle: activity.metadata?.taskId || "Practice Activity",
+                    skill: activity.skill,
+                    level: activity.metadata?.level || "B1",
+                    score: activity.score ? Math.round(activity.score * 10) : null,
+                    maxScore: 100,
+                    submittedAt: activity.date,
+                    metadata: activity.metadata as { taskTitle?: string; taskType?: string; targetWords?: string } | undefined,
+                };
+            }) || [],
           };
           setStats(transformedStats);
           return;

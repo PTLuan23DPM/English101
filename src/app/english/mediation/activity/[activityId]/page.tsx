@@ -31,7 +31,7 @@ interface Question {
   type: string;
   prompt: string;
   score: number;
-  content: any;
+  content: Record<string, unknown>;
   choices: Array<{
     id: string;
     order: number;
@@ -53,7 +53,12 @@ export default function MediationActivityPage() {
   const [text, setText] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<{
+    totalScore?: number;
+    maxScore?: number;
+    percentage?: number;
+    feedback?: string | { overall?: string; suggestions?: string[] };
+  } | null>(null);
 
   useEffect(() => {
     if (session?.user && activityId) {
@@ -233,7 +238,7 @@ export default function MediationActivityPage() {
                 {result.feedback && (
                   <div style={{ marginTop: "16px" }}>
                     <h4>Feedback:</h4>
-                    <p>{result.feedback}</p>
+                    <p>{typeof result.feedback === 'string' ? result.feedback : result.feedback.overall || ""}</p>
                   </div>
                 )}
               </div>

@@ -22,7 +22,7 @@ export async function POST(
             body
         );
 
-        return NextResponse.json(result.data, { status: result.status });
+        return NextResponse.json(result.data, { status: result.status || 200 });
     } catch (error) {
         console.error("Error submitting culture activity:", error);
         return NextResponse.json(

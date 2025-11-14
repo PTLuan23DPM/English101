@@ -318,7 +318,17 @@ export async function callGemini(
                 }
 
                 // Prepare request body for this specific model/version
-                const modelRequestBody: any = {
+                const modelRequestBody: {
+                    contents: GeminiMessage[];
+                    generationConfig: {
+                        temperature?: number;
+                        topK?: number;
+                        topP?: number;
+                        maxOutputTokens?: number;
+                        responseMimeType?: string;
+                    };
+                    systemInstruction?: { parts: Array<{ text: string }> };
+                } = {
                     contents: modelMessages,
                     generationConfig: {
                         temperature: config?.temperature ?? 0.7,
@@ -368,6 +378,17 @@ export async function callGemini(
                         continue; // Continue to next version
                     }
 
+                    // Handle 503 Service Unavailable with retry logic
+                    if (response.status === 503 || errorData.error?.code === 503 || errorData.error?.status === "UNAVAILABLE") {
+                        // For 503 errors, throw immediately so caller can handle retry
+                        // Don't try other models/versions as they'll likely all be overloaded
+                        const error = new Error(errorMessage || "Service temporarily unavailable");
+                        (error as any).code = 503;
+                        (error as any).status = "UNAVAILABLE";
+                        (error as any).error = errorData.error || { code: 503, status: "UNAVAILABLE", message: errorMessage };
+                        throw error;
+                    }
+
                     // If invalid argument (400) due to unsupported features, try fallback format
                     if (response.status === 400 && errorMessage.includes("Unknown name")) {
                         console.warn(`[Gemini API] Model ${model} (${version}) doesn't support advanced features, trying fallback format...`);
@@ -382,7 +403,16 @@ export async function callGemini(
                             });
                         }
 
-                        const fallbackBody: any = {
+                        const fallbackBody: {
+                            contents: GeminiMessage[];
+                            generationConfig: {
+                                temperature?: number;
+                                topK?: number;
+                                topP?: number;
+                                maxOutputTokens?: number;
+                            };
+                            systemInstruction?: { parts: Array<{ text: string }> };
+                        } = {
                             contents: fallbackMessages,
                             generationConfig: {
                                 temperature: config?.temperature ?? 0.7,
@@ -453,6 +483,10 @@ export async function callGemini(
                     throw new Error(`Prompt blocked: ${data.promptFeedback.blockReason}`);
                 }
 
+                // Try to extract text from candidate FIRST (before checking finish reason)
+                // This is important because MAX_TOKENS responses may still have usable partial content
+                let extractedText: string | null = null;
+
                 // Check if response was blocked or filtered
                 if (candidate.finishReason && (candidate.finishReason === "SAFETY" || candidate.finishReason === "RECITATION")) {
                     console.error("[Gemini API] Response blocked:", candidate.finishReason, candidate.safetyRatings);
@@ -485,10 +519,6 @@ export async function callGemini(
                     }
                 }
 
-                // Try to extract text from candidate FIRST (before checking finish reason)
-                // This is important because MAX_TOKENS responses may still have usable partial content
-                let extractedText: string | null = null;
-
                 // Method 1: Standard structure (content.parts[0].text)
                 if (candidate.content?.parts?.[0]?.text) {
                     extractedText = candidate.content.parts[0].text;
@@ -510,12 +540,12 @@ export async function callGemini(
                     }
                 }
                 // Method 3: Check if content itself is a string
-                else if (candidate.content && typeof candidate.content === 'string' && candidate.content.length > 0) {
-                    extractedText = candidate.content;
+                else if (candidate.content && typeof candidate.content === 'string' && (candidate.content as string).length > 0) {
+                    extractedText = candidate.content as string;
                 }
                 // Method 4: Check if candidate has text directly
-                else if ('text' in candidate && typeof candidate.text === 'string' && candidate.text.length > 0) {
-                    extractedText = candidate.text;
+                else if ('text' in candidate && typeof (candidate as { text?: unknown }).text === 'string' && ((candidate as { text: string }).text).length > 0) {
+                    extractedText = (candidate as { text: string }).text;
                 }
 
                 // Log finish reason for debugging (after trying to extract text)
@@ -852,7 +882,7 @@ export function parseGeminiJSON<T>(text: string): T {
 
     // Try to extract JSON if there's text before/after
     // Use extractValidJSON for better extraction
-    let extractedJSON = extractValidJSON(cleaned);
+    const extractedJSON = extractValidJSON(cleaned);
     if (extractedJSON) {
         cleaned = extractedJSON;
     } else {

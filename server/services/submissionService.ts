@@ -242,7 +242,7 @@ class SubmissionService {
         const result: SubmissionResult = {
             attemptId: attempt.id,
             totalScore,
-            maxScore: activity.maxScore,
+            maxScore: activity.maxScore || 0,
             percentage,
             answers: gradedAnswers,
         };

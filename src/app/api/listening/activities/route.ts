@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireAuth, unauthorizedResponse, createResponse } from "@/server/utils/auth";
+import { requireAuth, unauthorizedResponse } from "@/server/utils/auth";
 import { activityController } from "@/server/controllers/activityController";
 
 /**
@@ -35,18 +35,20 @@ export async function GET(req: NextRequest) {
 
     const result = await activityController.getActivities("LISTENING", { level, type });
 
-    return createResponse({
+    return NextResponse.json({
       activities: result.data,
     });
-  } catch (error: any) {
-    if (error.message === "Unauthorized") {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    
+    if (errorMessage === "Unauthorized") {
       return unauthorizedResponse();
     }
 
     console.error("Error fetching listening activities:", error);
-    return createResponse(
-      { error: error.message || "Failed to fetch activities" },
-      500
+    return NextResponse.json(
+      { error: errorMessage || "Failed to fetch activities" },
+      { status: 500 }
     );
   }
 }

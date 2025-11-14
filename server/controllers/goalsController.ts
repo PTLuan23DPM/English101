@@ -154,7 +154,7 @@ export class GoalsController {
 
             await goalsService.updateGoal(goalId, userId, {
                 ...data,
-                deadline: data.deadline ? new Date(data.deadline) : data.deadline,
+                deadline: data.deadline ? (typeof data.deadline === 'string' ? new Date(data.deadline) : data.deadline) : null,
             });
 
             const updatedGoal = await goalsService.getGoalById(goalId, userId);

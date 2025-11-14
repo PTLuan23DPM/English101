@@ -20,15 +20,17 @@ export async function GET(req: NextRequest) {
             timeframe,
         });
 
-        return NextResponse.json(result.data, { status: result.status });
-    } catch (error: any) {
-        if (error.message === "Unauthorized") {
+        return NextResponse.json(result.data, { status: result.success ? 200 : 500 });
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        
+        if (errorMessage === "Unauthorized") {
             return unauthorizedResponse();
         }
 
         console.error("[Analytics API] Error:", error);
         return NextResponse.json(
-            { error: error.message || "Failed to fetch analytics" },
+            { error: errorMessage || "Failed to fetch analytics" },
             { status: 500 }
         );
     }

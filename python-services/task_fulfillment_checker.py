@@ -13,15 +13,17 @@ from typing import Dict, List, Optional, Tuple
 def extract_keywords_and_constraints(prompt: str) -> Dict:
     """
     Extract keywords and constraints from prompt
+    IMPROVED: Focus on MAIN TOPIC NOUNS and key phrases, not generic words
     Returns: {
-        'keywords': List of core keywords,
+        'keywords': List of core keywords (prioritized by importance),
+        'main_topic_nouns': List of main topic nouns (most important),
         'required_elements': List of required elements (WHERE, WHAT, WHY, etc.),
         'task_type': Type of task (narrative, descriptive, argumentative, etc.)
     }
     """
     prompt_lower = prompt.lower()
     
-    # Extract core keywords (nouns, verbs, adjectives - length > 3)
+    # Enhanced stop words - more comprehensive
     stop_words = {
         'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for',
         'of', 'with', 'by', 'from', 'as', 'is', 'was', 'are', 'were', 'be',
@@ -31,35 +33,86 @@ def extract_keywords_and_constraints(prompt: str) -> Dict:
         'what', 'which', 'who', 'whom', 'whose', 'where', 'when', 'why',
         'how', 'all', 'each', 'every', 'some', 'any', 'no', 'not', 'if',
         'then', 'else', 'while', 'because', 'although', 'however', 'therefore',
-        'write', 'describe', 'explain', 'discuss', 'tell', 'about'
+        'write', 'describe', 'explain', 'discuss', 'tell', 'about', 'your',
+        'you', 'yourself', 'think', 'opinion', 'believe', 'agree', 'disagree',
+        'compare', 'contrast', 'difference', 'similar', 'different', 'both',
+        'one', 'two', 'first', 'second', 'also', 'more', 'most', 'less', 'least'
     }
     
-    # Extract meaningful keywords
-    keywords = set([
-        word for word in re.findall(r'\b\w+\b', prompt_lower)
-        if len(word) > 3 and word not in stop_words
-    ])
-    
-    # Also extract multi-word phrases that are important (e.g., "daily routine", "every day")
-    important_phrases = [
-        'daily routine', 'every day', 'every morning', 'every evening', 'every night',
-        'weekend activities', 'last summer', 'last year', 'last month',
-        'online shopping', 'work from home', 'environmental pollution'
+    # Extract multi-word key phrases FIRST (these are most important)
+    key_phrases = []
+    important_phrases_patterns = [
+        r'\bwork\s+from\s+home\b', r'\bwork\s+at\s+home\b', r'\bremote\s+work\b',
+        r'\buniversity\s+education\b', r'\bhigher\s+education\b', r'\bcollege\s+education\b',
+        r'\bdaily\s+routine\b', r'\bevery\s+day\b', r'\bevery\s+morning\b',
+        r'\bweekend\s+activities\b', r'\bweekend\s+activity\b',
+        r'\bonline\s+shopping\b', r'\bonline\s+store\b', r'\be-commerce\b',
+        r'\benvironmental\s+pollution\b', r'\bair\s+pollution\b', r'\bwater\s+pollution\b',
+        r'\bmemorable\s+trip\b', r'\bvacation\s+trip\b', r'\btravel\s+experience\b',
+        r'\bfavorite\s+food\b', r'\bfavorite\s+meal\b',
+        r'\bwork\s+life\s+balance\b', r'\bwork-life\s+balance\b'
     ]
-    for phrase in important_phrases:
-        if phrase in prompt_lower:
-            # Add individual words from phrase
-            keywords.update(phrase.split())
     
-    # Expand keywords with synonyms for better matching
-    # This helps match "memorable trip" with "vacation" in the essay
-    expanded_keywords = set(keywords)
-    for keyword in keywords:
-        synonyms = get_synonyms(keyword)
-        expanded_keywords.update(synonyms)
+    for pattern in important_phrases_patterns:
+        matches = re.findall(pattern, prompt_lower)
+        for match in matches:
+            if isinstance(match, tuple):
+                match = ' '.join(match)
+            key_phrases.append(match)
+            # Also add individual words from phrase (but mark as part of phrase)
+            for word in match.split():
+                if len(word) > 2:
+                    key_phrases.append(word)
     
-    # Use original keywords for tracking, but expanded for matching
-    # (We'll use synonyms in calculate_keyword_coverage instead)
+    # Extract MAIN TOPIC NOUNS (most important for topic detection)
+    # Look for nouns that appear early in prompt or are capitalized
+    words = re.findall(r'\b\w+\b', prompt_lower)
+    
+    # Identify main topic nouns by:
+    # 1. Words that appear after key verbs (write about, discuss, describe)
+    # 2. Capitalized words in original prompt (if any)
+    # 3. Nouns that are not stop words and length > 4
+    main_topic_nouns = []
+    topic_indicators = ['about', 'discuss', 'describe', 'write', 'tell', 'explain', 'opinion']
+    
+    for i, word in enumerate(words):
+        if word in topic_indicators and i + 1 < len(words):
+            # Next few words after topic indicator are likely main topic
+            for j in range(i + 1, min(i + 5, len(words))):
+                next_word = words[j]
+                if len(next_word) > 4 and next_word not in stop_words:
+                    main_topic_nouns.append(next_word)
+    
+    # Also extract all meaningful keywords (nouns, verbs, adjectives - length > 4)
+    # But prioritize main topic nouns
+    keywords = set(main_topic_nouns)  # Start with main topic nouns
+    
+    # Add other meaningful words (length > 4, not stop words)
+    for word in words:
+        if len(word) > 4 and word not in stop_words:
+            keywords.add(word)
+    
+    # Add words from key phrases
+    for phrase in key_phrases:
+        if ' ' in phrase:  # Multi-word phrase
+            keywords.add(phrase)  # Add whole phrase
+        else:
+            keywords.add(phrase)  # Single word
+    
+    # Remove very common words that might cause false matches
+    common_false_positives = {'work', 'home', 'office', 'time', 'people', 'life', 'way', 'things', 'thing', 'place', 'places'}
+    keywords = {k for k in keywords if k not in common_false_positives or k in main_topic_nouns}
+    
+    # Prioritize: main_topic_nouns first, then key phrases, then other keywords
+    prioritized_keywords = main_topic_nouns + [p for p in key_phrases if ' ' in p] + [k for k in keywords if k not in main_topic_nouns and k not in key_phrases]
+    
+    # Remove duplicates while preserving order
+    seen = set()
+    unique_keywords = []
+    for k in prioritized_keywords:
+        if k not in seen:
+            seen.add(k)
+            unique_keywords.append(k)
     
     # Extract required elements based on prompt structure
     required_elements = []
@@ -98,7 +151,9 @@ def extract_keywords_and_constraints(prompt: str) -> Dict:
         task_type = 'comparative'
     
     return {
-        'keywords': list(keywords),
+        'keywords': unique_keywords[:15],  # Limit to top 15 most important
+        'main_topic_nouns': main_topic_nouns[:5],  # Top 5 main topic nouns
+        'key_phrases': [p for p in key_phrases if ' ' in p][:5],  # Top 5 key phrases
         'required_elements': required_elements,
         'task_type': task_type
     }
@@ -132,9 +187,10 @@ def get_synonyms(word: str) -> List[str]:
     return [word_lower]  # Return word itself if no synonyms found
 
 
-def calculate_keyword_coverage(essay: str, prompt_keywords: List[str]) -> Tuple[float, List[str], List[str]]:
+def calculate_keyword_coverage(essay: str, prompt_keywords: List[str], main_topic_nouns: List[str] = None, key_phrases: List[str] = None) -> Tuple[float, List[str], List[str]]:
     """
     Calculate keyword coverage: how many keywords from prompt appear in essay
+    IMPROVED: Prioritize main topic nouns and key phrases, penalize if missing
     Returns: (coverage_ratio, matched_keywords, missing_keywords)
     
     Uses semantic matching with synonyms to understand related concepts
@@ -144,20 +200,79 @@ def calculate_keyword_coverage(essay: str, prompt_keywords: List[str]) -> Tuple[
     
     essay_lower = essay.lower()
     essay_words = set(re.findall(r'\b\w+\b', essay_lower))
+    essay_text = essay_lower  # For phrase matching
     
     matched_keywords = []
     missing_keywords = []
+    main_topic_nouns = main_topic_nouns or []
+    key_phrases = key_phrases or []
     
-    for keyword in prompt_keywords:
-        keyword_lower = keyword.lower()
+    # CRITICAL: Check key phrases FIRST (most important)
+    matched_phrases = []
+    missing_phrases = []
+    for phrase in key_phrases:
+        phrase_lower = phrase.lower()
+        if phrase_lower in essay_text:
+            matched_phrases.append(phrase)
+            matched_keywords.append(phrase)
+        else:
+            missing_phrases.append(phrase)
+            missing_keywords.append(phrase)
+    
+    # CRITICAL: Check main topic nouns (high priority)
+    matched_main_nouns = []
+    missing_main_nouns = []
+    for noun in main_topic_nouns:
+        noun_lower = noun.lower()
         matched = False
         
         # 1. Check exact match first
+        if noun_lower in essay_words:
+            matched_main_nouns.append(noun)
+            matched_keywords.append(noun)
+            matched = True
+        else:
+            # 2. Check for synonyms (semantic matching)
+            synonyms = get_synonyms(noun_lower)
+            for synonym in synonyms:
+                if synonym in essay_words:
+                    matched_main_nouns.append(noun)
+                    matched_keywords.append(noun)
+                    matched = True
+                    break
+            
+            # 3. Check word stem match (strict)
+            if not matched:
+                for essay_word in essay_words:
+                    if abs(len(essay_word) - len(noun_lower)) > 2:
+                        continue
+                    
+                    common_suffixes = ['s', 'es', 'ed', 'ing', 'er', 'ly', 'ion', 'tion']
+                    for suffix in common_suffixes:
+                        if essay_word == noun_lower + suffix or noun_lower == essay_word + suffix:
+                            matched_main_nouns.append(noun)
+                            matched_keywords.append(noun)
+                            matched = True
+                            break
+                    if matched:
+                        break
+        
+        if not matched:
+            missing_main_nouns.append(noun)
+            missing_keywords.append(noun)
+    
+    # Check other keywords (lower priority)
+    other_keywords = [k for k in prompt_keywords if k not in main_topic_nouns and k not in key_phrases]
+    for keyword in other_keywords:
+        keyword_lower = keyword.lower()
+        matched = False
+        
+        # 1. Check exact match
         if keyword_lower in essay_words:
             matched_keywords.append(keyword)
             matched = True
         else:
-            # 2. Check for synonyms (semantic matching)
+            # 2. Check synonyms
             synonyms = get_synonyms(keyword_lower)
             for synonym in synonyms:
                 if synonym in essay_words:
@@ -165,39 +280,42 @@ def calculate_keyword_coverage(essay: str, prompt_keywords: List[str]) -> Tuple[
                     matched = True
                     break
             
-            # 3. If no synonym match, check for word stem match with STRICT conditions
+            # 3. Check stem match
             if not matched:
                 for essay_word in essay_words:
-                    # Only check if words are very similar length (within 2 characters)
                     if abs(len(essay_word) - len(keyword_lower)) > 2:
                         continue
-                    
-                    # STRICT: Only match if one word is exactly the other word + suffix
-                    # e.g., "shop" -> "shopping" (adding "ping"), "educate" -> "education" (adding "ion")
-                    # But NOT "environment" -> "environmental" (too different in meaning)
-                    
-                    # Check common suffixes for plurals and verb forms only
                     common_suffixes = ['s', 'es', 'ed', 'ing', 'er', 'ly']
-                    
-                    # If keyword + suffix = essay_word
                     for suffix in common_suffixes:
-                        if essay_word == keyword_lower + suffix:
+                        if essay_word == keyword_lower + suffix or keyword_lower == essay_word + suffix:
                             matched_keywords.append(keyword)
                             matched = True
                             break
-                        # If essay_word + suffix = keyword
-                        if keyword_lower == essay_word + suffix:
-                            matched_keywords.append(keyword)
-                            matched = True
-                            break
-                    
                     if matched:
                         break
-            
-            if not matched:
-                missing_keywords.append(keyword)
+        
+        if not matched:
+            missing_keywords.append(keyword)
     
-    coverage = len(matched_keywords) / len(prompt_keywords) if prompt_keywords else 0.0
+    # Calculate weighted coverage:
+    # - Key phrases: 40% weight
+    # - Main topic nouns: 40% weight  
+    # - Other keywords: 20% weight
+    
+    phrase_coverage = len(matched_phrases) / len(key_phrases) if key_phrases else 1.0
+    main_noun_coverage = len(matched_main_nouns) / len(main_topic_nouns) if main_topic_nouns else 1.0
+    other_coverage = len([k for k in matched_keywords if k not in main_topic_nouns and k not in key_phrases]) / len(other_keywords) if other_keywords else 1.0
+    
+    # If main topic nouns or key phrases are missing, heavily penalize
+    if main_topic_nouns and len(matched_main_nouns) == 0:
+        # No main topic nouns matched - likely completely off-topic
+        coverage = 0.1  # Very low coverage
+    elif key_phrases and len(matched_phrases) == 0:
+        # No key phrases matched - likely off-topic
+        coverage = max(0.2, phrase_coverage * 0.4 + main_noun_coverage * 0.4 + other_coverage * 0.2)
+    else:
+        coverage = phrase_coverage * 0.4 + main_noun_coverage * 0.4 + other_coverage * 0.2
+    
     return coverage, matched_keywords, missing_keywords
 
 
@@ -306,7 +424,10 @@ def calculate_topic_score(essay: str, prompt: str, task_level: str = "B2") -> Di
     
     # 1. Keyword Coverage
     keyword_coverage, matched_keywords, missing_keywords = calculate_keyword_coverage(
-        essay, prompt_info['keywords']
+        essay,
+        prompt_info['keywords'],
+        main_topic_nouns=prompt_info.get('main_topic_nouns', []),
+        key_phrases=prompt_info.get('key_phrases', [])
     )
     
     # 2. Task Fulfillment Rubric
@@ -384,6 +505,18 @@ def detect_topic_contradiction(essay: str, prompt: str) -> Tuple[bool, List[str]
             'prompt_indicators': ['daily', 'routine', 'every day', 'every morning', 'usually', 'always', 'often', 'normally', 'typically', 'habit', 'habits', 'regular', 'regularly', 'weekday', 'weekdays'],
             'essay_indicators': ['vacation', 'holiday', 'trip', 'travel', 'travelled', 'traveled', 'journey', 'tour', 'beach', 'hotel', 'visited', 'explored', 'sightseeing', 'tourist', 'memorable', 'special', 'last summer', 'last year', 'last month'],
             'message': 'Essay discusses vacation/trip but prompt asks about daily routine'
+        },
+        # Work from Home vs Office vs University Education
+        {
+            'prompt_indicators': ['work from home', 'work at home', 'remote work', 'working from home', 'home office', 'telecommute', 'telecommuting', 'office', 'workplace', 'workplace environment', 'vs office', 'versus office'],
+            'essay_indicators': ['university', 'education', 'college', 'school', 'student', 'teacher', 'study', 'studying', 'academic', 'tuition', 'degree', 'campus', 'classroom', 'lecture', 'professor', 'higher education', 'university education', 'free education', 'educational'],
+            'message': 'Essay discusses university/education but prompt asks about work from home vs office'
+        },
+        # University Education vs Work from Home
+        {
+            'prompt_indicators': ['university', 'education', 'college', 'higher education', 'university education', 'academic', 'tuition', 'degree', 'campus', 'student', 'teacher', 'free education'],
+            'essay_indicators': ['work from home', 'work at home', 'remote work', 'working from home', 'home office', 'telecommute', 'telecommuting', 'office', 'workplace', 'workplace environment', 'remote', 'commute', 'vs office', 'versus office'],
+            'message': 'Essay discusses work from home/office but prompt asks about university education'
         },
     ]
     

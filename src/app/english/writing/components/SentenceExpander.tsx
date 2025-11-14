@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
+import { fetchWithRetry, handleLLMError } from "@/lib/utils/llm-retry";
 
 interface Expansion {
   text: string;
@@ -37,17 +38,31 @@ export default function SentenceExpander({ selectedSentence, onReplace, onClose,
     setActiveMode(mode);
     setLoading(true);
     try {
-      const response = await fetch("/api/writing/expand", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          sentence: selectedSentence,
-          mode,
-        }),
-      });
+      const response = await fetchWithRetry(
+        "/api/writing/expand",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            sentence: selectedSentence,
+            mode,
+          }),
+        },
+        {
+          maxRetries: 3,
+          baseDelay: 1000,
+          maxDelay: 10000,
+          onRetry: (attempt, delay) => {
+            toast.info("Service busy, retrying...", {
+              description: `Attempt ${attempt}/3. Waiting ${delay / 1000}s...`,
+              duration: delay,
+            });
+          },
+        }
+      );
 
       if (!response.ok) {
-        const error = await response.json();
+        const error = await response.json().catch(() => ({ error: "Unknown error" }));
         throw new Error(error.error || "Failed to expand");
       }
 
@@ -62,22 +77,8 @@ export default function SentenceExpander({ selectedSentence, onReplace, onClose,
       toast.success("Expansions generated!");
     } catch (error) {
       console.error("Expand error:", error);
-      const errorMessage = error instanceof Error ? error.message : "Failed to expand";
-      
-      // Provide helpful error messages with requirements
-      if (errorMessage.includes("Gemini API is not configured") || errorMessage.includes("GEMINI_API_KEY")) {
-        toast.error("Gemini API not configured", {
-          description: "Please add GEMINI_API_KEY to your .env.local file and restart the server.",
-        });
-      } else if (errorMessage.includes("sentence") || errorMessage.includes("text")) {
-        toast.error("No sentence selected", {
-          description: "Please select a sentence in your writing before using the Expand feature.",
-        });
-      } else {
-        toast.error("Failed to expand", {
-          description: errorMessage,
-        });
-      }
+      const { title, description } = handleLLMError(error, "expand");
+      toast.error(title, { description });
     } finally {
       setLoading(false);
     }
@@ -106,7 +107,7 @@ export default function SentenceExpander({ selectedSentence, onReplace, onClose,
           {/* Show selected sentence */}
           <div className="selected-text-preview">
             <h4>Selected Sentence:</h4>
-            <p>"{selectedSentence}"</p>
+            <p>&quot;{selectedSentence}&quot;</p>
           </div>
 
           {!expansions ? (

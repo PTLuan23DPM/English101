@@ -12,7 +12,7 @@ interface Goal {
   current: number;
   deadline: string | null;
   completed: boolean;
-  metadata?: any;
+  metadata?: Record<string, unknown>;
   createdAt: string;
 }
 

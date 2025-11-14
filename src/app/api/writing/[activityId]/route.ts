@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireAuth, unauthorizedResponse, createResponse } from "@/server/utils/auth";
+import { requireAuth, unauthorizedResponse } from "@/server/utils/auth";
 import { activityController } from "@/server/controllers/activityController";
 
 /**
@@ -32,20 +32,22 @@ export async function GET(
     const { activityId } = await params;
     const result = await activityController.getActivityById(activityId, "WRITING");
 
-    return createResponse(result.data);
-  } catch (error: any) {
-    if (error.message === "Unauthorized") {
+    return NextResponse.json(result.data);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    
+    if (errorMessage === "Unauthorized") {
       return unauthorizedResponse();
     }
 
-    if (error.message === "Activity not found") {
-      return createResponse({ error: error.message }, 404);
+    if (errorMessage === "Activity not found") {
+      return NextResponse.json({ error: errorMessage }, { status: 404 });
     }
 
     console.error("Error fetching writing activity:", error);
-    return createResponse(
-      { error: error.message || "Failed to fetch activity" },
-      500
+    return NextResponse.json(
+      { error: errorMessage || "Failed to fetch activity" },
+      { status: 500 }
     );
   }
 }

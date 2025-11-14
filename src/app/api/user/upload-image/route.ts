@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireAuth, unauthorizedResponse, createResponse } from "@/server/utils/auth";
+import { requireAuth, unauthorizedResponse } from "@/server/utils/auth";
 import { fileController } from "@/server/controllers/fileController";
 import { createErrorResponse } from "@/server/utils/response";
 
@@ -21,21 +21,23 @@ export async function POST(req: NextRequest) {
 
         const result = await fileController.uploadProfileImage(userId, file);
 
-        return createResponse(result.data, 200);
-    } catch (error: any) {
-        if (error.message === "Unauthorized") {
+        return NextResponse.json(result.data, { status: 200 });
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        
+        if (errorMessage === "Unauthorized") {
             return unauthorizedResponse();
         }
 
         if (
-            error.message === "No file provided" ||
-            error.message === "Invalid file type. Only JPEG, PNG, and WebP are allowed" ||
-            error.message === "File size too large. Maximum size is 5MB"
+            errorMessage === "No file provided" ||
+            errorMessage === "Invalid file type. Only JPEG, PNG, and WebP are allowed" ||
+            errorMessage === "File size too large. Maximum size is 5MB"
         ) {
-            return createErrorResponse(error.message, 400);
+            return createErrorResponse(errorMessage, 400);
         }
 
         console.error("[Upload Image API] Error:", error);
-        return createErrorResponse(error.message || "Failed to upload image", 500);
+        return createErrorResponse(errorMessage || "Failed to upload image", 500);
     }
 }

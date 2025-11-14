@@ -22,27 +22,29 @@ export async function PUT(req: NextRequest) {
             }
         );
 
-        return NextResponse.json(result.data || result, { status: result.status || 200 });
-    } catch (error: any) {
-        if (error.message === "Unauthorized") {
+        return NextResponse.json(result.data || result, { status: result.success ? 200 : 500 });
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        
+        if (errorMessage === "Unauthorized") {
             return unauthorizedResponse();
         }
 
-        if (error.message === "User not found") {
-            return createErrorResponse(error.message, 404);
+        if (errorMessage === "User not found") {
+            return createErrorResponse(errorMessage, 404);
         }
 
         if (
-            error.message === "Email already in use" ||
-            error.message === "Current password is required to set a new password" ||
-            error.message === "Cannot update password for OAuth accounts" ||
-            error.message === "Current password is incorrect"
+            errorMessage === "Email already in use" ||
+            errorMessage === "Current password is required to set a new password" ||
+            errorMessage === "Cannot update password for OAuth accounts" ||
+            errorMessage === "Current password is incorrect"
         ) {
-            return createErrorResponse(error.message, 400);
+            return createErrorResponse(errorMessage, 400);
         }
 
         console.error("[Profile Update API] Error:", error);
-        return createErrorResponse(error.message || "Failed to update profile", 500);
+        return createErrorResponse(errorMessage || "Failed to update profile", 500);
     }
 }
 
@@ -50,24 +52,26 @@ export async function PUT(req: NextRequest) {
  * Get user profile
  * GET /api/user/profile
  */
-export async function GET(req: NextRequest) {
+export async function GET() {
     try {
         const session = await requireAuth();
         const userId = session.user.id;
 
         const result = await userController.getProfile(userId);
 
-        return NextResponse.json(result.data || result, { status: result.status || 200 });
-    } catch (error: any) {
-        if (error.message === "Unauthorized") {
+        return NextResponse.json(result.data || result, { status: result.success ? 200 : 500 });
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        
+        if (errorMessage === "Unauthorized") {
             return unauthorizedResponse();
         }
 
-        if (error.message === "User not found") {
-            return createErrorResponse(error.message, 404);
+        if (errorMessage === "User not found") {
+            return createErrorResponse(errorMessage, 404);
         }
 
         console.error("[Profile Get API] Error:", error);
-        return createErrorResponse(error.message || "Failed to fetch profile", 500);
+        return createErrorResponse(errorMessage || "Failed to fetch profile", 500);
     }
 }

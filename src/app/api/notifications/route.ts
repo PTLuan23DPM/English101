@@ -6,22 +6,24 @@ import { notificationsController } from "@/server/controllers/notificationsContr
  * Get user notifications
  * GET /api/notifications
  */
-export async function GET(req: NextRequest) {
+export async function GET() {
     try {
         const session = await requireAuth();
         const userId = session.user.id;
 
         const result = await notificationsController.getNotifications(userId);
 
-        return NextResponse.json(result.data, { status: result.status });
-    } catch (error: any) {
-        if (error.message === "Unauthorized") {
+        return NextResponse.json(result.data, { status: result.success ? 200 : 500 });
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        
+        if (errorMessage === "Unauthorized") {
             return unauthorizedResponse();
         }
 
         console.error("[Notifications GET API] Error:", error);
         return NextResponse.json(
-            { error: error.message || "Failed to fetch notifications" },
+            { error: errorMessage || "Failed to fetch notifications" },
             { status: 500 }
         );
     }
@@ -48,15 +50,17 @@ export async function PUT(req: NextRequest) {
 
         const result = await notificationsController.markAsRead(notificationId, userId);
 
-        return NextResponse.json(result.data, { status: result.status });
-    } catch (error: any) {
-        if (error.message === "Unauthorized") {
+        return NextResponse.json(result.data, { status: result.success ? 200 : 500 });
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        
+        if (errorMessage === "Unauthorized") {
             return unauthorizedResponse();
         }
 
         console.error("[Notification Update API] Error:", error);
         return NextResponse.json(
-            { error: error.message || "Failed to update notification" },
+            { error: errorMessage || "Failed to update notification" },
             { status: 500 }
         );
     }

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
+import { fetchWithRetry, handleLLMError } from "@/lib/utils/llm-retry";
 
 interface RephraseOption {
   text: string;
@@ -38,18 +39,32 @@ export default function RephraseMenu({ selectedText, level, onReplace, onClose, 
     setActiveStyle(style);
     setLoading(true);
     try {
-      const response = await fetch("/api/writing/rephrase", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          text: selectedText,
-          style,
-          targetLevel: level,
-        }),
-      });
+      const response = await fetchWithRetry(
+        "/api/writing/rephrase",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            text: selectedText,
+            style,
+            targetLevel: level,
+          }),
+        },
+        {
+          maxRetries: 3,
+          baseDelay: 1000,
+          maxDelay: 10000,
+          onRetry: (attempt, delay) => {
+            toast.info("Service busy, retrying...", {
+              description: `Attempt ${attempt}/3. Waiting ${delay / 1000}s...`,
+              duration: delay,
+            });
+          },
+        }
+      );
 
       if (!response.ok) {
-        const error = await response.json();
+        const error = await response.json().catch(() => ({ error: "Unknown error" }));
         throw new Error(error.error || "Failed to rephrase");
       }
 
@@ -64,32 +79,8 @@ export default function RephraseMenu({ selectedText, level, onReplace, onClose, 
       toast.success("Rephrase options generated!");
     } catch (error) {
       console.error("Rephrase error:", error);
-      const errorMessage = error instanceof Error ? error.message : "Failed to rephrase";
-      
-      // Provide helpful error messages with requirements
-      if (errorMessage.includes("Gemini API is not configured") || errorMessage.includes("GEMINI_API_KEY")) {
-        toast.error("Gemini API not configured", {
-          description: "Please add GEMINI_API_KEY to your .env.local file and restart the server.",
-        });
-      } else if (errorMessage.includes("MAX_TOKENS") || errorMessage.includes("truncated") || errorMessage.includes("token limit")) {
-        toast.error("Text too long", {
-          description: "The selected text is too long for rephrasing. Please select shorter text (under 150 characters) and try again.",
-        });
-      } else if (errorMessage.includes("text") || errorMessage.includes("selectedText")) {
-        toast.error("No text selected", {
-          description: "Please select some text in your writing before using the Rephrase feature.",
-        });
-      } else if (errorMessage.includes("level")) {
-        toast.error("Missing level information", {
-          description: "This feature requires a selected writing task. Please select a task first.",
-        });
-      } else {
-        toast.error("Failed to rephrase", {
-          description: errorMessage.includes("Failed to parse") 
-            ? "Unable to process the AI response. Please try again with shorter or simpler text."
-            : errorMessage,
-        });
-      }
+      const { title, description } = handleLLMError(error, "rephrase");
+      toast.error(title, { description });
     } finally {
       setLoading(false);
     }
@@ -115,7 +106,7 @@ export default function RephraseMenu({ selectedText, level, onReplace, onClose, 
           {/* Show selected text */}
           <div className="selected-text-preview">
             <h4>Selected Text:</h4>
-            <p>"{selectedText}"</p>
+            <p>&quot;{selectedText}&quot;</p>
           </div>
 
           {!options ? (

@@ -154,6 +154,7 @@ export class ActivityService {
      */
     formatActivities(activities: any[], skill: Skill) {
         return activities.map((activity) => {
+            const unit = Array.isArray(activity.unit) ? activity.unit[0] : activity.unit;
             const base = {
                 id: activity.id,
                 title: activity.title,
@@ -162,7 +163,7 @@ export class ActivityService {
                 type: activity.type,
                 maxScore: activity.maxScore,
                 timeLimitSec: activity.timeLimitSec,
-                unitTitle: activity.unit.title,
+                unitTitle: (unit as { title?: string } | null)?.title || "",
             };
 
             if (skill === "WRITING") {
@@ -183,16 +184,16 @@ export class ActivityService {
                 return {
                     ...base,
                     questionCount: activity._count.questions,
-                    moduleTitle: activity.unit.module?.title,
-                    topics: activity.unit.contents?.flatMap((c: any) =>
-                        c.topics.map((t: any) => ({ id: t.id, slug: t.slug, title: t.title }))
+                    moduleTitle: (unit as { module?: { title?: string } } | null)?.module?.title,
+                    topics: (unit as { contents?: Array<{ topics?: Array<{ id: string; slug: string; title: string }> }> } | null)?.contents?.flatMap((c: any) =>
+                        c.topics?.map((t: any) => ({ id: t.id, slug: t.slug, title: t.title })) || []
                     ) || [],
                 };
             } else if (skill === "MEDIATION") {
                 return {
                     ...base,
                     questionCount: activity._count.questions,
-                    moduleTitle: activity.unit.module?.title,
+                    moduleTitle: (unit as { module?: { title?: string } } | null)?.module?.title,
                 };
             } else {
                 return {
@@ -239,6 +240,7 @@ export class ActivityService {
             })),
         }));
 
+        const unit = Array.isArray(activity.unit) ? activity.unit[0] : activity.unit;
         return {
             activity: {
                 id: activity.id,
@@ -248,7 +250,7 @@ export class ActivityService {
                 type: activity.type,
                 maxScore: activity.maxScore,
                 timeLimitSec: activity.timeLimitSec,
-                unitTitle: activity.unit.title,
+                unitTitle: (unit as { title?: string } | null)?.title || "",
             },
             questions: sanitizedQuestions,
         };
@@ -269,6 +271,7 @@ export class ActivityService {
             sampleAudio: Array.isArray(q.media) ? q.media[0]?.url : undefined,
         }));
 
+        const unit = Array.isArray(activity.unit) ? activity.unit[0] : activity.unit;
         return {
             activity: {
                 id: activity.id,
@@ -278,7 +281,7 @@ export class ActivityService {
                 type: activity.type,
                 maxScore: activity.maxScore,
                 timeLimitSec: activity.timeLimitSec,
-                unitTitle: activity.unit.title,
+                unitTitle: (unit as { title?: string } | null)?.title || "",
             },
             prompts,
         };
@@ -305,6 +308,7 @@ export class ActivityService {
             })),
         }));
 
+        const unit = Array.isArray(activity.unit) ? activity.unit[0] : activity.unit;
         return {
             activity: {
                 id: activity.id,
@@ -314,7 +318,7 @@ export class ActivityService {
                 type: activity.type,
                 maxScore: activity.maxScore,
                 timeLimitSec: activity.timeLimitSec,
-                unitTitle: activity.unit.title,
+                unitTitle: (unit as { title?: string } | null)?.title || "",
                 audioUrl: activity.media[0]?.url,
                 audioDuration: activity.media[0]?.durationS,
                 audioMeta: activity.media[0]?.meta,
@@ -522,6 +526,7 @@ export class ActivityService {
             })),
         }));
 
+        const unit = Array.isArray(activity.unit) ? activity.unit[0] : activity.unit;
         return {
             activity: {
                 id: activity.id,
@@ -531,10 +536,10 @@ export class ActivityService {
                 type: activity.type,
                 maxScore: activity.maxScore,
                 timeLimitSec: activity.timeLimitSec,
-                unitTitle: activity.unit.title,
-                moduleTitle: activity.unit.module?.title,
+                unitTitle: (unit as { title?: string } | null)?.title || "",
+                moduleTitle: (unit as { module?: { title?: string } } | null)?.module?.title,
             },
-            article: activity.unit.contents?.length > 0 ? activity.unit.contents[0] : null,
+            article: (unit as { contents?: unknown[] } | null)?.contents && (unit as { contents?: unknown[] }).contents!.length > 0 ? (unit as { contents?: unknown[] }).contents![0] : null,
             questions: sanitizedQuestions,
         };
     }
@@ -558,6 +563,7 @@ export class ActivityService {
             })),
         }));
 
+        const unit = Array.isArray(activity.unit) ? activity.unit[0] : activity.unit;
         return {
             activity: {
                 id: activity.id,
@@ -567,10 +573,10 @@ export class ActivityService {
                 type: activity.type,
                 maxScore: activity.maxScore,
                 timeLimitSec: activity.timeLimitSec,
-                unitTitle: activity.unit.title,
-                moduleTitle: activity.unit.module?.title,
+                unitTitle: (unit as { title?: string } | null)?.title || "",
+                moduleTitle: (unit as { module?: { title?: string } } | null)?.module?.title,
             },
-            sourceContent: activity.unit.contents?.length > 0 ? activity.unit.contents[0] : null,
+            sourceContent: (unit as { contents?: unknown[] } | null)?.contents && (unit as { contents?: unknown[] }).contents!.length > 0 ? (unit as { contents?: unknown[] }).contents![0] : null,
             questions: sanitizedQuestions,
         };
     }

@@ -46,7 +46,14 @@ export function useWritingLLMUsage(taskId: string | null) {
                     const data = await response.json();
                     setUsage(data);
                 } else {
-                    console.error("Failed to fetch usage:", response.status, response.statusText);
+                    const errorData = await response.json().catch(() => ({}));
+                    console.error("Failed to fetch usage:", {
+                        status: response.status,
+                        statusText: response.statusText,
+                        error: errorData.error || "Unknown error",
+                    });
+                    // Set default available state on error to prevent blocking UI
+                    setUsage(null);
                 }
             } catch (error) {
                 console.error("Failed to fetch usage:", error);
@@ -60,7 +67,7 @@ export function useWritingLLMUsage(taskId: string | null) {
         fetchUsage();
     }, [session?.user?.id, taskId]);
 
-    const recordUsage = async (feature: string, metadata?: any) => {
+    const recordUsage = async (feature: string, metadata?: Record<string, unknown>) => {
         if (!session?.user || !taskId) {
             console.warn("Cannot record usage: no session or taskId");
             return;

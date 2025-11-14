@@ -9,6 +9,30 @@ import json
 import requests
 import os
 from typing import Dict, List, Optional, Tuple
+from pathlib import Path
+
+# Load environment variables from .env file
+try:
+    from dotenv import load_dotenv
+    # Try to load .env from project root (parent of python-services)
+    env_path = Path(__file__).parent.parent / '.env'
+    if env_path.exists():
+        load_dotenv(env_path)
+    else:
+        # Try current directory
+        load_dotenv()
+except ImportError:
+    # dotenv not available, try to load manually
+    env_path = Path(__file__).parent.parent / '.env'
+    if env_path.exists():
+        with open(env_path, 'r') as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith('#') and '=' in line:
+                    key, value = line.split('=', 1)
+                    os.environ[key.strip()] = value.strip().strip('"').strip("'")
+except Exception:
+    pass
 
 
 def analyze_prompt_with_gemini(prompt: str, task_level: str = "B2") -> Optional[Dict]:
@@ -73,7 +97,8 @@ CRITICAL INSTRUCTIONS:
 Return ONLY the JSON, no additional text."""
 
     try:
-        api_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={gemini_api_key}"
+        # Try v1 first, fallback to v1beta if needed
+        api_url = f"https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key={gemini_api_key}"
         
         response = requests.post(
             api_url,
@@ -89,8 +114,25 @@ Return ONLY the JSON, no additional text."""
             timeout=10
         )
         
+        # If 404, try v1beta
+        if response.status_code == 404:
+            api_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={gemini_api_key}"
+            response = requests.post(
+                api_url,
+                json={
+                    "contents": [{
+                        "parts": [{"text": analysis_prompt}]
+                    }],
+                    "generationConfig": {
+                        "temperature": 0.2,
+                        "maxOutputTokens": 2048,
+                    }
+                },
+                timeout=10
+            )
+        
         if response.status_code != 200:
-            print(f"[Prompt Analyzer] Gemini API error: {response.status_code}")
+            print(f"[Prompt Analyzer] Gemini API error: {response.status_code} - {response.text[:200]}")
             return None
         
         result = response.json()

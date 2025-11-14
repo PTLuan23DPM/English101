@@ -114,8 +114,8 @@ export default function CulturePage() {
           {displayActivities.map((item) => {
             const isFallback = useFallback && 'category' in item;
             const category = isFallback 
-              ? (item as any).category 
-              : item.topics[0]?.slug || "general";
+              ? (item as { category?: string }).category 
+              : (item as { topics?: Array<{ slug?: string }> }).topics?.[0]?.slug || "general";
             
             return (
               <Link 
@@ -132,8 +132,8 @@ export default function CulturePage() {
                 <h3 className="module-title">{item.title}</h3>
                 <p className="module-description">
                   {isFallback 
-                    ? (item as any).description 
-                    : item.instruction || item.moduleTitle || "Explore authentic content"}
+                    ? (item as { description?: string }).description 
+                    : (item as { instruction?: string; moduleTitle?: string }).instruction || (item as { instruction?: string; moduleTitle?: string }).moduleTitle || "Explore authentic content"}
                 </p>
                 <div className="module-stats">
                   {isFallback ? (
@@ -143,14 +143,14 @@ export default function CulturePage() {
                           <path d="M2 4H14V12H2V4Z" stroke="currentColor" strokeWidth="1.5" fill="none"/>
                           <path d="M5 7H11M5 9H9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
                         </svg>
-                        <span>{(item as any).articles} articles</span>
+                        <span>{(item as { articles?: number }).articles} articles</span>
                       </div>
                       <div className="module-stat">
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                           <rect x="2" y="3" width="12" height="10" rx="1" stroke="currentColor" strokeWidth="1.5" fill="none"/>
                           <path d="M6 7L10 9.5L6 12V7Z" fill="currentColor"/>
                         </svg>
-                        <span>{(item as any).videos} videos</span>
+                        <span>{(item as { videos?: number }).videos} videos</span>
                       </div>
                     </>
                   ) : (
@@ -159,7 +159,7 @@ export default function CulturePage() {
                         <circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="1.5" fill="none"/>
                         <path d="M6 8L7.5 9.5L10 6.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
-                      <span>{item.questionCount} questions</span>
+                      <span>{(item as { questionCount?: number }).questionCount || 0} questions</span>
                     </div>
                   )}
                 </div>

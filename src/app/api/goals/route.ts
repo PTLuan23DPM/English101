@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireAuth, unauthorizedResponse, createResponse } from "@/server/utils/auth";
+import { requireAuth, unauthorizedResponse } from "@/server/utils/auth";
 import { goalsController } from "@/server/controllers/goalsController";
 import { createErrorResponse } from "@/server/utils/response";
 
@@ -7,21 +7,23 @@ import { createErrorResponse } from "@/server/utils/response";
  * Get user goals
  * GET /api/goals
  */
-export async function GET(req: NextRequest) {
+export async function GET() {
     try {
         const session = await requireAuth();
         const userId = session.user.id;
 
         const result = await goalsController.getGoals(userId);
 
-        return createResponse(result.data);
-    } catch (error: any) {
-        if (error.message === "Unauthorized") {
+        return NextResponse.json(result.data);
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        
+        if (errorMessage === "Unauthorized") {
             return unauthorizedResponse();
         }
 
         console.error("[Goals GET API] Error:", error);
-        return createErrorResponse(error.message || "Failed to fetch goals", 500);
+        return createErrorResponse(errorMessage || "Failed to fetch goals", 500);
     }
 }
 
@@ -44,18 +46,20 @@ export async function POST(req: NextRequest) {
             metadata,
         });
 
-        return createResponse(result.data, 201);
-    } catch (error: any) {
-        if (error.message === "Unauthorized") {
+        return NextResponse.json(result.data, { status: 201 });
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        
+        if (errorMessage === "Unauthorized") {
             return unauthorizedResponse();
         }
 
-        if (error.message === "Missing required fields: type, target") {
-            return createErrorResponse(error.message, 400);
+        if (errorMessage === "Missing required fields: type, target") {
+            return createErrorResponse(errorMessage, 400);
         }
 
         console.error("[Goals POST API] Error:", error);
-        return createErrorResponse(error.message || "Failed to create goal", 500);
+        return createErrorResponse(errorMessage || "Failed to create goal", 500);
     }
 }
 

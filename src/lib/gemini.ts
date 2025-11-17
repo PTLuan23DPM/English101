@@ -22,7 +22,7 @@ const DEPRECATED_MODELS = [
     "gemini-pro-vision",
 ];
 
-const GEMINI_API_VERSIONS = ["v1beta", "v1"];
+// Removed unused GEMINI_API_VERSIONS
 
 // Default model (will be determined dynamically)
 let activeModel = "gemini-2.5-flash";
@@ -250,7 +250,7 @@ export async function callGemini(
     let availableModelsWithVersions: ModelAvailability[] = [];
     try {
         availableModelsWithVersions = await listAvailableModels();
-    } catch (error) {
+    } catch {
         console.warn("[Gemini API] Failed to get available models, will try default models");
     }
 
@@ -382,10 +382,14 @@ export async function callGemini(
                     if (response.status === 503 || errorData.error?.code === 503 || errorData.error?.status === "UNAVAILABLE") {
                         // For 503 errors, throw immediately so caller can handle retry
                         // Don't try other models/versions as they'll likely all be overloaded
-                        const error = new Error(errorMessage || "Service temporarily unavailable");
-                        (error as any).code = 503;
-                        (error as any).status = "UNAVAILABLE";
-                        (error as any).error = errorData.error || { code: 503, status: "UNAVAILABLE", message: errorMessage };
+                        const error = new Error(errorMessage || "Service temporarily unavailable") as Error & {
+                            code?: number;
+                            status?: string;
+                            error?: { code?: number; status?: string; message?: string };
+                        };
+                        error.code = 503;
+                        error.status = "UNAVAILABLE";
+                        error.error = errorData.error || { code: 503, status: "UNAVAILABLE", message: errorMessage };
                         throw error;
                     }
 
@@ -690,7 +694,6 @@ function fixUnterminatedStrings(jsonString: string): string {
     const unterminatedStrings: Array<{ start: number; end: number }> = [];
     let currentStringStart = -1;
     let bracketDepth = 0;
-    let inObject = false;
 
     // First pass: Find all unterminated strings and track bracket depth
     for (let i = 0; i < fixed.length; i++) {
@@ -710,10 +713,8 @@ function fixUnterminatedStrings(jsonString: string): string {
         if (!inString) {
             if (char === '{') {
                 bracketDepth++;
-                inObject = true;
             } else if (char === '}') {
                 bracketDepth--;
-                if (bracketDepth === 0) inObject = false;
             }
         }
 
@@ -961,7 +962,7 @@ export function parseGeminiJSON<T>(text: string): T {
             try {
                 const fixed = fixUnterminatedStrings(cleaned);
                 return JSON.parse(fixed);
-            } catch (fixError) {
+            } catch {
                 console.warn("[Gemini API] Fix attempt failed, trying extraction...");
             }
         }
@@ -977,7 +978,7 @@ export function parseGeminiJSON<T>(text: string): T {
                     try {
                         const fixed = fixUnterminatedStrings(extracted);
                         return JSON.parse(fixed);
-                    } catch (fixError) {
+                    } catch {
                         console.warn("[Gemini API] Extracted JSON still invalid after fix, trying original text...");
                     }
                 } else {
@@ -997,7 +998,7 @@ export function parseGeminiJSON<T>(text: string): T {
                     try {
                         const fixed = fixUnterminatedStrings(extractedFromOriginal);
                         return JSON.parse(fixed);
-                    } catch (fixError) {
+                    } catch {
                         // Still failed
                     }
                 }
@@ -1009,7 +1010,7 @@ export function parseGeminiJSON<T>(text: string): T {
         if (simpleObjectMatch) {
             try {
                 return JSON.parse(simpleObjectMatch[0]);
-            } catch (e) {
+            } catch {
                 // Still failed
             }
         }

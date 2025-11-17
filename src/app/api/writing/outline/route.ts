@@ -3,6 +3,7 @@ import { callGemini, parseGeminiJSON, isGeminiConfigured } from "@/lib/gemini";
 import { SYSTEM_INSTRUCTIONS, buildOutlinePrompt } from "@/lib/prompts/writing";
 
 export async function POST(req: NextRequest) {
+    let topic = "the topic"; // Default value for error handling
     try {
         if (!isGeminiConfigured()) {
             return NextResponse.json(
@@ -11,7 +12,9 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        const { level, type, topic } = await req.json();
+        const body = await req.json();
+        topic = body.topic || "the topic";
+        const { level, type } = body;
 
         if (!level || !type || !topic) {
             return NextResponse.json(
@@ -29,12 +32,12 @@ export async function POST(req: NextRequest) {
                 maxTokens: 4000, // Increased significantly to prevent truncation
             });
         } catch (error) {
-            const errorAny = error as any;
+            const geminiError = error as { message?: string };
             // Handle MAX_TOKENS error - return default outline instead of failing
             if (
-                errorAny.message?.includes("MAX_TOKENS") ||
-                errorAny.message?.includes("truncated") ||
-                errorAny.message?.includes("token limit")
+                geminiError.message?.includes("MAX_TOKENS") ||
+                geminiError.message?.includes("truncated") ||
+                geminiError.message?.includes("token limit")
             ) {
                 console.warn("[Outline API] MAX_TOKENS error, returning default outline");
                 return NextResponse.json({
@@ -105,13 +108,13 @@ export async function POST(req: NextRequest) {
         
         // Handle Gemini API 503 errors (from gemini.ts)
         if (error instanceof Error) {
-            const errorAny = error as any;
-            if (errorAny.code === 503 || errorAny.status === "UNAVAILABLE" || errorAny.error?.code === 503) {
+            const geminiError = error as { code?: number; status?: string; error?: { code?: number; message?: string } };
+            if (geminiError.code === 503 || geminiError.status === "UNAVAILABLE" || geminiError.error?.code === 503) {
                 return NextResponse.json(
                     {
                         error: {
                             code: 503,
-                            message: errorAny.error?.message || "The model is overloaded. Please try again later.",
+                            message: geminiError.error?.message || "The model is overloaded. Please try again later.",
                             status: "UNAVAILABLE",
                         },
                     },
@@ -144,7 +147,6 @@ export async function POST(req: NextRequest) {
         }
         
         const errorMessage = error instanceof Error ? error.message : "Failed to generate outline";
-        const errorAny = error as any;
 
         // Handle MAX_TOKENS error - return default outline instead of error
         if (
@@ -160,7 +162,7 @@ export async function POST(req: NextRequest) {
                     { section: "Body 2", points: ["Main point", "Supporting detail"] },
                     { section: "Conclusion", points: ["Restate thesis", "Summary"] },
                 ],
-                thesisOptions: [`This essay will discuss ${topic || "the topic"}.`],
+                thesisOptions: [`This essay will discuss ${topic}.`],
             });
         }
 

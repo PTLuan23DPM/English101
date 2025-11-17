@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { requireAuth, unauthorizedResponse } from "@/server/utils/auth";
 import { statsController } from "@/server/controllers/statsController";
 

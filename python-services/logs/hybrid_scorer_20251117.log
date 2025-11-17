@@ -1,0 +1,32 @@
+2025-11-17 20:23:50,612 - [INFO] - Task fulfillment checker and task response analyzer available
+2025-11-17 20:24:11,120 - [WARNING] - From C:\Users\ADMIN\Desktop\English101\python-services\venv\Lib\site-packages\tf_keras\src\losses.py:2976: The name tf.losses.sparse_softmax_cross_entropy is deprecated. Please use tf.compat.v1.losses.sparse_softmax_cross_entropy instead.
+
+2025-11-17 20:24:11,634 - [INFO] - Use pytorch device_name: cpu
+2025-11-17 20:24:11,634 - [INFO] - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-11-17 20:24:15,532 - [INFO] - Use pytorch device_name: cpu
+2025-11-17 20:24:15,533 - [INFO] - Load pretrained SentenceTransformer: paraphrase-mpnet-base-v2
+2025-11-17 20:24:19,509 - [INFO] - Use pytorch device_name: cpu
+2025-11-17 20:24:19,510 - [INFO] - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-11-17 20:24:23,014 - [INFO] - Use pytorch device_name: cpu
+2025-11-17 20:24:23,015 - [INFO] - Load pretrained SentenceTransformer: paraphrase-mpnet-base-v2
+2025-11-17 20:24:27,785 - [INFO] - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.1.243:5001
+2025-11-17 20:24:27,786 - [INFO] - [33mPress CTRL+C to quit[0m
+2025-11-17 20:24:27,787 - [INFO] -  * Restarting with stat
+2025-11-17 20:24:31,058 - [INFO] - Task fulfillment checker and task response analyzer available
+2025-11-17 20:24:35,004 - [INFO] - Use pytorch device_name: cpu
+2025-11-17 20:24:35,004 - [INFO] - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-11-17 20:24:39,256 - [INFO] - Use pytorch device_name: cpu
+2025-11-17 20:24:39,256 - [INFO] - Load pretrained SentenceTransformer: paraphrase-mpnet-base-v2
+2025-11-17 20:24:42,759 - [INFO] - Use pytorch device_name: cpu
+2025-11-17 20:24:42,759 - [INFO] - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-11-17 20:24:46,161 - [INFO] - Use pytorch device_name: cpu
+2025-11-17 20:24:46,161 - [INFO] - Load pretrained SentenceTransformer: paraphrase-mpnet-base-v2
+2025-11-17 20:24:50,166 - [WARNING] -  * Debugger is active!
+2025-11-17 20:24:50,169 - [INFO] -  * Debugger PIN: 737-614-385
+2025-11-17 20:57:13,502 - [INFO] - 127.0.0.1 - - [17/Nov/2025 20:57:13] "GET /health HTTP/1.1" 200 -
+2025-11-17 20:57:13,757 - [INFO] - 127.0.0.1 - - [17/Nov/2025 20:57:13] "GET /health HTTP/1.1" 200 -
+2025-11-18 02:55:01,368 - [INFO] - 127.0.0.1 - - [18/Nov/2025 02:55:01] "GET /health HTTP/1.1" 200 -
+2025-11-18 02:55:01,617 - [INFO] - 127.0.0.1 - - [18/Nov/2025 02:55:01] "GET /health HTTP/1.1" 200 -

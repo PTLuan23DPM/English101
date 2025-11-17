@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
 
                     // Provide default recommendation based on weakest area
                     const weakestArea = Object.entries(errorProfile)
-                        .filter(([_, score]) => typeof score === 'number')
+                        .filter(([, score]) => typeof score === 'number')
                         .sort((a, b) => (a[1] as number) - (b[1] as number))[0];
 
                     const defaultRecommendation = {
@@ -112,7 +112,7 @@ export async function POST(req: NextRequest) {
         console.warn("[Next Task API] Using fallback recommendation (Gemini unavailable)");
 
         const weakestArea = Object.entries(errorProfile)
-            .filter(([_, score]) => typeof score === 'number')
+            .filter(([, score]) => typeof score === 'number')
             .sort((a, b) => (a[1] as number) - (b[1] as number))[0];
 
         const fallbackRecommendation = {

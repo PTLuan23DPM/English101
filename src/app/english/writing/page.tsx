@@ -818,7 +818,7 @@ export default function WritingPage() {
                 <div className="scoring-grid">
                   {/* IELTS 4 Criteria (Hybrid v3 or Traditional) */}
                   {(scoringResult.scoring_method === 'hybrid_v3_ielts' || 
-                    scoringResult.scoring_system === 'ielts_4_criteria' ||
+                    scoringResult.scoring_system === 'traditional' ||
                     (scoringResult.detailed_scores.coherence_cohesion && scoringResult.detailed_scores.lexical_resource && scoringResult.detailed_scores.grammatical_range)) ? (
                     <>
                       {/* IELTS 4 Criteria Scoring System */}

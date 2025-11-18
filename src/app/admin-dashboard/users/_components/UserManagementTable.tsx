@@ -10,8 +10,8 @@ interface User {
   placementTestCompleted: boolean;
   streak: number;
   longestStreak: number;
-  lastActive: string | null;
-  createdAt: string;
+  lastActive: Date | null;
+  createdAt: Date;
   _count: {
     progress: number;
     attempts: number;
@@ -31,7 +31,7 @@ export default function UserManagementTable({
   onViewProgress,
   onResetPassword,
 }: UserManagementTableProps) {
-  const formatDate = (date: Date | string | null) => {
+  const formatDate = (date: Date | null) => {
     if (!date) return "Chưa có";
     return new Date(date).toLocaleDateString("vi-VN", {
       year: "numeric",
@@ -111,7 +111,9 @@ export default function UserManagementTable({
                 </td>
                 <td>
                   <div className="user-table-streak">
-                    <span className="user-table-streak-current">{user.streak}</span>
+                    <span className="user-table-streak-current">
+                      🔥 {user.streak}
+                    </span>
                     {user.longestStreak > user.streak && (
                       <span className="user-table-streak-best">
                         (Tốt nhất: {user.longestStreak})

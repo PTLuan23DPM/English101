@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authController } from "@/server/controllers/authController";
-import { createResponse, createErrorResponse } from "@/server/utils/response";
+import { createErrorResponse } from "@/server/utils/response";
 import { handleError } from "@/lib/error-handler";
 
 export async function POST(req: NextRequest) {
@@ -10,18 +10,20 @@ export async function POST(req: NextRequest) {
 
     const result = await authController.register({ name, email, password });
 
-    return createResponse(result, 201);
-  } catch (error: any) {
-    if (error.message === "Email and password are required") {
-      return createErrorResponse(error.message, 400);
+    return NextResponse.json(result, { status: 201 });
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    
+    if (errorMessage === "Email and password are required") {
+      return createErrorResponse(errorMessage, 400);
     }
 
-    if (error.message === "Password must be at least 8 characters") {
-      return createErrorResponse(error.message, 400);
+    if (errorMessage === "Password must be at least 8 characters") {
+      return createErrorResponse(errorMessage, 400);
     }
 
-    if (error.message === "User with this email already exists") {
-      return createErrorResponse(error.message, 409);
+    if (errorMessage === "User with this email already exists") {
+      return createErrorResponse(errorMessage, 409);
     }
 
     return handleError(error);

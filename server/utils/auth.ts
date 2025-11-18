@@ -32,19 +32,28 @@ export async function requireAuth() {
  */
 export async function requireAuthByEmail(userEmail: string) {
     if (!userEmail) {
-        throw new Error("Unauthorized");
+        throw new Error("Unauthorized: Email is required");
     }
 
-    const { prisma } = await import("@/lib/prisma");
-    const user = await prisma.user.findUnique({
-        where: { email: userEmail },
-    });
+    try {
+        const { prisma } = await import("@/lib/prisma");
+        const user = await prisma.user.findUnique({
+            where: { email: userEmail },
+        });
 
-    if (!user) {
-        throw new Error("User not found");
+        if (!user) {
+            console.error("[requireAuthByEmail] User not found for email:", userEmail);
+            throw new Error("User not found");
+        }
+
+        return user;
+    } catch (error: unknown) {
+        if (error instanceof Error && error.message === "User not found") {
+            throw error;
+        }
+        console.error("[requireAuthByEmail] Database error:", error);
+        throw new Error("Failed to fetch user");
     }
-
-    return user;
 }
 
 /**

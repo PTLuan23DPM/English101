@@ -38,6 +38,7 @@ export class ActivityController {
 
             if (skill === "WRITING") {
                 const prompts = activityService.formatWritingPrompts(activity);
+                const unit = Array.isArray(activity.unit) ? activity.unit[0] : activity.unit;
                 return {
                     success: true,
                     data: {
@@ -49,7 +50,7 @@ export class ActivityController {
                             type: activity.type,
                             maxScore: activity.maxScore,
                             timeLimitSec: activity.timeLimitSec,
-                            unitTitle: activity.unit.title,
+                            unitTitle: (unit as { title?: string } | null)?.title || "",
                         },
                         prompts,
                     },

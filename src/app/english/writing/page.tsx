@@ -250,9 +250,9 @@ export default function WritingPage() {
       //   }
       // }
 
-      // Use NEW intelligent scoring system (v2)
-      // This system is prompt-aware and scalable for any new prompt
-      let response = await fetch("http://localhost:5001/score-v2", {
+      // Use HYBRID scoring system (v3) - combines Gemini + BERT + IELTS criteria
+      // Falls back to v2 if v3 not available
+      let response = await fetch("http://localhost:5001/score-v3", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -263,7 +263,22 @@ export default function WritingPage() {
         }),
       });
 
-      // If v2 not available, fallback to old scoring system
+      // If v3 not available, fallback to v2
+      if (!response.ok && response.status === 503) {
+        console.log("Hybrid scoring (v3) not available, trying v2...");
+        response = await fetch("http://localhost:5001/score-v2", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            text: text,
+            prompt: selectedTask?.prompt || "",
+            level: selectedTask?.level || "B2",
+            task_type: selectedTask?.type || null,
+          }),
+        });
+      }
+
+      // If v2 also not available, fallback to old scoring system
       if (!response.ok && response.status === 503) {
         console.log("Intelligent scoring (v2) not available, using traditional scoring...");
         response = await fetch("http://localhost:5001/score-ai", {
@@ -801,7 +816,65 @@ export default function WritingPage() {
 
                 {/* Detailed Scores */}
                 <div className="scoring-grid">
-                  {scoringResult.scoring_method === 'intelligent_v2' ? (
+                  {/* IELTS 4 Criteria (Hybrid v3 or Traditional) */}
+                  {(scoringResult.scoring_method === 'hybrid_v3_ielts' || 
+                    scoringResult.scoring_system === 'traditional' ||
+                    (scoringResult.detailed_scores.coherence_cohesion && scoringResult.detailed_scores.lexical_resource && scoringResult.detailed_scores.grammatical_range)) ? (
+                    <>
+                      {/* IELTS 4 Criteria Scoring System */}
+                      {/* Task Response */}
+                      {scoringResult.detailed_scores.task_response && (
+                        <div className="score-card">
+                          <h4>📝 Task Response</h4>
+                          <div className="score-value">{scoringResult.detailed_scores.task_response.score}/10</div>
+                          <div className="score-feedback">
+                            {scoringResult.detailed_scores.task_response.feedback.map((item, i) => (
+                              <div key={i}>{item}</div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Coherence & Cohesion */}
+                      {scoringResult.detailed_scores.coherence_cohesion && (
+                        <div className="score-card">
+                          <h4>🔗 Coherence & Cohesion</h4>
+                          <div className="score-value">{scoringResult.detailed_scores.coherence_cohesion.score}/10</div>
+                          <div className="score-feedback">
+                            {scoringResult.detailed_scores.coherence_cohesion.feedback.map((item, i) => (
+                              <div key={i}>{item}</div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Lexical Resource */}
+                      {scoringResult.detailed_scores.lexical_resource && (
+                        <div className="score-card">
+                          <h4>📚 Lexical Resource</h4>
+                          <div className="score-value">{scoringResult.detailed_scores.lexical_resource.score}/10</div>
+                          <div className="score-feedback">
+                            {scoringResult.detailed_scores.lexical_resource.feedback.map((item, i) => (
+                              <div key={i}>{item}</div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Grammatical Range & Accuracy */}
+                      {scoringResult.detailed_scores.grammatical_range && (
+                        <div className="score-card">
+                          <h4>✍️ Grammatical Range & Accuracy</h4>
+                          <div className="score-value">{scoringResult.detailed_scores.grammatical_range.score}/10</div>
+                          <div className="score-feedback">
+                            {scoringResult.detailed_scores.grammatical_range.feedback.map((item, i) => (
+                              <div key={i}>{item}</div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  ) : scoringResult.scoring_method === 'intelligent_v2' ? (
                     <>
                       {/* Intelligent Scoring System v2 */}
                       {/* Task Response */}

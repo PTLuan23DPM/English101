@@ -119,8 +119,8 @@ export default function MediationPage() {
                 <h3 className="module-title">{item.title}</h3>
                 <p className="module-description">
                   {isFallback 
-                    ? (item as any).description 
-                    : item.instruction || item.moduleTitle || "Practice mediation skills"}
+                    ? (item as { description?: string }).description 
+                    : (item as { instruction?: string; moduleTitle?: string }).instruction || (item as { instruction?: string; moduleTitle?: string }).moduleTitle || "Practice mediation skills"}
                 </p>
                 <div className="module-stats">
                   <div className="module-stat">
@@ -128,7 +128,7 @@ export default function MediationPage() {
                       <circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="1.5" fill="none"/>
                       <path d="M6 8L7.5 9.5L10 6.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
-                    <span>{isFallback ? (item as any).exercises : item.questionCount} {isFallback ? 'exercises' : 'questions'}</span>
+                    <span>{isFallback ? (item as { exercises?: number }).exercises : (item as { questionCount?: number }).questionCount || 0} {isFallback ? 'exercises' : 'questions'}</span>
                   </div>
                 </div>
               </Link>

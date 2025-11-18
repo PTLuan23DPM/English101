@@ -105,9 +105,10 @@ export default function ProfilePage() {
 
       await update();
       toast.success("Profile updated successfully!");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Profile update error:", error);
-      toast.error(error.message || "Failed to update profile");
+      const errorMessage = error instanceof Error ? error.message : "Failed to update profile";
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -149,9 +150,10 @@ export default function ProfilePage() {
         confirmPassword: "",
       });
       toast.success("Password updated successfully!");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Password update error:", error);
-      toast.error(error.message || "Failed to update password");
+      const errorMessage = error instanceof Error ? error.message : "Failed to update password";
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }

@@ -13,7 +13,15 @@ export class WritingController {
      */
     async getUsage(userId: string, feature: string, taskId?: string) {
         try {
+            if (!userId) {
+                throw new Error("UserId is required");
+            }
+
             const user = await userService.getUserById(userId);
+            if (!user) {
+                throw new Error("User not found");
+            }
+
             const limits = writingService.getUsageLimits(user?.cefrLevel);
             const usageCount = await writingService.getUsageCount(userId, feature, taskId);
 
@@ -31,9 +39,10 @@ export class WritingController {
                     isAvailable,
                 },
             };
-        } catch (error) {
+        } catch (error: unknown) {
             console.error("[WritingController] Error getting usage:", error);
-            throw error;
+            const message = error instanceof Error ? error.message : "Failed to get usage";
+            throw new Error(message);
         }
     }
 
@@ -42,7 +51,15 @@ export class WritingController {
      */
     async getAllUsage(userId: string, taskId?: string) {
         try {
+            if (!userId) {
+                throw new Error("UserId is required");
+            }
+
             const user = await userService.getUserById(userId);
+            if (!user) {
+                throw new Error("User not found");
+            }
+
             const limits = writingService.getUsageLimits(user?.cefrLevel);
             const usageCounts = await writingService.getAllUsageCounts(userId, taskId);
 
@@ -72,9 +89,10 @@ export class WritingController {
                 success: true,
                 data: result,
             };
-        } catch (error) {
+        } catch (error: unknown) {
             console.error("[WritingController] Error getting all usage:", error);
-            throw error;
+            const message = error instanceof Error ? error.message : "Failed to get all usage";
+            throw new Error(message);
         }
     }
 
@@ -108,10 +126,14 @@ export class WritingController {
             level?: string;
             duration?: number | null;
             text?: string;
-            scoringDetails?: any;
+            scoringDetails?: Record<string, unknown>;
         }
     ) {
         try {
+            if (!userId) {
+                throw new Error("UserId is required");
+            }
+
             // Validate required fields
             if (!data.taskId || data.score === undefined) {
                 throw new Error("Missing required fields: taskId, score");
@@ -139,9 +161,10 @@ export class WritingController {
                     isNewDay: streakData.isNewDay,
                 },
             };
-        } catch (error) {
+        } catch (error: unknown) {
             console.error("[WritingController] Error saving completion:", error);
-            throw error;
+            const message = error instanceof Error ? error.message : "Failed to save completion";
+            throw new Error(message);
         }
     }
 }

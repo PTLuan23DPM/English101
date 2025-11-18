@@ -22,6 +22,29 @@ import requests
 import time
 from functools import lru_cache
 
+# Load environment variables from .env file
+try:
+    from dotenv import load_dotenv
+    # Try to load .env from project root (parent of python-services)
+    env_path = Path(__file__).parent.parent / '.env'
+    if env_path.exists():
+        load_dotenv(env_path)
+    else:
+        # Try current directory
+        load_dotenv()
+except ImportError:
+    # dotenv not available, try to load manually
+    env_path = Path(__file__).parent.parent / '.env'
+    if env_path.exists():
+        with open(env_path, 'r') as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith('#') and '=' in line:
+                    key, value = line.split('=', 1)
+                    os.environ[key.strip()] = value.strip().strip('"').strip("'")
+except Exception:
+    pass
+
 # Import task response analyzer
 try:
     from task_response_analyzer import analyze_task_response_semantic
@@ -62,6 +85,15 @@ try:
 except ImportError as e:
     INTELLIGENT_SCORER_AVAILABLE = False
     print(f"[WARNING] Intelligent scorer not available: {e}")
+
+# Import hybrid scorer (v3 - combines Gemini + BERT + IELTS criteria)
+try:
+    from hybrid_intelligent_scorer import score_essay_hybrid
+    HYBRID_SCORER_AVAILABLE = True
+    print("[OK] Hybrid scorer (v3) available")
+except ImportError as e:
+    HYBRID_SCORER_AVAILABLE = False
+    print(f"[WARNING] Hybrid scorer not available: {e}")
 
 app = Flask(__name__)
 CORS(app)
@@ -2340,8 +2372,8 @@ If on-topic (same topic, even with different wording):
   "reason": ""
 }}"""
         
-        # Call Gemini API
-        api_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={gemini_api_key}"
+        # Try v1 first, fallback to v1beta if needed
+        api_url = f"https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key={gemini_api_key}"
         
         response = requests.post(
             api_url,
@@ -2357,6 +2389,24 @@ If on-topic (same topic, even with different wording):
             },
             timeout=10
         )
+        
+        # If 404, try v1beta
+        if response.status_code == 404:
+            api_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={gemini_api_key}"
+            response = requests.post(
+                api_url,
+                json={
+                    "contents": [{
+                        "parts": [{"text": check_prompt}]
+                    }],
+                    "generationConfig": {
+                        "temperature": 0.1,
+                        "maxOutputTokens": 500,
+                        "responseMimeType": "application/json"
+                    }
+                },
+                timeout=10
+            )
         
         if response.status_code == 200:
             data = response.json()
@@ -3097,6 +3147,115 @@ def score_writing_v2():
         
     except Exception as e:
         print(f"[Score V2] Error: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/score-v3', methods=['POST'])
+def score_writing_v3():
+    """
+    Score writing using HYBRID system (v3)
+    Combines:
+    - Gemini AI (prompt-aware analysis)
+    - BERT model (semantic similarity cross-validation)
+    - Improved off-topic detection (không cho 0 điểm ngay)
+    - IELTS 4 criteria scoring (Task Response, Coherence, Lexical Resource, Grammar)
+    ---
+    tags:
+      - Scoring
+    parameters:
+      - in: body
+        name: body
+        required: true
+        schema:
+          type: object
+          properties:
+            text:
+              type: string
+              description: Essay text to score
+            prompt:
+              type: string
+              description: Writing prompt/task description
+            level:
+              type: string
+              description: Target CEFR level (A1-C2)
+              default: B2
+            task_type:
+              type: string
+              description: Optional task type override
+    responses:
+      200:
+        description: Scoring result with IELTS 4 criteria
+    """
+    try:
+        data = request.json
+        text = data.get('text', '')
+        prompt = data.get('prompt', '')
+        task_level = data.get('level', 'B2')
+        task_type = data.get('task_type')
+        
+        if not text:
+            return jsonify({'error': 'No text provided'}), 400
+        
+        if not prompt:
+            return jsonify({'error': 'No prompt provided'}), 400
+        
+        # Check if hybrid scorer is available
+        if not HYBRID_SCORER_AVAILABLE:
+            # Fallback to v2 if available
+            if INTELLIGENT_SCORER_AVAILABLE:
+                print("[Score V3] Hybrid scorer not available, falling back to v2...")
+                return score_writing_v2()
+            return jsonify({
+                'error': 'Hybrid scorer not available',
+                'message': 'Please use /score or /score-v2 endpoint instead'
+            }), 503
+        
+        print(f"\n{'='*80}")
+        print(f"[Score V3] Starting hybrid scoring (Gemini + BERT + IELTS)...")
+        print(f"[Score V3] Prompt: {prompt[:100]}...")
+        print(f"[Score V3] Level: {task_level}")
+        print(f"[Score V3] Essay length: {len(text.split())} words")
+        print(f"{'='*80}\n")
+        
+        # Use hybrid scorer
+        result = score_essay_hybrid(
+            essay=text,
+            prompt=prompt,
+            task_level=task_level.upper(),
+            task_type=task_type
+        )
+        
+        # If text validation failed or off-topic, return 0 score (not error)
+        if result.get('overall_score', 0) == 0.0 and (
+            result.get('off_topic_level') == 'complete' or 
+            result.get('validation_issues') is not None
+        ):
+            if result.get('off_topic_level') == 'complete':
+                print(f"[Score V3] Essay is completely off-topic - returning 0 score")
+                print(f"[Score V3] Reason: {result.get('off_topic_reason', 'N/A')}")
+            else:
+                print(f"[Score V3] Text validation failed - returning 0 score")
+                print(f"[Score V3] Issues: {result.get('validation_issues', [])}")
+            # Return 200 with 0 score instead of 500 error
+            return jsonify(result), 200
+        elif 'error' in result:
+            # Other errors still return 500
+            print(f"[Score V3] Error: {result['error']}")
+            return jsonify(result), 500
+        
+        print(f"\n{'='*80}")
+        print(f"[Score V3] ✓ Hybrid scoring complete!")
+        print(f"[Score V3] Overall Score: {result.get('overall_score')}/10")
+        print(f"[Score V3] CEFR Level: {result.get('cefr_level')}")
+        print(f"[Score V3] Off-topic: {result.get('is_off_topic', False)} ({result.get('off_topic_level', 'none')})")
+        print(f"{'='*80}\n")
+        
+        return jsonify(result)
+        
+    except Exception as e:
+        print(f"[Score V3] Error: {e}")
         import traceback
         traceback.print_exc()
         return jsonify({'error': str(e)}), 500

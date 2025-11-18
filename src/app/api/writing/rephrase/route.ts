@@ -147,6 +147,21 @@ export async function POST(req: NextRequest) {
         } catch (error) {
             console.error("Rephrase error:", error);
             const errorMessage = error instanceof Error ? error.message : "Failed to rephrase text";
+            
+            // Handle 503 errors from Gemini
+            const geminiError = error as { code?: number; status?: string; error?: { code?: number; message?: string } };
+            if (geminiError.code === 503 || geminiError.status === "UNAVAILABLE" || geminiError.error?.code === 503) {
+                return NextResponse.json(
+                    {
+                        error: {
+                            code: 503,
+                            message: geminiError.error?.message || "The model is overloaded. Please try again later.",
+                            status: "UNAVAILABLE",
+                        },
+                    },
+                    { status: 503 }
+                );
+            }
 
             // Handle MAX_TOKENS error specifically
             if (errorMessage.includes("MAX_TOKENS") || errorMessage.includes("truncated")) {

@@ -10,6 +10,111 @@ import requests
 import os
 from typing import Dict, List, Optional, Tuple
 from collections import Counter
+from pathlib import Path
+
+# Load environment variables from .env file
+try:
+    from dotenv import load_dotenv
+    # Try to load .env from project root (parent of python-services)
+    env_path = Path(__file__).parent.parent / '.env'
+    if env_path.exists():
+        load_dotenv(env_path)
+    else:
+        # Try current directory
+        load_dotenv()
+except ImportError:
+    # dotenv not available, try to load manually
+    env_path = Path(__file__).parent.parent / '.env'
+    if env_path.exists():
+        with open(env_path, 'r') as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith('#') and '=' in line:
+                    key, value = line.split('=', 1)
+                    os.environ[key.strip()] = value.strip().strip('"').strip("'")
+except Exception:
+    pass
+
+# Common English words dictionary for basic spell checking
+COMMON_ENGLISH_WORDS = {
+    'i', 'a', 'an', 'the', 'is', 'are', 'was', 'were', 'be', 'been', 'being',
+    'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'should', 'could',
+    'can', 'may', 'might', 'must', 'shall', 'this', 'that', 'these', 'those',
+    'he', 'she', 'it', 'they', 'we', 'you', 'me', 'him', 'her', 'us', 'them',
+    'my', 'your', 'his', 'her', 'its', 'our', 'their', 'mine', 'yours', 'hers', 'ours', 'theirs',
+    'what', 'which', 'who', 'whom', 'whose', 'where', 'when', 'why', 'how',
+    'and', 'or', 'but', 'so', 'because', 'if', 'then', 'else', 'while', 'until',
+    'for', 'with', 'from', 'to', 'in', 'on', 'at', 'by', 'of', 'about', 'into', 'through',
+    'during', 'before', 'after', 'above', 'below', 'up', 'down', 'out', 'off', 'over', 'under',
+    'again', 'further', 'then', 'once', 'here', 'there', 'when', 'where', 'why', 'how',
+    'all', 'each', 'every', 'both', 'few', 'more', 'most', 'other', 'some', 'such',
+    'no', 'nor', 'not', 'only', 'own', 'same', 'so', 'than', 'too', 'very',
+    'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten',
+    'first', 'second', 'third', 'last', 'next', 'previous', 'new', 'old', 'good', 'bad',
+    'big', 'small', 'large', 'little', 'long', 'short', 'high', 'low', 'early', 'late',
+    'young', 'old', 'right', 'wrong', 'true', 'false', 'yes', 'no', 'maybe',
+    'go', 'went', 'gone', 'come', 'came', 'get', 'got', 'give', 'gave', 'given',
+    'take', 'took', 'taken', 'make', 'made', 'see', 'saw', 'seen', 'know', 'knew', 'known',
+    'think', 'thought', 'say', 'said', 'tell', 'told', 'ask', 'asked', 'want', 'wanted',
+    'need', 'needed', 'try', 'tried', 'use', 'used', 'work', 'worked', 'play', 'played',
+    'like', 'liked', 'love', 'loved', 'help', 'helped', 'look', 'looked', 'find', 'found',
+    'time', 'day', 'week', 'month', 'year', 'hour', 'minute', 'second', 'morning', 'afternoon', 'evening', 'night',
+    'today', 'yesterday', 'tomorrow', 'now', 'then', 'soon', 'later', 'always', 'often', 'sometimes', 'never',
+    'house', 'home', 'room', 'door', 'window', 'table', 'chair', 'bed', 'kitchen', 'bathroom',
+    'food', 'water', 'bread', 'milk', 'meat', 'fruit', 'vegetable', 'breakfast', 'lunch', 'dinner',
+    'friend', 'family', 'mother', 'father', 'parent', 'brother', 'sister', 'son', 'daughter',
+    'school', 'student', 'teacher', 'class', 'book', 'read', 'write', 'study', 'learn',
+    'sport', 'football', 'basketball', 'tennis', 'swim', 'run', 'walk', 'exercise',
+    'music', 'song', 'listen', 'watch', 'movie', 'film', 'television', 'tv',
+    'weekend', 'holiday', 'vacation', 'travel', 'trip', 'visit', 'cafe', 'park', 'relax', 'refresh'
+}
+
+def detect_spelling_errors(text: str) -> Tuple[List[str], int, float]:
+    """
+    Detect spelling errors in text - ONLY detect known misspellings
+    Returns: (list of misspelled words, count, error_rate)
+    
+    CRITICAL: Only flag words that are KNOWN misspellings, not unknown words.
+    Unknown words (like "whether", "university", "education") are likely correct
+    and should NOT be flagged as errors.
+    """
+    words = re.findall(r'\b[a-zA-Z]+\b', text.lower())
+    
+    if not words:
+        return [], 0, 0.0
+    
+    # CRITICAL: Only check against KNOWN misspellings dictionary
+    # Do NOT flag unknown words as errors - they are likely correct
+    common_misspellings = {
+        'enjyo': 'enjoy', 'ofnet': 'often', 'goé': 'go', 'wacths': 'watch',
+        'litsen': 'listen', 'slep': 'sleep', 'weekoinds': 'weekends',
+        'favoriaete': 'favorite', 'reafreashed': 'refreshed', 'realaxed': 'relaxed',
+        'teh': 'the', 'adn': 'and', 'taht': 'that', 'recieve': 'receive',
+        'seperate': 'separate', 'occured': 'occurred', 'definately': 'definitely',
+        'accomodate': 'accommodate', 'begining': 'beginning', 'beleive': 'believe',
+        'calender': 'calendar', 'cemetary': 'cemetery', 'definately': 'definitely',
+        'existance': 'existence', 'goverment': 'government', 'independant': 'independent',
+        'neccessary': 'necessary', 'occured': 'occurred', 'priviledge': 'privilege',
+        'seperate': 'separate', 'suprise': 'surprise', 'thier': 'their',
+        'tommorrow': 'tomorrow', 'truely': 'truly', 'untill': 'until'
+    }
+    
+    misspelled = []
+    for word in words:
+        # Skip very short words (likely correct)
+        if len(word) <= 2:
+            continue
+        
+        # ONLY flag if word is in known misspellings dictionary
+        if word in common_misspellings:
+            misspelled.append(f"{word} (should be '{common_misspellings[word]}')")
+        # Do NOT flag unknown words - they are likely correct
+        # (e.g., "whether", "university", "education" are correct but not in COMMON_ENGLISH_WORDS)
+    
+    error_count = len(misspelled)
+    error_rate = error_count / len(words) if words else 0.0
+    
+    return misspelled[:10], error_count, error_rate  # Return first 10 errors
 
 
 def calculate_vocabulary_metrics(text: str, task_level: str = "B2") -> Dict:
@@ -198,36 +303,50 @@ def assess_quality_with_gemini(
         print("[Quality Assessor] Gemini API key not configured")
         return None
     
-    assessment_prompt = f"""You are an expert English writing quality assessor. Evaluate this essay's writing quality at {task_level} level.
+    # Detect spelling errors first
+    spelling_errors, spelling_count, spelling_rate = detect_spelling_errors(essay)
+    spelling_errors_text = ", ".join(spelling_errors[:5]) if spelling_errors else "None detected"
+    
+    assessment_prompt = f"""You are an expert IELTS writing assessor. Evaluate this essay using IELTS 4 criteria at {task_level} level.
 
 Student's Essay:
 "{essay[:3000]}"
 
 Task Level: {task_level}
 
-Evaluate these aspects and return ONLY valid JSON:
+CRITICAL: Check for spelling errors carefully. Common errors found: {spelling_errors_text}
+If you find spelling errors, you MUST list them in the "errors" array and reduce the score accordingly.
+
+Evaluate using IELTS criteria and return ONLY valid JSON:
 
 {{
   "vocabulary": {{
     "score": 85,
-    "diversity": "good",
-    "sophistication": "appropriate for level",
-    "errors": ["repeated word 'very' too often"],
-    "suggestions": ["Use synonyms: 'extremely', 'particularly'"]
+    "range": "good variety of vocabulary, avoids repetition",
+    "accuracy": "mostly accurate word choice",
+    "collocations": "uses natural word combinations",
+    "style": "appropriate academic/formal style",
+    "sophistication": "uses some less common vocabulary appropriately",
+    "errors": ["repeated word 'very' too often", "incorrect collocation: 'make homework' should be 'do homework'"],
+    "suggestions": ["Use synonyms: 'extremely', 'particularly'", "Learn common collocations"]
   }},
   "grammar": {{
     "score": 80,
+    "range": "uses variety of sentence structures (simple, compound, complex)",
     "accuracy": "mostly accurate with minor errors",
-    "sentence_variety": "good mix of simple and complex",
-    "errors": ["Subject-verb agreement: 'people likes'", "Tense consistency issue"],
-    "suggestions": ["Review subject-verb agreement", "Maintain consistent tense"]
+    "sentence_structures": ["simple sentences", "compound sentences", "complex sentences with relative clauses", "passive voice", "conditional sentences"],
+    "errors": ["Subject-verb agreement: 'people likes' should be 'people like'", "Tense consistency: mixed past and present"],
+    "suggestions": ["Review subject-verb agreement", "Maintain consistent tense throughout"]
   }},
   "coherence": {{
     "score": 85,
-    "organization": "well-organized with clear paragraphs",
-    "linking": "good use of transitional phrases",
-    "flow": "ideas connect logically",
-    "suggestions": ["Add topic sentences to paragraphs"]
+    "coherence": "ideas flow logically, clear structure",
+    "cohesion": "good use of linking words and referencing",
+    "organization": "well-organized with clear paragraphs and topic sentences",
+    "linking_words": ["however", "therefore", "furthermore", "in addition"],
+    "referencing": "uses pronouns (it, they, this) appropriately",
+    "paragraph_structure": "clear introduction, body paragraphs, conclusion",
+    "suggestions": ["Add more topic sentences to paragraphs", "Use more varied linking words"]
   }},
   "mechanics": {{
     "score": 90,
@@ -237,18 +356,34 @@ Evaluate these aspects and return ONLY valid JSON:
   }}
 }}
 
-Scoring Guidelines (0-100 for each):
-- 90-100: Excellent, minimal errors
-- 80-89: Good, few errors that don't impede understanding
-- 70-79: Satisfactory, some errors but communication clear
-- 60-69: Fair, frequent errors affect clarity
-- Below 60: Poor, serious errors impede understanding
+CRITICAL SCORING RULES (0-100 for each):
+- 90-100: Excellent, NO ERRORS, sophisticated use
+- 80-89: Good, 1-2 MINOR errors that don't impede understanding
+- 70-79: Satisfactory, 3-4 errors but communication clear
+- 60-69: Fair, 5-6 errors affect clarity
+- 50-59: Poor, 7-10 errors impede understanding
+- Below 50: Very poor, 10+ serious errors
 
-Be fair but accurate. Adjust expectations based on {task_level} level.
+IMPORTANT - STRICT RULES: 
+- SPELLING ERRORS: If you find spelling errors (e.g., "enjyo" instead of "enjoy", "wacths" instead of "watch"), score MUST be below 70. Each spelling error reduces score by 10-15 points.
+- VOCABULARY ERRORS: If you find vocabulary errors (wrong word choice, incorrect collocations), score MUST be below 80. Each error reduces score by 8-12 points.
+- GRAMMAR ERRORS: If you find grammar errors (subject-verb agreement, tense, articles, "go to slep" instead of "go to sleep"), score MUST be below 80. Each error reduces score by 10-15 points.
+- List ALL errors in the "errors" array - be thorough and specific. Include spelling, vocabulary, and grammar errors.
+- DO NOT give high scores (80+) if there are ANY spelling errors or multiple other errors
+- Example: If essay has "enjyo", "wacths", "litsen", "slep" → vocabulary score MUST be below 60, grammar score MUST be below 60
+
+For {task_level} level, expect:
+- Vocabulary: Appropriate range and accuracy for level - but still penalize errors
+- Grammar: Mix of sentence types, mostly accurate - but still penalize errors
+- Coherence: Clear structure with linking words
+
+Be STRICT and ACCURATE. If there are errors, the score MUST reflect them.
+Adjust expectations based on {task_level} level, but always penalize errors.
 Return ONLY the JSON."""
 
     try:
-        api_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={gemini_api_key}"
+        # Try v1 first, fallback to v1beta if needed
+        api_url = f"https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key={gemini_api_key}"
         
         response = requests.post(
             api_url,
@@ -264,8 +399,25 @@ Return ONLY the JSON."""
             timeout=15
         )
         
+        # If 404, try v1beta
+        if response.status_code == 404:
+            api_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={gemini_api_key}"
+            response = requests.post(
+                api_url,
+                json={
+                    "contents": [{
+                        "parts": [{"text": assessment_prompt}]
+                    }],
+                    "generationConfig": {
+                        "temperature": 0.3,
+                        "maxOutputTokens": 2048,
+                    }
+                },
+                timeout=15
+            )
+        
         if response.status_code != 200:
-            print(f"[Quality Assessor] Gemini API error: {response.status_code}")
+            print(f"[Quality Assessor] Gemini API error: {response.status_code} - {response.text[:200]}")
             return None
         
         result = response.json()

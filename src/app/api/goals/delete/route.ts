@@ -17,9 +17,11 @@ export async function DELETE(req: NextRequest) {
 
     const result = await goalsController.deleteGoal(session.user.id, goalId);
 
-    return NextResponse.json(result.data, { status: result.status });
-  } catch (error: any) {
-    if (error.message === "Unauthorized") {
+    return NextResponse.json(result.data, { status: result.success ? 200 : 500 });
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    
+    if (errorMessage === "Unauthorized") {
       return unauthorizedResponse();
     }
 

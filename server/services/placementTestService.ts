@@ -73,7 +73,7 @@ export class PlacementTestService {
     async getTestResult(userId: string) {
         return await prisma.placementTestResult.findFirst({
             where: { userId },
-            orderBy: { createdAt: "desc" },
+            orderBy: { id: "desc" },
         });
     }
 }

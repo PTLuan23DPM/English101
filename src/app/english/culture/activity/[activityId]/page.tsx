@@ -36,7 +36,7 @@ interface Question {
   type: string;
   prompt: string;
   score: number;
-  content: any;
+  content: Record<string, unknown>;
   choices: Array<{
     id: string;
     order: number;
@@ -58,7 +58,15 @@ export default function CultureActivityPage() {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [showResults, setShowResults] = useState(false);
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<{
+    totalScore?: number;
+    maxScore?: number;
+    percentage?: number;
+    answers?: Array<{
+      isCorrect?: boolean;
+      explanation?: string;
+    }>;
+  } | null>(null);
   const [fontScale, setFontScale] = useState(1);
 
   useEffect(() => {
@@ -273,7 +281,7 @@ export default function CultureActivityPage() {
                   <p><strong>Percentage:</strong> {result.percentage}%</p>
                   <div style={{ marginTop: "16px" }}>
                     <h4>Answers:</h4>
-                    {result.answers?.map((ans: any, idx: number) => (
+                    {result.answers?.map((ans: { isCorrect?: boolean; explanation?: string }, idx: number) => (
                       <div key={idx} style={{ marginBottom: "12px", padding: "12px", background: ans.isCorrect ? "#d1fae5" : "#fee2e2", borderRadius: "8px" }}>
                         <p><strong>Question {idx + 1}:</strong> {ans.isCorrect ? "✓ Correct" : "✗ Incorrect"}</p>
                         {ans.explanation && <p className="muted">{ans.explanation}</p>}

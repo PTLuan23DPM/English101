@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
+import { fetchWithRetry, handleLLMError } from "@/lib/utils/llm-retry";
 
 interface OutlineSection {
   section: string;
@@ -38,15 +39,29 @@ export default function OutlineGenerator({ level, type, topic, onInsert, isAvail
 
     setLoading(true);
     try {
-      const response = await fetch("/api/writing/outline", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ level, type, topic }),
-      });
+      const response = await fetchWithRetry(
+        "/api/writing/outline",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ level, type, topic }),
+        },
+        {
+          maxRetries: 3,
+          baseDelay: 1000,
+          maxDelay: 10000,
+          onRetry: (attempt, delay) => {
+            toast.info("Service busy, retrying...", {
+              description: `Attempt ${attempt}/3. Waiting ${delay / 1000}s...`,
+              duration: delay,
+            });
+          },
+        }
+      );
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Failed to generate outline");
+        const error = await response.json().catch(() => ({ error: "Unknown error" }));
+        throw new Error(error.error?.message || error.error || "Failed to generate outline");
       }
 
       const data: OutlineData = await response.json();
@@ -61,22 +76,8 @@ export default function OutlineGenerator({ level, type, topic, onInsert, isAvail
       toast.success("Outline generated!");
     } catch (error) {
       console.error("Outline generation error:", error);
-      const errorMessage = error instanceof Error ? error.message : "Failed to generate outline";
-      
-      // Provide helpful error messages with requirements
-      if (errorMessage.includes("Gemini API is not configured") || errorMessage.includes("GEMINI_API_KEY")) {
-        toast.error("Gemini API not configured", {
-          description: "Please add GEMINI_API_KEY to your .env.local file and restart the server.",
-        });
-      } else if (errorMessage.includes("level") || errorMessage.includes("type") || errorMessage.includes("topic")) {
-        toast.error("Missing information", {
-          description: "This feature requires a selected writing task with level, type, and topic. Please select a task first.",
-        });
-      } else {
-        toast.error("Failed to generate outline", {
-          description: errorMessage,
-        });
-      }
+      const { title, description } = handleLLMError(error, "generate outline");
+      toast.error(title, { description });
     } finally {
       setLoading(false);
     }

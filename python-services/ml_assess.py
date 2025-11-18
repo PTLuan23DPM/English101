@@ -7,10 +7,12 @@ import pandas as pd
 import numpy as np
 import pickle
 from pathlib import Path
-from typing import Dict, Tuple
+from typing import Dict, Tuple, Optional
 import logging
 import os
 from datetime import datetime
+import requests
+from textwrap import dedent
 
 # Setup logging
 log_dir = Path(__file__).parent / "logs"
@@ -26,6 +28,35 @@ logging.basicConfig(
     ]
 )
 logger = logging.getLogger(__name__)
+
+MAX_SCORE = 10.0
+ROUNDING_STEP = 0.5
+SEVERE_WORD_COUNT_CAP = (4.5 / 9.0) * MAX_SCORE
+MODERATE_WORD_COUNT_CAP = (5.5 / 9.0) * MAX_SCORE
+DEFAULT_GEMINI_MODEL = os.environ.get('GEMINI_MODEL', 'gemini-2.5-flash')
+IELTS_BAND_THRESHOLDS = [
+    (9.0, 'Expert User'),
+    (8.5, 'Very Good User'),
+    (8.0, 'Very Good User'),
+    (7.5, 'Good User'),
+    (7.0, 'Good User'),
+    (6.5, 'Competent User'),
+    (6.0, 'Competent User'),
+    (5.5, 'Modest User'),
+    (5.0, 'Modest User'),
+    (4.5, 'Limited User'),
+    (4.0, 'Limited User'),
+    (3.5, 'Extremely Limited User'),
+    (3.0, 'Extremely Limited User'),
+    (2.5, 'Intermittent User'),
+    (2.0, 'Intermittent User'),
+    (1.0, 'Non User'),
+    (0.0, 'Did not attempt'),
+]
+NORMALIZED_BAND_THRESHOLDS = [
+    ((threshold / 9.0) * MAX_SCORE, description)
+    for threshold, description in IELTS_BAND_THRESHOLDS
+]
 
 try:
     from transformers import BertTokenizer, BertModel
@@ -665,14 +696,14 @@ class QuestionAssessor:
         logger.info("=" * 60)
         logger.info("Step 6: Post-processing (Not a model)")
         logger.info("  Input: raw score from neural model")
-        logger.info("  Output: Final score (0-9) rounded to 0.5, Band description, Simple feedback")
+        logger.info("  Output: Final score (0-10) rounded to 0.5, Band description, Simple feedback")
         
         # Unscale prediction
         logger.info("  Unscaling prediction:")
-        logger.info(f"    Formula: final_score = y_pred_scaled × 9.0")
-        logger.info(f"    Calculation: {prediction_scaled:.6f} × 9.0")
-        score = prediction_scaled * 9.0
-        logger.info(f"    Unscaled score (0-9): {score:.4f}")
+        logger.info(f"    Formula: final_score = y_pred_scaled × {MAX_SCORE:.1f}")
+        logger.info(f"    Calculation: {prediction_scaled:.6f} × {MAX_SCORE:.1f}")
+        score = prediction_scaled * MAX_SCORE
+        logger.info(f"    Unscaled score (0-{MAX_SCORE:.0f}): {score:.4f}")
         
         # Round to nearest 0.5
         logger.info("  Rounding to nearest 0.5:")
@@ -693,50 +724,44 @@ class QuestionAssessor:
         
         score_before_penalty = score
         if word_count < min_words * 0.5:
-            score = min(score, 4.5)
-            logger.info(f"    Rule: word count < 50% of minimum → max score capped at 4.5")
+            score = min(score, SEVERE_WORD_COUNT_CAP)
+            logger.info(f"    Rule: word count < 50% of minimum → max score capped at {SEVERE_WORD_COUNT_CAP:.1f}")
             logger.info(f"    Applied penalty: {score:.1f} (was {score_before_penalty:.1f})")
         elif word_count < min_words * 0.7:
-            score = min(score, 5.5)
-            logger.info(f"    Rule: word count < 70% of minimum → max score capped at 5.5")
+            score = min(score, MODERATE_WORD_COUNT_CAP)
+            logger.info(f"    Rule: word count < 70% of minimum → max score capped at {MODERATE_WORD_COUNT_CAP:.1f}")
             logger.info(f"    Applied penalty: {score:.1f} (was {score_before_penalty:.1f})")
         else:
             logger.info(f"    No word count penalty applied")
         
         # Ensure score is in valid range
-        score = max(0.0, min(9.0, score))
-        logger.info(f"  Final score: {score:.1f}/9.0")
+        score = max(0.0, min(MAX_SCORE, score))
+        logger.info(f"  Final score: {score:.1f}/{MAX_SCORE:.1f}")
         logger.info(f"  Band description: {self.get_band_description(score)}")
         logger.info("=" * 60)
         
-        return {
+        feedback = self.generate_feedback(essay, score, question)
+        llm_assessment = self.generate_llm_assessment(essay, score, question)
+        if llm_assessment:
+            feedback['llm_assessment'] = llm_assessment
+        
+        result = {
             'score': float(score),
             'band': self.get_band_description(score),
-            'feedback': self.generate_feedback(essay, score, question)
+            'feedback': feedback
         }
+        
+        if llm_assessment:
+            result['assessment'] = llm_assessment
+        
+        return result
     
     def get_band_description(self, score: float) -> str:
-        """Get IELTS band description"""
-        descriptions = {
-            9.0: 'Expert User',
-            8.5: 'Very Good User',
-            8.0: 'Very Good User',
-            7.5: 'Good User',
-            7.0: 'Good User',
-            6.5: 'Competent User',
-            6.0: 'Competent User',
-            5.5: 'Modest User',
-            5.0: 'Modest User',
-            4.5: 'Limited User',
-            4.0: 'Limited User',
-            3.5: 'Extremely Limited User',
-            3.0: 'Extremely Limited User',
-            2.5: 'Intermittent User',
-            2.0: 'Intermittent User',
-            1.0: 'Non User',
-            0.0: 'Did not attempt'
-        }
-        return descriptions.get(score, 'Unknown')
+        """Map a 0-10 score to an IELTS-style descriptor."""
+        for threshold, description in NORMALIZED_BAND_THRESHOLDS:
+            if score >= threshold:
+                return description
+        return 'Unknown'
     
     def generate_feedback(self, essay: str, score: float, question: str = "") -> Dict:
         """Generate feedback based on prediction"""
@@ -766,6 +791,87 @@ class QuestionAssessor:
         
         return feedback
     
+    def generate_llm_assessment(self, essay: str, score: float, question: str = "") -> Optional[str]:
+        """
+        Use Gemini to generate a narrative assessment that references the BERT score.
+        Gemini is only used for textual feedback, never for scoring decisions.
+        """
+        gemini_api_key = os.environ.get('GEMINI_API_KEY')
+        if not gemini_api_key:
+            return None
+        
+        model = os.environ.get('GEMINI_ASSESSMENT_MODEL', DEFAULT_GEMINI_MODEL)
+        base_prompt = dedent(f"""
+            You are an IELTS writing examiner. A BERT-based regression model produced
+            an overall writing score of {score:.1f} out of {MAX_SCORE:.1f}.
+            Write a short assessment (3 concise bullet points) that:
+            • Explains why this score is appropriate, referencing Task Response, Coherence,
+              Lexical Resource, and Grammar only if you have signals from the essay.
+            • Highlights one strength and one priority improvement.
+            • Avoids assigning a new score or contradicting the provided score.
+            • Keeps each bullet under 20 words, using direct actionable language.
+        """).strip()
+        
+        essay_excerpt = essay.strip()
+        if len(essay_excerpt) > 4000:
+            essay_excerpt = essay_excerpt[:4000] + "\n...[truncated]"
+        
+        prompt_parts = [
+            {"text": base_prompt},
+        ]
+        
+        if question:
+            prompt_parts.append({"text": f"Prompt:\n{question.strip()}"})
+        
+        prompt_parts.append({"text": f"Essay:\n{essay_excerpt}"})
+        
+        payload = {
+            "contents": [
+                {
+                    "role": "user",
+                    "parts": prompt_parts
+                }
+            ],
+            "generationConfig": {
+                "temperature": 0.2,
+                "top_p": 0.9,
+                "max_output_tokens": 256
+            }
+        }
+        
+        endpoints = [
+            f"https://generativelanguage.googleapis.com/v1/models/{model}:generateContent",
+            f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+        ]
+        
+        for api_url in endpoints:
+            try:
+                response = requests.post(
+                    api_url,
+                    params={"key": gemini_api_key},
+                    json=payload,
+                    timeout=30
+                )
+                if response.status_code == 404 and "v1/models" in api_url:
+                    continue
+                response.raise_for_status()
+                data = response.json()
+                candidates = data.get('candidates', [])
+                if not candidates:
+                    continue
+                candidate_parts = candidates[0].get('content', {}).get('parts', [])
+                if not candidate_parts:
+                    continue
+                text = candidate_parts[0].get('text', '').strip()
+                if text:
+                    return text
+            except requests.exceptions.RequestException as exc:
+                logger.warning(f"Gemini assessment call failed via {api_url}: {exc}")
+            except Exception as exc:
+                logger.warning(f"Unexpected error during Gemini assessment: {exc}")
+        
+        return None
+    
     def evaluate(self, X_test, y_test_original, y_test_scaled):
         """Evaluate model performance"""
         print("\n" + "="*70)
@@ -774,32 +880,33 @@ class QuestionAssessor:
         
         # Make predictions
         y_pred_scaled = self.model.predict(X_test, verbose=0)
-        y_pred = y_pred_scaled.flatten() * 9.0
+        y_pred = y_pred_scaled.flatten() * MAX_SCORE
         
         # Round to nearest 0.5
         y_pred_rounded = np.round(y_pred * 2) / 2
         
         # Calculate metrics
-        mae = mean_absolute_error(y_test_original, y_pred_rounded)
-        rmse = np.sqrt(mean_squared_error(y_test_original, y_pred_rounded))
+        y_test_converted = (y_test_original / 9.0) * MAX_SCORE
+        mae = mean_absolute_error(y_test_converted, y_pred_rounded)
+        rmse = np.sqrt(mean_squared_error(y_test_converted, y_pred_rounded))
         
         # Accuracy within bands
-        within_05 = np.mean(np.abs(y_test_original - y_pred_rounded) <= 0.5) * 100
-        within_10 = np.mean(np.abs(y_test_original - y_pred_rounded) <= 1.0) * 100
-        exact = np.mean(y_test_original == y_pred_rounded) * 100
+        within_05 = np.mean(np.abs(y_test_converted - y_pred_rounded) <= 0.5) * 100
+        within_10 = np.mean(np.abs(y_test_converted - y_pred_rounded) <= 1.0) * 100
+        exact = np.mean(y_test_converted == y_pred_rounded) * 100
         
         # R-squared
-        ss_res = np.sum((y_test_original - y_pred_rounded) ** 2)
-        ss_tot = np.sum((y_test_original - np.mean(y_test_original)) ** 2)
+        ss_res = np.sum((y_test_converted - y_pred_rounded) ** 2)
+        ss_tot = np.sum((y_test_converted - np.mean(y_test_converted)) ** 2)
         r2 = 1 - (ss_res / ss_tot)
         
-        print(f"\nMean Absolute Error: {mae:.2f} bands")
+        print(f"\nMean Absolute Error: {mae:.2f} points (0-10 scale)")
         print(f"Root Mean Squared Error: {rmse:.2f}")
         print(f"R-squared (R²): {r2:.4f}")
         print(f"\nAccuracy:")
         print(f"  Exact matches: {exact:.1f}%")
-        print(f"  Within 0.5 bands: {within_05:.1f}%")
-        print(f"  Within 1.0 bands: {within_10:.1f}%")
+        print(f"  Within 0.5 points: {within_05:.1f}%")
+        print(f"  Within 1.0 points: {within_10:.1f}%")
         
         return {
             'mae': mae,

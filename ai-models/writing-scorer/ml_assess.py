@@ -5,12 +5,11 @@ from pathlib import Path
 from typing import Dict, Tuple
 
 try:
-    from transformers import BertTokenizer, BertModel
+    from sentence_transformers import SentenceTransformer
     import torch
-    import torch.nn as nn
 except ImportError:
     print("\nPlease run:")
-    print("pip install transformers torch")
+    print("pip install sentence-transformers torch")
     import sys
     sys.exit(1)
 
@@ -85,31 +84,37 @@ class AttentionLayer(layers.Layer):
 
 class QuestionAssessor:
     """
-    IELTS Assessment 
+    IELTS Assessment using Sentence-BERT (SBERT)
+    Score range: 0-10 (changed from 0-9)
     """
     
-    def __init__(self, max_length=512, bert_model='bert-base-uncased', use_question=True):
+    def __init__(self, max_sentences=50, sbert_model='all-MiniLM-L6-v2', use_question=True):
         """
-        Initialize with BERT tokenizer and model
+        Initialize with Sentence-BERT model
         
         Args:
-            max_length: Maximum sequence length (default 512 for BERT)
-            bert_model: BERT model name
+            max_sentences: Maximum number of sentences to process
+            sbert_model: Sentence-BERT model name
+                - 'all-MiniLM-L6-v2': Fast, good quality (384 dims)
+                - 'all-mpnet-base-v2': Best quality (768 dims)
+                - 'paraphrase-multilingual-MiniLM-L12-v2': Multilingual support
             use_question: Whether to use question in scoring
         """
-        print(f"Loading BERT model: {bert_model}")
-        self.tokenizer = BertTokenizer.from_pretrained(bert_model)
-        self.bert_model = BertModel.from_pretrained(bert_model)
-        self.bert_model.eval()  # Set to evaluation mode
+        print(f"Loading Sentence-BERT model: {sbert_model}")
+        self.sbert_model = SentenceTransformer(sbert_model)
         
-        self.max_length = max_length
+        self.max_sentences = max_sentences
         self.use_question = use_question
         self.model = None
+        self.embedding_dim = self.sbert_model.get_sentence_embedding_dimension()
+        
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.bert_model.to(self.device)
+        self.sbert_model = self.sbert_model.to(self.device)
         
         print(f"Using device: {self.device}")
+        print(f"Embedding dimension: {self.embedding_dim}")
         print(f"Question awareness: {'ENABLED' if use_question else 'DISABLED'}")
+        print(f"Score range: 0-10 (IELTS band scores)")
         
     def load_data(self, csv_path: str) -> pd.DataFrame:
         """Load IELTS essay data from CSV"""
@@ -131,86 +136,97 @@ class QuestionAssessor:
         
         return df
     
-    def extract_bert_features(self, text: str) -> np.ndarray:
+    def split_into_sentences(self, text: str) -> list:
         """
-        Extract BERT token embeddings for text
-        Returns token-level embeddings (sequence_length, 768)
+        Split text into sentences using simple heuristics
         
         Args:
             text: Input text
             
         Returns:
-            Token embeddings from BERT's last hidden state
+            List of sentences
         """
-        # Tokenize with BERT tokenizer
-        encoded = self.tokenizer.encode_plus(
-            text,
-            add_special_tokens=True,
-            max_length=self.max_length,
-            padding='max_length',
-            truncation=True,
-            return_attention_mask=True,
-            return_tensors='pt'
+        import re
+        
+        # Split on sentence boundaries
+        sentences = re.split(r'[.!?]+', text)
+        
+        # Clean and filter
+        sentences = [s.strip() for s in sentences if s.strip()]
+        
+        return sentences
+    
+    def extract_sbert_features(self, text: str) -> np.ndarray:
+        """
+        Extract Sentence-BERT embeddings for text
+        Returns sentence-level embeddings (num_sentences, embedding_dim)
+        
+        Args:
+            text: Input text
+            
+        Returns:
+            Sentence embeddings from SBERT
+        """
+        # Split text into sentences
+        sentences = self.split_into_sentences(text)
+        
+        if not sentences:
+            # Return zero embedding if no sentences
+            return np.zeros((1, self.embedding_dim))
+        
+        # Encode sentences with SBERT
+        embeddings = self.sbert_model.encode(
+            sentences,
+            convert_to_numpy=True,
+            show_progress_bar=False
         )
         
-        input_ids = encoded['input_ids'].to(self.device)
-        attention_mask = encoded['attention_mask'].to(self.device)
-        
-        # Get BERT embeddings
-        with torch.no_grad():
-            outputs = self.bert_model(
-                input_ids=input_ids,
-                attention_mask=attention_mask
-            )
-            # Use last hidden state: (batch_size=1, sequence_length, 768)
-            last_hidden_state = outputs.last_hidden_state
-        
-        # Convert to numpy and remove batch dimension
-        embeddings = last_hidden_state.cpu().numpy()[0]  # (sequence_length, 768)
-        mask = attention_mask.cpu().numpy()[0]  # (sequence_length,)
-        
-        # Only return embeddings for actual tokens (not padding)
-        actual_length = max(1, int(mask.sum()))
-        
-        return embeddings[:actual_length, :]
+        return embeddings  # (num_sentences, embedding_dim)
     
     def extract_features_with_question(self, essay: str, question: str) -> np.ndarray:
         """
-        Extract features
+        Extract features combining essay and question
         
         Args:
             essay: Essay text
             question: Question text
             
         Returns:
-            Combined features (sequence_length, 1536)
-            - First 768 dims: Essay embeddings
-            - Last 768 dims: Question representation (repeated for each token)
+            Combined features (num_sentences, embedding_dim * 2)
+            - First half: Essay sentence embeddings
+            - Second half: Question representation (repeated for each sentence)
         """
         # Extract essay features
-        essay_features = self.extract_bert_features(essay)  # (seq_len, 768)
+        essay_features = self.extract_sbert_features(essay)  # (num_sent, dim)
         
         if not self.use_question or not question or not question.strip():
             # If not using question, return essay features only
             return essay_features
         
-        # Extract question features
-        question_features = self.extract_bert_features(question)  # (q_len, 768)
-        
-        # Get question representation via mean pooling
-        question_repr = np.mean(question_features, axis=0)  # (768,)
+        # Extract question features - encode as single semantic unit
+        question_embedding = self.sbert_model.encode(
+            question,
+            convert_to_numpy=True,
+            show_progress_bar=False
+        )  # (dim,)
         
         # Expand question to match essay length
-        question_expanded = np.tile(question_repr, (essay_features.shape[0], 1))  # (seq_len, 768)
+        question_expanded = np.tile(
+            question_embedding, 
+            (essay_features.shape[0], 1)
+        )  # (num_sent, dim)
         
         # Concatenate essay and question features
-        combined = np.concatenate([essay_features, question_expanded], axis=1)  # (seq_len, 1536)
+        combined = np.concatenate(
+            [essay_features, question_expanded], 
+            axis=1
+        )  # (num_sent, dim * 2)
         
         return combined
     
     def prepare_training_data(self, df: pd.DataFrame, max_samples=None) -> Tuple:
         """
-        Extract BERT token embeddings from all essays with optional questions
+        Extract Sentence-BERT embeddings from all essays with optional questions
         
         Args:
             df: DataFrame with essays and optional questions
@@ -219,167 +235,175 @@ class QuestionAssessor:
         Returns:
             X_train, X_test, y_train, y_test, y_train_orig, y_test_orig
         """
-        print("\nExtracting BERT features from essays...")
+        print("\nExtracting Sentence-BERT features from essays...")
         if self.use_question:
             print("Including question awareness...")
-        print("This will take some time (processing with BERT)...")
+        print("This will take some time (processing with SBERT)...")
         
         if max_samples:
             df = df.head(max_samples)
-            print(f"Limited to {max_samples} samples for memory efficiency")
+            print(f"Using first {max_samples} samples")
         
+        # Extract features
         features_list = []
         scores = []
         
-        has_questions = 'Question' in df.columns
+        has_question = 'Question' in df.columns
         
         for idx, row in df.iterrows():
-            if idx % 50 == 0:
-                print(f"Processing essay {idx + 1}/{len(df)}")
+            if idx % 100 == 0:
+                print(f"Processing essay {idx + 1}/{len(df)}...")
             
-            try:
-                question = row.get('Question', '') if has_questions else ''
-                
-                if self.use_question and question:
-                    features = self.extract_features_with_question(row['Essay'], question)
-                else:
-                    features = self.extract_bert_features(row['Essay'])
-                
-                features_list.append(features)
-                scores.append(row['Overall'])
-            except Exception as e:
-                print(f"Error processing essay {idx}: {e}")
-                continue
-        
-        print(f"\nFeature extraction complete!")
-        print(f"  Total essays processed: {len(features_list)}")
+            essay = row['Essay']
+            question = row['Question'] if has_question else ""
+            score = row['Overall']
+            
+            # Extract features
+            if self.use_question and has_question:
+                features = self.extract_features_with_question(essay, question)
+            else:
+                features = self.extract_sbert_features(essay)
+            
+            features_list.append(features)
+            scores.append(score)
         
         # Pad sequences to same length
-        max_seq_length = max(f.shape[0] for f in features_list)
-        feature_dim = features_list[0].shape[1]
-        print(f"  Max sequence length: {max_seq_length}")
-        print(f"  Feature dimension: {feature_dim}")
+        max_len = min(
+            max([f.shape[0] for f in features_list]), 
+            self.max_sentences
+        )
         
-        X_padded = []
-        for features in features_list:
-            if features.shape[0] < max_seq_length:
-                # Pad with zeros
-                padding = np.zeros((max_seq_length - features.shape[0], features.shape[1]))
-                features_padded = np.vstack([features, padding])
-            else:
-                features_padded = features
-            X_padded.append(features_padded)
+        print(f"\nPadding/truncating to {max_len} sentences per essay")
         
-        X = np.array(X_padded)
-        y = np.array(scores)
+        X = np.zeros((len(features_list), max_len, features_list[0].shape[1]))
         
-        print(f"  Feature shape: {X.shape}")
+        for i, features in enumerate(features_list):
+            length = min(features.shape[0], max_len)
+            X[i, :length, :] = features[:length, :]
         
-        # Show score distribution
-        print("\nScore distribution:")
-        unique, counts = np.unique(y, return_counts=True)
-        for score, count in zip(unique, counts):
-            print(f"  Band {score}: {count} essays")
+        # Convert scores to numpy array
+        y_original = np.array(scores)
         
-        # Split data
-        y_stratify = np.round(y * 2).astype(int)
-        unique_groups, group_counts = np.unique(y_stratify, return_counts=True)
-        min_samples = np.min(group_counts)
+        # Scale scores to 0-1 range (changed from 0-9 to 0-10)
+        y_scaled = y_original / 10.0
         
-        if min_samples >= 2:
-            X_train, X_test, y_train, y_test = train_test_split(
-                X, y, test_size=0.2, random_state=42, stratify=y_stratify
-            )
-        else:
-            X_train, X_test, y_train, y_test = train_test_split(
-                X, y, test_size=0.2, random_state=42
-            )
+        print(f"\nFeature shape: {X.shape}")
+        print(f"Score range (original): {y_original.min():.1f} - {y_original.max():.1f}")
+        print(f"Score range (scaled): {y_scaled.min():.3f} - {y_scaled.max():.3f}")
         
-        # Normalize scores to [0, 1]
-        y_train_scaled = y_train / 9.0
-        y_test_scaled = y_test / 9.0
+        # Split into train/test
+        X_train, X_test, y_train, y_test, y_train_orig, y_test_orig = train_test_split(
+            X, y_scaled, y_original,
+            test_size=0.2,
+            random_state=42,
+            stratify=None  # Can't stratify continuous values
+        )
         
-        print(f"\nTraining set: {len(X_train)} essays")
-        print(f"Test set: {len(X_test)} essays")
+        print(f"\nTraining samples: {len(X_train)}")
+        print(f"Test samples: {len(X_test)}")
         
-        return X_train, X_test, y_train_scaled, y_test_scaled, y_train, y_test
+        return X_train, X_test, y_train, y_test, y_train_orig, y_test_orig
     
-    def build_model(self, sequence_length: int, feature_dim: int) -> keras.Model:
+    def build_model(self, input_shape):
         """
-        Args:
-            sequence_length: Maximum sequence length
-            feature_dim: Feature dimension (768 without question, 1536 with question)
-            
-        Returns:
-            Compiled Keras model
-        """        
-        print(f"\nInput dimension: {feature_dim}")
-        if feature_dim == 1536:
-            print("  → Using essay (768) + question (768) features")
-        else:
-            print("  → Using essay features only")
+        Build SBERT-BiLSTM-Attention model
         
-        # Input: (sequence_length, feature_dim)
-        inputs = layers.Input(shape=(sequence_length, feature_dim), name='bert_embeddings')
+        Architecture:
+        1. Sentence-BERT embeddings (pre-computed)
+        2. Bidirectional LSTM layers
+        3. Self-attention mechanism
+        4. Dense layers with dropout
+        5. Single output (regression for 0-10 score)
+        """
+        print("\nBuilding SBERT-BiLSTM-Attention model...")
+        print(f"Input shape: {input_shape}")
         
-        # Bidirectional LSTM layer
-        bilstm = layers.Bidirectional(
-            layers.LSTM(128, return_sequences=True, dropout=0.2),
-            name='bilstm'
+        # Input layer
+        inputs = layers.Input(shape=input_shape, name='sbert_embeddings')
+        
+        # Bidirectional LSTM layers
+        x = layers.Bidirectional(
+            layers.LSTM(
+                256, 
+                return_sequences=True,
+                dropout=0.3,
+                recurrent_dropout=0.2
+            ),
+            name='bilstm_1'
         )(inputs)
-        # Output: (sequence_length, 256)
         
-        # Attention layer
-        attention = AttentionLayer(units=256, name='attention')(bilstm)
-        # Output: (256,)
+        x = layers.Bidirectional(
+            layers.LSTM(
+                128, 
+                return_sequences=True,
+                dropout=0.3,
+                recurrent_dropout=0.2
+            ),
+            name='bilstm_2'
+        )(x)
         
-        # Fully connected layer
-        fc = layers.Dense(140, activation='relu', name='fc_layer')(attention)
+        # Self-attention layer
+        x = AttentionLayer(128, name='attention')(x)
         
-        # Output layer (linear activation for regression)
-        outputs = layers.Dense(1, activation='linear', name='output')(fc)
+        # Dense layers
+        x = layers.Dense(
+            128, 
+            activation='relu',
+            kernel_regularizer=regularizers.l2(0.001),
+            name='dense_1'
+        )(x)
+        x = layers.Dropout(0.4)(x)
         
-        # Build model
-        model = keras.Model(inputs=inputs, outputs=outputs)
+        x = layers.Dense(
+            64, 
+            activation='relu',
+            kernel_regularizer=regularizers.l2(0.001),
+            name='dense_2'
+        )(x)
+        x = layers.Dropout(0.3)(x)
         
-        # Compile
+        # Output layer (0-1 scaled, will be converted to 0-10)
+        outputs = layers.Dense(1, activation='sigmoid', name='output')(x)
+        
+        # Create model
+        model = keras.Model(inputs=inputs, outputs=outputs, name='sbert_bilstm_attention')
+        
+        # Compile with appropriate loss and metrics
         model.compile(
             optimizer=keras.optimizers.Adam(learning_rate=0.001),
             loss='mse',
             metrics=['mae']
         )
         
+        print("\nModel Summary:")
+        model.summary()
+        
         return model
     
-    def train(self, X_train, y_train, X_val, y_val, epochs=50, batch_size=32, use_combined_loss=False):
+    def train(self, X_train, y_train, X_test, y_test, epochs=50, batch_size=32):
         """
-        Train the model
+        Train the model with callbacks
         
         Args:
-            X_train: Training features
-            y_train: Training scores (0-1 scaled)
-            X_val: Validation features
-            y_val: Validation scores
+            X_train, y_train: Training data
+            X_test, y_test: Validation data
             epochs: Number of training epochs
             batch_size: Batch size
-            use_combined_loss: Whether to use combined MSE+Cosine loss
             
         Returns:
             Training history
         """
-        # Build model
-        self.model = self.build_model(
-            sequence_length=X_train.shape[1],
-            feature_dim=X_train.shape[2]
-        )
+        print("\n" + "="*70)
+        print("TRAINING MODEL")
+        print("="*70)
         
-        print(f"\nModel architecture:")
-        self.model.summary()
+        # Build model
+        self.model = self.build_model(input_shape=(X_train.shape[1], X_train.shape[2]))
         
         # Callbacks
         early_stop = callbacks.EarlyStopping(
             monitor='val_loss',
-            patience=15,
+            patience=10,
             restore_best_weights=True,
             verbose=1
         )
@@ -387,72 +411,49 @@ class QuestionAssessor:
         reduce_lr = callbacks.ReduceLROnPlateau(
             monitor='val_loss',
             factor=0.5,
-            patience=7,
-            min_lr=0.00001,
+            patience=5,
+            min_lr=1e-6,
             verbose=1
         )
         
         # Train
-        print(f"\nTraining for up to {epochs} epochs...")
-        print("(Will stop early if validation loss stops improving)\n")
-        
         history = self.model.fit(
             X_train, y_train,
-            validation_data=(X_val, y_val),
+            validation_data=(X_test, y_test),
             epochs=epochs,
             batch_size=batch_size,
             callbacks=[early_stop, reduce_lr],
             verbose=1
         )
         
-        print("\nTraining complete!")
+        print("\nTraining completed!")
         
         return history
     
     def predict(self, essay: str, task_type: int = 2, question: str = "") -> Dict:
         """
-        Predict IELTS band score with optional question awareness
+        Predict IELTS score for an essay
+        Score range: 0-10
         
         Args:
             essay: Essay text
-            task_type: 1 or 2 (for word count validation)
-            question: Question text (used if use_question=True)
+            task_type: 1 for Task 1, 2 for Task 2
+            question: Optional question text
             
         Returns:
-            Dictionary with score and feedback
+            Dictionary with score, band, and feedback
         """
         if self.model is None:
-            raise ValueError("Model not trained! Call train() first.")
+            raise ValueError("Model not trained or loaded. Please train or load a model first.")
         
-        # Basic validation
-        essay = essay.strip()
+        # Word count for sanity checks
         word_count = len(essay.split())
-        
-        if word_count < 30:
-            return {
-                'score': 1.0,
-                'band': 'Non User',
-                'feedback': {
-                    'overall': [f"Essay too short ({word_count} words)"],
-                    'interpretation': ['Minimum 30 words required for assessment']
-                }
-            }
-        
-        if word_count < 50:
-            return {
-                'score': 2.0,
-                'band': 'Intermittent User',
-                'feedback': {
-                    'overall': [f"Essay very short ({word_count} words)"],
-                    'interpretation': ['Essay should be at least 150 words for Task 1, 250 words for Task 2']
-                }
-            }
         
         # Extract features
         if self.use_question and question:
             features = self.extract_features_with_question(essay, question)
         else:
-            features = self.extract_bert_features(essay)
+            features = self.extract_sbert_features(essay)
         
         # Pad to match training sequence length
         if features.shape[0] < self.model.input_shape[1]:
@@ -466,7 +467,7 @@ class QuestionAssessor:
         
         # Predict
         prediction_scaled = self.model.predict(features, verbose=0)[0][0]
-        score = prediction_scaled * 9.0
+        score = prediction_scaled * 10.0  # Changed from 9.0 to 10.0
         
         # Round to nearest 0.5
         score = round(score * 2) / 2
@@ -475,12 +476,12 @@ class QuestionAssessor:
         min_words = 150 if task_type == 1 else 250
         
         if word_count < min_words * 0.5:
-            score = min(score, 4.5)
+            score = min(score, 5.0)  # Adjusted for 0-10 scale
         elif word_count < min_words * 0.7:
-            score = min(score, 5.5)
+            score = min(score, 6.0)  # Adjusted for 0-10 scale
         
-        # Ensure score is in valid range
-        score = max(0.0, min(9.0, score))
+        # Ensure score is in valid range (0-10)
+        score = max(0.0, min(10.0, score))
         
         return {
             'score': float(score),
@@ -489,8 +490,10 @@ class QuestionAssessor:
         }
     
     def get_band_description(self, score: float) -> str:
-        """Get IELTS band description"""
+        """Get IELTS band description (0-10 scale)"""
         descriptions = {
+            10.0: 'Expert User (Perfect)',
+            9.5: 'Expert User',
             9.0: 'Expert User',
             8.5: 'Very Good User',
             8.0: 'Very Good User',
@@ -506,7 +509,9 @@ class QuestionAssessor:
             3.0: 'Extremely Limited User',
             2.5: 'Intermittent User',
             2.0: 'Intermittent User',
+            1.5: 'Non User',
             1.0: 'Non User',
+            0.5: 'Did not attempt',
             0.0: 'Did not attempt'
         }
         return descriptions.get(score, 'Unknown')
@@ -520,8 +525,10 @@ class QuestionAssessor:
         
         word_count = len(essay.split())
         
-        # Score-based feedback
-        if score >= 8.0:
+        # Score-based feedback (adjusted for 0-10 scale)
+        if score >= 9.0:
+            feedback['overall'].append("Outstanding essay with exceptional writing")
+        elif score >= 8.0:
             feedback['overall'].append("Excellent essay overall")
         elif score >= 7.0:
             feedback['overall'].append("Good essay with strong writing")
@@ -537,17 +544,19 @@ class QuestionAssessor:
         if self.use_question and question:
             feedback['interpretation'].append("Question relevance considered in scoring")
         
+        feedback['interpretation'].append("Scored using Sentence-BERT semantic analysis")
+        
         return feedback
     
     def evaluate(self, X_test, y_test_original, y_test_scaled):
-        """Evaluate model performance"""
+        """Evaluate model performance (0-10 scale)"""
         print("\n" + "="*70)
         print("MODEL EVALUATION")
         print("="*70)
         
         # Make predictions
         y_pred_scaled = self.model.predict(X_test, verbose=0)
-        y_pred = y_pred_scaled.flatten() * 9.0
+        y_pred = y_pred_scaled.flatten() * 10.0  # Changed from 9.0 to 10.0
         
         # Round to nearest 0.5
         y_pred_rounded = np.round(y_pred * 2) / 2
@@ -591,9 +600,10 @@ class QuestionAssessor:
         
         # Save metadata
         metadata = {
-            'max_length': self.max_length,
-            'bert_model': 'bert-base-uncased',
-            'use_question': self.use_question
+            'max_sentences': self.max_sentences,
+            'sbert_model': self.sbert_model.get_sentence_embedding_dimension(),
+            'use_question': self.use_question,
+            'embedding_dim': self.embedding_dim
         }
         
         with open(f'{model_dir}/metadata.pkl', 'wb') as f:
@@ -609,8 +619,9 @@ class QuestionAssessor:
         with open(f'{model_dir}/metadata.pkl', 'rb') as f:
             metadata = pickle.load(f)
         
-        self.max_length = metadata['max_length']
+        self.max_sentences = metadata['max_sentences']
         self.use_question = metadata.get('use_question', False)
+        self.embedding_dim = metadata.get('embedding_dim', 384)
         
         # Load model with custom objects
         self.model = keras.models.load_model(
@@ -624,13 +635,16 @@ class QuestionAssessor:
 
 # MAIN EXECUTION
 if __name__ == '__main__':
-    # Initialize assessor WITH question awareness
+    # Initialize assessor WITH question awareness using SBERT
     print("="*70)
-    print("MODEL WITH QUESTION AWARENESS")
+    print("SBERT-BASED MODEL WITH QUESTION AWARENESS")
+    print("Score Range: 0-10")
     print("="*70)
     
     assessor = QuestionAssessor(
-        max_length=512,
+        max_sentences=50,
+        sbert_model='all-MiniLM-L6-v2',  # Fast and efficient
+        # sbert_model='all-mpnet-base-v2',  # Better quality but slower
         use_question=True  
     )
     
@@ -651,7 +665,7 @@ if __name__ == '__main__':
     )
     
     # Evaluate
-    # metrics = assessor.evaluate(X_test, y_test_orig, y_test)
+    metrics = assessor.evaluate(X_test, y_test_orig, y_test)
     
     # Save model
     assessor.save_model('./bert_question_model')

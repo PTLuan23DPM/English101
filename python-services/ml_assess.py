@@ -13,6 +13,11 @@ import os
 from datetime import datetime
 import requests
 from textwrap import dedent
+import warnings
+
+# Suppress TensorFlow deprecation warning for sparse_softmax_cross_entropy
+# This warning comes from TensorFlow's internal code, not our code
+warnings.filterwarnings('ignore', message='.*tf.losses.sparse_softmax_cross_entropy.*', category=DeprecationWarning)
 
 # Setup logging
 log_dir = Path(__file__).parent / "logs"
@@ -71,7 +76,17 @@ except ImportError:
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 
+# Suppress TensorFlow messages BEFORE importing TensorFlow
+# These environment variables must be set before TensorFlow is imported
+os.environ.setdefault('TF_CPP_MIN_LOG_LEVEL', '2')  # 0=all, 1=exclude INFO, 2=exclude INFO+WARNING, 3=exclude all
+os.environ.setdefault('TF_ENABLE_ONEDNN_OPTS', '0')  # Disable oneDNN to avoid info messages
+
 import tensorflow as tf
+# Suppress TensorFlow deprecation warning for sparse_softmax_cross_entropy
+# This warning comes from TensorFlow's internal code when loading models
+tf_logger = tf.get_logger()
+tf_logger.setLevel('ERROR')  # Suppress TensorFlow warnings and info messages
+
 try:
     import tf_keras as keras
     from tf_keras import layers, regularizers, callbacks

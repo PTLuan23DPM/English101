@@ -10,53 +10,97 @@ export class NotificationsService {
      * Get all notifications for a user
      */
     async getNotifications(userId: string) {
-        // TODO: Implement actual notifications from database
-        // For now, return mock data
-        return [
-            {
-                id: "1",
-                type: "achievement",
-                title: "New Streak Record!",
-                message: "You've reached a 7-day streak! Keep it up!",
-                read: false,
-                createdAt: new Date(),
-            },
-            {
-                id: "2",
-                type: "reminder",
-                title: "Complete Your Daily Goal",
-                message: "You're almost there! Complete 1 more exercise today.",
-                read: false,
-                createdAt: new Date(Date.now() - 3600000),
-            },
-            {
-                id: "3",
-                type: "feedback",
-                title: "Writing Score Improved!",
-                message: "Your writing score has improved by 15% this week.",
-                read: true,
-                createdAt: new Date(Date.now() - 86400000),
-            },
-        ];
+        try {
+            const notifications = await prisma.userNotification.findMany({
+                where: {
+                    userId: userId,
+                },
+                orderBy: {
+                    createdAt: "desc",
+                },
+                select: {
+                    id: true,
+                    title: true,
+                    message: true,
+                    type: true,
+                    link: true,
+                    read: true,
+                    readAt: true,
+                    createdAt: true,
+                },
+            });
+
+            return notifications.map((notif) => ({
+                id: notif.id,
+                type: notif.type || "info",
+                title: notif.title,
+                message: notif.message,
+                link: notif.link,
+                read: notif.read,
+                readAt: notif.readAt,
+                createdAt: notif.createdAt,
+            }));
+        } catch (error) {
+            console.error("[NotificationsService] Error fetching notifications:", error);
+            throw error;
+        }
     }
 
     /**
      * Mark notification as read
      */
     async markAsRead(notificationId: string, userId: string) {
-        // TODO: Implement actual notification update in database
-        return {
-            success: true,
-            message: "Notification updated",
-        };
+        try {
+            // Verify the notification belongs to the user
+            const notification = await prisma.userNotification.findFirst({
+                where: {
+                    id: notificationId,
+                    userId: userId,
+                },
+            });
+
+            if (!notification) {
+                throw new Error("Notification not found or access denied");
+            }
+
+            // Update notification
+            const updated = await prisma.userNotification.update({
+                where: {
+                    id: notificationId,
+                },
+                data: {
+                    read: true,
+                    readAt: new Date(),
+                },
+            });
+
+            return {
+                success: true,
+                message: "Notification marked as read",
+                notification: updated,
+            };
+        } catch (error) {
+            console.error("[NotificationsService] Error marking as read:", error);
+            throw error;
+        }
     }
 
     /**
      * Get unread count
      */
     async getUnreadCount(userId: string) {
-        const notifications = await this.getNotifications(userId);
-        return notifications.filter((n) => !n.read).length;
+        try {
+            const count = await prisma.userNotification.count({
+                where: {
+                    userId: userId,
+                    read: false,
+                },
+            });
+            return count;
+        } catch (error) {
+            console.error("[NotificationsService] Error getting unread count:", error);
+            throw error;
+        }
     }
 }
 

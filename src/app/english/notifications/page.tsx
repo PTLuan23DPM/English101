@@ -10,7 +10,9 @@ interface Notification {
   type: string;
   title: string;
   message: string;
+  link?: string | null;
   read: boolean;
+  readAt?: Date | null;
   createdAt: Date;
 }
 
@@ -28,12 +30,24 @@ export default function NotificationsPage() {
       const res = await fetch("/api/notifications");
       if (res.ok) {
         const data = await res.json();
-        if (data.success) {
+        // API returns { success, notifications, unreadCount }
+        if (data.success && data.notifications && Array.isArray(data.notifications)) {
           setNotifications(data.notifications);
+        } else if (data.notifications && Array.isArray(data.notifications)) {
+          // Fallback: if notifications exist but no success field
+          setNotifications(data.notifications);
+        } else {
+          console.warn("Unexpected API response format:", data);
+          setNotifications([]);
         }
+      } else {
+        const errorData = await res.json().catch(() => ({}));
+        console.error("Failed to fetch notifications:", res.status, errorData);
+        setNotifications([]);
       }
     } catch (error) {
       console.error("Failed to fetch notifications:", error);
+      setNotifications([]);
     } finally {
       setLoading(false);
     }
@@ -73,6 +87,10 @@ export default function NotificationsPage() {
       feedback: "💬",
       system: "⚙️",
       streak: "🔥",
+      info: "ℹ️",
+      success: "✅",
+      warning: "⚠️",
+      error: "❌",
     };
     return icons[type] || "📢";
   };
@@ -128,8 +146,40 @@ export default function NotificationsPage() {
                 {getNotificationIcon(notification.type)}
               </div>
               <div className="notification-content">
-                <h4 className="notification-title">{notification.title}</h4>
+                <h4 className="notification-title">
+                  {notification.link ? (
+                    <a 
+                      href={notification.link} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      style={{ color: "inherit", textDecoration: "none" }}
+                    >
+                      {notification.title}
+                    </a>
+                  ) : (
+                    notification.title
+                  )}
+                </h4>
                 <p className="notification-message">{notification.message}</p>
+                {notification.link && (
+                  <a 
+                    href={notification.link} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="notification-link"
+                    style={{ 
+                      color: "#6366f1", 
+                      textDecoration: "underline",
+                      fontSize: "0.875rem",
+                      marginTop: "4px",
+                      display: "inline-block"
+                    }}
+                  >
+                    Xem thêm →
+                  </a>
+                )}
                 <span className="notification-time">
                   {new Date(notification.createdAt).toLocaleString()}
                 </span>

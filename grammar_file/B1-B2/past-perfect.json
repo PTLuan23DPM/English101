@@ -1,0 +1,102 @@
+{
+  "id": "past-perfect",
+  "title": "Past perfect",
+  "level": "B1-B2",
+  "introduction": "Do you know how to use phrases like They'd finished the project by March or Had you finished work when I called? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "Time up to a point in the past",
+  "rules": [
+    "We use the past perfect simple (had + past participle) to talk about time up to a certain point in the past.",
+    "had + past participle) to talk about time up to a certain point in the past."
+  ],
+  "keyPoints": [
+    "the police arrived, the thief had escaped",
+    "if there's only a single event, we don't use the past perfect, even if it happened a long time ago"
+  ],
+  "examples": [
+    "Do you know how to use phrases like They'd finished the project by March or Had you finished work when I called?",
+    "Look at these examples to see how the past perfect is used.",
+    "He couldn't make a sandwich because he'd forgotten to buy bread.",
+    "The hotel was full, so I was glad that we'd booked in advance.",
+    "My new job wasn't exactly what I'd expected.",
+    "Grammar explanation",
+    "Time up to a point in the past",
+    "We use the past perfect simple (had + past participle) to talk about time up to a certain point in the past.",
+    "She'd published her first poem by the time she was eight.",
+    "We'd finished all the water before we were halfway up the mountain.",
+    "Had the parcel arrived when you called yesterday?",
+    "Past perfect for the earlier of two past actions",
+    "We can use the past perfect to show the order of two past events.",
+    "When the police arrived, the thief had escaped.",
+    "It doesn't matter in which order we say the two events.",
+    "The thief had escaped when the police arrived.",
+    "Past perfect after before",
+    "We can also use before + past perfect to show that an action was not done or was incomplete when the past simple action happened.",
+    "Sadly, the author died before he'd finished the series.",
+    "I called his office but he'd already left."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Do you know how to use phrases like They'd finished the project by March or _____ you finished work when I called?",
+      "options": [
+        "Had",
+        "having",
+        "hasn't",
+        "haven't"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to past perfect usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Look at these examples _____ see how the past perfect is used.",
+      "options": [
+        "to",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to past perfect usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "He couldn't make a sandwich because he'd forgotten _____ buy bread.",
+      "options": [
+        "to",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to past perfect usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "Time up _____ a point in the past",
+      "correct": "to",
+      "hint": "Apply the rule for past perfect.",
+      "explanation": "The correct form here is 'to'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "We use the past perfect simple (_____ + past participle) to talk about time up to a certain point in the past.",
+      "correct": "had",
+      "hint": "Apply the rule for past perfect.",
+      "explanation": "The correct form here is 'had'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "She'd published her first poem _____ she was eight.",
+      "correct": "by the time",
+      "hint": "Apply the rule for past perfect.",
+      "explanation": "The correct form here is 'by the time'."
+    }
+  ]
+}

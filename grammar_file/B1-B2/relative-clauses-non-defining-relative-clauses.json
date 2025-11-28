@@ -1,0 +1,98 @@
+{
+  "id": "relative-clauses-non-defining-relative-clauses",
+  "title": "Relative clauses: non-defining relative clauses",
+  "level": "B1-B2",
+  "introduction": "Do you know how to give extra information about someone or something using relative clauses? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "Relative clauses give us information about the person or thing mentioned.",
+  "rules": [
+    "when we use which without a preposition, we can't use where or when."
+  ],
+  "keyPoints": [],
+  "examples": [
+    "Do you know how to give extra information about someone or something using relative clauses?",
+    "Look at these examples to see how non-defining relative clauses are used.",
+    "Jack, who's retired now, spends a lot of time with his grandchildren.",
+    "We want to see the new Tom Carter film, which was released on Friday.",
+    "My sister, whose dog I'm looking after, is visiting a friend in Australia.",
+    "The house, which was built in 1883, has just been opened to the public.",
+    "The award was given to Sara, whose short story impressed the judges.",
+    "Yesterday I met my new boss, who was very nice.",
+    "The house, which is very big, is also very cold!",
+    "My next-door neighbour, whose children go to school with ours, has just bought a new car.",
+    "After the port there is a row of fishermen's houses, whose lights can be seen from across the bay.",
+    "Places and times",
+    "We can use which with a preposition to talk about places and times.",
+    "City Park, which we used to go to, has been closed down.",
+    "City Park, where we used to go, has been closed down.",
+    "December, which Christmas is celebrated in, is a summer month for the southern hemisphere.",
+    "December, when Christmas is celebrated, is a summer month for the southern hemisphere.",
+    "However, when we use which without a preposition, we can't use where or when.",
+    "Centre Park, which we love, is always really busy on Saturdays.",
+    "February, which is my favourite month, lasts 29 days this year."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Jack, _____'s retired now, spends a lot of time with his grandchildren.",
+      "options": [
+        "who",
+        "whos",
+        "whoed",
+        "not who"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to relative clauses: non-defining relative clauses usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "We want to see the new Tom Carter film, _____ was released on Friday.",
+      "options": [
+        "which",
+        "whichs",
+        "whiched",
+        "not which"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to relative clauses: non-defining relative clauses usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "My sister, _____ dog I'm looking after, is visiting a friend in Australia.",
+      "options": [
+        "whose",
+        "whoses",
+        "whoseed",
+        "not whose"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to relative clauses: non-defining relative clauses usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "The house, _____ was built in 1883, has just been opened to the public.",
+      "correct": "which",
+      "hint": "Apply the rule for relative clauses: non-defining relative clauses.",
+      "explanation": "The correct form here is 'which'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "The award was given to Sara, _____ short story impressed the judges.",
+      "correct": "whose",
+      "hint": "Apply the rule for relative clauses: non-defining relative clauses.",
+      "explanation": "The correct form here is 'whose'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "Yesterday I met my new boss, _____ was very nice.",
+      "correct": "who",
+      "hint": "Apply the rule for relative clauses: non-defining relative clauses.",
+      "explanation": "The correct form here is 'who'."
+    }
+  ]
+}

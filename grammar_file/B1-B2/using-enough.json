@@ -1,0 +1,103 @@
+{
+  "id": "using-enough",
+  "title": "Using 'enough'",
+  "level": "B1-B2",
+  "introduction": "Do you know how to use the word enough? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "enough means 'as much as necessary'. It can be used with an adjective, an adverb, a verb or a noun. It can also act as a pronoun.",
+  "rules": [
+    "enough means 'as much as necessary'."
+  ],
+  "keyPoints": [
+    "adjectives and adverbs",
+    "an adjective and a noun",
+    "enough is used with an adjective and a noun, two positions are possible but the meaning changes",
+    "enough is after the adjective (big enough envelopes), it describes the adjective – the envelopes are too small"
+  ],
+  "examples": [
+    "Do you know how to use the word enough?",
+    "Look at these examples to see how enough is used.",
+    "We are not acting fast enough to stop climate change.",
+    "I don't read enough.",
+    "Is there enough coffee for everyone?",
+    "We've had enough of their lies.",
+    "Your marks are good enough to study engineering at university.",
+    "I couldn't write quickly enough and I ran out of time.",
+    "I've helped at conferences often enough to know what can go wrong.",
+    "I don't read enough but I'm going to start downloading books to my phone.",
+    "There isn't enough bread to make sandwiches.",
+    "Have you got enough money?",
+    "As a pronoun",
+    "enough can also be used without a noun.",
+    "A: Do you want more coffee?",
+    "We know what the noun is because of the context.",
+    "With an adjective and a noun",
+    "When enough is used with an adjective and a noun, two positions are possible but the meaning changes.",
+    "We haven't got big enough envelopes.",
+    "We haven't got enough big envelopes."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Do you know how _____ use the word enough?",
+      "options": [
+        "to",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to using 'enough' usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Look at these examples to _____ how enough is used.",
+      "options": [
+        "see",
+        "sees",
+        "seeed",
+        "not see"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to using 'enough' usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "We are not acting fast _____ to stop climate change.",
+      "options": [
+        "enough",
+        "enoughs",
+        "enoughed",
+        "not enough"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to using 'enough' usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "I don't _____ enough.",
+      "correct": "read",
+      "hint": "Apply the rule for using 'enough'.",
+      "explanation": "The correct form here is 'read'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "Is there enough _____ for everyone?",
+      "correct": "coffee",
+      "hint": "Apply the rule for using 'enough'.",
+      "explanation": "The correct form here is 'coffee'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "We've had enough _____ their lies.",
+      "correct": "of",
+      "hint": "Apply the rule for using 'enough'.",
+      "explanation": "The correct form here is 'of'."
+    }
+  ]
+}

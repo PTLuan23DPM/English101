@@ -1,0 +1,101 @@
+{
+  "id": "present-perfect-just-yet-still-and-already",
+  "title": "Present perfect: 'just', 'yet', 'still' and 'already'",
+  "level": "B1-B2",
+  "introduction": "Do you know how to use just, yet, still and already with the present perfect? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "We often use just, yet, still and already with the present perfect because they are related to the present moment. This page focuses on the meaning and use of these words when they are used with the present perfect.",
+  "rules": [
+    "We use it to emphasise that we expect something to happen soon.",
+    "We use it to emphasise that we expected the thing to happen earlier.",
+    "We use it to emphasise that something happened before something else or earlier than expected.",
+    "Just used with the present perfect means 'a short time before'.",
+    "Yet used with the present perfect means 'at any time up to now'.",
+    "Still used with the present perfect means that something hasn't happened.",
+    "Already used with the present perfect means 'before now'."
+  ],
+  "keyPoints": [],
+  "examples": [
+    "Do you know how to use just, yet, still and already with the present perfect?",
+    "Look at these examples to see how just, yet, still and already are used.",
+    "We haven't decided what to do yet.",
+    "I still haven't called Yumi to see how she is.",
+    "I've already had lunch but I'll join you for coffee.",
+    "Grammar explanation",
+    "We often use just, yet, still and already with the present perfect because they are related to the present moment.",
+    "Have you just taken my pen?",
+    "Just comes between the auxiliary verb (have/has) and the past participle.",
+    "Have you finished your homework yet?",
+    "I haven't finished it yet.",
+    "Still used with the present perfect means that something hasn't happened.",
+    "I've been waiting for an hour and the bus still hasn't come.",
+    "They promised me that report yesterday but they still haven't finished it.",
+    "She still hasn't replied to my email.",
+    "He wanted to see Sudden Risk but I've already seen it.",
+    "Already can come between the auxiliary and the main verb or at the end of the clause."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Do you know how to use just, yet, still and _____ with the present perfect?",
+      "options": [
+        "already",
+        "alreadys",
+        "alreadyed",
+        "not already"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to present perfect: 'just', 'yet', 'still' and 'already' usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Look at these examples to see how just, yet, still and _____ are used.",
+      "options": [
+        "already",
+        "alreadys",
+        "alreadyed",
+        "not already"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to present perfect: 'just', 'yet', 'still' and 'already' usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "We haven't decided what to do _____.",
+      "options": [
+        "yet",
+        "yets",
+        "yeted",
+        "not yet"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to present perfect: 'just', 'yet', 'still' and 'already' usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "I still haven't called Yumi _____ see how she is.",
+      "correct": "to",
+      "hint": "Apply the rule for present perfect: 'just', 'yet', 'still' and 'already'.",
+      "explanation": "The correct form here is 'to'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "I've _____ had lunch but I'll join you for coffee.",
+      "correct": "already",
+      "hint": "Apply the rule for present perfect: 'just', 'yet', 'still' and 'already'.",
+      "explanation": "The correct form here is 'already'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "We often use just, yet, still and _____ with the present perfect because they are related to the present moment.",
+      "correct": "already",
+      "hint": "Apply the rule for present perfect: 'just', 'yet', 'still' and 'already'.",
+      "explanation": "The correct form here is 'already'."
+    }
+  ]
+}

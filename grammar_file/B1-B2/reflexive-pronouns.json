@@ -1,0 +1,101 @@
+{
+  "id": "reflexive-pronouns",
+  "title": "Reflexive pronouns",
+  "level": "B1-B2",
+  "introduction": "Do you know how to use reflexive pronouns like myself, yourself or themselves? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "Reflexive pronouns are words like myself, yourself, himself, herself, itself, ourselves, yourselves and themselves. They refer back to a person or thing.",
+  "rules": [
+    "By + reflexive pronoun",
+    "We can use by + reflexive pronoun to mean alone."
+  ],
+  "keyPoints": [
+    "reciprocal pronouns (e"
+  ],
+  "examples": [
+    "each other)",
+    "each person does the action to the other person/people but not to themselves",
+    "Do you know how to use reflexive pronouns like myself, yourself or themselves?",
+    "Look at these examples to see how reflexive pronouns are used.",
+    "Grammar explanation",
+    "Reflexive pronouns are words like myself, yourself, himself, herself, itself, ourselves, yourselves and themselves.",
+    "I cut myself when I was making dinner last night.",
+    "My phone isn't working properly.",
+    "Adding emphasis",
+    "We can add a reflexive pronoun for emphasis when it's unusual or different.",
+    "He wants to pass his driving test so that he can drive himself to work.",
+    "She broke her arm, so she couldn't wash herself very easily.",
+    "The door was definitely locked.",
+    "Are you redecorating your flat yourselves?",
+    "Parents themselves need to take more responsibility for their children's learning.",
+    "By + reflexive pronoun",
+    "We can use by + reflexive pronoun to mean alone.",
+    "Do you enjoy being by yourself?",
+    "They're buying themselves a new television.",
+    "We looked at each other in surprise."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "each person does the action to the other person/people but not to _____",
+      "options": [
+        "themselves",
+        "themselvess",
+        "themselvesed",
+        "not themselves"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to reflexive pronouns usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Do you know how to use reflexive pronouns like myself, yourself or _____?",
+      "options": [
+        "themselves",
+        "themselvess",
+        "themselvesed",
+        "not themselves"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to reflexive pronouns usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Look at these examples _____ see how reflexive pronouns are used.",
+      "options": [
+        "to",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to reflexive pronouns usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "Reflexive pronouns are words like myself, yourself, himself, herself, itself, ourselves, yourselves and _____.",
+      "correct": "themselves",
+      "hint": "Apply the rule for reflexive pronouns.",
+      "explanation": "The correct form here is 'themselves'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "I cut _____ when I was making dinner last night.",
+      "correct": "myself",
+      "hint": "Apply the rule for reflexive pronouns.",
+      "explanation": "The correct form here is 'myself'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "We can add a _____ for emphasis when it's unusual or different.",
+      "correct": "reflexive pronoun",
+      "hint": "Apply the rule for reflexive pronouns.",
+      "explanation": "The correct form here is 'reflexive pronoun'."
+    }
+  ]
+}

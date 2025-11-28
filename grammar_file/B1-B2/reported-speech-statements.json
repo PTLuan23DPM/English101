@@ -1,0 +1,102 @@
+{
+  "id": "reported-speech-statements",
+  "title": "Reported speech: statements",
+  "level": "B1-B2",
+  "introduction": "Do you know how to report what somebody else said? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "Reported speech is when we tell someone what another person said. To do this, we can use direct speech or indirect speech.",
+  "rules": [
+    "when we tell someone what another person said. To do this, we can use direct speech or indirect speech."
+  ],
+  "keyPoints": [
+    "we backshift, present simple changes to past simple, present continuous changes to past continuous and present perfect changes to past perfect",
+    "we backshift, past simple usually changes to past perfect simple, and past continuous usually changes to past perfect continuous",
+    "what the speaker has said is still true or relevant, it's not always necessary to change the tense"
+  ],
+  "examples": [
+    "worked) than the tense originally used (e",
+    "Do you know how to report what somebody else said?",
+    "Look at these examples to see how we can tell someone what another person said.",
+    "Grammar explanation",
+    "Reported speech is when we tell someone what another person said.",
+    "In indirect speech, we often use a tense which is 'further back' in the past (e.",
+    "He told me the baby was sleeping.",
+    "He told me it had been raining all day.",
+    "Past perfect",
+    "The past perfect doesn't change.",
+    "He said he'd tried everything without success, but the new medicine was great.",
+    "No backshift",
+    "If what the speaker has said is still true or relevant, it's not always necessary to change the tense.",
+    "She said she's broken her arm, so she won't be at work this week.",
+    "Bob said that he enjoyed working in his garden.",
+    "Alina told me they'd played tennis for their school.",
+    "However, if you are the person or one of the people who spoke, then the pronouns don't change.",
+    "I told her that I was working on my thesis.",
+    "He said this was his house.",
+    "He said that was his house."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Do you know how to report what somebody else _____?",
+      "options": [
+        "said",
+        "saids",
+        "saided",
+        "not said"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to reported speech: statements usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Look at these examples to see how we can tell someone what another person _____.",
+      "options": [
+        "said",
+        "saids",
+        "saided",
+        "not said"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to reported speech: statements usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Reported speech is when we tell someone what another person _____.",
+      "options": [
+        "said",
+        "saids",
+        "saided",
+        "not said"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to reported speech: statements usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "He _____ me the baby was sleeping.",
+      "correct": "told",
+      "hint": "Apply the rule for reported speech: statements.",
+      "explanation": "The correct form here is 'told'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "He _____ me it had been raining all day.",
+      "correct": "told",
+      "hint": "Apply the rule for reported speech: statements.",
+      "explanation": "The correct form here is 'told'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "He _____ he'd tried everything without success, but the new medicine was great.",
+      "correct": "said",
+      "hint": "Apply the rule for reported speech: statements.",
+      "explanation": "The correct form here is 'said'."
+    }
+  ]
+}

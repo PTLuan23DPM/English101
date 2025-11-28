@@ -1,0 +1,98 @@
+{
+  "id": "adjectives-gradable-and-non-gradable",
+  "title": "Adjectives: gradable and non-gradable",
+  "level": "B1-B2",
+  "introduction": "Do you know how to use adjectives in phrases like a bit cold, really cold and absolutely freezing? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "Gradable adjectives",
+  "rules": [
+    "Most adjectives are gradable. This means we can have different levels of that quality."
+  ],
+  "keyPoints": [],
+  "examples": [
+    "Do you know how to use adjectives in phrases like a bit cold, really cold and absolutely freezing?",
+    "Look at these examples to see how gradable and non-gradable adjectives are used.",
+    "This exercise is really difficult.",
+    "This exercise is completely impossible.",
+    "Grammar explanation",
+    "Gradable adjectives",
+    "Most adjectives are gradable.",
+    "She was quite angry when she found out.",
+    "The film we saw last night was really funny!",
+    "It can be extremely cold in Russia in the winter.",
+    "Here is a list of some common gradable adjectives and some modifiers that we can use with them.",
+    "Non-gradable: absolute adjectives",
+    "Some adjectives are non-gradable.",
+    "Their farm was totally destroyed by a tornado.",
+    "My work is completely finished.",
+    "Here is a list of some common absolute adjectives and some modifiers that we can use with them.",
+    "Modifiers: absolutely/totally/completely",
+    "Adjectives: acceptable, dead, destroyed, finished, free, impossible, necessary, perfect, ruined, unacceptable, etc.",
+    "Non-gradable: extreme adjectives",
+    "Adjectives like amazing, awful and boiling are also non-gradable."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Look at these examples to see how gradable and non-gradable adjectives _____ used.",
+      "options": [
+        "are",
+        "be",
+        "been",
+        "being"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to adjectives: gradable and non-gradable usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Most adjectives _____ gradable.",
+      "options": [
+        "are",
+        "be",
+        "been",
+        "being"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to adjectives: gradable and non-gradable usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "It _____ be extremely cold in Russia in the winter.",
+      "options": [
+        "can",
+        "will",
+        "would",
+        "shall"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to adjectives: gradable and non-gradable usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "Here is a list of some common gradable adjectives and some modifiers that we _____ use with them.",
+      "correct": "can",
+      "hint": "Apply the rule for adjectives: gradable and non-gradable.",
+      "explanation": "The correct form here is 'can'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "Some adjectives _____ non-gradable.",
+      "correct": "are",
+      "hint": "Apply the rule for adjectives: gradable and non-gradable.",
+      "explanation": "The correct form here is 'are'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "Here is a list of some common absolute adjectives and some modifiers that we _____ use with them.",
+      "correct": "can",
+      "hint": "Apply the rule for adjectives: gradable and non-gradable.",
+      "explanation": "The correct form here is 'can'."
+    }
+  ]
+}

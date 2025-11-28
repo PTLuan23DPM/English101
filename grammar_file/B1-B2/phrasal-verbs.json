@@ -1,0 +1,91 @@
+{
+  "id": "phrasal-verbs",
+  "title": "Phrasal verbs",
+  "level": "B1-B2",
+  "introduction": "Do you know how to use verbs in phrases like pick the kids up, turn the music down and look after my cat? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "Phrasal verbs are very common in English, especially in more informal contexts. They are made up of a verb and a particle or, sometimes, two particles. The particle often changes the meaning of the verb.",
+  "rules": [],
+  "keyPoints": [
+    "separable phrasal verbs, the verb and particle can be apart or together",
+    "two particles"
+  ],
+  "examples": [
+    "Do you know how to use verbs in phrases like pick the kids up, turn the music down and look after my cat?",
+    "Look at these examples to see how phrasal verbs are used.",
+    "Why are you bringing that argument up now?",
+    "Police are looking into connections between the two crimes.",
+    "Grammar explanation",
+    "Phrasal verbs are very common in English, especially in more informal contexts.",
+    "I called Jen to see how she was.",
+    "In terms of word order, there are two main types of phrasal verb: separable and inseparable.",
+    "With separable phrasal verbs, the verb and particle can be apart or together.",
+    "However, separable phrasal verbs must be separated when you use a personal pronoun.",
+    "Please can you fill this form in?",
+    "She turned the job down because she didn't want to move to Glasgow.",
+    "Non-separable",
+    "Some phrasal verbs cannot be separated.",
+    "Even when there is a personal pronoun, the verb and particle remain together.",
+    "It was quite a major operation.",
+    "We are aware of the problem and we are looking into it.",
+    "Some multi-word verbs are inseparable simply because they don't take an object.",
+    "With two particles",
+    "Phrasal verbs with two particles are also inseparable."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Do you know how to use verbs in phrases like pick the kids _____, turn the music down and look after my cat?",
+      "options": [
+        "up",
+        "ups",
+        "uped",
+        "not up"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to phrasal verbs usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Why are you bringing that argument _____ now?",
+      "options": [
+        "up",
+        "ups",
+        "uped",
+        "not up"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to phrasal verbs usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Phrasal verbs are very common _____ English, especially in more informal contexts.",
+      "options": [
+        "in",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to phrasal verbs usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "_____ terms of word order, there are two main types of phrasal verb: separable and inseparable.",
+      "correct": "In",
+      "hint": "Apply the rule for phrasal verbs.",
+      "explanation": "The correct form here is 'In'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "Please can you fill this form _____?",
+      "correct": "in",
+      "hint": "Apply the rule for phrasal verbs.",
+      "explanation": "The correct form here is 'in'."
+    }
+  ]
+}

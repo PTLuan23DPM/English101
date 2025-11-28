@@ -1,0 +1,91 @@
+{
+  "id": "reported-speech-reporting-verbs",
+  "title": "Reported speech: reporting verbs",
+  "level": "B1-B2",
+  "introduction": "Do you know how to tell someone what another person said using reporting verbs? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "When we tell someone what another person said, we often use the verbs say, tell or ask. These are called 'reporting verbs'. However, we can also use other reporting verbs. Many reporting verbs can be followed by another verb in either an infinitive or an -ing form.",
+  "rules": [
+    "When we tell someone what another person said, we often use the verbs say, tell or ask.",
+    "Reporting verb + infinitive",
+    "Reporting verb + -ing form"
+  ],
+  "keyPoints": [
+    "we tell someone what another person said, we often use the verbs say, tell or ask"
+  ],
+  "examples": [
+    "Do you know how to tell someone what another person said using reporting verbs?",
+    "Look at these examples to see how reporting verbs are used.",
+    "Reporting verb + infinitive",
+    "Verbs like advise, agree, challenge, claim, decide, demand, encourage, invite, offer, persuade, promise, refuse and remind can follow an infinitive pattern.",
+    "He decided to have the risotto.",
+    "She promised to do the report by Friday.",
+    "They advised us not to write our passwords down.",
+    "Reporting verb + -ing form",
+    "Verbs like admit, apologise for, complain about, deny, insist on, mention and suggest can follow an -ing form pattern.",
+    "She admitted breaking the window.",
+    "He apologised for not getting back to me sooner."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Do you know how to tell someone what another person _____ using reporting verbs?",
+      "options": [
+        "said",
+        "saids",
+        "saided",
+        "not said"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to reported speech: reporting verbs usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "_____ + infinitive",
+      "options": [
+        "Reporting verb",
+        "reporting verbs",
+        "reporting verbed",
+        "not reporting verb"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to reported speech: reporting verbs usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Verbs like advise, agree, challenge, claim, decide, demand, encourage, invite, offer, persuade, promise, refuse and remind can follow an _____ pattern.",
+      "options": [
+        "infinitive",
+        "infinitives",
+        "infinitiveed",
+        "not infinitive"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to reported speech: reporting verbs usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "_____ + -ing form",
+      "correct": "Reporting verb",
+      "hint": "Apply the rule for reported speech: reporting verbs.",
+      "explanation": "The correct form here is 'Reporting verb'."
+    },
+    {
+      "type": "true_false",
+      "question": "Is this statement correct?",
+      "statement": "When we tell someone what another person said, we often use the verbs say, tell or ask.",
+      "correct": true,
+      "explanation": "This reflects the rule from the lesson."
+    },
+    {
+      "type": "true_false",
+      "question": "Is this statement correct?",
+      "statement": "Reporting verb + infinitive",
+      "correct": true,
+      "explanation": "This reflects the rule from the lesson."
+    }
+  ]
+}

@@ -1,0 +1,99 @@
+{
+  "id": "inversion-after-negative-adverbials",
+  "title": "Inversion after negative adverbials",
+  "level": "C1",
+  "introduction": "Do you know how to use inversion after negative adverbials like Not only, Barely and Only? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "'Inversion' means reversing (inverting) the normal subject–verb word order in a sentence.",
+  "rules": [
+    "'Inversion' means reversing (inverting) the normal subject–verb word order in a sentence.",
+    "Only + time expression"
+  ],
+  "keyPoints": [
+    "there is no auxiliary verb, we need to add one"
+  ],
+  "examples": [
+    "Do you know how to use inversion after negative adverbials like Not only, Barely and Only?",
+    "Never have I been so happy to see someone.",
+    "Not only did he win the match but he came back from a difficult start.",
+    "Barely had she got back in bed when her alarm went off.",
+    "To invert a sentence in this way, we put the adverbial (e.",
+    "Not only did they arrive late but they talked throughout the film.",
+    "If there is no auxiliary verb, we need to add one.",
+    "Rarely do we find such talent.",
+    "Never, rarely, seldom",
+    "These adverbials are often used with present perfect, past perfect or modals like can and could.",
+    "Never had they seen so many people in the village.",
+    "Seldom has she taken a day off work.",
+    "Rarely can a patient fully recover from such an injury.",
+    "Hardly, barely, scarcely, no sooner",
+    "These adverbials often refer to an event which quickly follows another in the past and are usually used with past perfect.",
+    "Hardly had we sat down when we were told to evacuate the building.",
+    "Scarcely had the votes been counted when the new president was pushed in front of TV cameras.",
+    "No sooner had the game started than the captain was taken ill.",
+    "No sooner was the new park open than it started raining.",
+    "Only when they refilled my glass did I realise it was broken."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Do you know how to use _____ after negative adverbials like Not only, Barely and Only?",
+      "options": [
+        "inversion",
+        "inversions",
+        "inversioned",
+        "not inversion"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to inversion after negative adverbials usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Not _____ did he win the match but he came back from a difficult start.",
+      "options": [
+        "only",
+        "onlys",
+        "onlyed",
+        "not only"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to inversion after negative adverbials usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Not _____ did they arrive late but they talked throughout the film.",
+      "options": [
+        "only",
+        "onlys",
+        "onlyed",
+        "not only"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to inversion after negative adverbials usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "_____ when they refilled my glass did I realise it was broken.",
+      "correct": "Only",
+      "hint": "Apply the rule for inversion after negative adverbials.",
+      "explanation": "The correct form here is 'Only'."
+    },
+    {
+      "type": "true_false",
+      "question": "Is this statement correct?",
+      "statement": "'Inversion' means reversing (inverting) the normal subject–verb word order in a sentence.",
+      "correct": true,
+      "explanation": "This reflects the rule from the lesson."
+    },
+    {
+      "type": "true_false",
+      "question": "Is this statement correct?",
+      "statement": "Only + time expression",
+      "correct": true,
+      "explanation": "This reflects the rule from the lesson."
+    }
+  ]
+}

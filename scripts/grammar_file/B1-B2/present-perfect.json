@@ -1,0 +1,140 @@
+{
+  "id": "present-perfect",
+  "title": "Present perfect",
+  "level": "B1-B2",
+  "introduction": "Do you know how to use phrases like She's called every day this week, I've broken my leg and Have you ever been to Scotland? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "We use the present perfect simple (have or has + past participle) to talk about past actions or states which are still connected to the present.",
+  "rules": [
+    "when it happened, we use the past simple.",
+    "We use the present perfect simple (have or has + past participle) to talk about past actions or states which are still connected to the present.",
+    "when something happened, or we feel that that part of our life is finished, we use the past simple."
+  ],
+  "keyPoints": [
+    "we say when something happened, or we feel that that part of our life is finished, we use the past simple"
+  ],
+  "examples": [
+    "He's been to ten different countries.\n\nI haven't seen her today.\n\nMy phone's run out of battery. Can I use yours?\n\nHave you ever dyed your hair a different colour?",
+    "They've been on holiday twice this year.\n\nWe haven't had a lot of positive feedback so far.\n\nI'm sure I've seen that film before.",
+    "I've worked for six different companies.\n\nHe's never won a gold medal.\n\nHave you ever been to Australia?",
+    "She's wanted to be a police officer since she was a child.\n\nI haven't known him for very long.\n\nHow long have you had that phone?",
+    "We visited Russia for the first time in 1992.\n\nI went to three different primary schools.\n\nBefore she retired, she worked in several different countries.",
+    "We knew all our neighbours when we were children.\n\nI didn't like bananas for a really long time. Now I love them!",
+    "He's broken his leg so he can't go on holiday.\n\nThere's been an accident on the main road, so let's take a different route.\n\nThey haven't called me, so I don't think they need me today.",
+    "He broke his leg last week so he can't go on holiday.",
+    "We've recently started going to the gym.\n\nShe's already finished season one and now she's watching season two.\n\nHave you checked your emails yet?",
+    "this week",
+    "this year",
+    "so far",
+    "until now",
+    "before"
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct word to complete the sentence:",
+      "sentence": "He's been to ten different countries. I haven't seen her today. My phone's run out _____ battery. Can I use yours? Have you ever dyed your hair a different colour?",
+      "options": [
+        "of",
+        "ofs",
+        "ofed",
+        "very of"
+      ],
+      "correct": 0,
+      "explanation": "The correct answer is 'of' because..."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct word to complete the sentence:",
+      "sentence": "They've been on holiday twice this year. We haven't had a lot _____ positive feedback so far. I'm sure I've seen that film before.",
+      "options": [
+        "of",
+        "ofs",
+        "ofed",
+        "very of"
+      ],
+      "correct": 0,
+      "explanation": "The correct answer is 'of' because..."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct word to complete the sentence:",
+      "sentence": "I've worked for six different companies. He's never won _____ gold medal. Have you ever been to Australia?",
+      "options": [
+        "a",
+        "some",
+        "any",
+        "this"
+      ],
+      "correct": 0,
+      "explanation": "The correct answer is 'a' because..."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank:",
+      "sentence": "She's wanted to be a police officer since she was a child. I _____ known him for very long. How long have you had that phone?",
+      "correct": "haven't",
+      "hint": "Think about present perfect",
+      "explanation": "The answer is 'haven't'"
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank:",
+      "sentence": "We visited Russia for the first time in 1992. I went to _____ different primary schools. Before she retired, she worked in several different countries.",
+      "correct": "three",
+      "hint": "Think about present perfect",
+      "explanation": "The answer is 'three'"
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank:",
+      "sentence": "We knew all our neighbours when we were children. I didn't _____ bananas for a really long time. Now I love them!",
+      "correct": "like",
+      "hint": "Think about present perfect",
+      "explanation": "The answer is 'like'"
+    },
+    {
+      "type": "true_false",
+      "question": "Is this statement true or false?",
+      "statement": "This sentence demonstrates correct usage: He's broken his leg so he can't go on holiday.\n\nThere's been an accident on the main road, so let's take a different route.\n\nThey haven't called me, so I don't think they need me today.",
+      "correct": true,
+      "explanation": "This sentence correctly demonstrates the grammar rule."
+    },
+    {
+      "type": "true_false",
+      "question": "Is this statement true or false?",
+      "statement": "This sentence demonstrates correct usage: He broke his leg last week so he can't go on holiday.",
+      "correct": true,
+      "explanation": "This sentence correctly demonstrates the grammar rule."
+    },
+    {
+      "type": "matching",
+      "question": "Match the words with their correct usage:",
+      "pairs": [
+        {
+          "key": "He's",
+          "value": "been to ten different countries. I haven't seen her today. My phone's run out of battery. Can I use yours? Have you ever dyed your hair a different colour?"
+        },
+        {
+          "key": "They've",
+          "value": "been on holiday twice this year. We haven't had a lot of positive feedback so far. I'm sure I've seen that film before."
+        },
+        {
+          "key": "I've",
+          "value": "worked for six different companies. He's never won a gold medal. Have you ever been to Australia?"
+        },
+        {
+          "key": "She's",
+          "value": "wanted to be a police officer since she was a child. I haven't known him for very long. How long have you had that phone?"
+        }
+      ],
+      "explanation": "Match each word with its correct context."
+    },
+    {
+      "type": "transformation",
+      "question": "Rewrite this sentence using the grammar rule:",
+      "original": "He's been to ten different countries.\n\nI haven't seen her today.\n\nMy phone's run out of battery. Can I use yours?\n\nHave you ever dyed your hair a different colour?",
+      "hint": "Apply the rule: when it happened, we use the past simple.",
+      "explanation": "Transform the sentence while maintaining the same meaning."
+    }
+  ]
+}

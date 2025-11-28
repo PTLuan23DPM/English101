@@ -1,0 +1,103 @@
+{
+  "id": "advanced-present-simple-and-continuous",
+  "title": "Advanced present simple and continuous",
+  "level": "C1",
+  "introduction": "Do you know all the different uses of present simple and continuous? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "Basic contrasts",
+  "rules": [
+    "We use the present simple to talk about:",
+    "We use the present continuous to talk about:",
+    "when describing the story of a book, film, play, etc., we use present tenses."
+  ],
+  "keyPoints": [
+    "you heat ice, it melts",
+    "when describing the story of a book, film, play, etc"
+  ],
+  "examples": [
+    "Do you know all the different uses of present simple and continuous?",
+    "The world is changing and it's changing rapidly.",
+    "My daughter is always leaving clothes all over the floor.",
+    "Grammar explanation",
+    "Basic contrasts",
+    "We use the present simple to talk about:",
+    "something that is always or generally true",
+    "When you heat ice, it melts.",
+    "I'm working from home this month.",
+    "More and more people are feeling the effects of climate change.",
+    "I don't know the answer.",
+    "He really likes his new house.",
+    "Some verbs have a stative meaning and a different active meaning.",
+    "I have a new computer.",
+    "This coffee tastes delicious.",
+    "Other uses of present continuous",
+    "verbs describing change and development",
+    "Life is becoming more expensive.",
+    "He's always coming in late and making noise.",
+    "Other uses of present simple"
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "_____ you know all the different uses of present simple and continuous?",
+      "options": [
+        "Do",
+        "did",
+        "doing",
+        "done"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to advanced present simple and continuous usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "My daughter is _____ leaving clothes all over the floor.",
+      "options": [
+        "always",
+        "alwayss",
+        "alwaysed",
+        "not always"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to advanced present simple and continuous usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "We use the present simple _____ talk about:",
+      "options": [
+        "to",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to advanced present simple and continuous usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "something that is _____ or generally true",
+      "correct": "always",
+      "hint": "Apply the rule for advanced present simple and continuous.",
+      "explanation": "The correct form here is 'always'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "I _____ know the answer.",
+      "correct": "don't",
+      "hint": "Apply the rule for advanced present simple and continuous.",
+      "explanation": "The correct form here is 'don't'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "He's _____ coming in late and making noise.",
+      "correct": "always",
+      "hint": "Apply the rule for advanced present simple and continuous.",
+      "explanation": "The correct form here is 'always'."
+    }
+  ]
+}

@@ -1,0 +1,93 @@
+{
+  "id": "modals-deductions-about-the-present",
+  "title": "Modals: deductions about the present",
+  "level": "B1-B2",
+  "introduction": "Do you know how to use modal verbs to say how certain you are about a possibility? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "We can use modal verbs for deduction – guessing if something is true using the available information. The modal verb we choose shows how certain we are about the possibility. This page focuses on making deductions about the present or future.",
+  "rules": [
+    "We use might, may or could to say that we think something is possible but we're not sure."
+  ],
+  "keyPoints": [
+    "these verbs, like all modal verbs, are followed by an infinitive without to"
+  ],
+  "examples": [
+    "Do you know how to use modal verbs to say how certain you are about a possibility?",
+    "Look at these examples to see how must, might, may, could and can't can be used.",
+    "That must be the main entrance.",
+    "You can't be bored already!",
+    "Grammar explanation",
+    "We can use modal verbs for deduction – guessing if something is true using the available information.",
+    "This must be her house.",
+    "He must live near here because he always walks to work.",
+    "We regret to inform you that some services may be delayed due to the bad weather.",
+    "They all have the same meaning, but may is more formal than might and could.",
+    "It can't be far now.",
+    "She can't know about the complaint.",
+    "It can't be easy for him, looking after three kids on his own."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Do you know how _____ use modal verbs to say how certain you are about a possibility?",
+      "options": [
+        "to",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to modals: deductions about the present usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Look at these examples to see how must, might, may, _____ and can't can be used.",
+      "options": [
+        "could",
+        "will",
+        "would",
+        "shall"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to modals: deductions about the present usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "That _____ be the main entrance.",
+      "options": [
+        "must",
+        "will",
+        "would",
+        "shall"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to modals: deductions about the present usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "You _____'t be bored already!",
+      "correct": "can",
+      "hint": "Apply the rule for modals: deductions about the present.",
+      "explanation": "The correct form here is 'can'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "We _____ use modal verbs for deduction – guessing if something is true using the available information.",
+      "correct": "can",
+      "hint": "Apply the rule for modals: deductions about the present.",
+      "explanation": "The correct form here is 'can'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "This _____ be her house.",
+      "correct": "must",
+      "hint": "Apply the rule for modals: deductions about the present.",
+      "explanation": "The correct form here is 'must'."
+    }
+  ]
+}

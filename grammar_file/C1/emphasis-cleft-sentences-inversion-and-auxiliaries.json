@@ -1,0 +1,101 @@
+{
+  "id": "emphasis-cleft-sentences-inversion-and-auxiliaries",
+  "title": "Emphasis: cleft sentences, inversion and auxiliaries",
+  "level": "C1",
+  "introduction": "Do you know how to add emphasis using cleft sentences, inversion or auxiliaries? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "We can use different grammatical structures to add emphasis, either to a whole sentence or to highlight one particular part of it.",
+  "rules": [
+    "moving them to the front of the sentence after it + be."
+  ],
+  "keyPoints": [
+    "there is no auxiliary verb, we need to add one",
+    "there is no auxiliary verb, we can use do, does or did to add emphasis"
+  ],
+  "examples": [
+    "Do you know how to add emphasis using cleft sentences, inversion or auxiliaries?",
+    "What he loves about hiking is that it doesn't feel like exercise.",
+    "Not only did she sing at the talent show, she also danced!",
+    "I know it may surprise you, but I really do know quite a bit about this.",
+    "Grammar explanation",
+    "We can use different grammatical structures to add emphasis, either to a whole sentence or to highlight one particular part of it.",
+    "Cleft sentences",
+    "Cleft sentences allow us to emphasise different parts of the sentence, depending on which part is the most important.",
+    "Cleft sentences beginning with it",
+    "Here is a simple sentence with no particular emphasis.",
+    "It was you who invited me to the party yesterday.",
+    "Emphasis: you (not another person)",
+    "It was yesterday that you invited me to the party.",
+    "Emphasis: yesterday (not another time)",
+    "It was the party that you invited me to yesterday.",
+    "Emphasis: the party (not another event)",
+    "Cleft sentences beginning with what",
+    "What clauses + be are common in spoken English.",
+    "What I like best about going to the cinema is talking about the film afterwards.",
+    "What drives me up the wall is people talking during the film."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Do you know how _____ add emphasis using cleft sentences, inversion or auxiliaries?",
+      "options": [
+        "to",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to emphasis: cleft sentences, inversion and auxiliaries usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "We can use different grammatical structures _____ add emphasis, either to a whole sentence or to highlight one particular part of it.",
+      "options": [
+        "to",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to emphasis: cleft sentences, inversion and auxiliaries usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Cleft sentences allow us _____ emphasise different parts of the sentence, depending on which part is the most important.",
+      "options": [
+        "to",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to emphasis: cleft sentences, inversion and auxiliaries usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "It was you who invited me _____ the party yesterday.",
+      "correct": "to",
+      "hint": "Apply the rule for emphasis: cleft sentences, inversion and auxiliaries.",
+      "explanation": "The correct form here is 'to'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "It was yesterday that you invited me _____ the party.",
+      "correct": "to",
+      "hint": "Apply the rule for emphasis: cleft sentences, inversion and auxiliaries.",
+      "explanation": "The correct form here is 'to'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "It was the party that you invited me _____ yesterday.",
+      "correct": "to",
+      "hint": "Apply the rule for emphasis: cleft sentences, inversion and auxiliaries.",
+      "explanation": "The correct form here is 'to'."
+    }
+  ]
+}

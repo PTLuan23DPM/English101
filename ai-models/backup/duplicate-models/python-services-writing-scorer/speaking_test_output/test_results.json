@@ -1,0 +1,90 @@
+{
+  "prompt": "Please read: The quick brown fox jumps over the lazy dog.",
+  "expected_text": "the quick brown fox jumps over the lazy dog.",
+  "audio_file": "speaking_test_output\\student_recording.wav",
+  "transcription": " I ate an apple",
+  "phoneme_sequence": [
+    {
+      "word": "I",
+      "phonemes": [
+        "AY1"
+      ]
+    },
+    {
+      "word": "ate",
+      "phonemes": [
+        "EY1",
+        "T"
+      ]
+    },
+    {
+      "word": "an",
+      "phonemes": [
+        "AE1",
+        "N"
+      ]
+    },
+    {
+      "word": "apple",
+      "phonemes": [
+        "AE1",
+        "P",
+        "AH0",
+        "L"
+      ]
+    }
+  ],
+  "alignment_file": "speaking_test_output\\alignment.json",
+  "dtw_results": null,
+  "gop_results": {
+    "overall_gop": 0.9296774983983558,
+    "overall_quality": "Excellent",
+    "phoneme_scores": [
+      {
+        "word": "I",
+        "phonemes": [
+          "AY1"
+        ],
+        "gop_score": 0.9412346414151537,
+        "quality": "Excellent"
+      },
+      {
+        "word": "ate",
+        "phonemes": [
+          "EY1",
+          "T"
+        ],
+        "gop_score": 0.9830917663535721,
+        "quality": "Excellent"
+      },
+      {
+        "word": "an",
+        "phonemes": [
+          "AE1",
+          "N"
+        ],
+        "gop_score": 0.894788753055515,
+        "quality": "Good"
+      },
+      {
+        "word": "apple",
+        "phonemes": [
+          "AE1",
+          "P",
+          "AH0",
+          "L"
+        ],
+        "gop_score": 0.8995948327691827,
+        "quality": "Good"
+      }
+    ]
+  },
+  "final_score": {
+    "final_score": 46.48387491991779,
+    "gop_component": 92.96774983983558,
+    "content_accuracy": 0.0,
+    "dtw_component": null,
+    "grade": "F (Poor)",
+    "content_matched": false
+  }
+}

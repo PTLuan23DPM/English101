@@ -238,24 +238,17 @@ export async function callGemini(
 
 ### Model Files Location
 
-#### a) Traditional Model (Keras)
-**File**: `ai-models/writing-scorer/model.keras`
-- **Type**: Keras neural network model
-- **Size**: ~200MB+
-- **Format**: `.keras` (TensorFlow/Keras format)
-- **Usage**: Loaded trong `writing_scorer.py` khi start service
+#### a) Question-Aware BERT (Active)
+**Location**: `ai-models/writing-scorer/bert_question_model/`
+- **Files**: `model.keras`, `metadata.pkl`
+- **Usage**: Đây là model duy nhất được deploy trong service hiện tại.
+- **Notes**: Metadata lưu flag `use_question` để model biết có dùng prompt hay không.
 
-#### b) Supporting Files
-- **Scaler**: `ai-models/writing-scorer/scaler.pkl` - Feature scaler
-- **Vectorizer**: `ai-models/writing-scorer/vectorizer.pkl` - Text vectorizer
+#### b) Legacy Models (Archived)
+- Đã di chuyển sang `ai-models/backup/` (ví dụ: `legacy-models/IELTS_Model/`, `bert_ielts_model/`, ...).
+- Không còn nằm trong thư mục chính để tránh lộn xộn, nhưng vẫn có thể khôi phục khi cần.
 
-#### c) BERT Models (Advanced)
-**Location**: `ai-models/writing-scorer/bert_ielts_model/`
-- **BERT PRO**: Best accuracy model
-- **BERT Multi-task**: Multi-task learning model
-- **BERT Base**: Standard BERT model
-
-#### d) Model Loader
+#### c) Model Loader
 **File**: `python-services/model_loader.py`
 - **Function**: `load_all_models()` - Load tất cả models khi start service
 - **Priority**: BERT PRO > BERT Multi > BERT > Traditional
@@ -468,14 +461,8 @@ English101/
 │
 └── ai-models/
     └── writing-scorer/
-        ├── model.keras                         ← Traditional model
-        ├── scaler.pkl                          ← Feature scaler
-        ├── vectorizer.pkl                      ← Text vectorizer
-        ├── ml_assess.py                        ← Model architecture
-        └── bert_ielts_model/                   ← BERT models
-            ├── bert_pro/                       ← BERT PRO model
-            ├── bert_multi/                     ← BERT Multi-task
-            └── bert/                           ← BERT Base
+        ├── ml_assess.py                        ← QuestionAssessor definition
+        └── bert_question_model/                ← Model weights + metadata
 ```
 
 ---

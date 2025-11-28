@@ -5,7 +5,7 @@ import { writingController } from "@/server/controllers/writingController";
 /**
  * Get userId from session (handles both id and email cases)
  */
-async function getUserIdFromSession() {
+async function getUserIdFromSession(fallbackUserId?: string) {
     try {
         const session = await requireAuth();
         
@@ -25,6 +25,12 @@ async function getUserIdFromSession() {
     } catch (error: unknown) {
         console.error("[getUserIdFromSession] Error:", error);
         const message = error instanceof Error ? error.message : "Unauthorized";
+        
+        if (fallbackUserId) {
+            console.warn("[getUserIdFromSession] Falling back to provided userId due to auth error:", message);
+            return fallbackUserId;
+        }
+
         throw new Error(message);
     }
 }
@@ -35,11 +41,15 @@ async function getUserIdFromSession() {
  */
 export async function GET(req: NextRequest) {
     try {
-        const userId = await getUserIdFromSession();
-
         const { searchParams } = new URL(req.url);
         const taskId = searchParams.get("taskId") || undefined;
         const feature = searchParams.get("feature");
+        const clientUserId = searchParams.get("userId") || undefined;
+        const userId = await getUserIdFromSession(clientUserId);
+
+        if (!userId) {
+            return unauthorizedResponse();
+        }
 
         if (!feature) {
             return NextResponse.json(
@@ -80,9 +90,13 @@ export async function GET(req: NextRequest) {
  */
 export async function POST(req: NextRequest) {
     try {
-        const userId = await getUserIdFromSession();
-
-        const { taskId } = await req.json();
+        const body = await req.json();
+        const { taskId, userId: clientUserId } = body;
+        const userId = await getUserIdFromSession(clientUserId);
+        
+        if (!userId) {
+            return unauthorizedResponse();
+        }
 
         const result = await writingController.getAllUsage(userId, taskId);
 

@@ -23,11 +23,12 @@ except ImportError:
     TORCH_AVAILABLE = False
 
 try:
-    from ml_assess import QuestionAssessor
+    from ml_assess import QuestionAssessor, AttentionLayer
     ML_ASSESS_AVAILABLE = True
 except Exception as exc:
     ML_ASSESS_AVAILABLE = False
     QuestionAssessor = None  # type: ignore
+    AttentionLayer = None  # type: ignore
     print(f"[WARNING] QuestionAssessor not available: {exc}")
 
 
@@ -87,8 +88,15 @@ class ModelLoader:
             # Load sentence transformer model
             encoder = sentence_transformers.SentenceTransformer(encoder_name)
             
+            custom_objects = {}
+            if AttentionLayer is not None:
+                custom_objects['AttentionLayer'] = AttentionLayer
+            
             # Load Keras model
-            model = keras.models.load_model(str(model_path))
+            if custom_objects:
+                model = keras.models.load_model(str(model_path), custom_objects=custom_objects)
+            else:
+                model = keras.models.load_model(str(model_path))
             
             # Load scaler if available
             scaler = None
@@ -131,8 +139,15 @@ class ModelLoader:
             # Load sentence transformer model
             encoder = sentence_transformers.SentenceTransformer(encoder_name)
             
+            custom_objects = {}
+            if AttentionLayer is not None:
+                custom_objects['AttentionLayer'] = AttentionLayer
+            
             # Load Keras model
-            model = keras.models.load_model(str(model_path))
+            if custom_objects:
+                model = keras.models.load_model(str(model_path), custom_objects=custom_objects)
+            else:
+                model = keras.models.load_model(str(model_path))
             
             # Load scaler if available
             scaler = None

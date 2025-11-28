@@ -1365,6 +1365,21 @@
    RESPONSIVE
    ============================================ */
 
+@media (max-width: 1200px) {
+    /* Writing split layout - stack on smaller screens */
+    .writing-split-layout {
+        flex-direction: column;
+    }
+    
+    .writing-split-layout aside {
+        width: 100% !important;
+        max-width: 100% !important;
+        flex: 1 1 100% !important;
+        position: relative !important;
+        top: 0 !important;
+    }
+}
+
 @media (max-width: 768px) {
     .llm-features-grid {
         grid-template-columns: 1fr;

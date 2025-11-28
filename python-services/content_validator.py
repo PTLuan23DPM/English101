@@ -11,6 +11,50 @@ import os
 from typing import Dict, List, Optional, Tuple
 from pathlib import Path
 
+
+def build_advanced_validation_prompt(essay: str, prompt: str, task_level: str) -> str:
+    """
+    Tạo prompt nâng cao để Gemini phân tích lạc đề dựa trên Logic thay vì Keyword.
+    """
+    return f"""
+### ROLE
+You are a strict IELTS/CEFR Examiner. Your task is to validate if a student's essay matches the given writing prompt.
+
+### INPUT DATA
+1. **Task Level**: {task_level} (Adjust strictness based on this. A1/A2 can be simple, B2+ must be precise)
+2. **Prompt (The Question)**: "{prompt}"
+3. **Student Essay**: "{essay[:2500]}"
+
+### INSTRUCTIONS
+Step 1: Analyze the PROMPT. Identify:
+   - **Core Topic**: What is the main subject? (e.g., "Environment", "Technology")
+   - **Specific Focus**: What specific aspect? (e.g., "Climate change solutions", not just "Weather")
+   - **Task Type**: Argumentative, Problem/Solution, or Narrative?
+
+Step 2: Analyze the ESSAY. Check:
+   - Does it discuss the **Specific Focus** identified above?
+   - **Topic Drift**: Does the student start on topic but drift to a memorized text? (e.g., asked about "A specific holiday trip" but wrote about "Benefits of weekends" in general).
+   - **Keyword Stuffing**: Are keywords used naturally or forced?
+
+Step 3: Determine Relevance Score (0-100) & Off-topic Status.
+   - **0-30 (Complete Off-topic)**: Totally different subject OR a memorized essay on a vaguely related keyword (e.g., Prompt: "Traffic jams", Essay: "Advantages of cars").
+   - **31-59 (Partial/Tangential)**: Discusses the general topic but misses the specific question (e.g., Prompt: "Solutions for pollution", Essay: "Causes of pollution").
+   - **60-100 (On-topic)**: Addresses the prompt directly.
+
+### OUTPUT FORMAT (JSON ONLY)
+Return a valid JSON object with this exact structure:
+{{
+    "is_on_topic": boolean,
+    "overall_relevance": integer,
+    "off_topic_level": "none" | "incomplete" | "partial" | "complete",
+    "prompt_analysis": {{
+        "core_topic": "string",
+        "specific_focus": "string"
+    }},
+    "off_topic_reason": "string",
+    "confidence": float
+}}
+"""
 # Load environment variables from .env file
 try:
     from dotenv import load_dotenv
@@ -51,153 +95,30 @@ def validate_content_with_gemini(
         print("[Content Validator] Gemini API key not configured")
         return None
     
-    # Build required elements text
-    required_text = ""
+    validation_prompt = build_advanced_validation_prompt(essay, prompt, task_level)
+    
+    extra_sections: List[str] = []
+    
+    if prompt_analysis.get('main_topic'):
+        extra_sections.append(f"- Main Topic: {prompt_analysis.get('main_topic')}")
+    topic_keywords = prompt_analysis.get('topic_keywords', [])
+    if topic_keywords:
+        extra_sections.append(f"- Topic Keywords: {', '.join(topic_keywords[:10])}")
+    
     if prompt_analysis.get('required_elements'):
-        required_text = "\n".join([
-            f"- {key.upper()}: {value}"
+        required_text = ", ".join(
+            f"{key.upper()}: {value}"
             for key, value in prompt_analysis['required_elements'].items()
             if value
-        ])
+        )
+        extra_sections.append(f"- Required Elements: {required_text}")
     
-    # Build content requirements text
-    content_reqs_text = ""
     if prompt_analysis.get('content_requirements'):
-        content_reqs_text = "\n".join([
-            f"- {req}" for req in prompt_analysis['content_requirements']
-        ])
+        content_reqs_text = "; ".join(prompt_analysis['content_requirements'])
+        extra_sections.append(f"- Content Requirements: {content_reqs_text}")
     
-    validation_prompt = f"""You are an expert English writing evaluator. Check if the student's essay properly addresses the writing prompt requirements.
-
-Writing Prompt: "{prompt}"
-
-Required Elements:
-{required_text if required_text else "- Address the main topic"}
-
-Content Requirements:
-{content_reqs_text if content_reqs_text else "- Stay on topic"}
-
-Main Topic: {prompt_analysis.get('main_topic', 'general')}
-Topic Keywords: {', '.join(prompt_analysis.get('topic_keywords', [])[:10])}
-
-Student's Essay:
-"{essay[:2500]}"
-
-CRITICAL EVALUATION CRITERIA (STRICT OFF-TOPIC DETECTION):
-1. **Topic Relevance** (0-100): Does the essay discuss the SAME TOPIC as the prompt?
-   
-   STRICT RULES - Mark as COMPLETELY OFF-TOPIC (0-29) if:
-   - Essay discusses COMPLETELY DIFFERENT topic (e.g., prompt about "vacation/trip" but essay about "weekends/daily routine/work")
-   - Essay has NO connection to prompt topic at all
-   - Essay is clearly answering a different question
-   - Essay describes something that is NOT what the prompt asks for
-   - Example: Prompt asks "memorable trip/vacation" but essay describes "weekend activities" → COMPLETELY OFF-TOPIC
-   - Example: Prompt asks "favorite food" but essay describes "hobbies" → COMPLETELY OFF-TOPIC
-   
-   Mark as PARTIALLY OFF-TOPIC (30-49) if:
-   - Essay touches on the topic but mostly discusses unrelated things
-   - Essay mentions the topic briefly but then goes off-track
-   
-   Mark as INCOMPLETE (50-69) if:
-   - Essay addresses the topic but is missing key required elements
-   - Essay partially addresses the prompt (give lower relevance score)
-   
-   Mark as ON-TOPIC (70-100) if:
-   - Essay directly addresses the topic with clear connection
-   - Essay uses synonyms or related concepts (e.g., "trip" for "vacation", "journey" for "travel")
-   - Essay addresses the topic but may be missing minor details
-   
-   Scoring:
-   - 90-100: Directly addresses the topic with clear connection
-   - 70-89: Addresses the topic with some relevance (may be missing minor details)
-   - 50-69: Partially relevant - addresses main topic but missing key elements
-   - 30-49: Weakly relevant - touches on topic but mostly off-track
-   - 0-29: Completely off-topic - different subject entirely (e.g., "weekends" vs "trip/vacation")
-
-2. **Required Elements** (0-100): Does it include all required elements (what, where, when, why, who)?
-   - Score based on how many required elements are present and well-developed
-   - Missing 1-2 elements: 70-80
-   - Missing 3+ elements: 50-70
-   - All elements present: 80-100
-
-3. **Content Quality** (0-100): How well does it fulfill the writing purpose?
-   - Consider depth, detail, examples, and completeness of response
-   - Well-developed with examples: 80-100
-   - Adequate development: 60-79
-   - Superficial or vague: 40-59
-
-4. **Semantic Match** (0-100): Understanding synonyms and related concepts
-   - "vacation" = "trip" = "travel" = "holiday" = "journey" = "memorable trip" (SAME TOPIC)
-   - "shopping online" = "e-commerce" = "buying on internet" = "online purchases" (SAME TOPIC)
-   - "daily routine" ≠ "vacation trip" (DIFFERENT TOPICS - COMPLETELY OFF-TOPIC)
-   - "weekends" ≠ "trip/vacation" (DIFFERENT TOPICS - COMPLETELY OFF-TOPIC)
-   - "work" ≠ "vacation" (DIFFERENT TOPICS - COMPLETELY OFF-TOPIC)
-   - "hobbies" ≠ "favorite food" (DIFFERENT TOPICS - COMPLETELY OFF-TOPIC)
-   
-   CRITICAL EXAMPLES:
-   - Prompt: "Write about a memorable trip or vacation"
-     Essay about "weekends" or "daily routine" → COMPLETELY OFF-TOPIC (0-29 relevance)
-   - Prompt: "Describe your favorite food"
-     Essay about "hobbies" or "sports" → COMPLETELY OFF-TOPIC (0-29 relevance)
-
-Return ONLY valid JSON with this EXACT structure:
-{{
-  "is_on_topic": true,
-  "topic_relevance_score": 85,
-  "required_elements_score": 90,
-  "content_quality_score": 80,
-  "overall_relevance": 85,
-  "confidence": 0.9,
-  "addressed_elements": ["what", "when", "why"],
-  "missing_elements": ["where"],
-  "feedback": {{
-    "strengths": ["Clearly addresses main topic", "Good detail about activities"],
-    "weaknesses": ["Missing location information", "Could expand on reasons"],
-    "suggestions": ["Add more details about where this happened"]
-  }},
-  "off_topic_reason": ""
-}}
-
-IMPORTANT: Only mark is_on_topic=false if topic_relevance_score < 30 (completely different topic).
-If topic_relevance_score is 30-49, mark is_on_topic=true but with low overall_relevance (partial relevance).
-
-If completely off-topic (relevance < 30):
-{{
-  "is_on_topic": false,
-  "topic_relevance_score": 20,
-  "required_elements_score": 10,
-  "content_quality_score": 15,
-  "overall_relevance": 15,
-  "confidence": 0.95,
-  "addressed_elements": [],
-  "missing_elements": ["what", "where", "when", "why", "who"],
-  "feedback": {{
-    "strengths": [],
-    "weaknesses": ["Essay discusses completely different topic with no connection to prompt"],
-    "suggestions": ["Rewrite to address the actual prompt topic"]
-  }},
-  "off_topic_reason": "Essay discusses weekends/daily routine but prompt asks about memorable trip/vacation - completely different topics. Essay must describe a specific trip or vacation, not general weekend activities."
-}}
-
-If partially relevant (relevance 30-49):
-{{
-  "is_on_topic": true,
-  "topic_relevance_score": 40,
-  "required_elements_score": 30,
-  "content_quality_score": 35,
-  "overall_relevance": 35,
-  "confidence": 0.85,
-  "addressed_elements": ["what"],
-  "missing_elements": ["where", "when", "why"],
-  "feedback": {{
-    "strengths": ["Touches on the topic"],
-    "weaknesses": ["Weak connection to prompt", "Missing most required elements"],
-    "suggestions": ["Focus more directly on the prompt topic", "Include all required elements"]
-  }},
-  "off_topic_reason": "Essay partially addresses topic but is mostly off-track"
-}}
-
-Evaluate strictly but fairly. Return ONLY the JSON."""
+    if extra_sections:
+        validation_prompt += "\n### ADDITIONAL CONTEXT\n" + "\n".join(extra_sections)
 
     try:
         # Try v1 first, fallback to v1beta if needed
@@ -320,6 +241,17 @@ Evaluate strictly but fairly. Return ONLY the JSON."""
             return None
         
         validation = json.loads(json_match.group(0))
+        
+        # Backward compatibility with legacy fields
+        validation.setdefault('overall_relevance', validation.get('topic_relevance_score', 0))
+        validation.setdefault('topic_relevance_score', validation.get('overall_relevance', 0))
+        validation.setdefault('required_elements_score', validation.get('overall_relevance', 0))
+        validation.setdefault('content_quality_score', validation.get('overall_relevance', 0))
+        validation.setdefault('addressed_elements', [])
+        validation.setdefault('missing_elements', [])
+        validation.setdefault('off_topic_level', 'none')
+        validation.setdefault('confidence', 0.8)
+        validation.setdefault('off_topic_reason', '')
         
         print(f"[Content Validator] Validation complete - On topic: {validation.get('is_on_topic')}, Relevance: {validation.get('overall_relevance')}")
         return validation

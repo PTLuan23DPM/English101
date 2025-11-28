@@ -1,0 +1,25 @@
+2025-11-25 01:03:49,823 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.1.120:5001
+2025-11-25 01:03:49,824 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-11-25 01:03:49,825 - werkzeug - INFO -  * Restarting with stat
+2025-11-25 01:03:57,519 - werkzeug - WARNING -  * Debugger is active!
+2025-11-25 01:03:57,521 - werkzeug - INFO -  * Debugger PIN: 737-614-385
+2025-11-25 01:32:01,465 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 01:32:01] "GET /health HTTP/1.1" 200 -
+2025-11-25 01:32:01,715 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 01:32:01] "GET /health HTTP/1.1" 200 -
+2025-11-25 01:32:31,152 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 01:32:31] "GET /health HTTP/1.1" 200 -
+2025-11-25 01:33:01,616 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 01:33:01] "GET /health HTTP/1.1" 200 -
+2025-11-25 01:33:31,306 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 01:33:31] "GET /health HTTP/1.1" 200 -
+2025-11-25 01:34:01,629 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 01:34:01] "GET /health HTTP/1.1" 200 -
+2025-11-25 01:34:31,305 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 01:34:31] "GET /health HTTP/1.1" 200 -
+2025-11-25 01:35:01,619 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 01:35:01] "GET /health HTTP/1.1" 200 -
+2025-11-25 01:35:31,314 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 01:35:31] "GET /health HTTP/1.1" 200 -
+2025-11-25 01:36:32,627 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 01:36:32] "GET /health HTTP/1.1" 200 -
+2025-11-25 01:37:33,630 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 01:37:33] "GET /health HTTP/1.1" 200 -
+2025-11-25 01:38:34,616 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 01:38:34] "GET /health HTTP/1.1" 200 -
+2025-11-25 01:38:48,191 - werkzeug - INFO -  * Detected change in 'C:\\Users\\ADMIN\\Desktop\\English101\\python-services\\writing_scorer.py', reloading
+2025-11-25 01:38:49,053 - werkzeug - INFO -  * Restarting with stat
+2025-11-25 01:55:48,152 - werkzeug - INFO -  * Restarting with stat
+2025-11-25 01:59:08,753 - werkzeug - INFO -  * Restarting with stat
+2025-11-25 02:10:15,386 - werkzeug - INFO -  * Restarting with stat

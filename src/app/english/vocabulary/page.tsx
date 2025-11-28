@@ -1,11 +1,15 @@
 "use client";
 
-import { useState, useRef } from "react";
-import Link from "next/link";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-
-type CEFRLevel = "A1" | "A2" | "B1" | "B2" | "C1" | "C2";
-type VocabCategory = "general" | "business" | "academic" | "travel" | "technology" | "idioms";
+import {
+  addVocabularyEntry,
+  getSavedVocabulary,
+  removeVocabularyEntry,
+  SavedVocabEntry,
+  saveVocabulary,
+  VOCAB_UPDATED_EVENT,
+} from "@/lib/vocabularyStorage";
 
 interface DictionaryPhonetic {
   text: string;
@@ -32,124 +36,13 @@ interface DictionaryResult {
   origin?: string;
 }
 
-interface VocabTopic {
-  id: string;
-  title: string;
-  category: VocabCategory;
-  level: CEFRLevel;
-  description: string;
-  words: number;
-  exercises: number;
-  completed: boolean;
-}
-
-const VOCAB_TOPICS: VocabTopic[] = [
-  {
-    id: "1",
-    title: "Daily Routines & Activities",
-    category: "general",
-    level: "A1",
-    description: "Common verbs and expressions for everyday activities",
-    words: 45,
-    exercises: 8,
-    completed: true,
-  },
-  {
-    id: "2",
-    title: "Food & Cooking",
-    category: "general",
-    level: "A2",
-    description: "Vocabulary for ingredients, dishes, and cooking methods",
-    words: 60,
-    exercises: 10,
-    completed: false,
-  },
-  {
-    id: "3",
-    title: "Travel & Tourism",
-    category: "travel",
-    level: "B1",
-    description: "Essential vocabulary for traveling abroad",
-    words: 80,
-    exercises: 12,
-    completed: false,
-  },
-  {
-    id: "4",
-    title: "Business Communication",
-    category: "business",
-    level: "B2",
-    description: "Professional vocabulary for workplace situations",
-    words: 100,
-    exercises: 15,
-    completed: false,
-  },
-  {
-    id: "5",
-    title: "Academic Writing",
-    category: "academic",
-    level: "C1",
-    description: "Advanced vocabulary for essays and research",
-    words: 120,
-    exercises: 18,
-    completed: false,
-  },
-  {
-    id: "6",
-    title: "Technology & Innovation",
-    category: "technology",
-    level: "B2",
-    description: "Modern tech-related vocabulary",
-    words: 90,
-    exercises: 14,
-    completed: false,
-  },
-  {
-    id: "7",
-    title: "Common Idioms & Expressions",
-    category: "idioms",
-    level: "B1",
-    description: "Frequently used idiomatic expressions",
-    words: 50,
-    exercises: 10,
-    completed: false,
-  },
-  {
-    id: "8",
-    title: "Phrasal Verbs - Part 1",
-    category: "general",
-    level: "B1",
-    description: "Essential phrasal verbs for everyday use",
-    words: 40,
-    exercises: 12,
-    completed: false,
-  },
-  {
-    id: "9",
-    title: "Collocations - Verbs",
-    category: "academic",
-    level: "B2",
-    description: "Common verb collocations for fluent speech",
-    words: 70,
-    exercises: 15,
-    completed: false,
-  },
-  {
-    id: "10",
-    title: "Word Families & Derivations",
-    category: "academic",
-    level: "C1",
-    description: "Understanding word formation and relationships",
-    words: 85,
-    exercises: 16,
-    completed: false,
-  },
-];
-
 export default function VocabularyPage() {
-  const [selectedLevel, setSelectedLevel] = useState<CEFRLevel | "all">("all");
-  const [selectedCategory, setSelectedCategory] = useState<VocabCategory | "all">("all");
-  
+  const [savedVocab, setSavedVocab] = useState<SavedVocabEntry[]>([]);
+  const [collectionSearch, setCollectionSearch] = useState("");
+  const [memoryIndex, setMemoryIndex] = useState(0);
+  const [showMemoryMeaning, setShowMemoryMeaning] = useState(false);
+  const [audioLoadingId, setAudioLoadingId] = useState<string | null>(null);
+
   // Dictionary search state
   const [searchQuery, setSearchQuery] = useState("");
   const [searching, setSearching] = useState(false);
@@ -157,16 +50,166 @@ export default function VocabularyPage() {
   const [searchError, setSearchError] = useState<string>("");
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  const filteredTopics = VOCAB_TOPICS.filter((topic) => {
-    if (selectedLevel !== "all" && topic.level !== selectedLevel) return false;
-    if (selectedCategory !== "all" && topic.category !== selectedCategory) return false;
-    return true;
-  });
+  // Load saved vocabulary + subscribe to cross-page updates
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    setSavedVocab(getSavedVocabulary());
 
-  const stats = {
-    total: VOCAB_TOPICS.length,
-    completed: VOCAB_TOPICS.filter((t) => t.completed).length,
-    totalWords: VOCAB_TOPICS.reduce((sum, t) => sum + t.words, 0),
+    const handleExternalUpdate = (event: Event) => {
+      const detail = (event as CustomEvent<SavedVocabEntry[]>).detail;
+      if (Array.isArray(detail)) {
+        setSavedVocab(detail);
+      } else {
+        setSavedVocab(getSavedVocabulary());
+      }
+    };
+
+    window.addEventListener(VOCAB_UPDATED_EVENT, handleExternalUpdate);
+    return () => {
+      window.removeEventListener(VOCAB_UPDATED_EVENT, handleExternalUpdate);
+    };
+  }, []);
+
+  const syncLocalVocabulary = useCallback(
+    (updater: SavedVocabEntry[] | ((prev: SavedVocabEntry[]) => SavedVocabEntry[])) => {
+      setSavedVocab((prev) => {
+        const next = typeof updater === "function" ? updater(prev) : updater;
+        saveVocabulary(next);
+        return next;
+      });
+    },
+    []
+  );
+
+  const stats = useMemo(() => {
+    const total = savedVocab.length;
+    const recent = savedVocab.filter((entry) => {
+      const diff = Date.now() - new Date(entry.createdAt).getTime();
+      return diff < 7 * 24 * 60 * 60 * 1000; // 7 days
+    }).length;
+    const uniqueParts = new Set(savedVocab.map((entry) => entry.partOfSpeech).filter(Boolean));
+    return { total, recent, uniqueParts: uniqueParts.size };
+  }, [savedVocab]);
+
+  const filteredSaved = useMemo(() => {
+    if (!collectionSearch.trim()) return savedVocab;
+    const term = collectionSearch.toLowerCase();
+    return savedVocab.filter(
+      (entry) =>
+        entry.word.toLowerCase().includes(term) ||
+        entry.meaning.toLowerCase().includes(term) ||
+        (entry.example && entry.example.toLowerCase().includes(term))
+    );
+  }, [collectionSearch, savedVocab]);
+
+  useEffect(() => {
+    if (filteredSaved.length === 0) {
+      setMemoryIndex(0);
+      setShowMemoryMeaning(false);
+    } else if (memoryIndex >= filteredSaved.length) {
+      setMemoryIndex(0);
+      setShowMemoryMeaning(false);
+    }
+  }, [filteredSaved.length, memoryIndex]);
+
+  const activeMemoryCard =
+    filteredSaved.length > 0 ? filteredSaved[memoryIndex % filteredSaved.length] : null;
+
+  const handleAddToVocab = () => {
+    if (!dictionaryResult) {
+      toast.error("Search for a word first.");
+      return;
+    }
+
+    const coreMeaning = dictionaryResult.meanings[0];
+    const coreDefinition = coreMeaning?.definitions[0];
+
+    if (!coreMeaning || !coreDefinition) {
+      toast.error("No definition available to save.");
+      return;
+    }
+
+    const audioUrl = dictionaryResult.phonetics.find((p) => p.audio)?.audio;
+    const result = addVocabularyEntry({
+      word: dictionaryResult.word,
+      phonetic: dictionaryResult.phonetic,
+      audioUrl,
+      partOfSpeech: coreMeaning.partOfSpeech,
+      meaning: coreDefinition.definition,
+      example: coreDefinition.example,
+    });
+
+    if (!result.added) {
+      if (result.reason === "duplicate") {
+        toast.info("This word is already in your list.");
+      } else if (result.reason === "invalid") {
+        toast.error("Missing information to save this word.");
+      } else {
+        toast.error("Unable to save this word right now.");
+      }
+      return;
+    }
+
+    if (result.entries) {
+      setSavedVocab(result.entries);
+    }
+
+    toast.success(`Added "${dictionaryResult.word}" to your list.`);
+  };
+
+  const handleRemoveWord = (id: string) => {
+    const result = removeVocabularyEntry(id);
+    if (result.removed && result.entries) {
+      setSavedVocab(result.entries);
+      toast.success("Removed from your vocabulary list.");
+    }
+  };
+
+  const handleCopyWord = (entry: SavedVocabEntry) => {
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard
+        .writeText(`${entry.word}: ${entry.meaning}${entry.example ? ` (${entry.example})` : ""}`)
+        .then(() => toast.success("Copied to clipboard"))
+        .catch(() => toast.error("Unable to copy"));
+    }
+  };
+
+  const fetchWordAudio = async (word: string) => {
+    try {
+      const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
+      if (!response.ok) return null;
+      const data: DictionaryResult[] = await response.json();
+      const audio = data?.[0]?.phonetics?.find((p) => p.audio)?.audio;
+      return audio || null;
+    } catch (error) {
+      console.error("Audio fetch error:", error);
+      return null;
+    }
+  };
+
+  const handleMemoryPronounce = async (
+    entry: SavedVocabEntry,
+    e: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    e.stopPropagation();
+    if (entry.audioUrl) {
+      playPronunciation(entry.audioUrl);
+      return;
+    }
+
+    setAudioLoadingId(entry.id);
+    const audio = await fetchWordAudio(entry.word);
+    setAudioLoadingId(null);
+
+    if (!audio) {
+      toast.error("Pronunciation not available for this word.");
+      return;
+    }
+
+    syncLocalVocabulary((prev) =>
+      prev.map((item) => (item.id === entry.id ? { ...item, audioUrl: audio } : item))
+    );
+    playPronunciation(audio);
   };
 
   // Dictionary API functions
@@ -233,16 +276,16 @@ export default function VocabularyPage() {
         <div className="head-actions">
           <div className="stats" style={{ gap: "16px" }}>
             <div className="stat">
-              <span className="stat-val">{stats.completed}</span>
-              <span className="stat-lbl">Completed</span>
-            </div>
-            <div className="stat">
-              <span className="stat-val">{stats.totalWords}</span>
-              <span className="stat-lbl">Total Words</span>
-            </div>
-            <div className="stat">
               <span className="stat-val">{stats.total}</span>
-              <span className="stat-lbl">Topics</span>
+              <span className="stat-lbl">Saved words</span>
+            </div>
+            <div className="stat">
+              <span className="stat-val">{stats.recent}</span>
+              <span className="stat-lbl">This week</span>
+            </div>
+            <div className="stat">
+              <span className="stat-val">{stats.uniqueParts}</span>
+              <span className="stat-lbl">Parts of speech</span>
             </div>
           </div>
         </div>
@@ -402,10 +445,7 @@ export default function VocabularyPage() {
               ))}
             </div>
 
-            <button
-              className="vocab-dictionary-add-btn"
-              onClick={() => toast.success("Word saved to your vocabulary list!")}
-            >
+            <button className="vocab-dictionary-add-btn" onClick={handleAddToVocab}>
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                 <path d="M8 2V14M2 8H14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
               </svg>
@@ -418,112 +458,292 @@ export default function VocabularyPage() {
         <audio ref={audioRef} style={{ display: "none" }} />
       </section>
 
-      {/* Filters */}
-      <section className="card">
-        <h3 className="section-title" style={{ marginBottom: "16px" }}>
-          🎯 Filter Topics
-        </h3>
-        <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", alignItems: "center" }}>
-          <div style={{ flex: "1", minWidth: "200px" }}>
-            <label style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: "500" }}>
-              Level
-            </label>
-            <select
-              className="select"
-              value={selectedLevel}
-              onChange={(e) => setSelectedLevel(e.target.value as CEFRLevel | "all")}
-              style={{ width: "100%" }}
-            >
-              <option value="all">All Levels</option>
-              <option value="A1">A1 - Beginner</option>
-              <option value="A2">A2 - Elementary</option>
-              <option value="B1">B1 - Intermediate</option>
-              <option value="B2">B2 - Upper Intermediate</option>
-              <option value="C1">C1 - Advanced</option>
-              <option value="C2">C2 - Proficient</option>
-            </select>
+      {/* Saved Vocabulary Collection */}
+      <section className="card" style={{ marginBottom: "2rem" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: "1rem", flexWrap: "wrap", marginBottom: "1rem" }}>
+          <div>
+            <h2 style={{ marginBottom: "0.25rem" }}>My Vocabulary List</h2>
+            <p className="muted" style={{ margin: 0 }}>
+              Words you decided to keep during your study sessions.
+            </p>
           </div>
-
-          <div style={{ flex: "1", minWidth: "200px" }}>
-            <label style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: "500" }}>
-              Category
-            </label>
-            <select
-              className="select"
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value as VocabCategory | "all")}
-              style={{ width: "100%" }}
-            >
-              <option value="all">All Categories</option>
-              <option value="general">General</option>
-              <option value="business">Business</option>
-              <option value="academic">Academic</option>
-              <option value="travel">Travel</option>
-              <option value="technology">Technology</option>
-              <option value="idioms">Idioms & Phrases</option>
-            </select>
+          <div style={{ display: "flex", gap: "1rem" }}>
+            <div>
+              <div className="stat-val">{stats.total}</div>
+              <div className="stat-lbl">Total words</div>
+            </div>
+            <div>
+              <div className="stat-val">{stats.recent}</div>
+              <div className="stat-lbl">Added this week</div>
+            </div>
+            <div>
+              <div className="stat-val">{stats.uniqueParts}</div>
+              <div className="stat-lbl">Parts of speech</div>
+            </div>
           </div>
         </div>
-      </section>
 
-      {/* Vocabulary Topics Grid */}
-      <div className="module-grid">
-        {filteredTopics.map((topic) => (
-          <Link
-            href={`/english/vocabulary/${topic.id}`}
-            key={topic.id}
-            className="module-card"
-            style={{ textDecoration: "none" }}
-          >
-            <div className="module-card-header">
-              <div className="module-meta">
-                <span className={`level-badge level-${topic.level.toLowerCase()}`}>
-                  {topic.level}
-                </span>
-                <span className="category-badge">{topic.category}</span>
-              </div>
-              {topic.completed && (
-                <span className="completion-badge">✓ Completed</span>
-              )}
-            </div>
+        <div style={{ marginBottom: "1.5rem" }}>
+          <input
+            className="input"
+            placeholder="Search in your list..."
+            value={collectionSearch}
+            onChange={(e) => setCollectionSearch(e.target.value)}
+            style={{ width: "100%" }}
+          />
+        </div>
 
-            <h3 className="module-title">{topic.title}</h3>
-            <p className="module-description">{topic.description}</p>
-
-            <div className="module-stats">
-              <div className="module-stat">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                  <path d="M2 4H14V12H2V4Z" stroke="currentColor" strokeWidth="1.5" fill="none"/>
-                  <path d="M5 7H11M5 9H9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-                </svg>
-                <span>{topic.words} words</span>
-              </div>
-              <div className="module-stat">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                  <circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="1.5" fill="none"/>
-                  <path d="M6 8L7.5 9.5L10 6.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-                <span>{topic.exercises} exercises</span>
-              </div>
-            </div>
-          </Link>
-        ))}
-      </div>
-
-      {filteredTopics.length === 0 && (
-        <div className="empty-state">
-          <p>No vocabulary topics found for the selected filters.</p>
-          <button
-            className="btn primary"
-            onClick={() => {
-              setSelectedLevel("all");
-              setSelectedCategory("all");
+        {filteredSaved.length === 0 ? (
+          <div className="empty-state" style={{ margin: 0 }}>
+            <p>
+              {collectionSearch
+                ? "No words match your search."
+                : "You haven't saved any vocabulary yet. Look up a word above and add it here!"}
+            </p>
+          </div>
+        ) : (
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))",
+              gap: "1rem",
             }}
           >
-            Clear Filters
-          </button>
+            {filteredSaved.map((entry) => (
+              <div
+                key={entry.id}
+                style={{
+                  border: "1px solid #e2e8f0",
+                  borderRadius: "1rem",
+                  padding: "1rem",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "0.75rem",
+                  backgroundColor: "#fff",
+                }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", gap: "0.75rem", alignItems: "baseline" }}>
+                  <div>
+                    <h3 style={{ margin: 0 }}>{entry.word}</h3>
+                    {entry.phonetic && (
+                      <div style={{ fontSize: "0.85rem", color: "#64748b" }}>{entry.phonetic}</div>
+                    )}
+                  </div>
+                  {entry.partOfSpeech && (
+                    <span
+                      style={{
+                        borderRadius: "999px",
+                        padding: "0.2rem 0.8rem",
+                        backgroundColor: "#e0f2fe",
+                        color: "#0369a1",
+                        fontSize: "0.8rem",
+                        textTransform: "capitalize",
+                      }}
+                    >
+                      {entry.partOfSpeech}
+                    </span>
+                  )}
+                </div>
+                <p style={{ margin: 0, color: "#0f172a", lineHeight: 1.5 }}>{entry.meaning}</p>
+                {entry.example && (
+                  <p style={{ margin: 0, fontStyle: "italic", color: "#475569" }}>
+                    “{entry.example}”
+                  </p>
+                )}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "0.8rem", color: "#94a3b8" }}>
+                  <span>
+                    Added {new Date(entry.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+                  </span>
+                  <div style={{ display: "flex", gap: "0.5rem" }}>
+                    <button className="btn ghost" style={{ padding: "0.35rem 0.75rem" }} onClick={() => handleCopyWord(entry)}>
+                      Copy
+                    </button>
+                    <button className="btn ghost" style={{ padding: "0.35rem 0.75rem", color: "#b91c1c" }} onClick={() => handleRemoveWord(entry.id)}>
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* Memory Cards */}
+      <section className="card">
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            flexWrap: "wrap",
+            gap: "0.75rem",
+            marginBottom: "1rem",
+          }}
+        >
+          <div>
+            <h2 style={{ marginBottom: "0.25rem" }}>Memory Cards</h2>
+            <p className="muted" style={{ margin: 0 }}>
+              {filteredSaved.length > 0
+                ? `Card ${memoryIndex + 1}/${filteredSaved.length}`
+                : "Tap a saved word to revise it later."}
+            </p>
+          </div>
+          <div style={{ display: "flex", gap: "0.5rem" }}>
+            <button
+              className="btn ghost"
+              disabled={filteredSaved.length === 0}
+              onClick={() => {
+                if (filteredSaved.length === 0) return;
+                setMemoryIndex((idx) => (idx - 1 + filteredSaved.length) % filteredSaved.length);
+                setShowMemoryMeaning(false);
+              }}
+            >
+              Prev
+            </button>
+            <button
+              className="btn ghost"
+              disabled={filteredSaved.length === 0}
+              onClick={() => {
+                if (filteredSaved.length === 0) return;
+                setMemoryIndex((idx) => (idx + 1) % filteredSaved.length);
+                setShowMemoryMeaning(false);
+              }}
+            >
+              Next
+            </button>
+            <button
+              className="btn primary"
+              disabled={filteredSaved.length === 0}
+              onClick={() => {
+                if (filteredSaved.length === 0) return;
+                const randomIndex = Math.floor(Math.random() * filteredSaved.length);
+                setMemoryIndex(randomIndex);
+                setShowMemoryMeaning(false);
+              }}
+            >
+              Shuffle
+            </button>
+          </div>
         </div>
-      )}
+
+        {activeMemoryCard ? (
+          <div
+            onClick={() => setShowMemoryMeaning((prev) => !prev)}
+            style={{
+              minHeight: "240px",
+              borderRadius: "1.25rem",
+              border: "1px solid #c7d2fe",
+              background: showMemoryMeaning
+                ? "linear-gradient(135deg,#eef2ff,#e0e7ff)"
+                : "linear-gradient(135deg,#dbeafe,#bfdbfe)",
+              padding: "2rem",
+              cursor: "pointer",
+              transition: "all 0.3s ease",
+              boxShadow: "0 25px 60px rgba(59,130,246,0.25)",
+              position: "relative",
+            }}
+          >
+            <div
+              style={{
+                position: "absolute",
+                top: "1rem",
+                right: "1.5rem",
+                fontSize: "0.75rem",
+                color: "#1d4ed8",
+                letterSpacing: "0.15em",
+                textTransform: "uppercase",
+              }}
+            >
+              {showMemoryMeaning ? "Meaning" : "Word"}
+            </div>
+            {showMemoryMeaning ? (
+              <div style={{ textAlign: "center", marginTop: "1rem" }}>
+                <p style={{ fontSize: "1.25rem", margin: 0, color: "#1f2937", lineHeight: 1.6 }}>
+                  {activeMemoryCard.meaning}
+                </p>
+                {activeMemoryCard.example && (
+                  <p style={{ marginTop: "0.75rem", fontStyle: "italic", color: "#475569" }}>
+                    “{activeMemoryCard.example}”
+                  </p>
+                )}
+              </div>
+            ) : (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "0.5rem",
+                  minHeight: "160px",
+                  textAlign: "center",
+                }}
+              >
+                <h2 style={{ margin: 0, fontSize: "2.25rem" }}>{activeMemoryCard.word}</h2>
+                {activeMemoryCard.phonetic && (
+                  <div style={{ color: "#1d4ed8", fontSize: "1rem" }}>{activeMemoryCard.phonetic}</div>
+                )}
+                <button
+                  className="btn ghost"
+                  style={{
+                    padding: "0.4rem 0.9rem",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.35rem",
+                  }}
+                  onClick={(e) => handleMemoryPronounce(activeMemoryCard, e)}
+                  disabled={audioLoadingId === activeMemoryCard.id}
+                >
+                  {audioLoadingId === activeMemoryCard.id ? (
+                    <>
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 16 16"
+                        fill="none"
+                        className="vocab-spinner-icon"
+                      >
+                        <circle
+                          cx="8"
+                          cy="8"
+                          r="6"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeDasharray="24"
+                          strokeDashoffset="12"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                      Loading
+                    </>
+                  ) : (
+                    <>
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M6 5L9 8L6 11V5Z" fill="currentColor" />
+                        <path
+                          d="M9 4.5C10.5 5.5 11.5 6.5 11.5 8C11.5 9.5 10.5 10.5 9 11.5"
+                          stroke="currentColor"
+                          strokeWidth="1.3"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                      Play audio
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
+            <small style={{ display: "block", textAlign: "center", marginTop: "1.5rem", color: "#475569" }}>
+              Tap card to {showMemoryMeaning ? "see the word" : "reveal the meaning"}
+            </small>
+          </div>
+        ) : (
+          <div className="empty-state" style={{ margin: 0 }}>
+            <p>Save at least one word to start memory review.</p>
+          </div>
+        )}
+      </section>
     </div>
   );
 }

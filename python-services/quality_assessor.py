@@ -161,7 +161,17 @@ def calculate_vocabulary_metrics(text: str, task_level: str = "B2") -> Dict:
     length_score = min(avg_word_length / thresholds['avg_length'], 1.0) * 30
     sophistication_score = min(sophisticated_ratio / thresholds['sophisticated'], 1.0) * 30
     
-    vocabulary_score = int(diversity_score + length_score + sophistication_score)
+    # Apply stricter scaling so high scores really require strong vocabulary
+    base_vocab_score = diversity_score + length_score + sophistication_score
+    # Slightly more strict for higher levels
+    if task_level in ['C1', 'C2', 'B2']:
+        strict_factor = 0.8
+    elif task_level in ['B1']:
+        strict_factor = 0.85
+    else:
+        strict_factor = 0.9
+    vocabulary_score = int(base_vocab_score * strict_factor)
+    vocabulary_score = max(0, min(100, vocabulary_score))
     
     return {
         "total_words": total_words,
@@ -227,7 +237,15 @@ def calculate_grammar_metrics(text: str, task_level: str = "B2") -> Dict:
     punct_score = 10 if has_commas else 5
     punct_score += 10 if has_complex_punct else 0
     
-    grammar_score = int(length_score + variety_score + punct_score)
+    base_grammar_score = length_score + variety_score + punct_score
+    # Grammar should be penalized more strongly at higher levels
+    if task_level in ['C1', 'C2', 'B2']:
+        strict_factor = 0.8
+    elif task_level in ['B1']:
+        strict_factor = 0.85
+    else:
+        strict_factor = 0.9
+    grammar_score = int(base_grammar_score * strict_factor)
     
     return {
         "num_sentences": num_sentences,
@@ -279,7 +297,15 @@ def calculate_coherence_metrics(text: str, task_level: str = "B2") -> Dict:
     structure_score = 10 if has_introduction else 0
     structure_score += 10 if has_conclusion else 0
     
-    coherence_score = int(paragraph_score + linking_score + structure_score)
+    base_coherence_score = paragraph_score + linking_score + structure_score
+    # Coherence also slightly stricter for higher levels
+    if task_level in ['C1', 'C2', 'B2']:
+        strict_factor = 0.85
+    elif task_level in ['B1']:
+        strict_factor = 0.9
+    else:
+        strict_factor = 0.95
+    coherence_score = int(base_coherence_score * strict_factor)
     
     return {
         "num_paragraphs": num_paragraphs,
@@ -292,151 +318,122 @@ def calculate_coherence_metrics(text: str, task_level: str = "B2") -> Dict:
 
 def assess_quality_with_gemini(
     essay: str,
-    task_level: str = "B2"
+    task_level: str = "B2",
 ) -> Optional[Dict]:
-    """
-    Use Gemini to assess writing quality with detailed feedback
-    """
-    gemini_api_key = os.environ.get('GEMINI_API_KEY')
-    
+    """Use Gemini to assess writing quality with detailed feedback (strict mode)."""
+    gemini_api_key = os.environ.get("GEMINI_API_KEY")
     if not gemini_api_key:
         print("[Quality Assessor] Gemini API key not configured")
         return None
-    
-    # Detect spelling errors first
+
     spelling_errors, spelling_count, spelling_rate = detect_spelling_errors(essay)
-    spelling_errors_text = ", ".join(spelling_errors[:5]) if spelling_errors else "None detected"
-    
-    assessment_prompt = f"""You are an expert IELTS writing assessor. Evaluate this essay using IELTS 4 criteria at {task_level} level.
+    spelling_context = (
+        f"Detected potential spelling errors: {', '.join(spelling_errors[:5])}"
+        if spelling_errors
+        else "No obvious spelling errors detected via dictionary check."
+    )
 
-Student's Essay:
-"{essay[:3000]}"
+    assessment_prompt = f"""
+### ROLE
+You are a DRACONIAN IELTS EXAMINER. You are NOT here to encourage. You are here to grade strictly based on CEFR/IELTS standards.
+Your goal is to punish \"safe\" but \"simple\" writing.
 
-Task Level: {task_level}
+### INPUT
+Target Level: {task_level}
+Pre-check: {spelling_context}
+Essay:
+\"{essay[:3500]}\"
 
-CRITICAL: Check for spelling errors carefully. Common errors found: {spelling_errors_text}
-If you find spelling errors, you MUST list them in the "errors" array and reduce the score accordingly.
+### SCORING CRITERIA (STRICT ENFORCEMENT)
 
-Evaluate using IELTS criteria and return ONLY valid JSON:
+1. **Grammar (0-100)**:
+   - **The Simplicity Penalty**: If the essay uses mostly simple sentences (Subject-Verb-Object) like \"I like football. It is fun.\", the MAXIMUM score is 50, even if there are ZERO errors.
+   - **Complexity Requirement**: To score >60, there MUST be compound sentences. To score >70, there MUST be complex sentences (relative clauses, conditionals).
+   - **Error Penalty**: Deduct 15 points for basic errors (subject-verb agreement, singular/plural).
 
+2. **Vocabulary (0-100)**:
+   - **The Basic Penalty**: If the essay relies on A1/A2 words (good, bad, nice, happy, thing), the MAXIMUM score is 55.
+   - **Precision**: High scores (75+) require precise topic-specific collocations, not just \"big words\".
+   - **Spelling**: If you see basic spelling errors (e.g., \"becuase\", \"wrok\"), deduct 10 points per error type.
+
+3. **Coherence (0-100)**:
+   - Deduct points if linking words are repetitive (e.g., starting every sentence with \"And\" or \"Also\").
+
+### OUTPUT FORMAT (JSON ONLY)
 {{
-  "vocabulary": {{
-    "score": 85,
-    "range": "good variety of vocabulary, avoids repetition",
-    "accuracy": "mostly accurate word choice",
-    "collocations": "uses natural word combinations",
-    "style": "appropriate academic/formal style",
-    "sophistication": "uses some less common vocabulary appropriately",
-    "errors": ["repeated word 'very' too often", "incorrect collocation: 'make homework' should be 'do homework'"],
-    "suggestions": ["Use synonyms: 'extremely', 'particularly'", "Learn common collocations"]
+  \"vocabulary\": {{
+    \"score\": <int>,
+    \"range\": \"string\",
+    \"accuracy\": \"string\",
+    \"collocations\": \"string\",
+    \"sophistication\": \"string\",
+    \"errors\": [\"list\", \"of\", \"specific\", \"errors\"],
+    \"suggestions\": [\"specific\", \"improvements\"]
   }},
-  "grammar": {{
-    "score": 80,
-    "range": "uses variety of sentence structures (simple, compound, complex)",
-    "accuracy": "mostly accurate with minor errors",
-    "sentence_structures": ["simple sentences", "compound sentences", "complex sentences with relative clauses", "passive voice", "conditional sentences"],
-    "errors": ["Subject-verb agreement: 'people likes' should be 'people like'", "Tense consistency: mixed past and present"],
-    "suggestions": ["Review subject-verb agreement", "Maintain consistent tense throughout"]
+  \"grammar\": {{
+    \"score\": <int>,
+    \"range\": \"string\",
+    \"accuracy\": \"string\",
+    \"sentence_structures\": [\"list\", \"structures\", \"found\"],
+    \"errors\": [\"list\", \"of\", \"specific\", \"errors\"],
+    \"suggestions\": [\"specific\", \"improvements\"]
   }},
-  "coherence": {{
-    "score": 85,
-    "coherence": "ideas flow logically, clear structure",
-    "cohesion": "good use of linking words and referencing",
-    "organization": "well-organized with clear paragraphs and topic sentences",
-    "linking_words": ["however", "therefore", "furthermore", "in addition"],
-    "referencing": "uses pronouns (it, they, this) appropriately",
-    "paragraph_structure": "clear introduction, body paragraphs, conclusion",
-    "suggestions": ["Add more topic sentences to paragraphs", "Use more varied linking words"]
+  \"coherence\": {{
+    \"score\": <int>,
+    \"coherence\": \"string\",
+    \"cohesion\": \"string\",
+    \"organization\": \"string\",
+    \"linking_words\": [\"list\", \"found\"],
+    \"paragraph_structure\": \"string\",
+    \"suggestions\": [\"string\"]
   }},
-  "mechanics": {{
-    "score": 90,
-    "spelling_errors": [],
-    "punctuation_errors": ["Missing comma after introductory phrase"],
-    "capitalization_errors": []
+  \"mechanics\": {{
+    \"score\": <int>,
+    \"spelling_errors\": [\"list\"],
+    \"punctuation_errors\": [\"list\"],
+    \"capitalization_errors\": [\"list\"]
   }}
 }}
 
-CRITICAL SCORING RULES (0-100 for each):
-- 90-100: Excellent, NO ERRORS, sophisticated use
-- 80-89: Good, 1-2 MINOR errors that don't impede understanding
-- 70-79: Satisfactory, 3-4 errors but communication clear
-- 60-69: Fair, 5-6 errors affect clarity
-- 50-59: Poor, 7-10 errors impede understanding
-- Below 50: Very poor, 10+ serious errors
-
-IMPORTANT - STRICT RULES: 
-- SPELLING ERRORS: If you find spelling errors (e.g., "enjyo" instead of "enjoy", "wacths" instead of "watch"), score MUST be below 70. Each spelling error reduces score by 10-15 points.
-- VOCABULARY ERRORS: If you find vocabulary errors (wrong word choice, incorrect collocations), score MUST be below 80. Each error reduces score by 8-12 points.
-- GRAMMAR ERRORS: If you find grammar errors (subject-verb agreement, tense, articles, "go to slep" instead of "go to sleep"), score MUST be below 80. Each error reduces score by 10-15 points.
-- List ALL errors in the "errors" array - be thorough and specific. Include spelling, vocabulary, and grammar errors.
-- DO NOT give high scores (80+) if there are ANY spelling errors or multiple other errors
-- Example: If essay has "enjyo", "wacths", "litsen", "slep" → vocabulary score MUST be below 60, grammar score MUST be below 60
-
-For {task_level} level, expect:
-- Vocabulary: Appropriate range and accuracy for level - but still penalize errors
-- Grammar: Mix of sentence types, mostly accurate - but still penalize errors
-- Coherence: Clear structure with linking words
-
-Be STRICT and ACCURATE. If there are errors, the score MUST reflect them.
-Adjust expectations based on {task_level} level, but always penalize errors.
-Return ONLY the JSON."""
+BE HARSH. DO NOT INFLATE SCORES.
+"""
 
     try:
-        # Try v1 first, fallback to v1beta if needed
-        api_url = f"https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key={gemini_api_key}"
-        
+        api_url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={gemini_api_key}"
         response = requests.post(
             api_url,
             json={
-                "contents": [{
-                    "parts": [{"text": assessment_prompt}]
-                }],
+                "contents": [{"parts": [{"text": assessment_prompt}]}],
                 "generationConfig": {
-                    "temperature": 0.3,
-                    "maxOutputTokens": 2048,
-                }
-            },
-            timeout=15
-        )
-        
-        # If 404, try v1beta
-        if response.status_code == 404:
-            api_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={gemini_api_key}"
-            response = requests.post(
-                api_url,
-                json={
-                    "contents": [{
-                        "parts": [{"text": assessment_prompt}]
-                    }],
-                    "generationConfig": {
-                        "temperature": 0.3,
-                        "maxOutputTokens": 2048,
-                    }
+                    "temperature": 0.1,
+                    "responseMimeType": "application/json",
                 },
-                timeout=15
-            )
-        
+            },
+            timeout=15,
+        )
+
         if response.status_code != 200:
-            print(f"[Quality Assessor] Gemini API error: {response.status_code} - {response.text[:200]}")
+            print(f"[Quality Assessor] Gemini API error: {response.status_code}")
             return None
-        
+
         result = response.json()
-        
-        if 'candidates' not in result or not result['candidates']:
+        if "candidates" not in result or not result["candidates"]:
             return None
-        
-        content = result['candidates'][0]['content']['parts'][0]['text']
-        
-        # Extract JSON
-        json_match = re.search(r'\{[\s\S]*\}', content)
+
+        content = result["candidates"][0]["content"]["parts"][0].get("text", "")
+        if content.startswith("```json"):
+            content = content[7:-3].strip()
+
+        json_match = re.search(r"\{[\s\S]*\}", content)
         if not json_match:
             return None
-        
+
         assessment = json.loads(json_match.group(0))
-        
-        print(f"[Quality Assessor] Assessment complete - Vocab: {assessment.get('vocabulary', {}).get('score', 0)}, Grammar: {assessment.get('grammar', {}).get('score', 0)}")
+        print(
+            f"[Quality Assessor] Gemini strict score - Vocab: {assessment.get('vocabulary', {}).get('score')}, Grammar: {assessment.get('grammar', {}).get('score')}"
+        )
         return assessment
-        
+
     except Exception as e:
         print(f"[Quality Assessor] Error: {e}")
         return None
@@ -447,7 +444,7 @@ def assess_quality(essay: str, task_level: str = "B2") -> Dict:
     Main function to assess writing quality
     Combines rule-based metrics with optional Gemini assessment
     """
-    # Calculate rule-based metrics (always available)
+    # Calculate rule-based metrics (always available & fast)
     vocab_metrics = calculate_vocabulary_metrics(essay, task_level)
     grammar_metrics = calculate_grammar_metrics(essay, task_level)
     coherence_metrics = calculate_coherence_metrics(essay, task_level)
@@ -456,28 +453,54 @@ def assess_quality(essay: str, task_level: str = "B2") -> Dict:
     gemini_assessment = assess_quality_with_gemini(essay, task_level)
     
     if gemini_assessment:
-        # Use Gemini scores but keep metrics for transparency
+        # ----- Vocabulary score: trust Gemini but never above rule-based by too much -----
+        vocab_fb = gemini_assessment.get("vocabulary", {}) or {}
+        vocab_score_raw = vocab_fb.get("score", vocab_metrics["score"])
+        # Allow Gemini to be slightly higher than rule-based, but cap the gap
+        max_vocab = vocab_metrics["score"] + 10
+        vocab_score = max(0, min(vocab_score_raw, max_vocab))
+
+        # ----- Grammar score: penalize heavily if Gemini reports many errors -----
+        grammar_fb = gemini_assessment.get("grammar", {}) or {}
+        grammar_score_raw = grammar_fb.get("score", grammar_metrics["score"])
+        grammar_errors = grammar_fb.get("errors", []) or []
+        # 3 điểm / lỗi, tối đa 25 điểm penalty
+        grammar_penalty = min(len(grammar_errors) * 3, 25)
+        grammar_score_after_errors = max(0, grammar_score_raw - grammar_penalty)
+        # Không cho grammar cao hơn rule-based quá nhiều (giữ strict khi cấu trúc câu đơn giản)
+        max_grammar = grammar_metrics["score"] + 5
+        grammar_score = max(0, min(grammar_score_after_errors, max_grammar))
+
+        # ----- Coherence score: nhẹ hơn, chủ yếu tin Gemini nhưng vẫn cap -----
+        coherence_fb = gemini_assessment.get("coherence", {}) or {}
+        coherence_score_raw = coherence_fb.get("score", coherence_metrics["score"])
+        max_coherence = coherence_metrics["score"] + 10
+        coherence_score = max(0, min(coherence_score_raw, max_coherence))
+
+        mechanics_fb = gemini_assessment.get("mechanics", {}) or {}
+        mechanics_score = mechanics_fb.get("score", 95)
+
         return {
             "vocabulary": {
-                "score": gemini_assessment.get('vocabulary', {}).get('score', vocab_metrics['score']),
+                "score": vocab_score,
                 "metrics": vocab_metrics,
-                "feedback": gemini_assessment.get('vocabulary', {})
+                "feedback": vocab_fb,
             },
             "grammar": {
-                "score": gemini_assessment.get('grammar', {}).get('score', grammar_metrics['score']),
+                "score": grammar_score,
                 "metrics": grammar_metrics,
-                "feedback": gemini_assessment.get('grammar', {})
+                "feedback": grammar_fb,
             },
             "coherence": {
-                "score": gemini_assessment.get('coherence', {}).get('score', coherence_metrics['score']),
+                "score": coherence_score,
                 "metrics": coherence_metrics,
-                "feedback": gemini_assessment.get('coherence', {})
+                "feedback": coherence_fb,
             },
             "mechanics": {
-                "score": gemini_assessment.get('mechanics', {}).get('score', 95),
-                "feedback": gemini_assessment.get('mechanics', {})
+                "score": mechanics_score,
+                "feedback": mechanics_fb,
             },
-            "source": "gemini"
+            "source": "gemini_strict",
         }
     else:
         # Use only rule-based metrics

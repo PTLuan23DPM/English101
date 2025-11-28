@@ -39,7 +39,8 @@ export function useWritingLLMUsage(taskId: string | null) {
                 const response = await fetch("/api/writing/usage/check", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ taskId }),
+                    credentials: "include",
+                    body: JSON.stringify({ taskId, userId: session.user.id }),
                 });
 
                 if (response.ok) {
@@ -77,9 +78,11 @@ export function useWritingLLMUsage(taskId: string | null) {
             const response = await fetch("/api/writing/usage/record", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
+                credentials: "include",
                 body: JSON.stringify({
                     taskId,
                     feature,
+                    userId: session.user.id,
                     metadata,
                 }),
             });
@@ -91,7 +94,8 @@ export function useWritingLLMUsage(taskId: string | null) {
                         const usageResponse = await fetch("/api/writing/usage/check", {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ taskId }),
+                            credentials: "include",
+                            body: JSON.stringify({ taskId, userId: session.user.id }),
                         });
 
                         if (usageResponse.ok) {

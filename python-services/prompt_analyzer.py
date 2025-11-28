@@ -36,141 +36,94 @@ except Exception:
 
 
 def analyze_prompt_with_gemini(prompt: str, task_level: str = "B2") -> Optional[Dict]:
-    """
-    Use Gemini to analyze prompt and extract detailed requirements
-    Returns structured prompt analysis with scoring criteria
-    """
-    gemini_api_key = os.environ.get('GEMINI_API_KEY')
-    
+    """Use Gemini to analyze prompt and extract detailed requirements."""
+    gemini_api_key = os.environ.get("GEMINI_API_KEY")
     if not gemini_api_key:
         print("[Prompt Analyzer] Gemini API key not configured")
         return None
-    
-    analysis_prompt = f"""You are an expert English writing assessment specialist. Analyze this writing prompt and extract ALL requirements, constraints, and scoring criteria.
 
-Writing Prompt: "{prompt}"
-Task Level: {task_level}
+    analysis_prompt = f"""
+### ROLE
+You are a Lead IELTS Task Designer. Your job is to deconstruct writing prompts into strict validation criteria.
 
-Analyze and return ONLY valid JSON with this EXACT structure:
+### INPUT
+Prompt: "{prompt}"
+Target Level: {task_level}
+
+### INSTRUCTIONS
+Analyze the prompt and output a JSON object.
+1. **Core Topic vs. Focus**: Differentiate between the general topic (e.g., "Technology") and the specific question (e.g., "Should children use smartphones?").
+2. **Strictness**: Determine if this task requires strict adherence (e.g., Academic Essay) or allows creativity (e.g., Story).
+3. **Constraints**: Identify specific constraints (time, place, word count).
+
+### OUTPUT JSON FORMAT
 {{
-  "task_type": "descriptive/narrative/argumentative/email/sentence",
-  "main_topic": "the core topic in 2-3 words",
-  "topic_keywords": ["keyword1", "keyword2", "keyword3"],
+  "task_type": "argumentative" | "narrative" | "descriptive" | "email" | "sentence",
+  "main_topic": "The broad subject (e.g., Education)",
+  "specific_focus": "The specific angle (e.g., Online learning pros/cons)",
+  "topic_keywords": ["key1", "key2", "key3"],
+  "strictness": "strict" | "normal" | "lenient", 
   "required_elements": {{
-    "what": "what the student must write about",
-    "where": "location/place requirement (if any)",
-    "when": "time/period requirement (if any)",
-    "why": "reason/explanation requirement (if any)",
-    "who": "people/characters requirement (if any)"
+    "what": "actions/objects mentioned",
+    "where": "location constraint",
+    "when": "time constraint",
+    "why": "reasoning requirement",
+    "who": "specific characters/roles"
   }},
   "word_count": {{
-    "minimum": 50,
+    "minimum": 150,
     "maximum": 300,
-    "target": 150
+    "target": 250
   }},
-  "grammatical_focus": ["present simple", "past simple", "time expressions"],
-  "content_requirements": [
-    "Must describe...",
-    "Must explain...",
-    "Must include..."
-  ],
-  "scoring_emphasis": {{
-    "task_response": 0.35,
-    "vocabulary": 0.25,
-    "grammar": 0.25,
-    "coherence": 0.15
-  }},
+  "grammatical_focus": ["passive voice", "conditionals", "past tense"],
   "off_topic_indicators": [
-    "writing about X instead of Y",
-    "discussing unrelated topic"
+    "writing about generic topic instead of specific focus",
+    "ignoring the 'why' question"
   ]
 }}
 
-CRITICAL INSTRUCTIONS:
-1. Extract the CORE TOPIC - what is the essay fundamentally about?
-2. Identify ALL must-have elements (what, where, when, why, who)
-3. Set appropriate word count based on task type and level
-4. List specific grammatical structures that should be used
-5. Define what would make this essay off-topic
-6. Adjust scoring weights based on task type
-
-Return ONLY the JSON, no additional text."""
+Return ONLY the JSON.
+"""
 
     try:
-        # Try v1 first, fallback to v1beta if needed
-        api_url = f"https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key={gemini_api_key}"
-        
+        api_url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={gemini_api_key}"
         response = requests.post(
             api_url,
             json={
-                "contents": [{
-                    "parts": [{"text": analysis_prompt}]
-                }],
+                "contents": [{"parts": [{"text": analysis_prompt}]}],
                 "generationConfig": {
-                    "temperature": 0.2,
-                    "maxOutputTokens": 2048,
-                }
-            },
-            timeout=10
-        )
-        
-        # If 404, try v1beta
-        if response.status_code == 404:
-            api_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={gemini_api_key}"
-            response = requests.post(
-                api_url,
-                json={
-                    "contents": [{
-                        "parts": [{"text": analysis_prompt}]
-                    }],
-                    "generationConfig": {
-                        "temperature": 0.2,
-                        "maxOutputTokens": 2048,
-                    }
+                    "temperature": 0.1,
+                    "responseMimeType": "application/json",
                 },
-                timeout=10
-            )
-        
+            },
+            timeout=10,
+        )
+
         if response.status_code != 200:
-            print(f"[Prompt Analyzer] Gemini API error: {response.status_code} - {response.text[:200]}")
+            print(f"[Prompt Analyzer] Gemini API error: {response.status_code}")
             return None
-        
+
         result = response.json()
-        
-        if 'candidates' not in result or not result['candidates']:
-            print("[Prompt Analyzer] No response from Gemini")
+        if "candidates" not in result or not result["candidates"]:
             return None
-        
-        content = result['candidates'][0]['content']['parts'][0]['text']
-        
-        # Extract JSON from response
-        json_match = re.search(r'\{[\s\S]*\}', content)
+
+        content = result["candidates"][0]["content"]["parts"][0].get("text", "")
+        json_match = re.search(r"\{[\s\S]*\}", content)
         if not json_match:
-            print("[Prompt Analyzer] No JSON found in Gemini response")
             return None
-        
+
         analysis = json.loads(json_match.group(0))
-        
-        # Validate required fields
-        required_fields = ['task_type', 'main_topic', 'topic_keywords', 'required_elements', 'word_count']
-        if not all(field in analysis for field in required_fields):
-            print("[Prompt Analyzer] Missing required fields in analysis")
-            return None
-        
-        print(f"[Prompt Analyzer] Successfully analyzed prompt: {analysis['main_topic']}")
+
+        if "specific_focus" not in analysis:
+            analysis["specific_focus"] = analysis.get("main_topic", "")
+        if "strictness" not in analysis:
+            analysis["strictness"] = "normal"
+
+        print(f"[Prompt Analyzer] Analyzed: {analysis.get('main_topic')} -> {analysis.get('specific_focus')}")
         return analysis
-        
-    except requests.exceptions.Timeout:
-        print("[Prompt Analyzer] Gemini API timeout")
-        return None
-    except requests.exceptions.RequestException as e:
-        print(f"[Prompt Analyzer] Gemini API request failed: {e}")
-        return None
-    except json.JSONDecodeError as e:
-        print(f"[Prompt Analyzer] Failed to parse Gemini response: {e}")
-        return None
+
     except Exception as e:
-        print(f"[Prompt Analyzer] Unexpected error: {e}")
+        print(f"[Prompt Analyzer] Error: {e}")
         return None
 
 
@@ -229,7 +182,7 @@ def analyze_prompt_rule_based(prompt: str, task_level: str = "B2") -> Dict:
     # Main topic (first meaningful noun phrase)
     main_topic = " ".join(keywords[:3]) if keywords else "general topic"
     
-    return {
+    result = {
         "task_type": task_type,
         "main_topic": main_topic,
         "topic_keywords": keywords,
@@ -241,11 +194,14 @@ def analyze_prompt_rule_based(prompt: str, task_level: str = "B2") -> Dict:
             "task_response": 0.35,
             "vocabulary": 0.25,
             "grammar": 0.25,
-            "coherence": 0.15
+            "coherence": 0.15,
         },
         "off_topic_indicators": [],
-        "fallback": True
+        "fallback": True,
     }
+    result["specific_focus"] = result.get("main_topic", "general topic")
+    result["strictness"] = "normal"
+    return result
 
 
 def analyze_prompt(prompt: str, task_level: str = "B2") -> Dict:

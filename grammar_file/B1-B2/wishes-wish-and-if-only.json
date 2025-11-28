@@ -1,0 +1,104 @@
+{
+  "id": "wishes-wish-and-if-only",
+  "title": "Wishes: 'wish' and 'if only'",
+  "level": "B1-B2",
+  "introduction": "Do you know how to use wish and if only to talk about things you would like to change? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "We use wish and if only to talk about things that we would like to be different in either the present or the past. If only is usually a bit stronger than wish.",
+  "rules": [
+    "We use wish and if only to talk about things that we would like to be different in either the present or the past.",
+    "if only + a past form to talk about a present situation we would like to be different.",
+    "if only + a past perfect form to talk about something we would like to change about the past."
+  ],
+  "keyPoints": [
+    "only I hadn't lost her phone number",
+    "only we knew what to do",
+    "only I'd studied harder when I was at school"
+  ],
+  "examples": [
+    "Do you know how to use wish and if only to talk about things you would like to change?",
+    "Look at these examples to see how wish and if only are used.",
+    "That guy is so annoying!",
+    "I wish I lived closer to my family.",
+    "If only I hadn't lost her phone number.",
+    "I wish they wouldn't park their car in front of my house.",
+    "Grammar explanation",
+    "We use wish and if only to talk about things that we would like to be different in either the present or the past.",
+    "In the present",
+    "We can use wish/if only + a past form to talk about a present situation we would like to be different.",
+    "I wish you didn't live so far away.",
+    "If only we knew what to do.",
+    "He wishes he could afford a holiday.",
+    "In the past",
+    "We can use wish/if only + a past perfect form to talk about something we would like to change about the past.",
+    "They wish they hadn't eaten so much chocolate.",
+    "If only I'd studied harder when I was at school.",
+    "Expressing annoyance",
+    "We can use wish + would(n't) to show that we are annoyed with what someone or something does or doesn't do.",
+    "I wish you wouldn't borrow my clothes without asking."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Do you know how to use wish and _____ to talk about things you would like to change?",
+      "options": [
+        "if only",
+        "if onlys",
+        "if onlyed",
+        "not if only"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to wishes: 'wish' and 'if only' usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Look at these examples to see how wish and _____ are used.",
+      "options": [
+        "if only",
+        "if onlys",
+        "if onlyed",
+        "not if only"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to wishes: 'wish' and 'if only' usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "I _____ I lived closer to my family.",
+      "options": [
+        "wish",
+        "wishs",
+        "wished",
+        "not wish"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to wishes: 'wish' and 'if only' usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "_____ I hadn't lost her phone number.",
+      "correct": "If only",
+      "hint": "Apply the rule for wishes: 'wish' and 'if only'.",
+      "explanation": "The correct form here is 'If only'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "I _____ they wouldn't park their car in front of my house.",
+      "correct": "wish",
+      "hint": "Apply the rule for wishes: 'wish' and 'if only'.",
+      "explanation": "The correct form here is 'wish'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "We use wish and _____ to talk about things that we would like to be different in either the present or the past.",
+      "correct": "if only",
+      "hint": "Apply the rule for wishes: 'wish' and 'if only'.",
+      "explanation": "The correct form here is 'if only'."
+    }
+  ]
+}

@@ -1,0 +1,100 @@
+{
+  "id": "the-future-degrees-of-certainty",
+  "title": "The future: degrees of certainty",
+  "level": "B1-B2",
+  "introduction": "Do you know how to use phrases like will definitely, be likely to and probably won't to say how sure you are about future events? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "We can show how certain we are about the future by using modal verbs and other expressions.",
+  "rules": [
+    "When you are not sure, we can also use may, could and may not."
+  ],
+  "keyPoints": [
+    "you are not sure, we can also use may, could and may not"
+  ],
+  "examples": [
+    "may or could) and adverbs (such as probably and definitely) to show how sure we are",
+    "be bound to and be likely to",
+    "or verbs such as think and doubt",
+    "Do you know how to use phrases like will definitely, be likely to and probably won't to say how sure you are about future events?",
+    "Look at these examples to see how we can express different degrees of certainty about the future.",
+    "I'll definitely be at the meeting, don't worry.",
+    "Grammar explanation",
+    "We can show how certain we are about the future by using modal verbs and other expressions.",
+    "Modal verbs and adverbs",
+    "We can use modal verbs (such as will, might, may or could) and adverbs (such as probably and definitely) to show how sure we are.",
+    "People will definitely work from home more in the future.",
+    "Donna will really enjoy this film.",
+    "Almost sure",
+    "We'll probably finish the project by tomorrow.",
+    "He probably won't have enough time.",
+    "I might go to the party, but I'm not sure yet.",
+    "He hasn't studied much, so he might not pass the exam.",
+    "When you are not sure, we can also use may, could and may not.",
+    "Other expressions",
+    "We can also use other expressions such as be bound to and be likely to, or verbs such as think and doubt."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "may or _____) and adverbs (such as probably and definitely) to show how sure we are",
+      "options": [
+        "could",
+        "will",
+        "would",
+        "shall"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to the future: degrees of certainty usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Do you know how to use phrases like will definitely, be likely to and probably _____ to say how sure you are about future events?",
+      "options": [
+        "won't",
+        "won'ts",
+        "won'ted",
+        "not won't"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to the future: degrees of certainty usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Look at these examples to see how we _____ express different degrees of certainty about the future.",
+      "options": [
+        "can",
+        "will",
+        "would",
+        "shall"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to the future: degrees of certainty usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "We _____ show how certain we are about the future by using modal verbs and other expressions.",
+      "correct": "can",
+      "hint": "Apply the rule for the future: degrees of certainty.",
+      "explanation": "The correct form here is 'can'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "We can use modal verbs (such as will, might, may or _____) and adverbs (such as probably and definitely) to show how sure we are.",
+      "correct": "could",
+      "hint": "Apply the rule for the future: degrees of certainty.",
+      "explanation": "The correct form here is 'could'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "People _____ definitely work from home more in the future.",
+      "correct": "will",
+      "hint": "Apply the rule for the future: degrees of certainty.",
+      "explanation": "The correct form here is 'will'."
+    }
+  ]
+}

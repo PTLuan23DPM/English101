@@ -1,0 +1,113 @@
+{
+  "id": "patterns-with-reporting-verbs",
+  "title": "Patterns with reporting verbs",
+  "level": "C1",
+  "introduction": "Do you know how to use reporting verbs in a sentence? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "When we tell someone what another person said, we often use the reporting verbs say, tell and ask. However, we can also use other verbs to more accurately report what the speaker has said.",
+  "rules": [
+    "When we tell someone what another person said, we often use the reporting verbs say, tell and ask.",
+    "when verbs with dependent prepositions are followed by another verb, we always use the -ing form.",
+    "Verb + infinitive",
+    "Verb + object + infinitive",
+    "Verb + -ing",
+    "Verb + preposition + -ing",
+    "Verb + object + preposition + -ing",
+    "Verb + that + subjunctive",
+    "Verb + that + indicative",
+    "Verb + object + that clause"
+  ],
+  "keyPoints": [
+    "we tell someone what another person said, we often use the reporting verbs say, tell and ask",
+    "some verbs are immediately followed by another verb, the second verb is in infinitive form",
+    "certain verbs are immediately followed by another verb, the second verb has to be in -ing form",
+    "when verbs with dependent prepositions are followed by another verb, we always use the -ing form",
+    "reporting verbs do not relate to a desire, they can be followed by a that clause in a variety of tenses, and the subjunctive is not necessary"
+  ],
+  "examples": [
+    "Do you know how to use reporting verbs in a sentence?",
+    "Harper reminds us that human rights are the priority.",
+    "Each reporting verb requires a different pattern after it, and more than one pattern is possible after some verbs.",
+    "Verb + infinitive",
+    "When some verbs are immediately followed by another verb, the second verb is in infinitive form.",
+    "He promised not to share our personal information.",
+    "Verbs in this group include agree, claim, demand, offer, promise, refuse and threaten.",
+    "Verb + object + infinitive",
+    "Some verbs that are followed by the infinitive need an object between the reporting verb and the infinitive.",
+    "Verbs in this group include advise, ask, encourage, invite, order, remind, tell, urge and warn.",
+    "Verb + -ing",
+    "When certain verbs are immediately followed by another verb, the second verb has to be in -ing form.",
+    "Computer scientists admit not knowing where the faulty data came from.",
+    "Verbs in this group include admit, deny, mention, recommend and suggest.",
+    "Verb + preposition + -ing",
+    "Note that when verbs with dependent prepositions are followed by another verb, we always use the -ing form.",
+    "Two organisations apologised for not being present.",
+    "Verbs in this group include apologise for, complain about, confess to, insist on and object to.",
+    "This structure is also used with warn when it is followed by the preposition against, and admit when it is followed by the preposition to.",
+    "Verb + object + preposition + -ing"
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Harper reminds us _____ human rights are the priority.",
+      "options": [
+        "that",
+        "thats",
+        "thated",
+        "not that"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to patterns with reporting verbs usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Each reporting _____ requires a different pattern after it, and more than one pattern is possible after some verbs.",
+      "options": [
+        "verb",
+        "verbs",
+        "verbed",
+        "not verb"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to patterns with reporting verbs usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Verb + _____",
+      "options": [
+        "infinitive",
+        "infinitives",
+        "infinitiveed",
+        "not infinitive"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to patterns with reporting verbs usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "When some verbs are immediately followed by another verb, the second verb is in _____ form.",
+      "correct": "infinitive",
+      "hint": "Apply the rule for patterns with reporting verbs.",
+      "explanation": "The correct form here is 'infinitive'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "Verb + object + _____",
+      "correct": "infinitive",
+      "hint": "Apply the rule for patterns with reporting verbs.",
+      "explanation": "The correct form here is 'infinitive'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "Some verbs that are followed by the _____ need an object between the reporting verb and the infinitive.",
+      "correct": "infinitive",
+      "hint": "Apply the rule for patterns with reporting verbs.",
+      "explanation": "The correct form here is 'infinitive'."
+    }
+  ]
+}

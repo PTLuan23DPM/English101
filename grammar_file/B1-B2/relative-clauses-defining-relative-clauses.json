@@ -1,0 +1,95 @@
+{
+  "id": "relative-clauses-defining-relative-clauses",
+  "title": "Relative clauses: defining relative clauses",
+  "level": "B1-B2",
+  "introduction": "Do you know how to define who or what you are talking about using relative clauses? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "Relative clauses give us information about the person or thing mentioned.",
+  "rules": [],
+  "keyPoints": [
+    "can refer to a time"
+  ],
+  "examples": [
+    "Do you know how to define who or what you are talking about using relative clauses?",
+    "Look at these examples to see how defining relative clauses are used.",
+    "Are you the one who sent me the email?",
+    "The phone which has the most features is also the most expensive.",
+    "The person they spoke to was really helpful.",
+    "Defining relative clauses give us essential information – information that tells us who or what we are talking about.",
+    "The woman who lives next door works in a bank.",
+    "There was a one-year guarantee which came with the TV.",
+    "The laptop that I bought last week has started making a strange noise!",
+    "Other pronouns",
+    "when can refer to a time.",
+    "Summer is the season when I'm happiest.",
+    "He's a musician whose albums have sold millions.",
+    "Omitting the relative pronoun",
+    "Sometimes we can leave out the relative pronoun.",
+    "The assistant [that] we met was really kind.",
+    "The assistant that helped us was really kind."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Do you know how to define _____ or what you are talking about using relative clauses?",
+      "options": [
+        "who",
+        "whos",
+        "whoed",
+        "not who"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to relative clauses: defining relative clauses usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Are you the one _____ sent me the email?",
+      "options": [
+        "who",
+        "whos",
+        "whoed",
+        "not who"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to relative clauses: defining relative clauses usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "The phone _____ has the most features is also the most expensive.",
+      "options": [
+        "which",
+        "whichs",
+        "whiched",
+        "not which"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to relative clauses: defining relative clauses usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "Defining relative clauses give us essential information – information _____ tells us who or what we are talking about.",
+      "correct": "that",
+      "hint": "Apply the rule for relative clauses: defining relative clauses.",
+      "explanation": "The correct form here is 'that'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "The woman _____ lives next door works in a bank.",
+      "correct": "who",
+      "hint": "Apply the rule for relative clauses: defining relative clauses.",
+      "explanation": "The correct form here is 'who'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "There was a one-year guarantee _____ came with the TV.",
+      "correct": "which",
+      "hint": "Apply the rule for relative clauses: defining relative clauses.",
+      "explanation": "The correct form here is 'which'."
+    }
+  ]
+}

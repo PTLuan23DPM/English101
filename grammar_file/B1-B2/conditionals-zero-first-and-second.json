@@ -1,0 +1,109 @@
+{
+  "id": "conditionals-zero-first-and-second",
+  "title": "Conditionals: zero, first and second",
+  "level": "B1-B2",
+  "introduction": "Do you know how to use the zero, first and second conditionals? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "Conditionals describe the result of a certain condition. The if clause tells you the condition (If you study hard) and the main clause tells you the result (you will pass your exams). The order of the clauses does not change the meaning.",
+  "rules": [
+    "We use the zero conditional to talk about things that are generally true, especially for laws and rules.",
+    "The second conditional is used to imagine present or future situations that are impossible or unlikely in reality.",
+    "The structure is: if/when + present simple >> present simple.",
+    "when + present simple >> present simple.",
+    "when + present simple >> will + infinitive.",
+    "if + past simple >> + would + infinitive."
+  ],
+  "keyPoints": [
+    "you freeze water, it becomes solid",
+    "it rains tomorrow, I'll take the car",
+    "I lived closer to the cinema, I would go more often",
+    "you study hard, you will pass your exams",
+    "I drink too much coffee, I can't sleep at night"
+  ],
+  "examples": [
+    "Do you know how to use the zero, first and second conditionals?",
+    "Look at these examples to see how zero, first and second conditionals are used.",
+    "If I lived closer to the cinema, I would go more often.",
+    "If you study hard, you will pass your exams.",
+    "You will pass your exams if you study hard.",
+    "Conditional sentences are often divided into different types.",
+    "Zero conditional",
+    "We use the zero conditional to talk about things that are generally true, especially for laws and rules.",
+    "If I drink too much coffee, I can't sleep at night.",
+    "When the sun goes down, it gets dark.",
+    "First conditional",
+    "We use the first conditional when we talk about future situations we believe are real or possible.",
+    "If it doesn't rain tomorrow, we'll go to the beach.",
+    "Arsenal will be top of the league if they win.",
+    "When I finish work, I'll call you.",
+    "In first conditional sentences, the structure is usually: if/when + present simple >> will + infinitive.",
+    "It is also common to use this structure with unless, as long as, as soon as or in case instead of if.",
+    "I don't want to stay in London unless I get a well-paid job.",
+    "You can go to the party, as long as you're back by midnight.",
+    "Second conditional"
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Do you know how _____ use the zero, first and second conditionals?",
+      "options": [
+        "to",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to conditionals: zero, first and second usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Look at these examples to see how zero, first and second conditionals _____ used.",
+      "options": [
+        "are",
+        "be",
+        "been",
+        "being"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to conditionals: zero, first and second usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "If I lived closer to the cinema, I _____ go more often.",
+      "options": [
+        "would",
+        "woulds",
+        "woulded",
+        "not would"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to conditionals: zero, first and second usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "If you study hard, you _____ pass your exams.",
+      "correct": "will",
+      "hint": "Apply the rule for conditionals: zero, first and second.",
+      "explanation": "The correct form here is 'will'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "You _____ pass your exams if you study hard.",
+      "correct": "will",
+      "hint": "Apply the rule for conditionals: zero, first and second.",
+      "explanation": "The correct form here is 'will'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "Conditional sentences _____ often divided into different types.",
+      "correct": "are",
+      "hint": "Apply the rule for conditionals: zero, first and second.",
+      "explanation": "The correct form here is 'are'."
+    }
+  ]
+}

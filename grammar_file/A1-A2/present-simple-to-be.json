@@ -1,0 +1,101 @@
+{
+  "id": "present-simple-to-be",
+  "title": "Present simple: 'to be'",
+  "level": "A1-A2",
+  "introduction": "Do you know how to use the verb to be in the present simple? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "We can use the present simple of the verb to be to talk about situations and states in the present.",
+  "rules": [],
+  "keyPoints": [
+    "negatives, use not after the verb",
+    "questions, change the order of am, is or are and the person",
+    "with short answers, we only use contractions with no answers",
+    "is the meeting? It's next Tuesday"
+  ],
+  "examples": [
+    "I'm a student.",
+    "My mum's a doctor.",
+    "They aren't very busy.",
+    "Is he a teacher?",
+    "I am a shop assistant. = I'm a shop assistant.",
+    "You are a good friend! = You're a good friend!",
+    "He is my wife's brother. = He's my wife's brother.",
+    "We are very busy at the moment. = We're very busy at the moment.",
+    "They are on holiday in Italy. = They're on holiday in Italy.",
+    "I am not at work. = I'm not at work. Note: I amn't is not possible.",
+    "She is not a student. = She's not a student. = She isn't a student.",
+    "Money is not important. = Money's not important. = Money isn't important.",
+    "We are not hungry. = We're not hungry. = We aren't hungry.",
+    "They are not at home. = They're not at home. = They aren't at home.",
+    "Are you tired?",
+    "Is she Mexican?",
+    "Is this your phone?",
+    "Are we late?",
+    "Are they your children?",
+    "Yes, I am. / No, I am not. / No, I'm not."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "My mum's _____ doctor.",
+      "options": [
+        "a",
+        "some",
+        "any",
+        "one"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to present simple: 'to be' usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "They aren't _____ busy.",
+      "options": [
+        "very",
+        "verys",
+        "veryed",
+        "not very"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to present simple: 'to be' usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Is he _____ teacher?",
+      "options": [
+        "a",
+        "some",
+        "any",
+        "one"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to present simple: 'to be' usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "I am a shop assistant. _____ I'm a shop assistant.",
+      "correct": "=",
+      "hint": "Apply the rule for present simple: 'to be'.",
+      "explanation": "The correct form here is '='."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "You are a good friend! _____ You're a good friend!",
+      "correct": "=",
+      "hint": "Apply the rule for present simple: 'to be'.",
+      "explanation": "The correct form here is '='."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "He is my wife's brother. _____ He's my wife's brother.",
+      "correct": "=",
+      "hint": "Apply the rule for present simple: 'to be'.",
+      "explanation": "The correct form here is '='."
+    }
+  ]
+}

@@ -1,0 +1,128 @@
+{
+  "id": "articles-the-or-no-article",
+  "title": "Articles: 'the' or no article",
+  "level": "A1-A2",
+  "introduction": "Do you know when you need to use the in common phrases and place names? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "Here are some ways we use articles in common phrases and place names.",
+  "rules": [],
+  "keyPoints": [],
+  "examples": [
+    "I'm going to bed.\n\nI walk to work.\n\nMy children are going to start school.\n\nI visited the school yesterday.\n\nMount Everest is in the Himalayas.",
+    "go to bed / be in bed\ngo to work / be at work / start work / finish work\ngo home / be at home / get home / stay at home",
+    "start school / go to school / be at school\ngo to university / be at university\nbe sent to prison / go to prison / be in prison\ngo to hospital / be in hospital",
+    "My son has started school now. I went to the school to meet his teacher.\n\nI went to the prison a lot when I was a social worker.\n\nI'm at the hospital. My sister has just had a baby.",
+    "the United Arab Emirates, the United Kingdom, the United States of America\nthe Bahamas, the Gambia",
+    "the Atlantic, the Pacific, the Mediterranean\nthe Andes, the Himalayas, the Alps\nthe Nile, the Amazon, the Yangtze",
+    "the University of Cape Town, the University of Delhi, the University of Tokyo"
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct word to complete the sentence:",
+      "sentence": "I'm going to bed. I walk to work. My children are going to _____ school. I visited the school yesterday. Mount Everest is in the Himalayas.",
+      "options": [
+        "start",
+        "starts",
+        "started",
+        "very start"
+      ],
+      "correct": 0,
+      "explanation": "The correct answer is 'start' because..."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct word to complete the sentence:",
+      "sentence": "go to bed / be in bed go to work / be at work / start _____ / finish work go home / be at home / get home / stay at home",
+      "options": [
+        "work",
+        "works",
+        "worked",
+        "very work"
+      ],
+      "correct": 0,
+      "explanation": "The correct answer is 'work' because..."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct word to complete the sentence:",
+      "sentence": "start school / go to school / be at school go to university / be at university be _____ to prison / go to prison / be in prison go to hospital / be in hospital",
+      "options": [
+        "sent",
+        "sents",
+        "sented",
+        "very sent"
+      ],
+      "correct": 0,
+      "explanation": "The correct answer is 'sent' because..."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank:",
+      "sentence": "My son has started school now. I went to the school to meet his teacher. I went to the _____ a lot when I was a social worker. I'm at the hospital. My sister has just had a baby.",
+      "correct": "prison",
+      "hint": "Think about articles: 'the' or no article",
+      "explanation": "The answer is 'prison'"
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank:",
+      "sentence": "the United Arab Emirates, the United Kingdom, the _____ States of America the Bahamas, the Gambia",
+      "correct": "United",
+      "hint": "Think about articles: 'the' or no article",
+      "explanation": "The answer is 'United'"
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank:",
+      "sentence": "the Atlantic, the Pacific, the Mediterranean the Andes, the _____ the Alps the Nile, the Amazon, the Yangtze",
+      "correct": "Himalayas,",
+      "hint": "Think about articles: 'the' or no article",
+      "explanation": "The answer is 'Himalayas,'"
+    },
+    {
+      "type": "true_false",
+      "question": "Is this statement true or false?",
+      "statement": "This sentence demonstrates correct usage: the University of Cape Town, the University of Delhi, the University of Tokyo",
+      "correct": true,
+      "explanation": "This sentence correctly demonstrates the grammar rule."
+    },
+    {
+      "type": "matching",
+      "question": "Match the words with their correct usage:",
+      "pairs": [
+        {
+          "key": "I'm",
+          "value": "going to bed. I walk to work. My children are going to start school. I visited the school yesterday. Mount Everest is in the Himalayas."
+        },
+        {
+          "key": "go",
+          "value": "to bed / be in bed go to work / be at work / start work / finish work go home / be at home / get home / stay at home"
+        },
+        {
+          "key": "start",
+          "value": "school / go to school / be at school go to university / be at university be sent to prison / go to prison / be in prison go to hospital / be in hospital"
+        },
+        {
+          "key": "My",
+          "value": "son has started school now. I went to the school to meet his teacher. I went to the prison a lot when I was a social worker. I'm at the hospital. My sister has just had a baby."
+        }
+      ],
+      "explanation": "Match each word with its correct context."
+    },
+    {
+      "type": "transformation",
+      "question": "Rewrite this sentence using the grammar rule:",
+      "original": "I'm going to bed.\n\nI walk to work.\n\nMy children are going to start school.\n\nI visited the school yesterday.\n\nMount Everest is in the Himalayas.",
+      "hint": "Apply the rule: Articles: 'the' or no article",
+      "explanation": "Transform the sentence while maintaining the same meaning."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank:",
+      "sentence": "start school / go to school / be at school go to university / be at university be _____ to prison / go to prison / be in prison go to hospital / be in hospital",
+      "correct": "sent",
+      "hint": "Think about articles: 'the' or no article",
+      "explanation": "The answer is 'sent'"
+    }
+  ]
+}

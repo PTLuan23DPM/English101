@@ -1,0 +1,89 @@
+{
+  "id": "contrasting-ideas",
+  "title": "Contrasting ideas",
+  "level": "C1",
+  "introduction": "Do you know how to give contrasting information using conjunctions such as despite, much as and whereas? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "Although, despite, even if, even though, in spite of, much as, though, whereas and while are all used to link two contrasting ideas or show that one fact makes the other fact surprising.",
+  "rules": [
+    "Even if means 'whether or not' or 'no matter whether'.",
+    "Much as is a more formal expression. It means 'although', 'despite how much' or 'no matter how much'."
+  ],
+  "keyPoints": [],
+  "examples": [
+    "much as and whereas? Test what you know with interactive exercises and read the explanation to help you",
+    "Do you know how to give contrasting information using conjunctions such as despite, much as and whereas?",
+    "Look at these examples to see how we can give contrasting information.",
+    "Although she now flies down the slopes, it took her years to learn to ski well.",
+    "While I don't agree, I understand their point of view.",
+    "Much as I'd love a holiday this year, I just can't afford it.",
+    "They can all be used at the beginning or in the middle of the sentence.",
+    "We arrived on time in spite of missing the train.",
+    "It's common to use in spite of and despite with the expression the fact that, so that it can be followed by a subject and verb.",
+    "We arrived on time, in spite of the fact that we missed the train.",
+    "Even though my team lost, it was great to be in the stadium for the final.",
+    "Though can also go at the end of the second phrase.",
+    "I didn't know anyone when I first got to uni.",
+    "Even if you are an expert swimmer, you should be careful at this beach.",
+    "While and whereas",
+    "While is a conjunction that is most commonly used with time, but it can also be used to mean 'despite the fact that' or 'although'.",
+    "While I made some mistakes in my driving exam, I still passed.",
+    "In this sense, while comes at the beginning of the sentence.",
+    "While and whereas can be used to mean 'but' or 'compared with the fact that', to compare two contradictory ideas.",
+    "While/Whereas Ivan is very sociable, his brother is more reserved."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "_____ she now flies down the slopes, it took her years to learn to ski well.",
+      "options": [
+        "Although",
+        "althoughs",
+        "althoughed",
+        "not although"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to contrasting ideas usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "While is a conjunction that is most commonly used with time, but it can also be used to mean 'despite the fact that' or '_____'.",
+      "options": [
+        "although",
+        "althoughs",
+        "althoughed",
+        "not although"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to contrasting ideas usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "While/Whereas Ivan _____ very sociable, his brother is more reserved.",
+      "options": [
+        "is",
+        "be",
+        "been",
+        "being"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to contrasting ideas usage."
+    },
+    {
+      "type": "true_false",
+      "question": "Is this statement correct?",
+      "statement": "Even if means 'whether or not' or 'no matter whether'.",
+      "correct": true,
+      "explanation": "This reflects the rule from the lesson."
+    },
+    {
+      "type": "true_false",
+      "question": "Is this statement correct?",
+      "statement": "Much as is a more formal expression. It means 'although', 'despite how much' or 'no matter how much'.",
+      "correct": true,
+      "explanation": "This reflects the rule from the lesson."
+    }
+  ]
+}

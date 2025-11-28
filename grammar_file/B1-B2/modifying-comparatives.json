@@ -1,0 +1,96 @@
+{
+  "id": "modifying-comparatives",
+  "title": "Modifying comparatives",
+  "level": "B1-B2",
+  "introduction": "Do you know how to use phrases like much shorter than, almost as fit as and exactly the same as? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "There are several different ways to compare things in English. We can also modify comparisons to show big or small differences.",
+  "rules": [],
+  "keyPoints": [],
+  "examples": [
+    "Do you know how to use phrases like much shorter than, almost as fit as and exactly the same as?",
+    "Look at these examples to see how comparisons can be modified.",
+    "He's much shorter than his brother.",
+    "Good-quality socks are almost as important as your running shoes.",
+    "Our hotel room was exactly the same as the photos showed.",
+    "Grammar explanation",
+    "There are several different ways to compare things in English.",
+    "We can use comparative adjectives to compare different things.",
+    "Max is taller than Judy.",
+    "His first book is less interesting than his second.",
+    "Her hair is as long as mine.",
+    "England is different from the United Kingdom.",
+    "His car is similar to mine.",
+    "The results from the first test are the same as the results from the second.",
+    "Showing big differences",
+    "We can use much, so much, a lot, even or far with comparative adjectives.",
+    "Sales in July were a lot higher than sales in June.",
+    "He was far less experienced than the other applicant.",
+    "The interview was nowhere near as difficult as the written exam.",
+    "They may be twins, but they're completely different from each other."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Do you know how to use phrases like much shorter _____, almost as fit as and exactly the same as?",
+      "options": [
+        "than",
+        "thans",
+        "thaned",
+        "not than"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to modifying comparatives usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "He's much shorter _____ his brother.",
+      "options": [
+        "than",
+        "thans",
+        "thaned",
+        "not than"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to modifying comparatives usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Good-quality socks are almost _____ important as your running shoes.",
+      "options": [
+        "as",
+        "ass",
+        "ased",
+        "not as"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to modifying comparatives usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "Our hotel room was exactly the same _____ the photos showed.",
+      "correct": "as",
+      "hint": "Apply the rule for modifying comparatives.",
+      "explanation": "The correct form here is 'as'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "Max is taller _____ Judy.",
+      "correct": "than",
+      "hint": "Apply the rule for modifying comparatives.",
+      "explanation": "The correct form here is 'than'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "His first book is less interesting _____ his second.",
+      "correct": "than",
+      "hint": "Apply the rule for modifying comparatives.",
+      "explanation": "The correct form here is 'than'."
+    }
+  ]
+}

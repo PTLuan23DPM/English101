@@ -1,0 +1,99 @@
+{
+  "id": "prepositions-of-place-in-on-at",
+  "title": "Prepositions of place: 'in', 'on', 'at'",
+  "level": "A1-A2",
+  "introduction": "Do you know how to use in, on and at to talk about location? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "We can use the prepositions in, on and at to say where things are. They go before nouns.",
+  "rules": [
+    "We use in to talk about a place that is inside a bigger space, such as a box, a house, a city or a country.",
+    "We use on to talk about location on a surface."
+  ],
+  "keyPoints": [],
+  "examples": [
+    "Please put the book on the shelf.",
+    "They live in Helsinki.",
+    "You should keep milk in the fridge.",
+    "Mette is studying at the library.",
+    "I am in the kitchen.",
+    "My dog likes sleeping on the sofa.",
+    "The children eat lunch at school.",
+    "The clothes are in the wardrobe.",
+    "The children are playing in the park.",
+    "There's a bookshop in the shopping centre.",
+    "My grandmother was born in Sweden.",
+    "in the world",
+    "in water / the sea / a river / a lake / a pool",
+    "in the mountains / the countryside / a valley / the forest",
+    "in a car / a taxi",
+    "The books are on the desk.",
+    "We live on the fifth floor.",
+    "There are pictures on the wall.",
+    "She likes to sit on the floor.",
+    "He's on the bus now."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Please put the book _____ the shelf.",
+      "options": [
+        "on",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to prepositions of place: 'in', 'on', 'at' usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "They live _____ Helsinki.",
+      "options": [
+        "in",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to prepositions of place: 'in', 'on', 'at' usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "You should keep milk _____ the fridge.",
+      "options": [
+        "in",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to prepositions of place: 'in', 'on', 'at' usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "Mette is studying _____ the library.",
+      "correct": "at",
+      "hint": "Apply the rule for prepositions of place: 'in', 'on', 'at'.",
+      "explanation": "The correct form here is 'at'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "I am _____ the kitchen.",
+      "correct": "in",
+      "hint": "Apply the rule for prepositions of place: 'in', 'on', 'at'.",
+      "explanation": "The correct form here is 'in'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "My dog likes sleeping _____ the sofa.",
+      "correct": "on",
+      "hint": "Apply the rule for prepositions of place: 'in', 'on', 'at'.",
+      "explanation": "The correct form here is 'on'."
+    }
+  ]
+}

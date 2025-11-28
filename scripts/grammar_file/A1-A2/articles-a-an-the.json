@@ -1,0 +1,136 @@
+{
+  "id": "articles-a-an-the",
+  "title": "Articles: 'a', 'an', 'the'",
+  "level": "A1-A2",
+  "introduction": "Do you know how to use a, an and the? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "Here are some of the most important things to know about using articles.",
+  "rules": [
+    "When we talk about a particular group of things, we use the.",
+    "When we talk about things in general, we normally use a plural or uncountable noun with no article.",
+    "When we say what people's jobs are, we usually use a/an."
+  ],
+  "keyPoints": [
+    "we say what people's jobs are, we usually use a/an",
+    "we talk about things in general, we normally use a plural or uncountable noun with no article",
+    "we talk about a particular group of things, we use the"
+  ],
+  "examples": [
+    "She's a doctor.\n\nI need an umbrella.\n\nHave you heard the news?\n\nI don't like spiders.",
+    "He's an architect.\n\nShe's a scientist.\n\nMy grandmother was a teacher.",
+    "I saw a good film yesterday.\n\nDo you want a drink?",
+    "She has a university degree.\n\nIt took me an hour to get home.",
+    "I'm going to take the dog for a walk.\n\nHave you seen the car key?\n\nThey go to the school next to the bridge.",
+    "Birds eat worms.\n\nWater freezes at 0°C.\n\nChildren need a lot of sleep.",
+    "We went to the zoo and saw the kangaroos."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct word to complete the sentence:",
+      "sentence": "She's a doctor. I need an umbrella. Have _____ heard the news? I don't like spiders.",
+      "options": [
+        "you",
+        "yous",
+        "youed",
+        "very you"
+      ],
+      "correct": 0,
+      "explanation": "The correct answer is 'you' because..."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct word to complete the sentence:",
+      "sentence": "He's an architect. She's a _____ My grandmother was a teacher.",
+      "options": [
+        "scientist.",
+        "scientist.s",
+        "scientist.ed",
+        "very scientist."
+      ],
+      "correct": 0,
+      "explanation": "The correct answer is 'scientist.' because..."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct word to complete the sentence:",
+      "sentence": "I saw a good film _____ Do you want a drink?",
+      "options": [
+        "yesterday.",
+        "yesterday.s",
+        "yesterday.ed",
+        "very yesterday."
+      ],
+      "correct": 0,
+      "explanation": "The correct answer is 'yesterday.' because..."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank:",
+      "sentence": "She has a university degree. It _____ me an hour to get home.",
+      "correct": "took",
+      "hint": "Think about articles: 'a', 'an', 'the'",
+      "explanation": "The answer is 'took'"
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank:",
+      "sentence": "I'm going to take the dog for a walk. Have you seen _____ car key? They go to the school next to the bridge.",
+      "correct": "the",
+      "hint": "Think about articles: 'a', 'an', 'the'",
+      "explanation": "The answer is 'the'"
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank:",
+      "sentence": "Birds eat worms. Water freezes at _____ Children need a lot of sleep.",
+      "correct": "0°C.",
+      "hint": "Think about articles: 'a', 'an', 'the'",
+      "explanation": "The answer is '0°C.'"
+    },
+    {
+      "type": "true_false",
+      "question": "Is this statement true or false?",
+      "statement": "This sentence demonstrates correct usage: We went to the zoo and saw the kangaroos.",
+      "correct": true,
+      "explanation": "This sentence correctly demonstrates the grammar rule."
+    },
+    {
+      "type": "matching",
+      "question": "Match the words with their correct usage:",
+      "pairs": [
+        {
+          "key": "She's",
+          "value": "a doctor. I need an umbrella. Have you heard the news? I don't like spiders."
+        },
+        {
+          "key": "He's",
+          "value": "an architect. She's a scientist. My grandmother was a teacher."
+        },
+        {
+          "key": "I",
+          "value": "saw a good film yesterday. Do you want a drink?"
+        },
+        {
+          "key": "She",
+          "value": "has a university degree. It took me an hour to get home."
+        }
+      ],
+      "explanation": "Match each word with its correct context."
+    },
+    {
+      "type": "transformation",
+      "question": "Rewrite this sentence using the grammar rule:",
+      "original": "She's a doctor.\n\nI need an umbrella.\n\nHave you heard the news?\n\nI don't like spiders.",
+      "hint": "Apply the rule: When we talk about a particular group of things, we use the.",
+      "explanation": "Transform the sentence while maintaining the same meaning."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank:",
+      "sentence": "I saw a good film _____ Do you want a drink?",
+      "correct": "yesterday.",
+      "hint": "Think about articles: 'a', 'an', 'the'",
+      "explanation": "The answer is 'yesterday.'"
+    }
+  ]
+}

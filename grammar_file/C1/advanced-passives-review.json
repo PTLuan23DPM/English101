@@ -1,0 +1,105 @@
+{
+  "id": "advanced-passives-review",
+  "title": "Advanced passives review",
+  "level": "C1",
+  "introduction": "Do you know how to use all the different forms of the passive? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "We can use the passive voice to change the focus of the sentence.",
+  "rules": [
+    "Be + past participle",
+    "The most common way to form the passive is subject + be + past participle.",
+    "by using modal + be + past participle.",
+    "it + be + past participle + (that) + subject + verb:",
+    "something + be + past participle + infinitive:"
+  ],
+  "keyPoints": [
+    "we prefer not to mention who or what does the action (for example, it's not known, it's obvious or we don't want to say)",
+    "the infinitive can be simple (as above), perfect (for a past action) or continuous (for an action in progress)"
+  ],
+  "examples": [
+    "The interview was recorded yesterday.",
+    "Cleaner sources of energy must be developed.",
+    "An electrical fault is believed to have caused the power cut.",
+    "The new smoke alarm was installed yesterday.",
+    "The new smoke alarm was installed yesterday by the company director herself.",
+    "A podcast can be made with minimal resources.",
+    "The accident must be reported to the police.",
+    "New laws should be created to regulate electric scooters.",
+    "My bicycle got stolen last night.",
+    "(= My bicycle was stolen last night.)",
+    "It is estimated that millions of people visit the site every year.",
+    "It is believed that the walls date from the third century BCE.",
+    "It is reported that mosquitoes transmit the disease.",
+    "Millions of people are estimated to visit the site every year.",
+    "The walls are believed to date from the third century BCE.",
+    "Mosquitoes are reported to transmit the disease.",
+    "Millions are estimated to visit the site this year. (simple infinitive)",
+    "The walls are believed to have been built in the third century BCE. (perfect infinitive)",
+    "Mosquitoes are reported to be transmitting the disease. (continuous infinitive)",
+    "must and should"
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "The interview _____ recorded yesterday.",
+      "options": [
+        "was",
+        "be",
+        "been",
+        "being"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to advanced passives review usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Cleaner sources of energy must _____ developed.",
+      "options": [
+        "be",
+        "bes",
+        "beed",
+        "not be"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to advanced passives review usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "An electrical fault is believed _____ have caused the power cut.",
+      "options": [
+        "to",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to advanced passives review usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "The new smoke alarm _____ installed yesterday.",
+      "correct": "was",
+      "hint": "Apply the rule for advanced passives review.",
+      "explanation": "The correct form here is 'was'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "The new smoke alarm _____ installed yesterday by the company director herself.",
+      "correct": "was",
+      "hint": "Apply the rule for advanced passives review.",
+      "explanation": "The correct form here is 'was'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "A podcast can _____ made with minimal resources.",
+      "correct": "be",
+      "hint": "Apply the rule for advanced passives review.",
+      "explanation": "The correct form here is 'be'."
+    }
+  ]
+}

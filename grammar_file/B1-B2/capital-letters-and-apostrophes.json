@@ -1,0 +1,104 @@
+{
+  "id": "capital-letters-and-apostrophes",
+  "title": "Capital letters and apostrophes",
+  "level": "B1-B2",
+  "introduction": "Do you know how to use capital letters and apostrophes correctly? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "Capitalisation",
+  "rules": [
+    "We use an apostrophe to show a contraction or possession.",
+    "We use an apostrophe to show where there are missing letters in contractions.",
+    "When a plural noun ends in s, we put the apostrophe after the s (s').",
+    "When a singular noun ends in s, we generally use 's."
+  ],
+  "keyPoints": [
+    "a plural noun ends in s, we put the apostrophe after the s (s')",
+    "a singular noun ends in s, we generally use 's"
+  ],
+  "examples": [
+    "nationalities and adjectives that refer to people or things from a country",
+    "region or city – are capitalised",
+    "Do you know how to use capital letters and apostrophes correctly?",
+    "Look at these examples to see how capital letters and apostrophes are used.",
+    "Adam speaks English, Arabic and some Persian.",
+    "Jane's staying at her parents' house this week.",
+    "Grammar explanation",
+    "Capitalisation",
+    "There are lots of times when you need to use capital letters – for example, to start a sentence or for the pronoun I.",
+    "Days, months and holidays",
+    "We capitalise days of the week, months and festivals, but not seasons.",
+    "His birthday party is on Thursday.",
+    "Schools are closed at Christmas.",
+    "It rains a lot in April and May, but the summer is very dry.",
+    "Names of people and places",
+    "We capitalise the names of people and places, including streets, planets, continents and countries.",
+    "Bea Jankowski has lived on Church Street in Manchester for 20 years.",
+    "The Earth is the third planet from the Sun.",
+    "Russia is in both Europe and Asia.",
+    "Words that come from the names of places – for example languages, nationalities and adjectives that refer to people or things from a country, region or city – are capitalised."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "nationalities and adjectives that refer _____ people or things from a country",
+      "options": [
+        "to",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to capital letters and apostrophes usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "region or city – _____ capitalised",
+      "options": [
+        "are",
+        "be",
+        "been",
+        "being"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to capital letters and apostrophes usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Do you know how _____ use capital letters and apostrophes correctly?",
+      "options": [
+        "to",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to capital letters and apostrophes usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "Look at these examples to see how capital letters and apostrophes _____ used.",
+      "correct": "are",
+      "hint": "Apply the rule for capital letters and apostrophes.",
+      "explanation": "The correct form here is 'are'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "There _____ lots of times when you need to use capital letters – for example, to start a sentence or for the pronoun I.",
+      "correct": "are",
+      "hint": "Apply the rule for capital letters and apostrophes.",
+      "explanation": "The correct form here is 'are'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "Schools _____ closed at Christmas.",
+      "correct": "are",
+      "hint": "Apply the rule for capital letters and apostrophes.",
+      "explanation": "The correct form here is 'are'."
+    }
+  ]
+}

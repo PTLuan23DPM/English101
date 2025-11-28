@@ -1,0 +1,104 @@
+{
+  "id": "possessive-s",
+  "title": "Possessive 's",
+  "level": "A1-A2",
+  "introduction": "Do you know how to use possessive 's? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "We can use possessive 's to talk about the relationship between people or to say who owns something. Possessive 's always comes after a noun or a name.",
+  "rules": [
+    "When it is one person who owns something, we usually use 's."
+  ],
+  "keyPoints": [
+    "it is one person who owns something, we usually use 's",
+    "a name or noun ends in s, we can add either ' or 's",
+    "the thing belongs to more than one person, we usually add ' after the s of the plural noun",
+    "the plural noun is irregular and doesn't end in s, we add 's",
+    "something belongs to more than one person, and we give a list of names, the 's comes after the last name in the list"
+  ],
+  "examples": [
+    "Mohammed is my brother's son.",
+    "My grandpa's beard is white.",
+    "This is my grandparents' house.",
+    "Grandma and Grandpa are my mum's parents.",
+    "Maria's best friend is Juanita.",
+    "My cousins' birthdays are both in January.",
+    "That's Roberto's flat. He's got a flat in the city centre.",
+    "Kim's hair is very long. She's got long, black hair.",
+    "My parents' garden is beautiful. They grow a lot of flowers.",
+    "Our friend's car is red. She loves it.",
+    "Simon's phone is new. He bought it yesterday.",
+    "Can you see Amira's keys? She can't find them.",
+    "We had lunch at my friend's father's house.",
+    "If a name or noun ends in s, we can add either ' or 's. The pronunciation can be /zɪz/ or /sɪz/.",
+    "If the thing belongs to more than one person, we usually add ' after the s of the plural noun.",
+    "If the plural noun is irregular and doesn't end in s, we add 's.",
+    "If something belongs to more than one person, and we give a list of names, the 's comes after the last name in the list.",
+    "Remember that s at the end of a word without an apostrophe (') can make it plural, but this doesn't show possession.",
+    "Do you know how to use possessive 's?",
+    "Grammar explanation"
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Mohammed _____ my brother's son.",
+      "options": [
+        "is",
+        "be",
+        "been",
+        "being"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to possessive 's usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "My grandpa's beard _____ white.",
+      "options": [
+        "is",
+        "be",
+        "been",
+        "being"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to possessive 's usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "This _____ my grandparents' house.",
+      "options": [
+        "is",
+        "be",
+        "been",
+        "being"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to possessive 's usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "Maria's best friend _____ Juanita.",
+      "correct": "is",
+      "hint": "Apply the rule for possessive 's.",
+      "explanation": "The correct form here is 'is'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "Kim's hair _____ very long. She's got long, black hair.",
+      "correct": "is",
+      "hint": "Apply the rule for possessive 's.",
+      "explanation": "The correct form here is 'is'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "My parents' garden _____ beautiful. They grow a lot of flowers.",
+      "correct": "is",
+      "hint": "Apply the rule for possessive 's.",
+      "explanation": "The correct form here is 'is'."
+    }
+  ]
+}

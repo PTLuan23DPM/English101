@@ -1,0 +1,97 @@
+{
+  "id": "verbs-followed-by-ing-or-infinitive-to-change-meaning",
+  "title": "Verbs followed by '-ing' or infinitive to change meaning",
+  "level": "B1-B2",
+  "introduction": "Do you know the difference between stop doing something and stop to do something? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "Some verbs have a different meaning depending on whether they are followed by an -ing form or to + infinitive.",
+  "rules": [
+    "Stop + -ing means the action is not happening any more.",
+    "Stop + to + infinitive means that someone or something stops an activity so that they can do something else.",
+    "Try + -ing means that you are trying something as an experiment, especially as a possible solution to a problem, to see if it works or not.",
+    "Try + to + infinitive means that something is difficult but you are making an effort to do it.",
+    "ing form or to + infinitive.",
+    "stop\n\nStop + -ing means the action is not happening any more.",
+    "forget\n\nRemember + -ing and forget + -ing refer to having (or not having) a memory of something in the past."
+  ],
+  "keyPoints": [],
+  "examples": [
+    "Do you know the difference between stop doing something and stop to do something?",
+    "I'm trying to study but it's impossible with all this noise.",
+    "Grammar explanation",
+    "Some verbs have a different meaning depending on whether they are followed by an -ing form or to + infinitive.",
+    "Stop + -ing means the action is not happening any more.",
+    "Stop + to + infinitive means that someone or something stops an activity so that they can do something else.",
+    "Try + -ing means that you are trying something as an experiment, especially as a possible solution to a problem, to see if it works or not.",
+    "Have you tried turning the computer off and on again?",
+    "Try + to + infinitive means that something is difficult but you are making an effort to do it.",
+    "I remember watching this film before.",
+    "I'll never forget meeting you for the first time in this café.",
+    "Remember + to + infinitive and forget + to + infinitive refer to recalling (or not recalling) that there is something we need to do before we do it.",
+    "He forgot to lock the door when he went out."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Do you know the difference between _____ doing something and stop to do something?",
+      "options": [
+        "stop",
+        "stops",
+        "stoped",
+        "not stop"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to verbs followed by '-ing' or infinitive to change meaning usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "I'm trying _____ study but it's impossible with all this noise.",
+      "options": [
+        "to",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to verbs followed by '-ing' or infinitive to change meaning usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Some verbs have a different meaning depending on whether they are followed by an -_____ + infinitive.",
+      "options": [
+        "ing form or to",
+        "ing form or tos",
+        "ing form or toed",
+        "not ing form or to"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to verbs followed by '-ing' or infinitive to change meaning usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "_____ + -ing means the action is not happening any more.",
+      "correct": "Stop",
+      "hint": "Apply the rule for verbs followed by '-ing' or infinitive to change meaning.",
+      "explanation": "The correct form here is 'Stop'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "_____ + to + infinitive means that someone or something stops an activity so that they can do something else.",
+      "correct": "Stop",
+      "hint": "Apply the rule for verbs followed by '-ing' or infinitive to change meaning.",
+      "explanation": "The correct form here is 'Stop'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "_____ + -ing means that you are trying something as an experiment, especially as a possible solution to a problem, to see if it works or not.",
+      "correct": "Try",
+      "hint": "Apply the rule for verbs followed by '-ing' or infinitive to change meaning.",
+      "explanation": "The correct form here is 'Try'."
+    }
+  ]
+}

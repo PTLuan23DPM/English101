@@ -194,39 +194,39 @@ const LESSON_DETAILS: Record<string, LessonDetail> = {
 const LISTENING_TASKS: ListeningTask[] = [
   {
     id: "conv-restaurant",
-    icon: "🍴",
-    title: "At the Restaurant",
+      icon: "",
+      title: "At the Restaurant",
     type: "Conversation",
-    level: "A2",
+      level: "A2",
     description: "Customer and waiter talk through ordering dinner.",
     duration: "4:10",
-    speakers: "2 speakers",
-    accent: "🇺🇸 American",
+      speakers: "2 speakers",
+      accent: "American",
     questions: 6,
-    tags: ["Dining", "Daily Life"],
+      tags: ["Dining", "Daily Life"],
     recommended: true,
     attempts: 0,
-    color: "blue",
-  },
-  {
+      color: "blue",
+    },
+    {
     id: "conv-job-interview",
-    icon: "💼",
-    title: "Job Interview Practice",
+      icon: "",
+      title: "Job Interview Practice",
     type: "Conversation",
-    level: "B1",
+      level: "B1",
     description: "Formal interview between employer and candidate",
     duration: "4:15",
-    speakers: "2 speakers",
-    accent: "🇬🇧 British",
+      speakers: "2 speakers",
+      accent: "British",
     questions: 10,
-    tags: ["Business", "Career"],
+      tags: ["Business", "Career"],
     recommended: true,
     attempts: 0,
     color: "blue",
   },
   {
     id: "conv-doctor",
-    icon: "🏥",
+    icon: "",
     title: "Doctor's Appointment",
     type: "Conversation",
     level: "A2",
@@ -241,14 +241,14 @@ const LISTENING_TASKS: ListeningTask[] = [
   },
   {
     id: "conv-shopping",
-    icon: "🛍️",
+    icon: "",
     title: "Shopping for Clothes",
     type: "Conversation",
     level: "A2",
     description: "Customer asking for help in a clothing store",
     duration: "3:00",
     speakers: "2 speakers",
-    accent: "🇦🇺 Australian",
+    accent: "Australian",
     questions: 7,
     tags: ["Shopping", "Daily Life"],
     attempts: 0,
@@ -256,23 +256,23 @@ const LISTENING_TASKS: ListeningTask[] = [
   },
   {
     id: "podcast-tech",
-    icon: "🎧",
+      icon: "",
     title: "Technology Trends 2024",
     type: "Podcast",
-    level: "C1",
+      level: "C1",
     description: "Discussion about AI and future technology",
     duration: "12:00",
-    speakers: "3 speakers",
-    accent: "🌍 Mixed accents",
+      speakers: "3 speakers",
+      accent: "Mixed accents",
     questions: 15,
-    tags: ["Technology", "AI", "Future"],
+      tags: ["Technology", "AI", "Future"],
     recommended: true,
     attempts: 0,
     color: "green",
   },
   {
     id: "podcast-reading",
-    icon: "📚",
+    icon: "",
     title: "The Reading Corner",
     type: "Podcast",
     level: "B2",
@@ -287,7 +287,7 @@ const LISTENING_TASKS: ListeningTask[] = [
   },
   {
     id: "podcast-health",
-    icon: "💪",
+    icon: "",
     title: "Health & Wellness",
     type: "Podcast",
     level: "B2",
@@ -302,7 +302,7 @@ const LISTENING_TASKS: ListeningTask[] = [
   },
   {
     id: "news-climate",
-    icon: "🌍",
+    icon: "",
     title: "Global Climate Summit",
     type: "News Report",
     level: "B2",
@@ -317,7 +317,7 @@ const LISTENING_TASKS: ListeningTask[] = [
   },
   {
     id: "news-market",
-    icon: "💹",
+    icon: "",
     title: "Stock Market Update",
     type: "News Report",
     level: "C1",
@@ -332,7 +332,7 @@ const LISTENING_TASKS: ListeningTask[] = [
   },
   {
     id: "news-sports",
-    icon: "⚽",
+    icon: "",
     title: "Sports Headlines",
     type: "News Report",
     level: "B1",
@@ -347,7 +347,7 @@ const LISTENING_TASKS: ListeningTask[] = [
   },
   {
     id: "lecture-physics",
-    icon: "🔬",
+    icon: "",
     title: "Introduction to Quantum Physics",
     type: "Lecture",
     level: "C2",
@@ -362,7 +362,7 @@ const LISTENING_TASKS: ListeningTask[] = [
   },
   {
     id: "lecture-art",
-    icon: "🎨",
+    icon: "",
     title: "Renaissance Art History",
     type: "Lecture",
     level: "B2",
@@ -377,7 +377,7 @@ const LISTENING_TASKS: ListeningTask[] = [
   },
   {
     id: "lecture-economics",
-    icon: "📊",
+    icon: "",
     title: "Introduction to Economics",
     type: "Lecture",
     level: "B2",
@@ -480,7 +480,7 @@ export default function ListeningPage() {
   const [lessons, setLessons] = useState<Record<string, LessonDetail>>(LESSON_DETAILS);
   const [loading, setLoading] = useState(false);
   const [loadingLesson, setLoadingLesson] = useState(false);
-
+  
   const [isPlaying, setIsPlaying] = useState(false);
   const [playbackRate, setPlaybackRate] = useState(1);
   const [volume, setVolume] = useState(80);
@@ -518,7 +518,7 @@ export default function ListeningPage() {
               : `${lesson.segmentCount} segments`,
             duration: formatTime(lesson.duration || 0),
             speakers: "Multiple",
-            accent: "🇺🇸 American",
+            accent: "American",
             questions: lesson.segmentCount,
             tags: lesson.category ? [lesson.category] : ["General"],
             attempts: 0,
@@ -637,10 +637,7 @@ export default function ListeningPage() {
 
   // Helper functions
   const getIconForLevel = (level: string) => {
-    if (level === "Beginner") return "🌱";
-    if (level === "Intermediate") return "📚";
-    if (level === "Advanced") return "🎓";
-    return "🎧";
+    return "";
   };
 
   const mapLevel = (level: string) => {
@@ -754,7 +751,7 @@ export default function ListeningPage() {
     const nextIndex = shadowingIndex + 1;
     if (nextIndex >= activeLesson.transcript.length) {
       setShadowingActive(false);
-      audioRef.current.pause();
+        audioRef.current.pause();
       return;
     }
     setShadowingIndex(nextIndex);
@@ -890,7 +887,7 @@ export default function ListeningPage() {
           const y = (v * canvas.height) / 2;
           if (i === 0) {
             canvasCtx.moveTo(x, y);
-          } else {
+      } else {
             canvasCtx.lineTo(x, y);
           }
           x += sliceWidth;
@@ -947,21 +944,21 @@ export default function ListeningPage() {
           {submitted && status && (
             <span className="gap-feedback-wrapper">
               {status === "correct" && (
-                <span className="gap-feedback gap-correct">✓ Correct</span>
+                <span className="gap-feedback gap-correct">Correct</span>
               )}
               {status === "near" && (
                 <span className="gap-feedback gap-near">
-                  ~ Almost: <strong>{segment.answer}</strong>
+                  Almost: <strong>{segment.answer}</strong>
                 </span>
               )}
               {status === "wrong" && (
                 <span className="gap-feedback gap-wrong">
-                  ✗ Correct: <strong>{segment.answer}</strong>
+                  Correct: <strong>{segment.answer}</strong>
                 </span>
               )}
               {status === "blank" && (
                 <span className="gap-feedback gap-blank">
-                  ○ Answer: <strong>{segment.answer}</strong>
+                  Answer: <strong>{segment.answer}</strong>
                 </span>
               )}
             </span>
@@ -998,7 +995,7 @@ export default function ListeningPage() {
                 speakWord(vocab.word);
               }}
             >
-              🔊
+              Play
             </button>
           </div>
           <p className="meaning">{vocab.meaning}</p>
@@ -1017,7 +1014,7 @@ export default function ListeningPage() {
         )}
         <section className="card stage-head">
           <div className="stage-info">
-            <p className="muted">
+              <p className="muted">
               {selectedTask.type} • {selectedTask.level} • {selectedTask.accent}
             </p>
             <h2 className="h2">{selectedTask.title}</h2>
@@ -1026,7 +1023,7 @@ export default function ListeningPage() {
               <span className="chip ghost">Duration {selectedTask.duration}</span>
               <span className="chip ghost">{selectedTask.speakers}</span>
               <span className="chip ghost">{selectedTask.questions} questions</span>
-            </div>
+              </div>
           </div>
           <div className="stage-side">
             <div className="stage-roadmap">
@@ -1054,7 +1051,7 @@ export default function ListeningPage() {
                 }}
               >
                 ← Back to Library
-              </button>
+            </button>
             </div>
           </div>
         </section>
@@ -1064,8 +1061,8 @@ export default function ListeningPage() {
             <div>
               <p className="stage-label">Stage 1 · Pre-Listening</p>
               <h3>Key Vocabulary Warm-up</h3>
-            </div>
-            <span className="muted">Hover to reveal the meaning • Tap 🔊 to hear it</span>
+              </div>
+            <span className="muted">Hover to reveal the meaning • Tap Play to hear it</span>
           </header>
           {vocabularySection}
           <div className="pre-instructions">
@@ -1103,7 +1100,7 @@ export default function ListeningPage() {
               <div className="player-controls">
                 <button className="btn ghost" onClick={handleReplay}>
                   ⟲ Replay -5s
-                </button>
+            </button>
                 <button
                   className="btn primary"
                   onClick={() => {
@@ -1116,7 +1113,7 @@ export default function ListeningPage() {
                   }}
                 >
                   {isPlaying ? "Pause" : "Play"}
-                </button>
+            </button>
                 <span className="time mono">
                   {formatTime(currentTime)} / {formatTime(duration)}
                 </span>
@@ -1128,11 +1125,11 @@ export default function ListeningPage() {
                       onClick={() => handleSpeedChange(speed)}
                     >
                       {speed.toFixed(1)}x
-                    </button>
+            </button>
                   ))}
                 </div>
                 <label className="volume">
-                  🔊
+                  Play
                   <input
                     type="range"
                     min={0}
@@ -1185,7 +1182,7 @@ export default function ListeningPage() {
             <div>
               <p className="stage-label">Exercise Workspace</p>
               <h3>Inline Gap-Fill Challenge</h3>
-            </div>
+              </div>
             <div className="dictation-actions">
               {!submitted && (
                 <button className="btn secondary" onClick={handleSubmit}>
@@ -1206,8 +1203,8 @@ export default function ListeningPage() {
                 {renderGapInput(segment, index)}
               </p>
             ))}
-          </div>
-        </section>
+            </div>
+          </section>
 
         <section className="card stage post-listening">
           <header>
@@ -1226,29 +1223,25 @@ export default function ListeningPage() {
                 <div className="score-pill">
                   <span className="score-value">{accuracy}%</span>
                   <span className="score-label">Accuracy</span>
-                </div>
+              </div>
                 <div className="score-breakdown">
                   <div className="score-item correct">
-                    <span className="score-icon">✓</span>
                     <span className="score-text">
                       <strong>{correctCount}</strong> Perfect
                     </span>
-                  </div>
+              </div>
                   <div className="score-item near">
-                    <span className="score-icon">~</span>
                     <span className="score-text">
                       <strong>{nearCount}</strong> Almost
                     </span>
-                  </div>
+              </div>
                   <div className="score-item wrong">
-                    <span className="score-icon">✗</span>
                     <span className="score-text">
                       <strong>{wrongCount}</strong> Wrong
                     </span>
-                  </div>
+              </div>
                   {blankCount > 0 && (
                     <div className="score-item blank">
-                      <span className="score-icon">○</span>
                       <span className="score-text">
                         <strong>{blankCount}</strong> Blank
                       </span>
@@ -1299,25 +1292,25 @@ export default function ListeningPage() {
                             </div>
                             <div className="error-details">
                               {gap.status === "correct" && (
-                                <span className="status-badge correct">✓ Perfect</span>
+                                <span className="status-badge correct">Perfect</span>
                               )}
                               {gap.status === "near" && (
-                                <span className="status-badge near">~ Almost correct</span>
+                                <span className="status-badge near">Almost correct</span>
                               )}
                               {gap.status === "wrong" && (
-                                <span className="status-badge wrong">✗ Incorrect</span>
+                                <span className="status-badge wrong">Incorrect</span>
                               )}
                               {gap.status === "blank" && (
-                                <span className="status-badge blank">○ Not answered</span>
+                                <span className="status-badge blank">Not answered</span>
                               )}
                               <span className="timestamp">@{formatTime(gap.timestamp)}</span>
                             </div>
                           </div>
                           <span className="evidence">
-                            {gap.status !== "correct" && "🔊 Replay audio ▸"}
-                            {gap.status === "correct" && "✓"}
+                            {gap.status !== "correct" && "Replay audio ▸"}
+                            {gap.status === "correct" && "Correct"}
                           </span>
-                        </button>
+                </button>
                       ))}
                   </>
                 )}
@@ -1341,7 +1334,7 @@ export default function ListeningPage() {
                   Next line ▸
                 </button>
               )}
-            </div>
+                    </div>
             <p className="muted">
               The system plays one sentence, pauses, and waits for your mimic. Tap any incorrect line above to hear the audio proof again.
             </p>
@@ -1352,10 +1345,10 @@ export default function ListeningPage() {
                   {activeLesson.transcript[shadowingIndex]?.text}
                 </p>
                 <textarea placeholder="Note what to improve: linking sounds, stress, rhythm..." />
-              </div>
-            )}
+                </div>
+              )}
           </div>
-        </section>
+            </section>
 
         <style jsx>{`
           .listening-player {
@@ -1898,7 +1891,7 @@ export default function ListeningPage() {
       <section className="card hero-head">
         <div className="hero-copy">
           <p className="eyebrow">Immersive Listening Lab</p>
-          <h1>🎧 Build confident ears, one story at a time</h1>
+          <h1>Build confident ears, one story at a time</h1>
           <p>
             Curated audio journeys with pre-listening vocabulary, smart waveform controls, and inline
             dictation that flows straight into shadowing feedback.
@@ -1913,8 +1906,8 @@ export default function ListeningPage() {
               Explore Conversations
             </button>
             <span className="muted">{filteredTasks.length} active lessons ready today</span>
-          </div>
         </div>
+            </div>
         <div className="hero-stats">
           {[
             { label: "Lessons completed", value: "42", trend: "+8 this week" },
@@ -1941,15 +1934,15 @@ export default function ListeningPage() {
           </div>
         </div>
         <div className="filter-chips">
-          {uniqueTypes.map((type) => (
+            {uniqueTypes.map((type) => (
             <button
               key={type}
               className={`pill ${filterType === type ? "active" : ""}`}
               onClick={() => setFilterType(type)}
             >
-              {type}
+                {type}
             </button>
-          ))}
+            ))}
         </div>
       </section>
 
@@ -1974,22 +1967,22 @@ export default function ListeningPage() {
               <h4 style={{ marginBottom: "1rem", fontSize: "1.25rem", fontWeight: 600, color: "#0f172a" }}>
                 {levelGroup} ({levelTasks.length} {levelTasks.length === 1 ? "lesson" : "lessons"})
               </h4>
-              <div className="task-grid">
+        <div className="task-grid">
                 {levelTasks.map((task) => (
-                  <div key={task.id} className={`task-card task-card-${task.color}`}>
+            <div key={task.id} className={`task-card task-card-${task.color}`}>
               {task.recommended && (
                 <div className="task-badge">
-                  <span>⭐ Recommended</span>
+                  <span>Recommended</span>
                 </div>
               )}
-
+              
               <div className="task-header">
                 <div className={`task-level-badge task-level-${task.level.toLowerCase()}`}>
                   {task.level}
                 </div>
                 <div className={`task-color-indicator task-color-${task.color}`} />
               </div>
-
+              
               <div className="task-content">
                 <h4 className="task-title">{task.title}</h4>
                 <span className={`task-type ${task.color}`}>{task.type}</span>
@@ -2000,9 +1993,9 @@ export default function ListeningPage() {
 
               <div className="task-meta">
                 <span className="chip">{task.level} Level</span>
-                <span className="chip">🕐 {task.duration}</span>
-                <span className="chip">👥 {task.speakers}</span>
-                <span className="chip">🧠 {task.questions} Qs</span>
+                <span className="chip">{task.duration}</span>
+                <span className="chip">{task.speakers}</span>
+                <span className="chip">{task.questions} Qs</span>
               </div>
 
               <div className="task-tags">
@@ -2027,11 +2020,11 @@ export default function ListeningPage() {
                   setShowPlayer(true);
                 }}
               >
-                ▶ Start Listening
+                Start Listening
               </button>
             </div>
-                ))}
-              </div>
+          ))}
+        </div>
             </div>
           )
         )}

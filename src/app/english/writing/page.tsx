@@ -59,10 +59,28 @@ interface ScoringResult {
 }
 
 
+function StatsCard({ label, value }: { label: string; value: string }) {
+  return (
+    <div
+      style={{
+        borderRadius: "12px",
+        padding: "12px 16px",
+        background: "rgba(255,255,255,0.4)",
+        minWidth: "140px",
+      }}
+    >
+      <div style={{ fontSize: "0.8rem", textTransform: "uppercase" }}>{label}</div>
+      <div style={{ fontSize: "1.1rem", fontWeight: 600 }}>{value}</div>
+    </div>
+  );
+}
+
 export default function WritingPage() {
   const { data: session } = useSession();
   const router = useRouter();
   const [filterType, setFilterType] = useState<string>("All types");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [levelFilter, setLevelFilter] = useState<string>("All levels");
   const [selectedTask, setSelectedTask] = useState<WritingTask | null>(null);
   const [text, setText] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -86,12 +104,21 @@ export default function WritingPage() {
   const [showExpandMenu, setShowExpandMenu] = useState(false);
   const [showSelfReview, setShowSelfReview] = useState(false);
 
-  // Filter tasks by type
-  const filteredTasks = filterType === "All types" 
-    ? WRITING_TASKS 
-    : WRITING_TASKS.filter(task => task.type === filterType);
+  // Filter tasks by type, level, and search
+  const filteredTasks = useMemo(() => {
+    return WRITING_TASKS.filter(task => {
+      const matchesType = filterType === "All types" || task.type === filterType;
+      const matchesLevel = levelFilter === "All levels" || task.level === levelFilter;
+      const matchesSearch = !searchTerm || 
+        task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        task.prompt.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        task.type.toLowerCase().includes(searchTerm.toLowerCase());
+      return matchesType && matchesLevel && matchesSearch;
+    });
+  }, [filterType, levelFilter, searchTerm]);
 
   const uniqueTypes = ["All types", ...Array.from(new Set(WRITING_TASKS.map(t => t.type)))];
+  const uniqueLevels = ["All levels", ...Array.from(new Set(WRITING_TASKS.map(t => t.level)))];
 
   const currentPrompt = selectedTask || null;
 
@@ -183,134 +210,86 @@ export default function WritingPage() {
     toast.loading("Scoring your writing...", { id: "scoring" });
 
     try {
-      // TEMPORARILY DISABLED: Gemini scoring
       // Try Gemini scoring first (more accurate and doesn't require Python service)
-      // let response = await fetch("/api/writing/score-gemini", {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify({
-      //     text: text,
-      //     prompt: selectedTask?.prompt || "",
-      //     task: selectedTask ? {
-      //       id: selectedTask.id,
-      //       type: selectedTask.type,
-      //       level: selectedTask.level,
-      //       targetWords: selectedTask.targetWords,
-      //     } : null,
-      //   }),
-      // });
+      let response: Response | null = null;
 
-      // // If Gemini scoring fails, try Python service as fallback
-      // if (!response.ok) {
-      //   console.log("Gemini scoring unavailable, trying Python service...");
-      //   try {
-      //     response = await fetch("http://localhost:5001/score-ai", {
-      //       method: "POST",
-      //       headers: { "Content-Type": "application/json" },
-      //       body: JSON.stringify({
-      //         text: text,
-      //         prompt: selectedTask?.prompt || "",
-      //         task: selectedTask ? {
-      //           id: selectedTask.id,
-      //           type: selectedTask.type,
-      //           level: selectedTask.level,
-      //           targetWords: selectedTask.targetWords,
-      //         } : null,
-      //       }),
-      //     });
+      try {
+        response = await fetch("/api/writing/score-gemini", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            text,
+            prompt: selectedTask?.prompt || "",
+            task: selectedTask
+              ? {
+                  id: selectedTask.id,
+                  type: selectedTask.type,
+                  level: selectedTask.level,
+                  targetWords: selectedTask.targetWords,
+                }
+              : null,
+          }),
+        });
 
-      //     // If AI endpoint not available, fallback to regular endpoint
-      //     if (!response.ok && response.status === 503) {
-      //       console.log("AI model not available, using traditional model...");
-      //       response = await fetch("http://localhost:5001/score", {
-      //         method: "POST",
-      //         headers: { "Content-Type": "application/json" },
-      //         body: JSON.stringify({
-      //           text: text,
-      //           prompt: selectedTask?.prompt || "",
-      //           task: selectedTask ? {
-      //             id: selectedTask.id,
-      //             type: selectedTask.type,
-      //             level: selectedTask.level,
-      //             targetWords: selectedTask.targetWords,
-      //           } : null,
-      //         }),
-      //       });
-      //     }
+        if (!response.ok) {
+          console.log("Gemini scoring unavailable, will try Python service...");
+          response = null;
+        }
+      } catch (geminiError) {
+        console.error("Gemini scoring error:", geminiError);
+        response = null;
+      }
 
-      //     if (response.ok) {
-      //       setServiceAvailable(true);
-      //     } else {
-      //       throw new Error("Python scoring service unavailable");
-      //     }
-      //   } catch (pythonError) {
-      //     console.error("Python service error:", pythonError);
-      //     setServiceAvailable(false);
-      //     throw new Error("All scoring services unavailable. Please check Gemini API key or Python service.");
-      //   }
-      // }
-
-      // Use HYBRID scoring system (v3) - combines Gemini + BERT + IELTS criteria
-      // Falls back to v2 if v3 not available
-      let response = await fetch("http://localhost:5001/score-v3", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          text: text,
-          prompt: selectedTask?.prompt || "",
-          level: selectedTask?.level || "B2",
-          task_type: selectedTask?.type || null,
-        }),
-      });
-
-      // If v3 not available, fallback to v2
-      if (!response.ok && response.status === 503) {
-        console.log("Hybrid scoring (v3) not available, trying v2...");
-        response = await fetch("http://localhost:5001/score-v2", {
+      // If Gemini scoring fails, try Python service as fallback
+      if (!response) {
+        // Use Hybrid Deep Model scoring system
+        response = await fetch("http://localhost:5001/score", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             text: text,
             prompt: selectedTask?.prompt || "",
-            level: selectedTask?.level || "B2",
-            task_type: selectedTask?.type || null,
+            task: selectedTask
+              ? {
+                  id: selectedTask.id,
+                  type: selectedTask.type,
+                  level: selectedTask.level,
+                  targetWords: selectedTask.targetWords,
+                }
+              : null,
           }),
         });
       }
 
-      // If v2 also not available, fallback to old scoring system
-      if (!response.ok && response.status === 503) {
-        console.log("Intelligent scoring (v2) not available, using traditional scoring...");
-        response = await fetch("http://localhost:5001/score-ai", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            text: text,
-            prompt: selectedTask?.prompt || "",
-            task: selectedTask ? {
-              id: selectedTask.id,
-              type: selectedTask.type,
-              level: selectedTask.level,
-              targetWords: selectedTask.targetWords,
-            } : null,
-          }),
-        });
-      }
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || "Scoring service unavailable");
+      if (!response || !response.ok) {
+        const errorData = await response?.json().catch(() => ({}));
+        throw new Error(errorData?.error || "Scoring service unavailable");
       }
 
       setServiceAvailable(true); // Update service status on success
 
       const result: ScoringResult = await response.json();
       
+      // DEBUG: Log API response
+      console.log("[FE] API Response:", result);
+      console.log("[FE] overall_score from API:", result.overall_score);
+      console.log("[FE] score_10 from API:", result.score_10);
+      
       // Normalize result format - handle both old and new scoring systems
+      // CRITICAL: Ensure overall_score is in [0, 10] range (backend already validates, but double-check)
+      let overallScore = result.overall_score;
+      if (overallScore > 10.0) {
+        console.warn("[FE] overall_score > 10.0, dividing by 10:", overallScore);
+        overallScore = overallScore / 10.0;
+      }
+      overallScore = Math.max(0.0, Math.min(10.0, overallScore));
+      
       const normalizedResult: ScoringResult = {
         ...result,
+        // CRITICAL: Use validated overall_score (ensure it's in [0, 10] range)
+        overall_score: overallScore,
         // Ensure score_10 exists (use overall_score if not)
-        score_10: result.score_10 ?? result.overall_score,
+        score_10: result.score_10 ?? overallScore,
         // Calculate statistics if missing (for new scoring system)
         statistics: result.statistics || (() => {
           const words = text.trim().split(/\s+/).filter(w => w.length > 0);
@@ -328,6 +307,12 @@ export default function WritingPage() {
         })(),
       };
       
+      // DEBUG: Log normalized result
+      console.log("[FE] Normalized Result:", normalizedResult);
+      console.log("[FE] overall_score after normalize:", normalizedResult.overall_score);
+      console.log("[FE] score_10 after normalize:", normalizedResult.score_10);
+      console.log("[FE] ✅ Final overall_score to display:", normalizedResult.overall_score, "/ 10");
+      
       setScoringResult(normalizedResult);
       setSubmitted(true);
 
@@ -336,7 +321,9 @@ export default function WritingPage() {
         const saveResponse = await fetch("/api/writing/complete", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
+          credentials: "include",
           body: JSON.stringify({
+            userId: session?.user?.id,
             taskId: selectedTask?.id,
             taskTitle: selectedTask?.title,
             taskType: selectedTask?.type,
@@ -347,10 +334,10 @@ export default function WritingPage() {
             text: text,
             scoringDetails: {
               cefr_level: normalizedResult.cefr_level,
-              task_response: normalizedResult.detailed_scores.task_response?.score || normalizedResult.detailed_scores.task_achievement?.score,
-              coherence: normalizedResult.detailed_scores.coherence_cohesion?.score || normalizedResult.detailed_scores.coherence?.score,
-              lexical: normalizedResult.detailed_scores.lexical_resource?.score || normalizedResult.detailed_scores.vocabulary?.score,
-              grammar: normalizedResult.detailed_scores.grammatical_range?.score || normalizedResult.detailed_scores.grammar?.score,
+              task_response: normalizedResult.detailed_scores?.task_response?.score || normalizedResult.detailed_scores?.task_achievement?.score || 0,
+              coherence: normalizedResult.detailed_scores?.coherence_cohesion?.score || normalizedResult.detailed_scores?.coherence?.score || 0,
+              lexical: normalizedResult.detailed_scores?.lexical_resource?.score || normalizedResult.detailed_scores?.vocabulary?.score || 0,
+              grammar: normalizedResult.detailed_scores?.grammatical_range?.score || normalizedResult.detailed_scores?.grammar?.score || 0,
             },
           }),
         });
@@ -561,9 +548,9 @@ export default function WritingPage() {
                 setSelectionRange(null);
               }}
             >
-              ← Back to Tasks
+              Back to Tasks
             </button>
-            <h1 style={{ marginTop: "12px" }}>{selectedTask.icon} {selectedTask.title}</h1>
+            <h1 style={{ marginTop: "12px" }}>{selectedTask.title}</h1>
             <p className="muted">{selectedTask.type} • {selectedTask.level} Level</p>
         </div>
 
@@ -575,15 +562,33 @@ export default function WritingPage() {
                   timeLeft < 300 ? "warning" : ""
                 } ${timerExpired ? "expired" : ""}`}
               >
-                ⏱️ {formatTime(timeLeft)}
+                {formatTime(timeLeft)}
               </div>
             )}
         </div>
       </section>
 
-        {/* Writing interface (existing code continues below) */}
-      <div className="writing-grid">
-        <div className="left-col">
+        {/* Writing interface - Split view like reading */}
+        <div
+          className="writing-split-layout"
+          style={{
+            display: "flex",
+            gap: "24px",
+            alignItems: "flex-start",
+            flexWrap: "wrap",
+          }}
+        >
+          <section
+            className="card"
+            style={{
+              flex: 1,
+              minWidth: "min(640px, 100%)",
+              display: "flex",
+              flexDirection: "column",
+              gap: "16px",
+            }}
+          >
+            <div className="left-col">
           {/* Prompt */}
           <section className="card">
               <h3 className="section-title">{selectedTask.title}</h3>
@@ -719,7 +724,7 @@ export default function WritingPage() {
                   onClick={() => setShowTimerModal(true)}
                   disabled={timerExpired}
                 >
-                  ⏱️ {timeLeft === null ? "Set Timer" : "Timer Active"}
+                  {timeLeft === null ? "Set Timer" : "Timer Active"}
                 </button>
                 <div style={{ flex: 1 }} />
                 <span className="small muted">
@@ -753,7 +758,7 @@ export default function WritingPage() {
                   )}
                   {timerExpired && (
                     <span style={{ color: "#ef4444", fontWeight: 600, marginLeft: "12px" }}>
-                      ⚠️ Time expired - editing disabled
+                      Time expired - editing disabled
                     </span>
                   )}
               </div>
@@ -767,7 +772,7 @@ export default function WritingPage() {
                     disabled={submitting || submitted || wordCount < 10 || serviceAvailable === false}
                     title={serviceAvailable === false ? "Python service is not available. Please start the service on port 5001" : ""}
                   >
-                    {submitting ? "Scoring..." : submitted ? "Submitted ✓" : "Submit for AI Review"}
+                    {submitting ? "Scoring..." : submitted ? "Submitted" : "Submit for AI Review"}
                   </button>
                 </div>
                 {serviceAvailable === false && (
@@ -780,52 +785,74 @@ export default function WritingPage() {
                     color: "#92400e",
                     fontSize: "14px"
                   }}>
-                    ⚠️ Python scoring service is not available. Please start the service to enable AI scoring.
+                    Python scoring service is not available. Please start the service to enable AI scoring.
               </div>
                 )}
             </div>
           </section>
+            </div>
+          </section>
 
+          {/* Right column - Sticky sidebar like reading */}
+          <aside
+            className="card"
+            style={{
+              width: "520px",
+              maxWidth: "100%",
+              flex: "0 0 520px",
+              position: "sticky",
+              top: "96px",
+              alignSelf: "flex-start",
+              display: "flex",
+              flexDirection: "column",
+              gap: "20px",
+              maxHeight: "calc(100vh - 120px)",
+              overflowY: "auto",
+            }}
+          >
             {/* Scoring Results - Only show if service is available and result exists */}
             {submitted && scoringResult && serviceAvailable && (
-          <section className="card">
-                <h3 className="section-title">🎯 Scoring Results</h3>
+              <div>
+                <h3 style={{ fontSize: "1.65rem", marginBottom: "8px" }}>Scoring Results</h3>
+                <p className="muted" style={{ marginBottom: "10px", fontSize: "1rem", lineHeight: 1.4 }}>
+                  Detailed feedback on your writing performance
+                </p>
 
                 {/* Score Display */}
-                <div style={{ textAlign: "center", marginBottom: "32px" }}>
+                <div style={{ textAlign: "center", marginBottom: "24px" }}>
                   <div
                     style={{
                       display: "inline-block",
-                      padding: "32px 64px",
+                      padding: "24px 48px",
                       background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
-                      borderRadius: "16px",
+                      borderRadius: "12px",
                       color: "white",
                     }}
                   >
-                    <div style={{ fontSize: "20px", opacity: 0.9, marginBottom: "12px" }}>
+                    <div style={{ fontSize: "18px", opacity: 0.9, marginBottom: "8px" }}>
                       Overall Score
                     </div>
-                    <div style={{ fontSize: "64px", fontWeight: "bold", lineHeight: "1" }}>
-                      {scoringResult.overall_score.toFixed(1)}
+                    <div style={{ fontSize: "48px", fontWeight: "bold", lineHeight: "1" }}>
+                      {Math.max(0, Math.min(10, scoringResult.overall_score)).toFixed(1)}
                     </div>
-                    <div style={{ fontSize: "18px", opacity: 0.8, marginTop: "8px" }}>
+                    <div style={{ fontSize: "16px", opacity: 0.8, marginTop: "4px" }}>
                       / 10
                     </div>
                   </div>
                 </div>
 
                 {/* Detailed Scores */}
-                <div className="scoring-grid">
+                <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
                   {/* IELTS 4 Criteria (Hybrid v3 or Traditional) */}
                   {(scoringResult.scoring_method === 'hybrid_v3_ielts' || 
                     scoringResult.scoring_system === 'traditional' ||
-                    (scoringResult.detailed_scores.coherence_cohesion && scoringResult.detailed_scores.lexical_resource && scoringResult.detailed_scores.grammatical_range)) ? (
+                    (scoringResult.detailed_scores?.coherence_cohesion && scoringResult.detailed_scores?.lexical_resource && scoringResult.detailed_scores?.grammatical_range)) ? (
                     <>
                       {/* IELTS 4 Criteria Scoring System */}
                       {/* Task Response */}
-                      {scoringResult.detailed_scores.task_response && (
+                      {scoringResult.detailed_scores?.task_response && (
                         <div className="score-card">
-                          <h4>📝 Task Response</h4>
+                          <h4>Task Response</h4>
                           <div className="score-value">{scoringResult.detailed_scores.task_response.score}/10</div>
                           <div className="score-feedback">
                             {scoringResult.detailed_scores.task_response.feedback.map((item, i) => (
@@ -836,9 +863,9 @@ export default function WritingPage() {
                       )}
 
                       {/* Coherence & Cohesion */}
-                      {scoringResult.detailed_scores.coherence_cohesion && (
+                      {scoringResult.detailed_scores?.coherence_cohesion && (
                         <div className="score-card">
-                          <h4>🔗 Coherence & Cohesion</h4>
+                          <h4>Coherence & Cohesion</h4>
                           <div className="score-value">{scoringResult.detailed_scores.coherence_cohesion.score}/10</div>
                           <div className="score-feedback">
                             {scoringResult.detailed_scores.coherence_cohesion.feedback.map((item, i) => (
@@ -849,9 +876,9 @@ export default function WritingPage() {
                       )}
 
                       {/* Lexical Resource */}
-                      {scoringResult.detailed_scores.lexical_resource && (
+                      {scoringResult.detailed_scores?.lexical_resource && (
                         <div className="score-card">
-                          <h4>📚 Lexical Resource</h4>
+                          <h4>Lexical Resource</h4>
                           <div className="score-value">{scoringResult.detailed_scores.lexical_resource.score}/10</div>
                           <div className="score-feedback">
                             {scoringResult.detailed_scores.lexical_resource.feedback.map((item, i) => (
@@ -862,9 +889,9 @@ export default function WritingPage() {
                       )}
 
                       {/* Grammatical Range & Accuracy */}
-                      {scoringResult.detailed_scores.grammatical_range && (
+                      {scoringResult.detailed_scores?.grammatical_range && (
                         <div className="score-card">
-                          <h4>✍️ Grammatical Range & Accuracy</h4>
+                          <h4>Grammatical Range & Accuracy</h4>
                           <div className="score-value">{scoringResult.detailed_scores.grammatical_range.score}/10</div>
                           <div className="score-feedback">
                             {scoringResult.detailed_scores.grammatical_range.feedback.map((item, i) => (
@@ -878,9 +905,9 @@ export default function WritingPage() {
                     <>
                       {/* Intelligent Scoring System v2 */}
                       {/* Task Response */}
-                      {scoringResult.detailed_scores.task_response && (
+                      {scoringResult.detailed_scores?.task_response && (
                         <div className="score-card">
-                          <h4>📝 Task Response</h4>
+                          <h4>Task Response</h4>
                           <div className="score-value">{scoringResult.detailed_scores.task_response.score}/10</div>
                           <div className="score-feedback">
                             {scoringResult.detailed_scores.task_response.feedback.map((item, i) => (
@@ -891,9 +918,9 @@ export default function WritingPage() {
                       )}
 
                       {/* Vocabulary */}
-                      {scoringResult.detailed_scores.vocabulary && (
+                      {scoringResult.detailed_scores?.vocabulary && (
                         <div className="score-card">
-                          <h4>📚 Vocabulary</h4>
+                          <h4>Vocabulary</h4>
                           <div className="score-value">{scoringResult.detailed_scores.vocabulary.score}/10</div>
                           <div className="score-feedback">
                             {scoringResult.detailed_scores.vocabulary.feedback.map((item, i) => (
@@ -904,9 +931,9 @@ export default function WritingPage() {
                       )}
 
                       {/* Grammar */}
-                      {scoringResult.detailed_scores.grammar && (
+                      {scoringResult.detailed_scores?.grammar && (
                         <div className="score-card">
-                          <h4>✏️ Grammar</h4>
+                          <h4>Grammar</h4>
                           <div className="score-value">{scoringResult.detailed_scores.grammar.score}/10</div>
                           <div className="score-feedback">
                             {scoringResult.detailed_scores.grammar.feedback.map((item, i) => (
@@ -917,9 +944,9 @@ export default function WritingPage() {
                       )}
 
                       {/* Coherence */}
-                      {scoringResult.detailed_scores.coherence && (
+                      {scoringResult.detailed_scores?.coherence && (
                         <div className="score-card">
-                          <h4>🔗 Coherence</h4>
+                          <h4>Coherence</h4>
                           <div className="score-value">{scoringResult.detailed_scores.coherence.score}/10</div>
                           <div className="score-feedback">
                             {scoringResult.detailed_scores.coherence.feedback.map((item, i) => (
@@ -933,9 +960,9 @@ export default function WritingPage() {
                     <>
                       {/* Modern Scoring System */}
                       {/* Task Achievement */}
-                      {scoringResult.detailed_scores.task_achievement && (
+                      {scoringResult.detailed_scores?.task_achievement && (
                         <div className="score-card">
-                          <h4>🎯 Task Achievement</h4>
+                          <h4>Task Achievement</h4>
                           <div className="score-value">{scoringResult.detailed_scores.task_achievement.score}/10</div>
                           <div className="score-feedback">
                             {scoringResult.detailed_scores.task_achievement.feedback.map((item, i) => (
@@ -946,9 +973,9 @@ export default function WritingPage() {
                       )}
 
                       {/* Language Quality */}
-                      {scoringResult.detailed_scores.language_quality && (
+                      {scoringResult.detailed_scores?.language_quality && (
                         <div className="score-card">
-                          <h4>💬 Language Quality</h4>
+                          <h4>Language Quality</h4>
                           <div className="score-value">{scoringResult.detailed_scores.language_quality.score}/10</div>
                           <div className="score-feedback">
                             {scoringResult.detailed_scores.language_quality.feedback.map((item, i) => (
@@ -959,9 +986,9 @@ export default function WritingPage() {
                       )}
 
                       {/* Content Depth */}
-                      {scoringResult.detailed_scores.content_depth && (
+                      {scoringResult.detailed_scores?.content_depth && (
                         <div className="score-card">
-                          <h4>📖 Content Depth</h4>
+                          <h4>Content Depth</h4>
                           <div className="score-value">{scoringResult.detailed_scores.content_depth.score}/10</div>
                           <div className="score-feedback">
                             {scoringResult.detailed_scores.content_depth.feedback.map((item, i) => (
@@ -972,9 +999,9 @@ export default function WritingPage() {
                       )}
 
                       {/* Fluency & Readability */}
-                      {scoringResult.detailed_scores.fluency_readability && (
+                      {scoringResult.detailed_scores?.fluency_readability && (
                         <div className="score-card">
-                          <h4>🌊 Fluency & Readability</h4>
+                          <h4>Fluency & Readability</h4>
                           <div className="score-value">{scoringResult.detailed_scores.fluency_readability.score}/10</div>
                           <div className="score-feedback">
                             {scoringResult.detailed_scores.fluency_readability.feedback.map((item, i) => (
@@ -985,9 +1012,9 @@ export default function WritingPage() {
                       )}
 
                       {/* Mechanics */}
-                      {scoringResult.detailed_scores.mechanics && (
+                      {scoringResult.detailed_scores?.mechanics && (
                         <div className="score-card">
-                          <h4>✏️ Mechanics</h4>
+                          <h4>Mechanics</h4>
                           <div className="score-value">{scoringResult.detailed_scores.mechanics.score}/10</div>
                           <div className="score-feedback">
                             {scoringResult.detailed_scores.mechanics.feedback.map((item, i) => (
@@ -1001,9 +1028,9 @@ export default function WritingPage() {
                     <>
                       {/* Traditional Scoring System */}
                       {/* Task Response */}
-                      {scoringResult.detailed_scores.task_response && (
+                      {scoringResult.detailed_scores?.task_response && (
                         <div className="score-card">
-                          <h4>📝 Task Response</h4>
+                          <h4>Task Response</h4>
                           <div className="score-value">{scoringResult.detailed_scores.task_response.score}/10</div>
                           <div className="score-feedback">
                             {scoringResult.detailed_scores.task_response.feedback.map((item, i) => (
@@ -1014,9 +1041,9 @@ export default function WritingPage() {
                       )}
 
                       {/* Coherence & Cohesion */}
-                      {scoringResult.detailed_scores.coherence_cohesion && (
+                      {scoringResult.detailed_scores?.coherence_cohesion && (
                         <div className="score-card">
-                          <h4>🔗 Coherence & Cohesion</h4>
+                          <h4>Coherence & Cohesion</h4>
                           <div className="score-value">{scoringResult.detailed_scores.coherence_cohesion.score}/10</div>
                           <div className="score-feedback">
                             {scoringResult.detailed_scores.coherence_cohesion.feedback.map((item, i) => (
@@ -1027,9 +1054,9 @@ export default function WritingPage() {
                       )}
 
                       {/* Lexical Resource */}
-                      {scoringResult.detailed_scores.lexical_resource && (
+                      {scoringResult.detailed_scores?.lexical_resource && (
                         <div className="score-card">
-                          <h4>📚 Lexical Resource</h4>
+                          <h4>Lexical Resource</h4>
                           <div className="score-value">{scoringResult.detailed_scores.lexical_resource.score}/10</div>
                           <div className="score-feedback">
                             {scoringResult.detailed_scores.lexical_resource.feedback.map((item, i) => (
@@ -1040,9 +1067,9 @@ export default function WritingPage() {
                       )}
 
                       {/* Grammatical Range */}
-                      {scoringResult.detailed_scores.grammatical_range && (
+                      {scoringResult.detailed_scores?.grammatical_range && (
                         <div className="score-card">
-                          <h4>✍️ Grammatical Range</h4>
+                          <h4>Grammatical Range</h4>
                           <div className="score-value">{scoringResult.detailed_scores.grammatical_range.score}/10</div>
                           <div className="score-feedback">
                             {scoringResult.detailed_scores.grammatical_range.feedback.map((item, i) => (
@@ -1058,7 +1085,7 @@ export default function WritingPage() {
                 {/* Statistics */}
                 {scoringResult.statistics && (
                   <div style={{ marginTop: "24px", padding: "16px", background: "#f9fafb", borderRadius: "12px" }}>
-                    <h4 style={{ marginBottom: "12px" }}>📊 Statistics</h4>
+                    <h4 style={{ marginBottom: "12px" }}>Statistics</h4>
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "16px" }}>
                       <div>
                         <div style={{ fontSize: "24px", fontWeight: "600" }}>{scoringResult.statistics.words}</div>
@@ -1090,7 +1117,7 @@ export default function WritingPage() {
 
                 <button
                   className="btn primary w-full"
-                  style={{ marginTop: "24px" }}
+                  style={{ marginTop: "24px", padding: "12px 20px", fontSize: "1.05rem", fontWeight: 600 }}
                   onClick={() => {
                     setSelectedTask(null);
                     setText("");
@@ -1108,29 +1135,12 @@ export default function WritingPage() {
                 >
                   Try Another Task
                 </button>
-          </section>
-            )}
-        </div>
-
-        {/* Right column */}
-        <aside className="right-col">
-            {/* Writing Tips */}
-          <section className="card no-pad">
-              <div className="card-head amber">
-                <h4>💡 Writing Tips</h4>
-            </div>
-            <div className="pad">
-                {selectedTask.tips.map((tip, i) => (
-                  <div key={i} className="tip">
-                    • {tip}
-                  </div>
-                ))}
               </div>
-            </section>
+            )}
 
-            {/* Word Count Guide */}
-            <section className="card">
-              <h4>📊 Progress</h4>
+            {/* Progress */}
+            <div className="card soft">
+              <h4 style={{ marginBottom: "8px" }}>Progress</h4>
               <div style={{ marginTop: "12px" }}>
                 <div className="progress-bar">
                   <div
@@ -1146,22 +1156,32 @@ export default function WritingPage() {
                 <p className="small muted" style={{ marginTop: "8px" }}>
                   Target: {selectedTask.targetWords}
                 </p>
+              </div>
             </div>
-          </section>
 
-            {/* Quick Grammar Reference */}
-          <section className="card no-pad">
-            <div className="card-head green">
-                <h4>📝 Grammar Reference</h4>
+            {/* Writing Tips */}
+            <div className="card soft">
+              <h4 style={{ marginBottom: "8px" }}>Writing Tips</h4>
+              <div style={{ marginTop: "8px", display: "flex", flexDirection: "column", gap: "8px" }}>
+                {selectedTask.tips.map((tip, i) => (
+                  <div key={i} style={{ fontSize: "0.95rem", lineHeight: 1.5 }}>
+                    {tip}
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className="pad">
-                <div className="grammar">• Use varied sentence structures</div>
-                <div className="grammar">• Check subject-verb agreement</div>
-                <div className="grammar">• Use proper punctuation</div>
-                <div className="grammar">• Avoid run-on sentences</div>
-                <div className="grammar">• Use linking words (however, moreover)</div>
+
+            {/* Grammar Reference */}
+            <div className="card soft">
+              <h4 style={{ marginBottom: "8px" }}>Grammar Reference</h4>
+              <div style={{ marginTop: "8px", display: "flex", flexDirection: "column", gap: "6px" }}>
+                <div style={{ fontSize: "0.95rem" }}>• Use varied sentence structures</div>
+                <div style={{ fontSize: "0.95rem" }}>• Check subject-verb agreement</div>
+                <div style={{ fontSize: "0.95rem" }}>• Use proper punctuation</div>
+                <div style={{ fontSize: "0.95rem" }}>• Avoid run-on sentences</div>
+                <div style={{ fontSize: "0.95rem" }}>• Use linking words (however, moreover)</div>
+              </div>
             </div>
-          </section>
           </aside>
         </div>
 
@@ -1217,16 +1237,16 @@ export default function WritingPage() {
             level={selectedTask?.level || "B2"}
             lastScore={scoringResult.overall_score}
             errorProfile={{
-              taskResponse: scoringResult.detailed_scores.task_response?.score || scoringResult.detailed_scores.task_achievement?.score || 0,
-              coherence: scoringResult.detailed_scores.coherence_cohesion?.score || scoringResult.detailed_scores.language_quality?.score || 0,
-              lexical: scoringResult.detailed_scores.lexical_resource?.score || scoringResult.detailed_scores.language_quality?.score || 0,
-              grammar: scoringResult.detailed_scores.grammatical_range?.score || scoringResult.detailed_scores.language_quality?.score || 0,
+              taskResponse: scoringResult.detailed_scores?.task_response?.score || scoringResult.detailed_scores?.task_achievement?.score || 0,
+              coherence: scoringResult.detailed_scores?.coherence_cohesion?.score || scoringResult.detailed_scores?.language_quality?.score || 0,
+              lexical: scoringResult.detailed_scores?.lexical_resource?.score || scoringResult.detailed_scores?.language_quality?.score || 0,
+              grammar: scoringResult.detailed_scores?.grammatical_range?.score || scoringResult.detailed_scores?.language_quality?.score || 0,
             }}
             scoringFeedback={{
-              taskResponse: scoringResult.detailed_scores.task_response?.feedback || scoringResult.detailed_scores.task_achievement?.feedback || [],
-              coherence: scoringResult.detailed_scores.coherence_cohesion?.feedback || scoringResult.detailed_scores.language_quality?.feedback || [],
-              lexical: scoringResult.detailed_scores.lexical_resource?.feedback || scoringResult.detailed_scores.language_quality?.feedback || [],
-              grammar: scoringResult.detailed_scores.grammatical_range?.feedback || scoringResult.detailed_scores.language_quality?.feedback || [],
+              taskResponse: scoringResult.detailed_scores?.task_response?.feedback || scoringResult.detailed_scores?.task_achievement?.feedback || [],
+              coherence: scoringResult.detailed_scores?.coherence_cohesion?.feedback || scoringResult.detailed_scores?.language_quality?.feedback || [],
+              lexical: scoringResult.detailed_scores?.lexical_resource?.feedback || scoringResult.detailed_scores?.language_quality?.feedback || [],
+              grammar: scoringResult.detailed_scores?.grammatical_range?.feedback || scoringResult.detailed_scores?.language_quality?.feedback || [],
             }}
           />
         )}
@@ -1284,113 +1304,143 @@ export default function WritingPage() {
   return (
     <div className="dashboard-content">
       {/* Page header */}
-      <section className="card page-head">
-        <div>
-          <h1>📝 Writing Practice</h1>
-          <p className="muted">AI-powered writing assessment</p>
-        </div>
-
-        <div className="head-actions">
-          <div className="stats" style={{ gap: "16px" }}>
-            <div className="stat">
-              <span className="stat-val">24</span>
-              <span className="stat-lbl">Completed</span>
-            </div>
-            <div className="stat">
-              <span className="stat-val">7.5</span>
-              <span className="stat-lbl">Avg Score</span>
-            </div>
-          </div>
-            </div>
-          </section>
-
-      {/* Filter dropdown */}
-      <div className="card" style={{ padding: "16px", marginBottom: "16px" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <label htmlFor="type-filter" style={{ fontWeight: 600 }}>
-            Filter by type:
-          </label>
-          <select
-            id="type-filter"
-            className="select"
-            value={filterType}
-            onChange={(e) => setFilterType(e.target.value)}
-            style={{ width: "250px" }}
-          >
-            {uniqueTypes.map((type) => (
-              <option key={type} value={type}>
-                {type}
-              </option>
-            ))}
-          </select>
-          <span className="muted" style={{ marginLeft: "auto" }}>
-            {filteredTasks.length} task{filteredTasks.length !== 1 ? "s" : ""} available
-          </span>
-        </div>
-      </div>
-
-      {/* Task Cards Grid */}
       <section className="card">
-        <h3 className="section-title" style={{ marginBottom: "20px" }}>
-          Choose a Writing Task
-        </h3>
-        <div className="task-grid">
-          {filteredTasks.map((task) => (
-            <div key={task.id} className={`task-card task-card-${task.color}`}>
-              {task.recommended && (
-                <div className="task-badge">
-                  <span>⭐ Recommended</span>
-                </div>
-              )}
-              
-              <div className="task-header">
-                <div className={`task-level-badge task-level-${task.level.toLowerCase()}`}>
-                  {task.level}
-                </div>
-                <div className={`task-color-indicator task-color-${task.color}`}></div>
-              </div>
-              
-              <div className="task-content">
-                <h4 className="task-title">{task.title}</h4>
-                <span className={`task-type ${task.color}`}>{task.type}</span>
-              </div>
-
-              <div className="task-meta">
-                <span className="chip">{task.level} Level</span>
-                <span className="chip">{task.targetWords}</span>
-              </div>
-
-              <div className="task-status">
-                {task.attempts > 0 ? (
-                  <span className="status-text">{task.attempts} attempt{task.attempts !== 1 ? "s" : ""}</span>
-                ) : (
-                  <span className="status-text muted">No attempts yet</span>
-                )}
-              </div>
-
-              <button
-                className="btn primary w-full"
-                onClick={() => {
-                  // Reset all states when selecting a new task
-                  setText("");
-                  setSubmitted(false);
-                  setScoringResult(null);
-                  setShowRephraseMenu(false);
-                  setShowExpandMenu(false);
-                  setShowSelfReview(false);
-                  setSelectedText("");
-                  setSelectionRange(null);
-                  setTimeLeft(null);
-                  setTimerExpired(false);
-                  setSelectedTask(task);
-                }}
-              >
-                ▶ Start
-              </button>
-            </div>
-          ))}
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "16px",
+            alignItems: "center",
+          }}
+        >
+          <div style={{ flex: 1, minWidth: "240px" }}>
+            <h1 style={{ marginBottom: "4px" }}>Writing Practice</h1>
+            <p className="muted">
+              AI-powered writing assessment with detailed feedback
+            </p>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              gap: "12px",
+              flexWrap: "wrap",
+              minWidth: "260px",
+            }}
+          >
+            <StatsCard label="Tasks" value={WRITING_TASKS.length.toString()} />
+            <StatsCard label="Avg. length" value="~15 phút" />
+            <StatsCard label="Skill focus" value="Grammar • Vocabulary • Structure" />
+          </div>
         </div>
       </section>
+
+      {/* Search and filters */}
+      <section
+        className="card"
+        style={{ display: "flex", flexWrap: "wrap", gap: "12px" }}
+      >
+        <input
+          type="text"
+          placeholder="Tìm theo tiêu đề hoặc chủ đề…"
+          value={searchTerm}
+          onChange={(event) => setSearchTerm(event.target.value)}
+          className="input"
+          style={{ flex: 1, minWidth: "220px" }}
+        />
+        <select
+          className="select"
+          value={levelFilter}
+          onChange={(event) => setLevelFilter(event.target.value)}
+          style={{ minWidth: "160px" }}
+        >
+          {uniqueLevels.map((option) => (
+            <option value={option} key={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+        <select
+          className="select"
+          value={filterType}
+          onChange={(event) => setFilterType(event.target.value)}
+          style={{ minWidth: "200px" }}
+        >
+          {uniqueTypes.map((type) => (
+            <option value={type} key={type}>
+              {type}
+            </option>
+          ))}
+        </select>
+      </section>
+
+      {/* Task Cards Grid */}
+      <section
+        className="card"
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))",
+          gap: "16px",
+        }}
+      >
+        {filteredTasks.map((task) => (
+          <TaskCard
+            key={task.id}
+            task={task}
+            onSelect={() => {
+              // Reset all states when selecting a new task
+              setText("");
+              setSubmitted(false);
+              setScoringResult(null);
+              setShowRephraseMenu(false);
+              setShowExpandMenu(false);
+              setShowSelfReview(false);
+              setSelectedText("");
+              setSelectionRange(null);
+              setTimeLeft(null);
+              setTimerExpired(false);
+              setSelectedTask(task);
+            }}
+          />
+        ))}
+        {!filteredTasks.length && (
+          <div className="card soft" style={{ gridColumn: "1/-1" }}>
+            Không tìm thấy bài viết nào phù hợp với bộ lọc hiện tại.
+          </div>
+        )}
+      </section>
+    </div>
+  );
+}
+
+function TaskCard({
+  task,
+  onSelect,
+}: {
+  task: WritingTask;
+  onSelect: () => void;
+}) {
+  return (
+    <div className="card soft" style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <span className="chip">{task.level}</span>
+      </div>
+      <div>
+        <h3 style={{ marginBottom: "4px" }}>{task.title}</h3>
+        <p className="muted" style={{ marginBottom: "8px" }}>
+          {task.prompt.substring(0, 100)}{task.prompt.length > 100 ? "..." : ""}
+        </p>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+          <span className="tag">{task.type}</span>
+          <span className="tag">{task.targetWords}</span>
+        </div>
+      </div>
+      <div style={{ display: "flex", gap: "8px", fontSize: "0.9rem" }}>
+        <span>{task.targetWords}</span>
+        {task.attempts > 0 && <span>{task.attempts} attempt{task.attempts !== 1 ? "s" : ""}</span>}
+      </div>
+      <button className="btn primary" onClick={onSelect}>
+        Bắt đầu luyện viết
+      </button>
     </div>
   );
 }

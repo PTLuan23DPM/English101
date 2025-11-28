@@ -60,23 +60,21 @@ assessor.save_model('./bert_question_model')
 
 ```
 ai-models/writing-scorer/
-├── ml_assess.py                    # ✅ Model mới (QuestionAssessor)
-├── ml_assess.py.backup            # ✅ Backup của model cũ
-├── bert_question_model/           # ⚠️ Cần có để sử dụng (chứa model đã train)
+├── ml_assess.py                    # ✅ Model QuestionAssessor đang dùng
+├── bert_question_model/            # ⚠️ Model đã train (bắt buộc phải có)
 │   ├── model.keras
 │   └── metadata.pkl
-└── bert_ielts_model/              # Fallback (model cũ)
-    ├── model.keras
-    └── metadata.pkl
+└── README.md (tùy chọn)            # Ghi chú nhanh về model
+
+Legacy assets (IELTS_Model, bert_ielts_model, ...) đã được dọn sang
+`ai-models/backup/` để thư mục chính gọn gàng hơn.
 ```
 
 ## 🔍 Model Loading Priority
 
-Service sẽ load model theo thứ tự:
-1. **BERT Question-Aware** (`bert_question_model/`) - Ưu tiên cao nhất
-2. **BERT Legacy** (`bert_ielts_model/`) - Fallback
-3. **Traditional Model** - Fallback cuối cùng
-4. **Fallback Algorithm** - Nếu không có model nào
+Service giờ chỉ tập trung vào **BERT Question-Aware** (`bert_question_model/`).
+Nếu thư mục này không tồn tại, service sẽ rơi về fallback logic cũ (heuristic scoring).
+Các model legacy vẫn có thể khôi phục từ `ai-models/backup/` nếu thật sự cần.
 
 ## 🧪 Test Model
 
@@ -110,10 +108,10 @@ curl -X POST http://localhost:5001/score-ai \
 
 ## ⚠️ Lưu ý
 
-1. **Model chưa train**: Nếu chưa có `bert_question_model/`, service sẽ fallback về model cũ hoặc traditional model
+1. **Model chưa train**: Nếu chưa có `bert_question_model/`, service sẽ fallback về thuật toán heuristic (độ chính xác thấp hơn). Có thể khôi phục model cũ từ `ai-models/backup/legacy-models/` khi cần.
 2. **Question là optional**: Model vẫn hoạt động nếu không có question (sẽ chỉ dùng essay features)
 3. **Metadata**: Model mới lưu `use_question` flag trong metadata.pkl
-4. **Backward compatibility**: Code vẫn hỗ trợ model cũ (`PMCStyleIELTSAssessor` nếu cần)
+4. **Backward compatibility**: Code vẫn hỗ trợ model cũ (`PMCStyleIELTSAssessor`), nhưng các file đã được chuyển vào thư mục `backup`.
 
 ## 📝 Next Steps
 

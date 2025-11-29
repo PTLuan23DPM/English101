@@ -12,7 +12,6 @@ const protectedRoutes = [
   "/english/grammar",
   "/english/vocabulary",
   "/english/pronunciation",
-  "/english/functional",
   "/english/assessment",
   "/english/test",
   "/english/support",

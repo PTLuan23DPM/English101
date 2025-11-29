@@ -1,273 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-
-interface SpeakingTask {
-  id: string;
-  icon: string;
-  title: string;
-  type: string;
-  level: string;
-  prompt: string;
-  timeLimit: string;
-  tips: string[];
-  vocab: Array<{ word: string; ipa: string }>;
-  phrases: string[];
-  recommended?: boolean;
-  attempts: number;
-  color: string;
-}
-
-const SPEAKING_TASKS: SpeakingTask[] = [
-  // Pronunciation
-  {
-    id: "pron-intro",
-    icon: "👋",
-    title: "Self Introduction",
-    type: "Pronunciation",
-    level: "A2",
-    prompt: "Introduce yourself to a new colleague at work. Include your name, job position, and something interesting about yourself.",
-    timeLimit: "2 min",
-    tips: [
-      "Speak clearly and at moderate pace",
-      "Use natural intonation",
-      "Pause between main ideas",
-    ],
-    vocab: [
-      { word: "introduce", ipa: "/ˌɪntrəˈdjuːs/" },
-      { word: "colleague", ipa: "/ˈkɒliːɡ/" },
-      { word: "position", ipa: "/pəˈzɪʃn/" },
-    ],
-    phrases: [
-      "✓ Hi, I'm... and I work as...",
-      "✓ Nice to meet you",
-      "✓ I've been working here for...",
-      "✓ In my free time, I enjoy...",
-    ],
-    recommended: true,
-    attempts: 0,
-    color: "blue",
-  },
-  {
-    id: "pron-numbers",
-    icon: "🔢",
-    title: "Numbers & Dates",
-    type: "Pronunciation",
-    level: "A2",
-    prompt: "Practice pronouncing numbers, prices, dates, and times correctly. Read aloud the provided examples.",
-    timeLimit: "3 min",
-    tips: [
-      "Pay attention to stress patterns",
-      "Practice -teen vs -ty sounds",
-      "Use rising intonation for dates",
-    ],
-    vocab: [
-      { word: "thirteen", ipa: "/ˌθɜːrˈtiːn/" },
-      { word: "thirty", ipa: "/ˈθɜːrti/" },
-      { word: "receipt", ipa: "/rɪˈsiːt/" },
-    ],
-    phrases: [
-      "✓ The meeting is at 2:30 PM",
-      "✓ My birthday is on March 15th",
-      "✓ That costs $13.50",
-    ],
-    attempts: 0,
-    color: "blue",
-  },
-  // Topic Discussion
-  {
-    id: "topic-season",
-    icon: "🌸",
-    title: "Favorite Season",
-    type: "Topic Discussion",
-    level: "B1",
-    prompt: "Talk about your favorite season of the year. Explain why you prefer it and what activities you enjoy during that time.",
-    timeLimit: "3 min",
-    tips: [
-      "Organize your ideas: introduction, reasons, conclusion",
-      "Use descriptive adjectives",
-      "Give specific examples",
-    ],
-    vocab: [
-      { word: "season", ipa: "/ˈsiːzn/" },
-      { word: "prefer", ipa: "/prɪˈfɜːr/" },
-      { word: "activity", ipa: "/ækˈtɪvɪti/" },
-    ],
-    phrases: [
-      "✓ My favorite season is...",
-      "✓ I prefer it because...",
-      "✓ During this time, I usually...",
-      "✓ What I love most is...",
-    ],
-    recommended: true,
-    attempts: 0,
-    color: "green",
-  },
-  {
-    id: "topic-technology",
-    icon: "💻",
-    title: "Technology in Daily Life",
-    type: "Topic Discussion",
-    level: "B2",
-    prompt: "Discuss how technology has changed your daily life. Talk about both positive and negative aspects.",
-    timeLimit: "4 min",
-    tips: [
-      "Present balanced viewpoint",
-      "Use linking words (however, moreover)",
-      "Support opinions with examples",
-    ],
-    vocab: [
-      { word: "convenient", ipa: "/kənˈviːniənt/" },
-      { word: "rely", ipa: "/rɪˈlaɪ/" },
-      { word: "distraction", ipa: "/dɪˈstrækʃn/" },
-    ],
-    phrases: [
-      "✓ On one hand..., on the other hand...",
-      "✓ Technology has made it possible to...",
-      "✓ However, there are some downsides...",
-    ],
-    attempts: 0,
-    color: "green",
-  },
-  // Role Play
-  {
-    id: "role-restaurant",
-    icon: "🍴",
-    title: "At the Restaurant",
-    type: "Role Play",
-    level: "A2",
-    prompt: "You are at a restaurant. Order a meal, ask about ingredients, and request a drink. Be polite and natural.",
-    timeLimit: "2-3 min",
-    tips: [
-      "Use polite expressions: Could I have..., I'd like...",
-      "Ask clarifying questions",
-      "Show appreciation: Thank you, That sounds great",
-    ],
-    vocab: [
-      { word: "order", ipa: "/ˈɔːrdər/" },
-      { word: "ingredient", ipa: "/ɪnˈɡriːdiənt/" },
-      { word: "recommend", ipa: "/ˌrekəˈmend/" },
-    ],
-    phrases: [
-      "✓ Could I have..., please?",
-      "✓ What do you recommend?",
-      "✓ Does this contain...?",
-      "✓ I'd like to order...",
-    ],
-    recommended: true,
-    attempts: 0,
-    color: "purple",
-  },
-  {
-    id: "role-doctor",
-    icon: "🏥",
-    title: "Doctor Appointment",
-    type: "Role Play",
-    level: "B1",
-    prompt: "You are visiting a doctor. Describe your symptoms and answer questions about your health.",
-    timeLimit: "3 min",
-    tips: [
-      "Describe symptoms clearly",
-      "Answer questions with details",
-      "Use medical vocabulary appropriately",
-    ],
-    vocab: [
-      { word: "symptom", ipa: "/ˈsɪmptəm/" },
-      { word: "prescribe", ipa: "/prɪˈskraɪb/" },
-      { word: "allergy", ipa: "/ˈælərdʒi/" },
-    ],
-    phrases: [
-      "✓ I've been feeling...",
-      "✓ It started about... ago",
-      "✓ Do I need any medication?",
-    ],
-    attempts: 0,
-    color: "purple",
-  },
-  // Picture Description
-  {
-    id: "pic-coffee-shop",
-    icon: "☕",
-    title: "Busy Coffee Shop",
-    type: "Picture Description",
-    level: "B1",
-    prompt: "Describe the scene you imagine: A busy coffee shop on a weekend morning. Include details about people, atmosphere, and activities.",
-    timeLimit: "2 min",
-    tips: [
-      "Start with an overview",
-      "Use present continuous: people are sitting, someone is ordering",
-      "Describe from general to specific details",
-    ],
-    vocab: [
-      { word: "atmosphere", ipa: "/ˈætməsfɪər/" },
-      { word: "crowded", ipa: "/ˈkraʊdɪd/" },
-      { word: "background", ipa: "/ˈbækɡraʊnd/" },
-    ],
-    phrases: [
-      "✓ In this scene, I can see...",
-      "✓ In the foreground/background...",
-      "✓ There are several people who are...",
-      "✓ The atmosphere seems...",
-    ],
-    attempts: 0,
-    color: "teal",
-  },
-  {
-    id: "pic-park",
-    icon: "🏞️",
-    title: "Park Activities",
-    type: "Picture Description",
-    level: "B2",
-    prompt: "Describe a busy park scene with various activities. Include weather, people's emotions, and background details.",
-    timeLimit: "3 min",
-    tips: [
-      "Use varied vocabulary for colors and emotions",
-      "Include weather and time of day",
-      "Describe spatial relationships",
-    ],
-    vocab: [
-      { word: "leisure", ipa: "/ˈleʒər/" },
-      { word: "stroll", ipa: "/stroʊl/" },
-      { word: "vicinity", ipa: "/vəˈsɪnəti/" },
-    ],
-    phrases: [
-      "✓ It appears to be...",
-      "✓ Next to/near/in front of...",
-      "✓ The people seem to be enjoying...",
-    ],
-    attempts: 0,
-    color: "teal",
-  },
-  // Interview Practice
-  {
-    id: "interview-job",
-    icon: "💼",
-    title: "Job Interview",
-    type: "Interview Practice",
-    level: "B2",
-    prompt: "Practice answering common job interview questions. Explain your strengths, experience, and why you're a good fit.",
-    timeLimit: "5 min",
-    tips: [
-      "Use STAR method (Situation, Task, Action, Result)",
-      "Be specific with examples",
-      "Show enthusiasm and confidence",
-    ],
-    vocab: [
-      { word: "strength", ipa: "/streŋkθ/" },
-      { word: "collaborate", ipa: "/kəˈlæbəreɪt/" },
-      { word: "achievement", ipa: "/əˈtʃiːvmənt/" },
-    ],
-    phrases: [
-      "✓ My greatest strength is...",
-      "✓ I have experience in...",
-      "✓ For example, in my previous role...",
-      "✓ I'm particularly interested in this position because...",
-    ],
-    recommended: true,
-    attempts: 0,
-    color: "indigo",
-  },
-];
+import { SPEAKING_TASKS, SpeakingTask } from "./data/speakingTasks";
 
 export default function SpeakingPage() {
   const [filterType, setFilterType] = useState<string>("All types");
@@ -278,21 +12,90 @@ export default function SpeakingPage() {
   const [transcript, setTranscript] = useState("");
   const [micPermission, setMicPermission] = useState<"granted" | "denied" | "prompt" | "checking">("prompt");
   const [micError, setMicError] = useState<string>("");
+  const [conversation, setConversation] = useState<string[]>([]);
+  const [conversationSegments, setConversationSegments] = useState<Array<{speaker: string; text: string}>>([]);
+  const [loadingConversation, setLoadingConversation] = useState(false);
+  const [currentLineIndex, setCurrentLineIndex] = useState<number | null>(null);
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 
-  // Filter tasks by type
-  const filteredTasks = filterType === "All types" 
-    ? SPEAKING_TASKS 
-    : SPEAKING_TASKS.filter(task => task.type === filterType);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [levelFilter, setLevelFilter] = useState<string>("All levels");
+
+  // Filter tasks by type, level, and search
+  const filteredTasks = useMemo(() => {
+    return SPEAKING_TASKS.filter(task => {
+      const matchesType = filterType === "All types" || task.type === filterType;
+      const matchesLevel = levelFilter === "All levels" || task.level === levelFilter;
+      const matchesSearch = !searchTerm || 
+        task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        task.prompt.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        task.type.toLowerCase().includes(searchTerm.toLowerCase());
+      return matchesType && matchesLevel && matchesSearch;
+    });
+  }, [filterType, levelFilter, searchTerm]);
 
   const uniqueTypes = ["All types", ...Array.from(new Set(SPEAKING_TASKS.map(t => t.type)))];
+  const uniqueLevels = ["All levels", ...Array.from(new Set(SPEAKING_TASKS.map(t => t.level)))];
 
   // Check microphone permission on mount
   useEffect(() => {
     checkMicrophonePermission();
   }, []);
+
+  // Load conversation when task is selected
+  useEffect(() => {
+    if (selectedTask) {
+      loadConversation(selectedTask.id);
+    } else {
+      setConversation([]);
+      setConversationSegments([]);
+      setCurrentLineIndex(null);
+    }
+  }, [selectedTask]);
+
+  const loadConversation = async (taskId: string) => {
+    setLoadingConversation(true);
+    try {
+      // Map task IDs to JSON filenames (new format)
+      const filenameMap: Record<string, string> = {
+        "conv-budget-cuts": "1_Budget_Cuts_speaking.json",
+        "conv-interview": "2_The_Interview_speaking.json",
+        "conv-he-said-she-said": "3_He_Said_-_She_Said_speaking.json",
+        "conv-circus": "4_Run_Away_With_the_Circus!_speaking.json",
+        "conv-vacation": "5_Greatest_Vacation_of_All_Time_speaking.json",
+        "conv-float": "6_Will_It_Float_speaking.json",
+        "conv-tour-guide": "7_Tip_Your_Tour_Guide_speaking.json",
+        "conv-pets": "8_Pets_Are_Family,_Too!_speaking.json",
+      };
+
+      const filename = filenameMap[taskId];
+      if (!filename) {
+        console.warn(`No conversation file found for task: ${taskId}`);
+        setConversation([]);
+        setConversationSegments([]);
+        return;
+      }
+
+      // Fetch from API
+      const response = await fetch(`/api/speaking/conversation?file=${encodeURIComponent(filename)}`);
+      if (response.ok) {
+        const data = await response.json();
+        setConversation(data.conversation || []);
+        setConversationSegments(data.segments || []);
+      } else {
+        console.error("Failed to load conversation");
+        setConversation([]);
+        setConversationSegments([]);
+      }
+    } catch (error) {
+      console.error("Error loading conversation:", error);
+      setConversation([]);
+    } finally {
+      setLoadingConversation(false);
+    }
+  };
 
   const checkMicrophonePermission = async () => {
     setMicPermission("checking");
@@ -453,6 +256,86 @@ export default function SpeakingPage() {
             </div>
           </section>
 
+          {/* Conversation Text - Main Content */}
+          {loadingConversation && (
+            <section className="card">
+              <div style={{ padding: "16px", textAlign: "center", color: "#64748b" }}>
+                Loading conversation...
+              </div>
+            </section>
+          )}
+
+          {(conversationSegments.length > 0 || conversation.length > 0) && (
+            <section className="card">
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+                <h3 className="section-title" style={{ margin: 0 }}>Conversation Text</h3>
+                <span className="muted" style={{ fontSize: "0.85rem" }}>
+                  {conversationSegments.length > 0 ? conversationSegments.length : conversation.length} lines
+                </span>
+              </div>
+              <p className="muted" style={{ marginBottom: "16px", fontSize: "0.9rem" }}>
+                Read along with the conversation. Click on a line to highlight it as you read.
+              </p>
+              <div
+                style={{
+                  maxHeight: "500px",
+                  overflowY: "auto",
+                  padding: "20px",
+                  background: "#ffffff",
+                  borderRadius: "8px",
+                  border: "1px solid #e2e8f0",
+                  boxShadow: "inset 0 1px 3px rgba(0,0,0,0.05)",
+                }}
+              >
+                {((conversationSegments.length > 0 ? conversationSegments : conversation.map((text) => ({ speaker: "", text })))).map((item, index) => (
+                  <div
+                    key={index}
+                    onClick={() => setCurrentLineIndex(index)}
+                    style={{
+                      padding: "12px 16px",
+                      marginBottom: "8px",
+                      borderRadius: "8px",
+                      cursor: "pointer",
+                      transition: "all 0.2s",
+                      backgroundColor: currentLineIndex === index ? "#eff6ff" : "transparent",
+                      borderLeft: currentLineIndex === index ? "4px solid #2563eb" : "4px solid transparent",
+                      fontSize: "1rem",
+                      lineHeight: "1.7",
+                      border: currentLineIndex === index ? "1px solid #bfdbfe" : "1px solid transparent",
+                    }}
+                    onMouseEnter={(e) => {
+                      if (currentLineIndex !== index) {
+                        e.currentTarget.style.backgroundColor = "#f8fafc";
+                        e.currentTarget.style.borderColor = "#e2e8f0";
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (currentLineIndex !== index) {
+                        e.currentTarget.style.backgroundColor = "transparent";
+                        e.currentTarget.style.borderColor = "transparent";
+                      }
+                    }}
+                  >
+                    {item.speaker && (
+                      <span style={{ 
+                        fontWeight: 700, 
+                        color: "#1e40af",
+                        marginRight: "12px",
+                        display: "inline-block",
+                        minWidth: "120px",
+                        fontSize: "0.95rem",
+                        textTransform: "none",
+                      }}>
+                        {item.speaker}:
+                      </span>
+                    )}
+                    <span style={{ color: "#1f2937" }}>{item.text}</span>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
           {/* Listen example */}
           <section className="card">
               <h3 className="section-title">Listen to Example First</h3>
@@ -564,7 +447,7 @@ export default function SpeakingPage() {
           {/* Vocabulary */}
           <section className="card no-pad">
             <div className="card-head indigo">
-              <h3>📚 Key Vocabulary</h3>
+              <h3>Key Vocabulary</h3>
             </div>
             <div className="pad">
                 {selectedTask.vocab.map(({ word, ipa }) => (
@@ -605,7 +488,7 @@ export default function SpeakingPage() {
           {/* Phrases */}
           <section className="card no-pad">
             <div className="card-head green">
-              <h3>💬 Useful Phrases</h3>
+              <h3>Useful Phrases</h3>
             </div>
             <div className="pad">
                 {selectedTask.phrases.map((p, i) => (
@@ -617,7 +500,7 @@ export default function SpeakingPage() {
           {/* Tips */}
           <section className="card no-pad">
             <div className="card-head amber">
-                <h3>💡 Speaking Tips</h3>
+                <h3>Speaking Tips</h3>
             </div>
             <div className="pad">
                 {selectedTask.tips.map((t, i) => (
@@ -634,103 +517,154 @@ export default function SpeakingPage() {
   // Task selection view
   return (
     <div className="dashboard-content">
-      {/* Header */}
-      <section className="card page-head">
-        <div>
-          <h1>🎤 Speaking Practice</h1>
-          <p className="muted">
-            Practice speaking and improve your pronunciation and fluency
-          </p>
-        </div>
-
-        <div className="head-actions">
-          <div className="stats" style={{ gap: "16px" }}>
-            <div className="stat">
-              <span className="stat-val">32</span>
-              <span className="stat-lbl">Sessions</span>
-            </div>
-            <div className="stat">
-              <span className="stat-val">8.2</span>
-              <span className="stat-lbl">Avg Score</span>
-            </div>
+      {/* Page header */}
+      <section className="card">
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "16px",
+            alignItems: "center",
+          }}
+        >
+          <div style={{ flex: 1, minWidth: "240px" }}>
+            <h1 style={{ marginBottom: "4px" }}>Speaking Practice</h1>
+            <p className="muted">
+              Practice speaking and improve your pronunciation and fluency
+            </p>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              gap: "12px",
+              flexWrap: "wrap",
+              minWidth: "260px",
+            }}
+          >
+            <StatsCard label="Tasks" value={SPEAKING_TASKS.length.toString()} />
+            <StatsCard label="Avg. length" value="~3 min" />
+            <StatsCard label="Skill focus" value="Pronunciation • Fluency • Expression" />
           </div>
         </div>
       </section>
 
-      {/* Filter dropdown */}
-      <div className="card" style={{ padding: "16px", marginBottom: "16px" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <label htmlFor="type-filter" style={{ fontWeight: 600 }}>
-            Filter by type:
-          </label>
-          <select
-            id="type-filter"
-            className="select"
-            value={filterType}
-            onChange={(e) => setFilterType(e.target.value)}
-            style={{ width: "250px" }}
-          >
-            {uniqueTypes.map((type) => (
-              <option key={type} value={type}>
-                {type}
-              </option>
-            ))}
-          </select>
-          <span className="muted" style={{ marginLeft: "auto" }}>
-            {filteredTasks.length} task{filteredTasks.length !== 1 ? "s" : ""} available
-          </span>
-        </div>
-      </div>
+      {/* Search and filters */}
+      <section
+        className="card"
+        style={{ display: "flex", flexWrap: "wrap", gap: "12px" }}
+      >
+        <input
+          type="text"
+          placeholder="Search by title or topic…"
+          value={searchTerm}
+          onChange={(event) => setSearchTerm(event.target.value)}
+          className="input"
+          style={{ flex: 1, minWidth: "220px" }}
+        />
+        <select
+          className="select"
+          value={levelFilter}
+          onChange={(event) => setLevelFilter(event.target.value)}
+          style={{ minWidth: "160px" }}
+        >
+          {uniqueLevels.map((option) => (
+            <option value={option} key={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+        <select
+          className="select"
+          value={filterType}
+          onChange={(event) => setFilterType(event.target.value)}
+          style={{ minWidth: "200px" }}
+        >
+          {uniqueTypes.map((type) => (
+            <option value={type} key={type}>
+              {type}
+            </option>
+          ))}
+        </select>
+      </section>
 
       {/* Task Cards Grid */}
-      <section className="card">
-        <h3 className="section-title" style={{ marginBottom: "20px" }}>
-          Choose a Speaking Task
-        </h3>
-        <div className="task-grid">
-          {filteredTasks.map((task) => (
-            <div key={task.id} className={`task-card task-card-${task.color}`}>
-              {task.recommended && (
-                <div className="task-badge">
-                  <span>⭐ Recommended</span>
-                </div>
-              )}
-              
-              <div className="task-header">
-                <div className={`task-level-badge task-level-${task.level.toLowerCase()}`}>
-                  {task.level}
-                </div>
-                <div className={`task-color-indicator task-color-${task.color}`}></div>
-              </div>
-              
-              <div className="task-content">
-                <h4 className="task-title">{task.title}</h4>
-                <span className={`task-type ${task.color}`}>{task.type}</span>
-              </div>
-
-              <div className="task-meta">
-                <span className="chip">{task.level} Level</span>
-                <span className="chip">⏱️ {task.timeLimit}</span>
-              </div>
-
-              <div className="task-status">
-                {task.attempts > 0 ? (
-                  <span className="status-text">{task.attempts} attempt{task.attempts !== 1 ? "s" : ""}</span>
-                ) : (
-                  <span className="status-text muted">No attempts yet</span>
-                )}
-              </div>
-
-              <button
-                className="btn primary w-full"
-                onClick={() => setSelectedTask(task)}
-              >
-                ▶ Start
-              </button>
-            </div>
-          ))}
-        </div>
+      <section
+        className="card"
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))",
+          gap: "16px",
+        }}
+      >
+        {filteredTasks.map((task) => (
+          <TaskCard
+            key={task.id}
+            task={task}
+            onSelect={() => {
+              setSelectedTask(task);
+            }}
+          />
+        ))}
+        {!filteredTasks.length && (
+          <div className="card soft" style={{ gridColumn: "1/-1" }}>
+            No tasks found matching your filters.
+          </div>
+        )}
       </section>
+    </div>
+  );
+}
+
+function StatsCard({ label, value }: { label: string; value: string }) {
+  return (
+    <div
+      style={{
+        borderRadius: "12px",
+        padding: "12px 16px",
+        background: "rgba(255,255,255,0.4)",
+        minWidth: "140px",
+      }}
+    >
+      <div style={{ fontSize: "0.8rem", textTransform: "uppercase" }}>{label}</div>
+      <div style={{ fontSize: "1.1rem", fontWeight: 600 }}>{value}</div>
+    </div>
+  );
+}
+
+function TaskCard({
+  task,
+  onSelect,
+}: {
+  task: SpeakingTask;
+  onSelect: () => void;
+}) {
+  return (
+    <div className="card soft" style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <span className="chip">{task.level}</span>
+        {task.recommended && (
+          <span className="chip" style={{ background: "#fef3c7", color: "#92400e" }}>
+            Recommended
+          </span>
+        )}
+      </div>
+      <div>
+        <h3 style={{ marginBottom: "4px" }}>{task.title}</h3>
+        <p className="muted" style={{ marginBottom: "8px" }}>
+          {task.prompt.substring(0, 100)}{task.prompt.length > 100 ? "..." : ""}
+        </p>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+          <span className="tag">{task.type}</span>
+          <span className="tag">{task.timeLimit}</span>
+        </div>
+      </div>
+      <div style={{ display: "flex", gap: "8px", fontSize: "0.9rem" }}>
+        <span>{task.timeLimit}</span>
+        {task.attempts > 0 && <span>{task.attempts} attempt{task.attempts !== 1 ? "s" : ""}</span>}
+      </div>
+      <button className="btn primary" onClick={onSelect}>
+        Start Practice
+      </button>
     </div>
   );
 }

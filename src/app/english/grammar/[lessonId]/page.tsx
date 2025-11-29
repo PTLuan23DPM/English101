@@ -135,7 +135,7 @@ export default function GrammarLessonPage() {
             exerciseCount: totalAutoExercises || lesson.exercises.length,
             metadata: {
               lessonTitle: lesson.title,
-              lessonTopic: lesson.topic,
+              lessonTopic: (lesson as any)?.topic,
               correctCount,
               totalCount: totalAutoExercises || lesson.exercises.length,
             },
@@ -738,7 +738,7 @@ export default function GrammarLessonPage() {
         {sections.map((section) => (
           <button
             key={section.label}
-            onClick={() => scrollToSection(section.ref)}
+            onClick={() => { if (section.ref) scrollToSection(section.ref as React.RefObject<HTMLDivElement>); }}
             style={{
               border: "none",
               background: "#f1f5f9",

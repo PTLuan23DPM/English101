@@ -8,7 +8,7 @@ import bcrypt from "bcryptjs";
 // POST: Reset password cho user
 export async function POST(
   req: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -27,6 +27,7 @@ export async function POST(
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    const { userId } = await params;
     const body = await req.json();
     const { newPassword } = body;
 
@@ -39,7 +40,7 @@ export async function POST(
 
     // Check if user exists
     const user = await prisma.user.findUnique({
-      where: { id: params.userId },
+      where: { id: userId },
       select: { id: true, email: true },
     });
 
@@ -52,7 +53,7 @@ export async function POST(
 
     // Update password
     await prisma.user.update({
-      where: { id: params.userId },
+      where: { id: userId },
       data: { password: hashedPassword },
     });
 

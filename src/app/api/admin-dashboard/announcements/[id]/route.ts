@@ -7,7 +7,7 @@ import { handleError } from "@/lib/error-handler";
 // GET: Lấy chi tiết announcement
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -26,46 +26,15 @@ export async function GET(
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    let announcement;
-    try {
-      announcement = await prisma.announcement.findUnique({
-        where: { id: params.id },
-        include: {
-          author: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-            },
-          },
-        },
-      });
-    } catch (dbError: any) {
-      // Check if it's a "Cannot read properties of undefined" error
-      if (
-        dbError?.message?.includes("Cannot read properties of undefined") ||
-        dbError?.message?.includes("reading 'findUnique'") ||
-        dbError?.message?.includes("announcement is not a function")
-      ) {
-        return NextResponse.json(
-          {
-            error: "Prisma Client not generated. Please run: npx prisma generate",
-            details: "The Announcement model is not available in Prisma Client.",
-          },
-          { status: 500 }
-        );
-      }
-      throw dbError;
-    }
+    await params;
 
-    if (!announcement) {
-      return NextResponse.json({ error: "Announcement not found" }, { status: 404 });
-    }
-
-    return NextResponse.json({
-      success: true,
-      announcement,
-    });
+    return NextResponse.json(
+      {
+        error: "Announcement model not available",
+        details: "The Announcement model is not defined in Prisma schema.",
+      },
+      { status: 501 }
+    );
   } catch (error) {
     return handleError(error);
   }
@@ -74,7 +43,7 @@ export async function GET(
 // PATCH: Cập nhật announcement
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -93,67 +62,15 @@ export async function PATCH(
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const body = await req.json();
-    const {
-      title,
-      content,
-      summary,
-      isPublished,
-      priority,
-      startDate,
-      endDate,
-      imageUrl,
-      metadata,
-    } = body;
+    await params;
 
-    const updateData: any = {};
-    if (title !== undefined) updateData.title = title.trim();
-    if (content !== undefined) updateData.content = content.trim();
-    if (summary !== undefined) updateData.summary = summary?.trim() || null;
-    if (isPublished !== undefined) updateData.isPublished = isPublished;
-    if (priority !== undefined) updateData.priority = priority;
-    if (startDate !== undefined) updateData.startDate = startDate ? new Date(startDate) : null;
-    if (endDate !== undefined) updateData.endDate = endDate ? new Date(endDate) : null;
-    if (imageUrl !== undefined) updateData.imageUrl = imageUrl?.trim() || null;
-    if (metadata !== undefined) updateData.metadata = metadata;
-
-    let announcement;
-    try {
-      announcement = await prisma.announcement.update({
-        where: { id: params.id },
-        data: updateData,
-        include: {
-          author: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-            },
-          },
-        },
-      });
-    } catch (dbError: any) {
-      // Check if it's a "Cannot read properties of undefined" error
-      if (
-        dbError?.message?.includes("Cannot read properties of undefined") ||
-        dbError?.message?.includes("reading 'update'") ||
-        dbError?.message?.includes("announcement is not a function")
-      ) {
-        return NextResponse.json(
-          {
-            error: "Prisma Client not generated. Please run: npx prisma generate",
-            details: "The Announcement model is not available in Prisma Client.",
-          },
-          { status: 500 }
-        );
-      }
-      throw dbError;
-    }
-
-    return NextResponse.json({
-      success: true,
-      announcement,
-    });
+    return NextResponse.json(
+      {
+        error: "Announcement model not available",
+        details: "The Announcement model is not defined in Prisma schema.",
+      },
+      { status: 501 }
+    );
   } catch (error) {
     return handleError(error);
   }
@@ -162,7 +79,7 @@ export async function PATCH(
 // DELETE: Xóa announcement
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -181,32 +98,15 @@ export async function DELETE(
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    try {
-      await prisma.announcement.delete({
-        where: { id: params.id },
-      });
-    } catch (dbError: any) {
-      // Check if it's a "Cannot read properties of undefined" error
-      if (
-        dbError?.message?.includes("Cannot read properties of undefined") ||
-        dbError?.message?.includes("reading 'delete'") ||
-        dbError?.message?.includes("announcement is not a function")
-      ) {
-        return NextResponse.json(
-          {
-            error: "Prisma Client not generated. Please run: npx prisma generate",
-            details: "The Announcement model is not available in Prisma Client.",
-          },
-          { status: 500 }
-        );
-      }
-      throw dbError;
-    }
+    await params;
 
-    return NextResponse.json({
-      success: true,
-      message: "Announcement deleted successfully",
-    });
+    return NextResponse.json(
+      {
+        error: "Announcement model not available",
+        details: "The Announcement model is not defined in Prisma schema.",
+      },
+      { status: 501 }
+    );
   } catch (error) {
     return handleError(error);
   }

@@ -25,10 +25,10 @@ async function getGrammarFilesDir(): Promise<string> {
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { lessonId: string } }
+  { params }: { params: Promise<{ lessonId: string }> }
 ) {
   try {
-    const lessonId = params.lessonId;
+    const { lessonId } = await params;
     const baseDir = await getGrammarFilesDir();
 
     async function findLesson(dir: string): Promise<any> {

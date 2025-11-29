@@ -17,13 +17,20 @@ export class NotificationsController {
             return {
                 success: true,
                 data: {
-                    notifications,
-                    unreadCount,
+                    notifications: notifications || [],
+                    unreadCount: unreadCount || 0,
                 },
             };
-        } catch (error) {
+        } catch (error: any) {
             console.error("[NotificationsController] Error getting notifications:", error);
-            throw error;
+            // Return empty data instead of throwing to prevent 500 error
+            return {
+                success: false,
+                data: {
+                    notifications: [],
+                    unreadCount: 0,
+                },
+            };
         }
     }
 

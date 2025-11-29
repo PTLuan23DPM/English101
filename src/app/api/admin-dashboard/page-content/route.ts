@@ -23,52 +23,13 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    let pages;
-    try {
-      pages = await prisma.pageContent.findMany({
-        orderBy: { slug: "asc" },
-        include: {
-          author: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-            },
-          },
-        },
-      });
-    } catch (dbError: any) {
-      // Check if it's a "Cannot read properties of undefined" error
-      if (
-        dbError?.message?.includes("Cannot read properties of undefined") ||
-        dbError?.message?.includes("reading 'findMany'") ||
-        dbError?.message?.includes("pageContent is not a function")
-      ) {
-        return NextResponse.json(
-          {
-            error: "Prisma Client not generated. Please run: npx prisma generate",
-            details: "The PageContent model is not available in Prisma Client.",
-          },
-          { status: 500 }
-        );
-      }
-      // Check if it's a table doesn't exist error
-      if (dbError?.code === "P2021" || dbError?.message?.includes("does not exist")) {
-        return NextResponse.json(
-          {
-            error: "Database table not found. Please run migrations: npm run db:migrate",
-            details: dbError.message,
-          },
-          { status: 500 }
-        );
-      }
-      throw dbError;
-    }
-
-    return NextResponse.json({
-      success: true,
-      pages,
-    });
+    return NextResponse.json(
+      {
+        error: "PageContent model not available",
+        details: "The PageContent model is not defined in Prisma schema.",
+      },
+      { status: 501 }
+    );
   } catch (error) {
     return handleError(error);
   }
@@ -96,56 +57,13 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { slug, title, content, isPublished, metadata } = body;
 
-    if (!slug || !title || !content) {
-      return NextResponse.json(
-        { error: "Slug, title and content are required" },
-        { status: 400 }
-      );
-    }
-
-    let page;
-    try {
-      page = await prisma.pageContent.create({
-        data: {
-          slug: slug.trim().toLowerCase(),
-          title: title.trim(),
-          content: content.trim(),
-          authorId: admin.id,
-          isPublished: isPublished !== undefined ? isPublished : true,
-          metadata: metadata || null,
-        },
-        include: {
-          author: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-            },
-          },
-        },
-      });
-    } catch (dbError: any) {
-      // Check if it's a "Cannot read properties of undefined" error
-      if (
-        dbError?.message?.includes("Cannot read properties of undefined") ||
-        dbError?.message?.includes("reading 'create'") ||
-        dbError?.message?.includes("pageContent is not a function")
-      ) {
-        return NextResponse.json(
-          {
-            error: "Prisma Client not generated. Please run: npx prisma generate",
-            details: "The PageContent model is not available in Prisma Client.",
-          },
-          { status: 500 }
-        );
-      }
-      throw dbError;
-    }
-
-    return NextResponse.json({
-      success: true,
-      page,
-    });
+    return NextResponse.json(
+      {
+        error: "PageContent model not available",
+        details: "The PageContent model is not defined in Prisma schema.",
+      },
+      { status: 501 }
+    );
   } catch (error) {
     return handleError(error);
   }

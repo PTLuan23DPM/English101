@@ -17,9 +17,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY writing_scorer.py .
 
-# Copy model files (if they exist)
-COPY ai-models/ ./ai-models/ 2>/dev/null || true
-
 # Expose port
 EXPOSE 5001
 

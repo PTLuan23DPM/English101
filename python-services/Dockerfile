@@ -17,8 +17,16 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY writing_scorer.py .
 
-# Copy model files (if they exist)
-COPY ai-models/ ./ai-models/ 2>/dev/null || true
+# Copy other Python files that might be needed
+COPY *.py ./
+
+# Create ai-models directory (will be empty if ai-models not in build context)
+RUN mkdir -p ./ai-models
+
+# Copy ai-models directory if it exists in build context
+# Note: If ai-models is empty or doesn't exist, this will create an empty directory
+# which is fine - the application should handle missing models gracefully
+COPY ai-models ./ai-models/
 
 # Expose port
 EXPOSE 5001

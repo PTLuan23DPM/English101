@@ -10,4 +10,8 @@ env/
 .DS_Store
 .vscode
 .idea
+temp_audio/
+temp_audio_processing/
+logs/
+*.pth
 

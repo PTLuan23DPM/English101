@@ -836,28 +836,127 @@ def demo_dtw_radius_comparison():
         print(f"Radius {radius} - Score: {results['final_score']['final_score']:.2f}/100")
 
 
-if __name__ == "__main__":
+def demo_custom_paragraph():
+    """Practice with user's own paragraph"""
     print("\n" + "="*60)
-    print("OPTIMIZED AI SPEAKING TEST SYSTEM")
+    print("CUSTOM PARAGRAPH PRACTICE MODE")
     print("="*60)
-    print("\nOptimizations:")
-    print("  ✓ Whisper model cached (loaded once)")
-    print("  ✓ DTW with radius parameter (10x faster)")
-    print("  ✓ Component reuse across tests")
-    print("\nAvailable demos:")
+    print("\nThis mode allows you to practice with your own text.")
+    print("You can input any paragraph and the system will evaluate")
+    print("your pronunciation against it.")
+    print("="*60)
+    
+    # Initialize system once
+    system = SpeakingTestSystem(
+        output_dir="./custom_practice",
+        whisper_model="base",
+        dtw_radius=10
+    )
+    
+    while True:
+        print("\n" + "-"*60)
+        print("CUSTOM PARAGRAPH INPUT")
+        print("-"*60)
+        print("\nOptions:")
+        print("  1. Enter a new paragraph to practice")
+        print("  2. Use sample paragraph")
+        print("  3. Exit to main menu")
+        print("-"*60)
+        
+        option = input("\nSelect option (1-3): ").strip()
+        
+        if option == "3":
+            print("\nExiting custom practice mode...")
+            break
+        elif option == "2":
+            # Sample paragraph
+            custom_text = ("Climate change is one of the most pressing challenges "
+                          "facing humanity today. Rising global temperatures are "
+                          "causing ice caps to melt and sea levels to rise.")
+            print("\nSample paragraph:")
+            print(f'"{custom_text}"')
+        elif option == "1":
+            # User input
+            print("\nEnter your paragraph (press Enter twice when done):")
+            print("Tip: Keep it 1-3 sentences for best results")
+            print("-"*60)
+            
+            lines = []
+            empty_count = 0
+            while empty_count < 1:
+                line = input()
+                if line.strip():
+                    lines.append(line)
+                    empty_count = 0
+                else:
+                    empty_count += 1
+            
+            custom_text = ' '.join(lines).strip()
+            
+            if not custom_text:
+                print("\nNo text entered. Please try again.")
+                continue
+            
+            print(f"\nYour paragraph:")
+            print(f'"{custom_text}"')
+        else:
+            print("\nInvalid option. Please try again.")
+            continue
+        
+        # Confirm
+        confirm = input("\nProceed with this text? (y/n): ").strip().lower()
+        if confirm != 'y':
+            continue
+        
+        # Run test with custom text
+        print("\n" + "="*60)
+        print("STARTING PRACTICE SESSION")
+        print("="*60)
+        print(f"\nPlease read the following text clearly:\n")
+        print(f'"{custom_text}"')
+        print("\n" + "="*60)
+        
+        input("\nPress Enter when ready to start recording...")
+        
+        try:
+            results = system.run_test(
+                prompt=f"Please read: {custom_text}",
+                use_vad=True,
+                silence_duration=2.0,
+                use_mfa=False  # Faster for practice
+            )
+            
+            system.print_detailed_results(results)
+            
+            # Ask if want to practice again
+            again = input("\nPractice with another paragraph? (y/n): ").strip().lower()
+            if again != 'y':
+                break
+                
+        except KeyboardInterrupt:
+            print("\n\nPractice session interrupted.")
+            break
+        except Exception as e:
+            print(f"\n\nError during practice: {e}")
+            print("Please try again.")
+
+
+if __name__ == "__main__":
+    print("\nAvailable modes:")
     print("  1. Speed Test (shows caching benefits)")
     print("  2. DTW Radius Comparison")
     print("  3. Basic Test (optimized)")
-    print("="*60)
+    print("  4. Custom Paragraph Practice ")
     
-    choice = input("\nSelect demo (1-3) or press Enter for basic: ").strip()
+    choice = input("\nSelect mode (1-4) or press Enter for basic: ").strip()
     
     if choice == "1":
         demo_optimized_speed()
     elif choice == "2":
         demo_dtw_radius_comparison()
+    elif choice == "4":
+        demo_custom_paragraph()
     else:
-        # Basic optimized test
         system = SpeakingTestSystem(dtw_radius=10)
         results = system.run_test(
             prompt="Please read: The quick brown fox jumps over the lazy dog.",

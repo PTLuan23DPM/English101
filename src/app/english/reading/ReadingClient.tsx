@@ -646,7 +646,7 @@ export default function ReadingPage() {
           <div style={{ flex: 1, minWidth: "240px" }}>
             <h1 style={{ marginBottom: "4px" }}>Reading Studio</h1>
                 <p className="muted">
-              Luyện đọc theo phong cách IELTS: split view, ghi chú, và bài tập đa dạng.
+              Practice reading in IELTS style: split view, notes, and diverse exercises.
             </p>
           </div>
           <div
@@ -658,7 +658,7 @@ export default function ReadingPage() {
             }}
           >
             <StatsCard label="Lessons" value={READING_LESSONS.length.toString()} />
-            <StatsCard label="Avg. length" value="~11 phút" />
+            <StatsCard label="Avg. length" value="~11 min" />
             <StatsCard label="Skill focus" value="Ideas • Evidence • Grammar" />
           </div>
         </div>
@@ -670,7 +670,7 @@ export default function ReadingPage() {
       >
         <input
           type="text"
-          placeholder="Tìm theo tiêu đề hoặc chủ đề…"
+          placeholder="Search by title or topic…"
           value={searchTerm}
           onChange={(event) => setSearchTerm(event.target.value)}
           className="input"
@@ -719,7 +719,7 @@ export default function ReadingPage() {
         ))}
         {!filteredLessons.length && (
           <div className="card soft" style={{ gridColumn: "1/-1" }}>
-            Không tìm thấy bài đọc nào phù hợp với bộ lọc hiện tại.
+            No lessons found matching your filters.
               </div>
             )}
         </section>
@@ -753,11 +753,11 @@ function LessonCard({
         </div>
       </div>
       <div style={{ display: "flex", gap: "8px", fontSize: "0.9rem" }}>
-        <span>{lesson.estimatedTime} phút</span>
+        <span>{lesson.estimatedTime} min</span>
         <span>{lesson.readingSkills.length} skills</span>
       </div>
       <button className="btn primary" onClick={onSelect}>
-        Bắt đầu luyện đọc
+        Start Practice
       </button>
     </div>
   );
@@ -814,7 +814,7 @@ function ReadingToolbar({
         </span>
           </div>
       <div className="muted" style={{ fontSize: "0.85rem" }}>
-        Bôi đen đoạn văn để hiện menu hành động (Tô màu • Ghi chú). Tổng highlight:{" "}
+        Select text to show action menu (Highlight • Note). Total highlights:{" "}
         {highlightCount}
           </div>
         </div>
@@ -869,12 +869,12 @@ function AnnotationPanel({
   return (
     <div className="card soft">
       <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <h4>Ghi chú & Highlight</h4>
-        <span className="muted">{highlights.length} mục</span>
+        <h4>Notes & Highlights</h4>
+        <span className="muted">{highlights.length} items</span>
                 </div>
       {highlights.length === 0 && (
         <p className="muted" style={{ marginTop: "8px" }}>
-          Chưa có highlight nào. Chọn đoạn văn trong bài đọc để bắt đầu ghi chú.
+          No highlights yet. Select text in the reading to start taking notes.
         </p>
       )}
       <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginTop: "12px" }}>
@@ -898,15 +898,15 @@ function AnnotationPanel({
                 <p style={{ marginBottom: "8px" }}>{hl.note}</p>
               ) : (
                 <p className="muted" style={{ marginBottom: "8px" }}>
-                  (Chưa có ghi chú)
+                  (No note)
                 </p>
               )}
               <div style={{ display: "flex", gap: "8px" }}>
                 <button className="btn xs" onClick={() => onEdit(hl.id)}>
-                  Sửa ghi chú
+                  Edit note
                 </button>
                 <button className="btn xs btn--outline" onClick={() => onRemove(hl.id)}>
-                  Xóa
+                  Delete
                 </button>
               </div>
             </div>
@@ -1043,7 +1043,7 @@ function ExerciseCard({
         <textarea
           className="input"
           rows={5}
-          placeholder="Viết câu trả lời ngắn…"
+          placeholder="Write a short answer…"
           value={value}
           onChange={(event) => onChange(event.target.value)}
           style={{
@@ -1230,9 +1230,9 @@ const SelectionMenu = forwardRef<HTMLDivElement, {
         zIndex: 5,
       }}
       >
-      <MenuButton label="Tô vàng" onClick={onHighlightYellow} tone="yellow" />
-      <MenuButton label="Tô xanh" onClick={onHighlightBlue} tone="blue" />
-      <MenuButton label="Ghi chú" onClick={onNote} />
+      <MenuButton label="Highlight Yellow" onClick={onHighlightYellow} tone="yellow" />
+      <MenuButton label="Highlight Blue" onClick={onHighlightBlue} tone="blue" />
+      <MenuButton label="Note" onClick={onNote} />
     </div>
   );
 });
@@ -1397,7 +1397,7 @@ function NoteModal({
       >
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
           <h3 style={{ margin: 0, fontSize: "1.25rem", fontWeight: 600, color: "#0f172a" }}>
-            Ghi chú
+            Note
           </h3>
           <button
             onClick={handleCancel}
@@ -1415,12 +1415,12 @@ function NoteModal({
           </button>
         </div>
         <p className="muted" style={{ marginBottom: "12px", fontSize: "0.9rem" }}>
-          Nhập ghi chú cho đoạn đã bôi (tuỳ chọn):
+          Enter a note for the selected text (optional):
         </p>
         <textarea
           value={noteText}
           onChange={(e) => setNoteText(e.target.value)}
-          placeholder="Viết ghi chú của bạn ở đây..."
+          placeholder="Write your note here..."
           style={{
             width: "100%",
             minHeight: "120px",

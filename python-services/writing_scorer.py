@@ -71,7 +71,7 @@ def check_word_in_dictionary(word: str, timeout: float = 0.5) -> Optional[bool]:
     try:
         # Demo check nhanh: Nếu từ nằm trong top 3000 từ phổ biến thì OK luôn
         # (Ở đây ta giả lập bằng cách return True cho nhanh, thực tế nên dùng file từ điển local)
-        return True 
+            return True
     except:
         return None
 
@@ -166,7 +166,7 @@ def detect_gibberish(text: str) -> Tuple[bool, str]:
     """Phát hiện văn bản rác"""
     if not text or len(text.strip()) < 10:
         return True, "Văn bản quá ngắn."
-        
+    
     words = text.lower().split()
     common_english = {'the', 'be', 'to', 'of', 'and', 'a', 'in', 'that', 'have', 'i', 'it', 'for', 'not', 'on', 'with'}
     english_count = sum(1 for w in words if w in common_english)
@@ -254,10 +254,10 @@ def score_writing():
             task_level=task_level,
             task_type=task_type
         )
-
+        
         if 'error' in result:
             return jsonify(result), 500
-
+        
         # 3. Bổ sung thông tin hiển thị
         final_score = result.get('overall_score', 0)
         cefr_level, cefr_desc = score_to_cefr(final_score)
@@ -270,7 +270,7 @@ def score_writing():
 
         return jsonify(result)
 
-    except Exception as e:
+            except Exception as e:
         logger.error(f"API Error: {e}", exc_info=True)
         return jsonify({'error': str(e)}), 500
 
@@ -282,7 +282,7 @@ def grammar_check():
         if not text: return jsonify({'error': 'No text'}), 400
         
         resp = requests.post(
-            'https://api.languagetool.org/v2/check',
+                'https://api.languagetool.org/v2/check',
             data={'text': text, 'language': 'en-US'}
         )
         return jsonify(resp.json())

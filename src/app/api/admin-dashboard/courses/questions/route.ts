@@ -114,7 +114,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    let question;
+    let question: any;
     try {
       // Create question
       question = await prisma.question.create({

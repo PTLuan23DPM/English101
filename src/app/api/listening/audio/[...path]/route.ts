@@ -65,7 +65,7 @@ export async function GET(
       else if (ext === "ogg") contentType = "audio/ogg";
       else if (ext === "m4a") contentType = "audio/mp4";
 
-      return new NextResponse(audioBuffer, {
+      return new NextResponse(audioBuffer as any, {
         headers: {
           "Content-Type": contentType,
           "Content-Length": audioBuffer.length.toString(),

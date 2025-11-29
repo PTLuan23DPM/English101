@@ -7,7 +7,7 @@ import { handleError } from "@/lib/error-handler";
 // GET: Lấy chi tiết activity
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -26,10 +26,12 @@ export async function GET(
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    const { id } = await params;
+
     let activity;
     try {
       activity = await prisma.activity.findUnique({
-        where: { id: params.id },
+        where: { id },
         include: {
           unit: {
             include: {
@@ -97,7 +99,7 @@ export async function GET(
 // PATCH: Cập nhật activity
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -116,6 +118,7 @@ export async function PATCH(
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    const { id } = await params;
     const body = await req.json();
     const {
       type,
@@ -141,7 +144,7 @@ export async function PATCH(
     try {
       // Update activity
       activity = await prisma.activity.update({
-        where: { id: params.id },
+        where: { id },
         data: updateData,
         include: {
           unit: {
@@ -158,7 +161,7 @@ export async function PATCH(
       if (mediaUrls !== undefined) {
         // Delete existing media
         await prisma.mediaAsset.deleteMany({
-          where: { activityId: params.id },
+          where: { activityId: id },
         });
 
         // Create new media assets
@@ -167,9 +170,9 @@ export async function PATCH(
             mediaUrls.map((media: { url: string; type: string; durationS?: number }) =>
               prisma.mediaAsset.create({
                 data: {
-                  activityId: params.id,
+                  activityId: id,
                   url: media.url,
-                  type: media.type,
+                  type: media.type as any,
                   durationS: media.durationS || null,
                 },
               })
@@ -179,7 +182,7 @@ export async function PATCH(
 
         // Reload activity with media
         activity = await prisma.activity.findUnique({
-          where: { id: params.id },
+          where: { id },
           include: {
             unit: {
               select: {
@@ -220,7 +223,7 @@ export async function PATCH(
 // DELETE: Xóa activity
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -239,9 +242,11 @@ export async function DELETE(
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    const { id } = await params;
+
     try {
       await prisma.activity.delete({
-        where: { id: params.id },
+        where: { id },
       });
     } catch (dbError: any) {
       if (dbError?.code === "P2025") {

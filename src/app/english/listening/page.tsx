@@ -679,8 +679,8 @@ export default function ListeningPage() {
     if (audioRef.current) {
       audioRef.current.playbackRate = value;
       if ("preservesPitch" in audioRef.current) {
-        // @ts-expect-error preservesPitch vendor prefix
-        audioRef.current.preservesPitch = true;
+        // @ts-ignore preservesPitch vendor prefix
+        (audioRef.current as any).preservesPitch = true;
       }
     }
   };

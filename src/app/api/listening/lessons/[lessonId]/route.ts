@@ -125,7 +125,7 @@ export async function GET(
     lessonData = JSON.parse(fileContent);
 
     // Generate audio URL - use filename from JSON or derive from file path
-    let audioFilename = lessonData.filename;
+    let audioFilename = (lessonData as any)?.filename;
     if (!audioFilename) {
       // Try to find MP3 file in same directory
       const baseName = filePath.replace(".json", "");
@@ -153,19 +153,19 @@ export async function GET(
       title: title,
       level,
       category: category || undefined,
-      filename: lessonData.filename || audioFilename,
+      filename: (lessonData as any)?.filename || audioFilename,
       audioUrl,
-      segments: lessonData.segments.map((seg, idx) => ({
+      segments: ((lessonData as any)?.segments || []).map((seg: any, idx: number) => ({
         id: `seg-${idx}`,
         start: seg.start,
         end: seg.end,
         text: seg.text,
       })),
-      fullTranscript: lessonData.fullTranscript,
-      vocabulary: extractVocabulary(lessonData),
-      dictation: lessonData.dictationGaps && lessonData.dictationGaps.length > 0
-        ? lessonData.dictationGaps
-        : extractDictationGaps(lessonData), // Fallback to generating if not in JSON
+      fullTranscript: (lessonData as any)?.fullTranscript,
+      vocabulary: extractVocabulary(lessonData as any),
+      dictation: (lessonData as any)?.dictationGaps && (lessonData as any).dictationGaps.length > 0
+        ? (lessonData as any).dictationGaps
+        : extractDictationGaps(lessonData as any), // Fallback to generating if not in JSON
     };
 
     return NextResponse.json(response);

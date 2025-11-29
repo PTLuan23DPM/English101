@@ -7,7 +7,7 @@ import { handleError } from "@/lib/error-handler";
 // GET: Lấy tiến trình học của user
 export async function GET(
   req: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -26,9 +26,11 @@ export async function GET(
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    const { userId } = await params;
+
     // Get user progress
     const progress = await prisma.userProgress.findMany({
-      where: { userId: params.userId },
+      where: { userId },
       include: {
         unit: {
           include: {
@@ -46,7 +48,7 @@ export async function GET(
 
     // Get recent attempts
     const recentAttempts = await prisma.attempt.findMany({
-      where: { userId: params.userId },
+      where: { userId },
       include: {
         activity: {
           select: {
@@ -63,7 +65,7 @@ export async function GET(
 
     // Get statistics
     const stats = await prisma.userProgress.aggregate({
-      where: { userId: params.userId },
+      where: { userId },
       _count: true,
       _sum: {
         scoreSum: true,
@@ -72,14 +74,14 @@ export async function GET(
 
     const completedCount = await prisma.userProgress.count({
       where: {
-        userId: params.userId,
+        userId,
         status: "completed",
       },
     });
 
     const inProgressCount = await prisma.userProgress.count({
       where: {
-        userId: params.userId,
+        userId,
         status: "in_progress",
       },
     });

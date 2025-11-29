@@ -8,7 +8,7 @@ import bcrypt from "bcryptjs";
 // GET: Lấy thông tin chi tiết của user
 export async function GET(
   req: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -27,8 +27,10 @@ export async function GET(
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    const { userId } = await params;
+
     const user = await prisma.user.findUnique({
-      where: { id: params.userId },
+      where: { id: userId },
       select: {
         id: true,
         name: true,
@@ -72,7 +74,7 @@ export async function GET(
 // PATCH: Cập nhật thông tin user
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -91,6 +93,7 @@ export async function PATCH(
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    const { userId } = await params;
     const body = await req.json();
     const { name, image, role, cefrLevel } = body;
 
@@ -103,7 +106,7 @@ export async function PATCH(
     if (cefrLevel !== undefined) updateData.cefrLevel = cefrLevel || null;
 
     const updatedUser = await prisma.user.update({
-      where: { id: params.userId },
+      where: { id: userId },
       data: updateData,
       select: {
         id: true,

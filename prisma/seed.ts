@@ -35,6 +35,19 @@ async function main() {
 
     console.log('✅ Created users:', testUser.email, adminUser.email);
 
+    // Update test user with sample data
+    await prisma.user.update({
+        where: { id: testUser.id },
+        data: {
+            cefrLevel: 'A2',
+            placementTestCompleted: true,
+            placementScore: 65,
+            streak: 7,
+            longestStreak: 7,
+            lastActive: new Date(),
+        },
+    });
+
     // ===== 2. CREATE TOPICS & TAGS =====
     console.log('🏷️  Creating topics and tags...');
 
@@ -720,26 +733,64 @@ async function main() {
     // ===== 8. CREATE USER PROGRESS =====
     console.log('📊 Creating user progress...');
 
-    await prisma.userProgress.create({
-        data: {
-            userId: testUser.id,
-            unitId: readingUnit1.id,
-            status: 'in_progress',
-            lastSeen: new Date(),
-            scoreSum: 6,
-        },
+    await prisma.userProgress.createMany({
+        data: [
+            {
+                userId: testUser.id,
+                unitId: readingUnit1.id,
+                status: 'completed',
+                lastSeen: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
+                scoreSum: 8,
+            },
+            {
+                userId: testUser.id,
+                unitId: listeningUnit1.id,
+                status: 'in_progress',
+                lastSeen: new Date(Date.now() - 1000 * 60 * 30), // 30 mins ago
+                scoreSum: 5,
+            },
+            {
+                userId: testUser.id,
+                unitId: writingUnit1.id,
+                status: 'in_progress',
+                lastSeen: new Date(Date.now() - 1000 * 60 * 60), // 1 hour ago
+                scoreSum: null,
+            },
+            {
+                userId: testUser.id,
+                unitId: speakingUnit1.id,
+                status: 'not_started',
+                lastSeen: null,
+                scoreSum: null,
+            },
+            {
+                userId: testUser.id,
+                unitId: cultureUnit1.id,
+                status: 'completed',
+                lastSeen: new Date(Date.now() - 1000 * 60 * 60 * 24), // 1 day ago
+                scoreSum: 9,
+            },
+            {
+                userId: testUser.id,
+                unitId: cultureUnit2.id,
+                status: 'in_progress',
+                lastSeen: new Date(Date.now() - 1000 * 60 * 60 * 12), // 12 hours ago
+                scoreSum: 7,
+            },
+        ],
     });
 
     // ===== 9. CREATE ATTEMPT & SUBMISSION =====
     console.log('📝 Creating attempts and submissions...');
 
+    // Reading attempt
     const attempt1 = await prisma.attempt.create({
         data: {
             userId: testUser.id,
             activityId: readingActivity1.id,
-            startedAt: new Date(Date.now() - 1000 * 60 * 10), // 10 mins ago
-            submittedAt: new Date(Date.now() - 1000 * 60 * 5), // 5 mins ago
-            score: 6,
+            startedAt: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
+            submittedAt: new Date(Date.now() - 1000 * 60 * 60 * 2 + 1000 * 60 * 5), // 5 mins later
+            score: 8,
             status: 'graded',
         },
     });
@@ -773,7 +824,92 @@ async function main() {
         ],
     });
 
-    console.log('✅ Created attempt and submissions');
+    // Culture attempts
+    const attempt2 = await prisma.attempt.create({
+        data: {
+            userId: testUser.id,
+            activityId: cultureActivity1.id,
+            startedAt: new Date(Date.now() - 1000 * 60 * 60 * 24), // 1 day ago
+            submittedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 + 1000 * 60 * 8), // 8 mins later
+            score: 9,
+            status: 'graded',
+        },
+    });
+
+    await prisma.submission.createMany({
+        data: [
+            {
+                attemptId: attempt2.id,
+                userId: testUser.id,
+                questionId: cultureQuestion1.id,
+                chosenIds: ['B'],
+                isCorrect: true,
+                score: 2,
+            },
+            {
+                attemptId: attempt2.id,
+                userId: testUser.id,
+                questionId: cultureQuestion2.id,
+                chosenIds: ['B'],
+                isCorrect: true,
+                score: 2,
+            },
+        ],
+    });
+
+    const attempt3 = await prisma.attempt.create({
+        data: {
+            userId: testUser.id,
+            activityId: cultureActivity2.id,
+            startedAt: new Date(Date.now() - 1000 * 60 * 60 * 12), // 12 hours ago
+            submittedAt: new Date(Date.now() - 1000 * 60 * 60 * 12 + 1000 * 60 * 10), // 10 mins later
+            score: 7,
+            status: 'graded',
+        },
+    });
+
+    await prisma.submission.createMany({
+        data: [
+            {
+                attemptId: attempt3.id,
+                userId: testUser.id,
+                questionId: cultureQuestion3.id,
+                chosenIds: ['B'],
+                isCorrect: true,
+                score: 2,
+            },
+        ],
+    });
+
+    // Writing attempt (no questions, just submission)
+    const attempt4 = await prisma.attempt.create({
+        data: {
+            userId: testUser.id,
+            activityId: writingActivity1.id,
+            startedAt: new Date(Date.now() - 1000 * 60 * 60), // 1 hour ago
+            submittedAt: new Date(Date.now() - 1000 * 60 * 45), // 45 mins ago
+            score: null,
+            status: 'submitted',
+            meta: {
+                taskTitle: 'Describe Your Daily Routine',
+                wordCount: 95,
+            },
+        },
+    });
+
+    // Listening attempt
+    const attempt5 = await prisma.attempt.create({
+        data: {
+            userId: testUser.id,
+            activityId: listeningActivity1.id,
+            startedAt: new Date(Date.now() - 1000 * 60 * 30), // 30 mins ago
+            submittedAt: new Date(Date.now() - 1000 * 60 * 20), // 20 mins ago
+            score: 5,
+            status: 'graded',
+        },
+    });
+
+    console.log('✅ Created', 5, 'attempts with submissions');
 
     // ===== 10. CREATE GRAMMAR POINTS =====
     console.log('📖 Creating grammar points...');
@@ -800,6 +936,50 @@ async function main() {
                     'I visited Paris last year.',
                     'He didn\'t call yesterday.',
                     'Did they arrive on time?',
+                ]),
+            },
+            {
+                title: 'Present Continuous Tense',
+                level: CEFRLevel.A2,
+                explanation: 'Used for actions happening now or temporary situations',
+                patterns: 'Subject + am/is/are + verb-ing',
+                examples: JSON.stringify([
+                    'I am studying English now.',
+                    'She is working at the moment.',
+                    'They are playing football.',
+                ]),
+            },
+            {
+                title: 'Future with "will"',
+                level: CEFRLevel.A2,
+                explanation: 'Used for predictions, promises, and spontaneous decisions',
+                patterns: 'Subject + will + verb (base form)',
+                examples: JSON.stringify([
+                    'I will help you tomorrow.',
+                    'It will rain later.',
+                    'She will call you soon.',
+                ]),
+            },
+            {
+                title: 'Present Perfect Tense',
+                level: CEFRLevel.B1,
+                explanation: 'Used for past actions with present relevance',
+                patterns: 'Subject + have/has + past participle',
+                examples: JSON.stringify([
+                    'I have finished my homework.',
+                    'She has lived here for 5 years.',
+                    'Have you ever been to London?',
+                ]),
+            },
+            {
+                title: 'Conditional Sentences (Type 1)',
+                level: CEFRLevel.B1,
+                explanation: 'Used for real or likely future situations',
+                patterns: 'If + present simple, will + verb',
+                examples: JSON.stringify([
+                    'If it rains, I will stay home.',
+                    'If you study hard, you will pass the exam.',
+                    'If she calls, tell her I\'m busy.',
                 ]),
             },
         ],
@@ -838,8 +1018,332 @@ async function main() {
                 idioms: ['swim against the tide'],
                 phrasalVerbs: [],
             },
+            {
+                lemma: 'achieve',
+                pos: 'verb',
+                phonetic: '/əˈtʃiːv/',
+                level: CEFRLevel.B1,
+                definition: 'To successfully complete or reach a goal',
+                examples: JSON.stringify(['She achieved her dream of becoming a doctor.', 'We achieved our target.']),
+                synonyms: ['accomplish', 'attain', 'reach'],
+                antonyms: ['fail'],
+                families: ['achievement', 'achievable'],
+                collocations: ['achieve success', 'achieve a goal'],
+                idioms: [],
+                phrasalVerbs: [],
+            },
+            {
+                lemma: 'environment',
+                pos: 'noun',
+                phonetic: '/ɪnˈvaɪrənmənt/',
+                level: CEFRLevel.B1,
+                definition: 'The natural world, especially as affected by human activity',
+                examples: JSON.stringify(['We must protect the environment.', 'The environment is changing.']),
+                synonyms: ['nature', 'surroundings'],
+                antonyms: [],
+                families: ['environmental', 'environmentally'],
+                collocations: ['protect the environment', 'environmental protection'],
+                idioms: [],
+                phrasalVerbs: [],
+            },
+            {
+                lemma: 'technology',
+                pos: 'noun',
+                phonetic: '/tekˈnɒlədʒi/',
+                level: CEFRLevel.B1,
+                definition: 'The application of scientific knowledge for practical purposes',
+                examples: JSON.stringify(['Modern technology has changed our lives.', 'Technology is advancing rapidly.']),
+                synonyms: ['innovation', 'tech'],
+                antonyms: [],
+                families: ['technological', 'technologist'],
+                collocations: ['modern technology', 'technology sector'],
+                idioms: [],
+                phrasalVerbs: [],
+            },
+            {
+                lemma: 'comprehend',
+                pos: 'verb',
+                phonetic: '/ˌkɒmprɪˈhend/',
+                level: CEFRLevel.B2,
+                definition: 'To understand something fully',
+                examples: JSON.stringify(['I cannot comprehend why he did that.', 'She comprehends the complexity.']),
+                synonyms: ['understand', 'grasp'],
+                antonyms: ['misunderstand'],
+                families: ['comprehension', 'comprehensible'],
+                collocations: ['comprehend the meaning'],
+                idioms: [],
+                phrasalVerbs: [],
+            },
+            {
+                lemma: 'fluent',
+                pos: 'adjective',
+                phonetic: '/ˈfluːənt/',
+                level: CEFRLevel.B2,
+                definition: 'Able to express oneself easily and accurately',
+                examples: JSON.stringify(['She is fluent in three languages.', 'He speaks fluent English.']),
+                synonyms: ['proficient', 'articulate'],
+                antonyms: ['hesitant'],
+                families: ['fluency', 'fluently'],
+                collocations: ['fluent speaker', 'fluent in English'],
+                idioms: [],
+                phrasalVerbs: [],
+            },
         ],
     });
+
+    // ===== 12. CREATE USER GOALS =====
+    console.log('🎯 Creating user goals...');
+
+    await prisma.userGoal.createMany({
+        data: [
+            {
+                userId: testUser.id,
+                type: 'daily_exercises',
+                target: 5,
+                current: 3,
+                deadline: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7), // 7 days from now
+                completed: false,
+                metadata: { skill: 'all' },
+            },
+            {
+                userId: testUser.id,
+                type: 'weekly_hours',
+                target: 10,
+                current: 6,
+                deadline: new Date(Date.now() + 1000 * 60 * 60 * 24 * 3), // 3 days from now
+                completed: false,
+                metadata: { unit: 'hours' },
+            },
+            {
+                userId: testUser.id,
+                type: 'target_level',
+                target: 1, // B1 level
+                current: 0,
+                deadline: new Date(Date.now() + 1000 * 60 * 60 * 24 * 90), // 90 days from now
+                completed: false,
+                metadata: { targetLevel: 'B1' },
+            },
+            {
+                userId: testUser.id,
+                type: 'writing_tasks',
+                target: 10,
+                current: 4,
+                deadline: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30), // 30 days from now
+                completed: false,
+                metadata: { skill: 'writing' },
+            },
+            {
+                userId: testUser.id,
+                type: 'reading_tasks',
+                target: 15,
+                current: 8,
+                deadline: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30), // 30 days from now
+                completed: false,
+                metadata: { skill: 'reading' },
+            },
+        ],
+    });
+
+    console.log('✅ Created 5 user goals');
+
+    // ===== 13. CREATE USER ACTIVITY TRACKING =====
+    console.log('📊 Creating user activity tracking...');
+
+    const now = Date.now();
+    await prisma.userActivity.createMany({
+        data: [
+            // Today's activities
+            {
+                userId: testUser.id,
+                date: new Date(now - 1000 * 60 * 60 * 2), // 2 hours ago
+                skill: 'reading',
+                activityType: 'exercise',
+                duration: 15,
+                score: 8.0,
+                completed: true,
+            },
+            {
+                userId: testUser.id,
+                date: new Date(now - 1000 * 60 * 30), // 30 mins ago
+                skill: 'listening',
+                activityType: 'exercise',
+                duration: 20,
+                score: 5.0,
+                completed: true,
+            },
+            {
+                userId: testUser.id,
+                date: new Date(now - 1000 * 60 * 60), // 1 hour ago
+                skill: 'writing',
+                activityType: 'practice',
+                duration: 30,
+                score: null,
+                completed: true,
+            },
+            // Yesterday's activities
+            {
+                userId: testUser.id,
+                date: new Date(now - 1000 * 60 * 60 * 24), // 1 day ago
+                skill: 'culture',
+                activityType: 'exercise',
+                duration: 25,
+                score: 9.0,
+                completed: true,
+            },
+            {
+                userId: testUser.id,
+                date: new Date(now - 1000 * 60 * 60 * 24 - 1000 * 60 * 30), // 1 day 30 mins ago
+                skill: 'reading',
+                activityType: 'exercise',
+                duration: 20,
+                score: 7.5,
+                completed: true,
+            },
+            // 2 days ago
+            {
+                userId: testUser.id,
+                date: new Date(now - 1000 * 60 * 60 * 24 * 2), // 2 days ago
+                skill: 'grammar',
+                activityType: 'practice',
+                duration: 15,
+                score: 8.5,
+                completed: true,
+            },
+            {
+                userId: testUser.id,
+                date: new Date(now - 1000 * 60 * 60 * 24 * 2 - 1000 * 60 * 60), // 2 days 1 hour ago
+                skill: 'vocabulary',
+                activityType: 'practice',
+                duration: 10,
+                score: 9.0,
+                completed: true,
+            },
+            // 3 days ago
+            {
+                userId: testUser.id,
+                date: new Date(now - 1000 * 60 * 60 * 24 * 3), // 3 days ago
+                skill: 'listening',
+                activityType: 'exercise',
+                duration: 18,
+                score: 6.5,
+                completed: true,
+            },
+            // 4 days ago
+            {
+                userId: testUser.id,
+                date: new Date(now - 1000 * 60 * 60 * 24 * 4), // 4 days ago
+                skill: 'reading',
+                activityType: 'exercise',
+                duration: 22,
+                score: 8.0,
+                completed: true,
+            },
+            // 5 days ago
+            {
+                userId: testUser.id,
+                date: new Date(now - 1000 * 60 * 60 * 24 * 5), // 5 days ago
+                skill: 'writing',
+                activityType: 'practice',
+                duration: 35,
+                score: 7.0,
+                completed: true,
+            },
+            // 6 days ago
+            {
+                userId: testUser.id,
+                date: new Date(now - 1000 * 60 * 60 * 24 * 6), // 6 days ago
+                skill: 'speaking',
+                activityType: 'practice',
+                duration: 12,
+                score: null,
+                completed: true,
+            },
+            // 7 days ago
+            {
+                userId: testUser.id,
+                date: new Date(now - 1000 * 60 * 60 * 24 * 7), // 7 days ago
+                skill: 'culture',
+                activityType: 'exercise',
+                duration: 28,
+                score: 8.5,
+                completed: true,
+            },
+        ],
+    });
+
+    console.log('✅ Created', 12, 'user activity records');
+
+    // ===== 14. CREATE SAMPLE NOTIFICATIONS =====
+    console.log('🔔 Creating sample notifications...');
+
+    const sampleNotifications = [
+        {
+            userId: testUser.id,
+            sentBy: adminUser.id,
+            title: 'Welcome to English101! 🎉',
+            message: 'We\'re excited to have you here. Start your learning journey by taking the placement test to discover your current level.',
+            type: 'info',
+            link: '/placement-test',
+            read: false,
+            createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2), // 2 days ago
+        },
+        {
+            userId: testUser.id,
+            sentBy: adminUser.id,
+            title: 'Great Progress! ⭐',
+            message: 'You\'ve completed 5 activities this week. Keep up the excellent work!',
+            type: 'success',
+            link: '/english/progress',
+            read: false,
+            createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24), // 1 day ago
+        },
+        {
+            userId: testUser.id,
+            sentBy: adminUser.id,
+            title: 'New Content Available 📚',
+            message: 'We\'ve added new reading exercises for B1 level. Check them out in the Reading section!',
+            type: 'info',
+            link: '/english/reading',
+            read: true,
+            readAt: new Date(Date.now() - 1000 * 60 * 60 * 12), // 12 hours ago
+            createdAt: new Date(Date.now() - 1000 * 60 * 60 * 18), // 18 hours ago
+        },
+        {
+            userId: testUser.id,
+            sentBy: adminUser.id,
+            title: 'Daily Reminder 💪',
+            message: 'Don\'t forget to practice today! Even 10 minutes of practice can make a difference.',
+            type: 'info',
+            link: '/english/dashboard',
+            read: false,
+            createdAt: new Date(Date.now() - 1000 * 60 * 60 * 6), // 6 hours ago
+        },
+        {
+            userId: testUser.id,
+            sentBy: adminUser.id,
+            title: 'Achievement Unlocked! 🏆',
+            message: 'Congratulations! You\'ve reached a 7-day learning streak. You\'re on fire!',
+            type: 'success',
+            link: '/english/progress',
+            read: true,
+            readAt: new Date(Date.now() - 1000 * 60 * 60 * 3), // 3 hours ago
+            createdAt: new Date(Date.now() - 1000 * 60 * 60 * 4), // 4 hours ago
+        },
+    ];
+
+    // Check if UserNotification model exists before creating
+    try {
+        await prisma.userNotification.createMany({
+            data: sampleNotifications,
+        });
+        console.log('✅ Created', sampleNotifications.length, 'sample notifications');
+    } catch (error: any) {
+        if (error?.code === 'P2021' || error?.message?.includes('does not exist')) {
+            console.warn('⚠️  UserNotification table does not exist. Run migrations first: npx prisma migrate dev');
+        } else {
+            console.error('❌ Error creating notifications:', error);
+        }
+    }
 
     console.log('✅ Database seeded successfully! 🎉');
     console.log('\n📋 Login credentials:');

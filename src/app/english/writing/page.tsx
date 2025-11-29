@@ -1341,7 +1341,7 @@ export default function WritingPage() {
       >
         <input
           type="text"
-          placeholder="Tìm theo tiêu đề hoặc chủ đề…"
+          placeholder="Search by title or topic…"
           value={searchTerm}
           onChange={(event) => setSearchTerm(event.target.value)}
           className="input"
@@ -1404,7 +1404,7 @@ export default function WritingPage() {
         ))}
         {!filteredTasks.length && (
           <div className="card soft" style={{ gridColumn: "1/-1" }}>
-            Không tìm thấy bài viết nào phù hợp với bộ lọc hiện tại.
+            No tasks found matching your filters.
           </div>
         )}
       </section>
@@ -1439,7 +1439,7 @@ function TaskCard({
         {task.attempts > 0 && <span>{task.attempts} attempt{task.attempts !== 1 ? "s" : ""}</span>}
       </div>
       <button className="btn primary" onClick={onSelect}>
-        Bắt đầu luyện viết
+        Start Practice
       </button>
     </div>
   );

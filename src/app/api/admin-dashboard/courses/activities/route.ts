@@ -135,7 +135,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    let activity;
+    let activity: any;
     try {
       // Create activity
       activity = await prisma.activity.create({
@@ -169,7 +169,7 @@ export async function POST(req: NextRequest) {
               data: {
                 activityId: activity.id,
                 url: media.url,
-                type: media.type,
+                type: media.type as any,
                 durationS: media.durationS || null,
               },
             })

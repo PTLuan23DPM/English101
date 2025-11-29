@@ -5,7 +5,6 @@ import { createPortal } from "react-dom";
 import { toast } from "sonner";
 import {
   addVocabularyEntry,
-  SavedVocabEntry,
 } from "@/lib/vocabularyStorage";
 
 interface LookupDefinition {
@@ -54,7 +53,7 @@ export default function InstantLookup() {
       const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word.toLowerCase()}`);
       if (!res.ok) {
         setLookup({ word });
-        setError("Không tìm thấy nghĩa phù hợp.");
+        setError("Word not found.");
         return;
       }
       const data: DictionaryEntry[] = await res.json();
@@ -79,7 +78,7 @@ export default function InstantLookup() {
       setLookup({
         word,
       });
-      setError("Không tìm thấy nghĩa phù hợp.");
+      setError("Word not found.");
     } finally {
       setLoading(false);
     }
@@ -174,7 +173,7 @@ export default function InstantLookup() {
 
   const handleAddToVocab = useCallback(() => {
     if (!lookup?.word || !lookup.meaning) {
-      toast.error("Chưa có đủ thông tin để lưu.");
+      toast.error("Insufficient information to save.");
       return;
     }
 
@@ -189,14 +188,14 @@ export default function InstantLookup() {
 
     if (!result.added) {
       if (result.reason === "duplicate") {
-        toast.info("Từ này đã có trong danh sách.");
+        toast.info("This word is already in your vocabulary list.");
       } else {
-        toast.error("Không thể lưu từ vựng.");
+        toast.error("Unable to save vocabulary.");
       }
       return;
     }
 
-    toast.success(`Đã lưu "${lookup.word}" vào Vocabulary.`);
+    toast.success(`Saved "${lookup.word}" to Vocabulary.`);
   }, [lookup]);
 
   const handlePlayAudio = useCallback(() => {
@@ -265,7 +264,7 @@ export default function InstantLookup() {
       </div>
 
       <div style={{ marginTop: "0.75rem" }}>
-        {loading && <p style={{ margin: 0, fontSize: "0.9rem" }}>Đang tra cứu...</p>}
+        {loading && <p style={{ margin: 0, fontSize: "0.9rem" }}>Looking up...</p>}
         {!loading && error && (
           <p style={{ margin: 0, fontSize: "0.9rem", color: "#fca5a5" }}>{error}</p>
         )}
@@ -294,7 +293,7 @@ export default function InstantLookup() {
             fontSize: "0.85rem",
           }}
         >
-          Lưu vào Vocab
+          Save to Vocab
         </button>
         <button
           onClick={handlePlayAudio}
@@ -310,7 +309,7 @@ export default function InstantLookup() {
             fontSize: "0.85rem",
           }}
         >
-          Nghe
+          Play
         </button>
       </div>
     </div>,

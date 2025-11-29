@@ -390,6 +390,129 @@ const LISTENING_TASKS: ListeningTask[] = [
     attempts: 0,
     color: "teal",
   },
+  {
+    id: "lesson-1-budget-cuts",
+    icon: "",
+    title: "Budget Cuts",
+    type: "Conversation",
+    level: "A2",
+    description: "Workplace conversation about budget cuts and job security",
+    duration: "4:30",
+    speakers: "Multiple speakers",
+    accent: "American",
+    questions: 8,
+    tags: ["Work", "Business", "Daily Life"],
+    recommended: true,
+    attempts: 0,
+    color: "blue",
+  },
+  {
+    id: "lesson-2-interview",
+    icon: "",
+    title: "The Interview",
+    type: "Conversation",
+    level: "A2",
+    description: "Job interview conversation focusing on phrasal verbs",
+    duration: "4:15",
+    speakers: "2 speakers",
+    accent: "American",
+    questions: 10,
+    tags: ["Business", "Career", "Interview"],
+    attempts: 0,
+    color: "blue",
+  },
+  {
+    id: "lesson-3-he-said-she-said",
+    icon: "",
+    title: "He Said - She Said",
+    type: "Conversation",
+    level: "A2",
+    description: "Conversation using past perfect tense about different perspectives",
+    duration: "4:20",
+    speakers: "3 speakers",
+    accent: "American",
+    questions: 9,
+    tags: ["Grammar", "Past Perfect", "Daily Life"],
+    attempts: 0,
+    color: "blue",
+  },
+  {
+    id: "lesson-4-circus",
+    icon: "",
+    title: "Run Away With the Circus!",
+    type: "Conversation",
+    level: "A2",
+    description: "Discussion about agreeing and disagreeing on circus arts",
+    duration: "5:00",
+    speakers: "2 speakers",
+    accent: "American",
+    questions: 10,
+    tags: ["Opinions", "Arts", "Culture"],
+    recommended: true,
+    attempts: 0,
+    color: "blue",
+  },
+  {
+    id: "lesson-5-vacation",
+    icon: "",
+    title: "Greatest Vacation of All Time",
+    type: "Conversation",
+    level: "A2",
+    description: "Conversation about vacations using comparatives and superlatives",
+    duration: "5:30",
+    speakers: "2 speakers",
+    accent: "American",
+    questions: 11,
+    tags: ["Travel", "Grammar", "Comparatives"],
+    attempts: 0,
+    color: "blue",
+  },
+  {
+    id: "lesson-6-float",
+    icon: "",
+    title: "Will It Float?",
+    type: "Conversation",
+    level: "A2",
+    description: "Tour conversation focusing on prepositions of place",
+    duration: "4:45",
+    speakers: "3 speakers",
+    accent: "American",
+    questions: 9,
+    tags: ["Travel", "Grammar", "Prepositions"],
+    attempts: 0,
+    color: "blue",
+  },
+  {
+    id: "lesson-7-tour-guide",
+    icon: "",
+    title: "Tip Your Tour Guide",
+    type: "Conversation",
+    level: "A2",
+    description: "Tour conversation about prepositions and tipping",
+    duration: "4:30",
+    speakers: "3 speakers",
+    accent: "American",
+    questions: 8,
+    tags: ["Travel", "Grammar", "Prepositions"],
+    attempts: 0,
+    color: "blue",
+  },
+  {
+    id: "lesson-8-pets",
+    icon: "",
+    title: "Pets Are Family, Too!",
+    type: "Conversation",
+    level: "A2",
+    description: "Conversation about pets using tag questions",
+    duration: "4:15",
+    speakers: "2 speakers",
+    accent: "American",
+    questions: 8,
+    tags: ["Family", "Grammar", "Tag Questions"],
+    recommended: true,
+    attempts: 0,
+    color: "blue",
+  },
 ];
 
 const speedOptions = [0.8, 1, 1.2];
@@ -526,21 +649,35 @@ export default function ListeningPage() {
             recommended: lesson.hasTranscript, // Mark lessons with transcripts as recommended
           }));
 
+          // Remove duplicates from loaded tasks (keep first occurrence)
+          const seenIds = new Set<string>();
+          const uniqueLoadedTasks = loadedTasks.filter(task => {
+            if (seenIds.has(task.id)) {
+              return false;
+            }
+            seenIds.add(task.id);
+            return true;
+          });
+
           // Don't load all lesson details upfront - load on demand when selected
           // This improves performance and reduces initial load time
           const loadedLessons: Record<string, LessonDetail> = {};
 
           // Sort loaded tasks: Beginner -> Intermediate -> Advanced
           const levelOrder = { "A1-A2": 1, "B1-B2": 2, "C1-C2": 3 };
-          const sortedLoadedTasks = loadedTasks.sort((a, b) => {
+          const sortedLoadedTasks = uniqueLoadedTasks.sort((a, b) => {
             const aLevel = levelOrder[a.level as keyof typeof levelOrder] || 999;
             const bLevel = levelOrder[b.level as keyof typeof levelOrder] || 999;
             if (aLevel !== bLevel) return aLevel - bLevel;
             return a.title.localeCompare(b.title);
           });
           
-          // Combine: hardcoded tasks first, then loaded tasks sorted by level
-          const sortedTasks = [...LISTENING_TASKS, ...sortedLoadedTasks];
+          // Remove duplicates: keep API tasks, remove from LISTENING_TASKS if id matches
+          const existingIds = new Set(sortedLoadedTasks.map(t => t.id));
+          const uniqueStaticTasks = LISTENING_TASKS.filter(task => !existingIds.has(task.id));
+          
+          // Combine: unique hardcoded tasks first, then loaded tasks sorted by level
+          const sortedTasks = [...uniqueStaticTasks, ...sortedLoadedTasks];
           setTasks(sortedTasks);
           setLessons({ ...LESSON_DETAILS, ...loadedLessons });
         }
@@ -1969,7 +2106,7 @@ export default function ListeningPage() {
               </h4>
         <div className="task-grid">
                 {levelTasks.map((task) => (
-            <div key={task.id} className={`task-card task-card-${task.color}`}>
+            <div key={`${levelGroup}-${task.id}`} className={`task-card task-card-${task.color}`}>
               {task.recommended && (
                 <div className="task-badge">
                   <span>Recommended</span>

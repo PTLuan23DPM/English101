@@ -13,3 +13,7 @@ transformers>=4.30.0
 requests>=2.31.0
 nltk>=3.8.1
 langdetect>=1.0.9
+openai-whisper>=20231117
+librosa>=0.10.0
+fastdtw>=0.3.4
+scipy>=1.11.0

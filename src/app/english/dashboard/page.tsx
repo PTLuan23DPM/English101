@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { toast } from "sonner";
 import AIAssistant from "@/components/AIAssistant";
 import AnalyticsCharts from "@/components/AnalyticsCharts";
@@ -64,8 +64,48 @@ export default function DashboardPage() {
   const [quickResult, setQuickResult] = useState<DictionaryResult | null>(null);
   const [quickSearching, setQuickSearching] = useState(false);
 
+  // Use useLayoutEffect to scroll before paint
+  useLayoutEffect(() => {
+    // Force scroll to top immediately
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    
+    // Also try after a microtask
+    Promise.resolve().then(() => {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    });
+  }, []);
+
   useEffect(() => {
     fetchDashboardStats();
+    
+    // Additional scroll attempts after render
+    const scrollToTop = () => {
+      window.scrollTo(0, 0);
+      if (document.documentElement) {
+        document.documentElement.scrollTop = 0;
+      }
+      if (document.body) {
+        document.body.scrollTop = 0;
+      }
+    };
+    
+    // Scroll multiple times to ensure it works
+    scrollToTop();
+    const timeout1 = setTimeout(scrollToTop, 0);
+    const timeout2 = setTimeout(scrollToTop, 50);
+    const timeout3 = setTimeout(scrollToTop, 100);
+    const timeout4 = setTimeout(scrollToTop, 200);
+    
+    return () => {
+      clearTimeout(timeout1);
+      clearTimeout(timeout2);
+      clearTimeout(timeout3);
+      clearTimeout(timeout4);
+    };
   }, []);
 
   const fetchDashboardStats = async () => {

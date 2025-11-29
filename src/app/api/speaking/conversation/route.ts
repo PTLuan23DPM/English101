@@ -16,37 +16,44 @@ export async function GET(request: NextRequest) {
 
     // Path to the speaking JSON files
     // Use absolute path
-    // Handle both old and new filename formats
-    let filePath = path.join(
-      "c:",
-      "Users",
-      "ADMIN",
-      "Desktop",
-      "listening_file",
-      "Beginner_Speaking",
-      filename
-    );
+    // Check both Speaking and Beginner_Speaking folders
+    const basePaths = [
+      path.join("c:", "Users", "ADMIN", "Desktop", "listening_file", "Speaking"),
+      path.join("c:", "Users", "ADMIN", "Desktop", "listening_file", "Beginner_Speaking"),
+    ];
     
-    // If file doesn't exist, try alternative filename format
-    if (!fs.existsSync(filePath)) {
-      // Try converting "Lesson X Title_speaking.json" to "X_Title_speaking.json"
+    let filePath: string | null = null;
+    
+    // Try each base path
+    for (const basePath of basePaths) {
+      let testPath = path.join(basePath, filename);
+      
+      if (fs.existsSync(testPath)) {
+        filePath = testPath;
+        break;
+      }
+      
+      // Try alternative filename format
       const altFilename = filename.replace(/^Lesson \d+ /, "").replace(/ /g, "_");
-      const altPath = path.join(
-        "c:",
-        "Users",
-        "ADMIN",
-        "Desktop",
-        "listening_file",
-        "Beginner_Speaking",
-        altFilename
-      );
-      if (fs.existsSync(altPath)) {
-        filePath = altPath;
+      testPath = path.join(basePath, altFilename);
+      if (fs.existsSync(testPath)) {
+        filePath = testPath;
+        break;
+      }
+      
+      // Try with "Lesson X Title.json" format
+      const lessonFilename = filename.includes("_speaking") 
+        ? filename.replace("_speaking.json", ".json")
+        : filename;
+      testPath = path.join(basePath, lessonFilename);
+      if (fs.existsSync(testPath)) {
+        filePath = testPath;
+        break;
       }
     }
 
     // Check if file exists
-    if (!fs.existsSync(filePath)) {
+    if (!filePath || !fs.existsSync(filePath)) {
       return NextResponse.json(
         { error: "Conversation file not found" },
         { status: 404 }
@@ -61,7 +68,8 @@ export async function GET(request: NextRequest) {
       conversation: data.conversation || [],
       fullText: data.full_text || "",
       title: data.title || "",
-      segments: data.segments || [], // Include segments with speaker names
+      segments: data.segments || [], // Include segments with speaker names and timestamps
+      filename: data.filename || data.original_filename || "", // Include audio filename
     });
   } catch (error) {
     console.error("Error loading conversation:", error);

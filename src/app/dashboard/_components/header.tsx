@@ -41,7 +41,7 @@ export default function DashboardHeader() {
 
         if (statsRes.ok) {
           const statsData = await statsRes.json();
-          if (statsData.success) {
+          if (statsData.success && statsData.stats) {
             const newStreak = statsData.stats.streak || 0;
             // If streak increased, show glow
             if (newStreak > streak && streak > 0) {

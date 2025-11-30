@@ -18,8 +18,8 @@ export async function POST(request: NextRequest) {
     const arrayBuffer = await audioFile.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    // Call Python speaking scorer service
-    const pythonServiceUrl = process.env.SPEAKING_SERVICE_URL || "http://localhost:5002";
+    // Call Python speaking scorer service (unified service on port 8080)
+    const pythonServiceUrl = process.env.PYTHON_SERVICE_URL || "http://localhost:8080";
     
     // Check if service is available first
     try {
@@ -42,13 +42,13 @@ export async function POST(request: NextRequest) {
     } catch (healthError) {
       console.error("Health check failed:", healthError);
       const errorMessage = healthError instanceof Error ? healthError.message : "Connection failed";
-      return NextResponse.json(
-        { 
-          error: "Speaking service is not running", 
-          details: `Please start the Python speaking service on port 5002. Error: ${errorMessage}` 
-        },
-        { status: 503 }
-      );
+        return NextResponse.json(
+          { 
+            error: "Speaking service is not running", 
+            details: `Please start the Python service (ai_scorer.py) on port 8080. Error: ${errorMessage}` 
+          },
+          { status: 503 }
+        );
     }
     
     // Create FormData for Python service
@@ -60,16 +60,40 @@ export async function POST(request: NextRequest) {
     formDataForPython.append("mode", mode || "roleplay");
 
     try {
-      const response = await fetch(`${pythonServiceUrl}/score`, {
+      const response = await fetch(`${pythonServiceUrl}/score-speech`, {
         method: "POST",
         body: formDataForPython,
       });
 
       if (!response.ok) {
-        const errorText = await response.text().catch(() => "Unknown error");
-        console.error("Python service error:", errorText);
+        let errorText = "Unknown error";
+        let errorData = null;
+        
+        try {
+          const contentType = response.headers.get("content-type");
+          if (contentType && contentType.includes("application/json")) {
+            errorData = await response.json();
+            errorText = errorData.error || errorData.message || JSON.stringify(errorData);
+          } else {
+            errorText = await response.text();
+          }
+        } catch (e) {
+          errorText = `HTTP ${response.status}: ${response.statusText}`;
+        }
+        
+        console.error("Python service error:", {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorText,
+          data: errorData
+        });
+        
         return NextResponse.json(
-          { error: "Scoring failed", details: errorText, status: response.status },
+          { 
+            error: errorData?.error || "Scoring failed", 
+            details: errorData?.details || errorText,
+            status: response.status 
+          },
           { status: response.status || 500 }
         );
       }

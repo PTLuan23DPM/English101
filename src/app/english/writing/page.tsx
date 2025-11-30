@@ -135,7 +135,9 @@ export default function WritingPage() {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
         
-        const response = await fetch("http://localhost:5001/health", {
+        // Use PYTHON_SERVICE_URL from env or default to localhost:8080
+        const pythonServiceUrl = process.env.NEXT_PUBLIC_PYTHON_SERVICE_URL || "http://localhost:8080";
+        const response = await fetch(`${pythonServiceUrl}/health`, {
           method: "GET",
           signal: controller.signal,
         });
@@ -243,7 +245,9 @@ export default function WritingPage() {
       // If Gemini scoring fails, try Python service as fallback
       if (!response) {
         // Use Hybrid Deep Model scoring system
-        response = await fetch("http://localhost:5001/score", {
+        // Use PYTHON_SERVICE_URL from env or default to localhost:8080
+        const pythonServiceUrl = process.env.NEXT_PUBLIC_PYTHON_SERVICE_URL || "http://localhost:8080";
+        response = await fetch(`${pythonServiceUrl}/score`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -353,9 +357,14 @@ export default function WritingPage() {
           const saveData = await saveResponse.json();
           console.log("Completion saved successfully:", saveData);
           
-          // Trigger activity completed event to update dashboard and show star
-          localStorage.setItem('activityCompleted', 'true');
-          window.dispatchEvent(new Event('activityCompleted'));
+          // Wait a bit to ensure database is updated, then trigger refresh
+          setTimeout(() => {
+            // Trigger activity completed event to update dashboard and show star
+            localStorage.setItem('activityCompleted', 'true');
+            const event = new Event('activityCompleted');
+            window.dispatchEvent(event);
+            console.log('[Writing] Activity completed event dispatched');
+          }, 500); // Small delay to ensure DB update
         }
       } catch (saveError) {
         console.error("Error saving completion:", saveError);
@@ -774,7 +783,7 @@ export default function WritingPage() {
                     className="btn primary"
                     onClick={handleSubmit}
                     disabled={submitting || submitted || wordCount < 10 || serviceAvailable === false}
-                    title={serviceAvailable === false ? "Python service is not available. Please start the service on port 5001" : ""}
+                    title={serviceAvailable === false ? `Python service is not available. Please start the service on ${process.env.NEXT_PUBLIC_PYTHON_SERVICE_URL || "http://localhost:8080"}` : ""}
                   >
                     {submitting ? "Scoring..." : submitted ? "Submitted" : "Submit for AI Review"}
                   </button>

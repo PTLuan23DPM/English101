@@ -16,6 +16,9 @@ export class StatsService {
                 where: { id: userId },
                 select: {
                     id: true,
+                    name: true,
+                    email: true,
+                    image: true,
                     createdAt: true,
                 },
             });
@@ -58,28 +61,37 @@ export class StatsService {
                     : 0;
 
             // Calculate scores by skill (only completed attempts)
-            const skillScores: Record<string, { avg: number; count: number }> = {};
+            const skillScores: Record<string, { avg: number; count: number; totalScore: number }> = {};
             attemptsWithScore.forEach((att) => {
                 const skill = att.activity.skill.toLowerCase();
                 if (!skillScores[skill]) {
-                    skillScores[skill] = { avg: 0, count: 0 };
+                    skillScores[skill] = { avg: 0, count: 0, totalScore: 0 };
                 }
-                skillScores[skill].avg += att.score || 0;
+                skillScores[skill].totalScore += att.score || 0;
                 skillScores[skill].count += 1;
             });
 
+            // Calculate averages
             Object.keys(skillScores).forEach((skill) => {
-                skillScores[skill].avg = skillScores[skill].avg / skillScores[skill].count;
+                if (skillScores[skill].count > 0) {
+                    skillScores[skill].avg = skillScores[skill].totalScore / skillScores[skill].count;
+                }
+                // Remove totalScore from final result
+                delete (skillScores[skill] as any).totalScore;
             });
 
             // Get recent activities (last 7 days, only completed)
             const sevenDaysAgo = new Date();
             sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
+            // Get recent activities (last 30 days for better coverage)
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
             const recentAttempts = await prisma.attempt.findMany({
                 where: {
                     userId,
-                    submittedAt: { not: null, gte: sevenDaysAgo },
+                    submittedAt: { not: null, gte: thirtyDaysAgo },
                 },
                 select: {
                     id: true,
@@ -88,13 +100,16 @@ export class StatsService {
                     meta: true,
                     activity: {
                         select: {
+                            id: true,
                             skill: true,
                             type: true,
+                            title: true,
+                            level: true,
                         },
                     },
                 },
                 orderBy: { submittedAt: "desc" },
-                take: 10,
+                take: 20, // Get more to have better selection
             });
 
             // Calculate streak from completed attempts
@@ -110,6 +125,9 @@ export class StatsService {
             const avgScoreDisplay = avgScore > 10 ? avgScore / 10 : avgScore;
 
             return {
+                name: user.name,
+                email: user.email,
+                image: user.image,
                 avgScore: parseFloat(avgScoreDisplay.toFixed(2)),
                 totalActivities: attempts.length,
                 completedUnits: completedDays,
@@ -126,14 +144,26 @@ export class StatsService {
                         }
                     ])
                 ),
-                recentActivities: recentAttempts.map(att => ({
-                    id: att.id,
-                    skill: att.activity.skill,
-                    activityType: att.activity.type,
-                    score: att.score ? (att.score > 10 ? att.score / 10 : att.score) : null, // Convert to 0-10 scale
-                    date: att.submittedAt,
-                    metadata: (att.meta as any) || {},
-                })),
+                recentActivities: recentAttempts.map(att => {
+                    const metadata = (att.meta as any) || {};
+                    const score = att.score ? (att.score > 10 ? att.score / 10 : att.score) : null;
+                    
+                    return {
+                        id: att.id,
+                        skill: att.activity.skill,
+                        activityType: att.activity.type,
+                        score: score,
+                        date: att.submittedAt?.toISOString() || null,
+                        metadata: {
+                            taskId: metadata.taskId || att.activity.id,
+                            taskTitle: metadata.taskTitle || att.activity.title || `${att.activity.skill} Exercise`,
+                            taskType: metadata.taskType || att.activity.type,
+                            level: metadata.level || att.activity.level || "B1",
+                            targetWords: metadata.targetWords,
+                            ...metadata,
+                        },
+                    };
+                }),
             };
         } catch (error: any) {
             // Handle database connection errors

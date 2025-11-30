@@ -75,7 +75,9 @@ export default function AIAssistant({ text, textareaRef, onSuggestionAccept }: A
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
       
-      const response = await fetch("http://localhost:5001/grammar-check", {
+      // Use PYTHON_SERVICE_URL from env or default to localhost:8080
+      const pythonServiceUrl = process.env.NEXT_PUBLIC_PYTHON_SERVICE_URL || "http://localhost:8080";
+      const response = await fetch(`${pythonServiceUrl}/grammar-check`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: currentText }),
@@ -135,7 +137,8 @@ export default function AIAssistant({ text, textareaRef, onSuggestionAccept }: A
           description: "Grammar check took too long. Please try again.",
         });
       } else {
-        const errorMessage = error instanceof Error ? error.message : "Make sure the Python service is running on port 5001";
+        const pythonServiceUrl = process.env.NEXT_PUBLIC_PYTHON_SERVICE_URL || "http://localhost:8080";
+        const errorMessage = error instanceof Error ? error.message : `Make sure the Python service is running on ${pythonServiceUrl}`;
         toast.error("Grammar check failed", {
           description: errorMessage,
         });

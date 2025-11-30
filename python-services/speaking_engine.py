@@ -9,6 +9,7 @@ import whisper
 import librosa
 import subprocess
 import os
+import re
 from pathlib import Path
 from typing import Dict, List, Optional
 from scipy.spatial.distance import euclidean

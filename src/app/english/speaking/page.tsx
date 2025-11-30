@@ -355,9 +355,16 @@ export default function SpeakingPage() {
           console.log("Scoring result:", result);
           setScoringResult(result);
           
-          // Update transcript from result
-          if (result.transcription) {
-            setTranscript(result.transcription);
+          // Update transcript from result (check both top level and details)
+          const transcription = result.transcription || result.details?.transcription || '';
+          if (transcription) {
+            setTranscript(transcription);
+          }
+          
+          // Ensure content_accuracy and pronunciation_score are available
+          if (result.details && !result.content_accuracy) {
+            result.content_accuracy = result.details.content_accuracy;
+            result.pronunciation_score = result.details.pronunciation_score;
           }
           
           // Set score based on mode
@@ -425,7 +432,7 @@ export default function SpeakingPage() {
         setScoringResult({
           error: errorMessage,
           details: errorDetails || (response.status === 503 
-            ? "Please start the Python speaking service on port 5002" 
+            ? "Please start the Python service (ai_scorer.py) on port 8080" 
             : response.status === 400
             ? "Invalid request. Please check your recording and try again."
             : "Please try again")
@@ -499,9 +506,14 @@ export default function SpeakingPage() {
         
         // Notify dashboard to refresh streak
         if (typeof window !== 'undefined') {
-          localStorage.setItem('activityCompleted', 'true');
-          // Trigger custom event for same-tab communication
-          window.dispatchEvent(new Event('activityCompleted'));
+          // Wait a bit to ensure database is updated, then trigger refresh
+          setTimeout(() => {
+            localStorage.setItem('activityCompleted', 'true');
+            // Trigger custom event for same-tab communication
+            const event = new Event('activityCompleted');
+            window.dispatchEvent(event);
+            console.log('[Speaking] Activity completed event dispatched');
+          }, 500); // Small delay to ensure DB update
         }
         
         // Wait a bit then go back to task selection
@@ -753,13 +765,13 @@ export default function SpeakingPage() {
                                     <div>
                                       <div style={{ fontSize: "0.85rem", color: "#64748b", marginBottom: "4px" }}>Content</div>
                                       <div style={{ fontSize: "1.2rem", fontWeight: 600, color: "#16a34a" }}>
-                                        {scoringResult.content_accuracy?.toFixed(1) || 0}%
+                                        {(scoringResult.content_accuracy ?? 0).toFixed(1)}%
                                       </div>
                                     </div>
                                     <div>
                                       <div style={{ fontSize: "0.85rem", color: "#64748b", marginBottom: "4px" }}>Pronunciation</div>
                                       <div style={{ fontSize: "1.2rem", fontWeight: 600, color: "#16a34a" }}>
-                                        {scoringResult.pronunciation_score?.toFixed(1) || 0}%
+                                        {(scoringResult.pronunciation_score ?? 0).toFixed(1)}%
                                       </div>
                                     </div>
                                   </div>
@@ -980,13 +992,13 @@ export default function SpeakingPage() {
                         <div>
                           <div style={{ fontSize: "0.85rem", color: "#64748b", marginBottom: "4px" }}>Content Accuracy</div>
                           <div style={{ fontSize: "1.2rem", fontWeight: 600, color: "#16a34a" }}>
-                            {scoringResult.content_accuracy?.toFixed(1) || 0}%
+                            {(scoringResult.content_accuracy ?? 0).toFixed(1)}%
                           </div>
                         </div>
                         <div>
                           <div style={{ fontSize: "0.85rem", color: "#64748b", marginBottom: "4px" }}>Pronunciation</div>
                           <div style={{ fontSize: "1.2rem", fontWeight: 600, color: "#16a34a" }}>
-                            {scoringResult.pronunciation_score?.toFixed(1) || 0}%
+                            {(scoringResult.pronunciation_score ?? 0).toFixed(1)}%
                           </div>
                         </div>
                       </div>
@@ -1254,13 +1266,13 @@ export default function SpeakingPage() {
                         <div>
                           <div style={{ fontSize: "0.85rem", color: "#64748b", marginBottom: "4px" }}>Content Accuracy</div>
                           <div style={{ fontSize: "1.2rem", fontWeight: 600, color: "#16a34a" }}>
-                            {scoringResult.content_accuracy?.toFixed(1) || 0}%
+                            {(scoringResult.content_accuracy ?? 0).toFixed(1)}%
                           </div>
                         </div>
                         <div>
                           <div style={{ fontSize: "0.85rem", color: "#64748b", marginBottom: "4px" }}>Pronunciation</div>
                           <div style={{ fontSize: "1.2rem", fontWeight: 600, color: "#16a34a" }}>
-                            {scoringResult.pronunciation_score?.toFixed(1) || 0}%
+                            {(scoringResult.pronunciation_score ?? 0).toFixed(1)}%
                           </div>
                         </div>
                       </div>
@@ -1621,7 +1633,7 @@ export default function SpeakingPage() {
                     <div style={{ marginTop: "12px", fontSize: "0.9rem", display: "flex", justifyContent: "space-around", paddingTop: "12px", borderTop: "1px solid #bbf7d0" }}>
                       <div>
                         <div style={{ fontWeight: 600, color: "#16a34a" }}>Content</div>
-                        <div style={{ fontSize: "1.1rem" }}>{scoringResult.content_accuracy.toFixed(1)}%</div>
+                        <div style={{ fontSize: "1.1rem" }}>{(scoringResult.content_accuracy ?? 0).toFixed(1)}%</div>
                       </div>
                       <div>
                         <div style={{ fontWeight: 600, color: "#16a34a" }}>Pronunciation</div>

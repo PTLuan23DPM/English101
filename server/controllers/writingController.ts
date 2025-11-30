@@ -196,6 +196,15 @@ export class WritingController {
                 streakData = { streak: 0, longestStreak: 0, isNewDay: false };
             }
 
+            // Mark first writing task as completed in Getting Started
+            try {
+                const { gettingStartedService } = await import("../services/gettingStartedService");
+                await gettingStartedService.markTaskCompleted(userId, "first_writing");
+            } catch (error) {
+                console.warn("[WritingController] Failed to mark getting started task:", error);
+                // Don't fail the request if this fails
+            }
+
             return {
                 success: true,
                 data: {

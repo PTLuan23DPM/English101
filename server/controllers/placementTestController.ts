@@ -29,6 +29,15 @@ export class PlacementTestController {
 
             const result = await placementTestService.saveTestResult(userId, data);
 
+            // Mark placement test task as completed in Getting Started
+            try {
+                const { gettingStartedService } = await import("../services/gettingStartedService");
+                await gettingStartedService.markTaskCompleted(userId, "placement_test");
+            } catch (error) {
+                console.warn("[PlacementTestController] Failed to mark getting started task:", error);
+                // Don't fail the request if this fails
+            }
+
             return createResponse(
                 {
                     success: true,

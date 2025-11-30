@@ -19,6 +19,7 @@ const envSchema = z.object({
 
     // Python Service
     PYTHON_SERVICE_URL: z.string().url().optional(),
+    NEXT_PUBLIC_PYTHON_SERVICE_URL: z.string().url().optional(),
 
     // Node Environment
     NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
@@ -44,6 +45,7 @@ export function validateEnv(): Env {
             FROM_EMAIL: process.env.FROM_EMAIL,
             FROM_NAME: process.env.FROM_NAME,
             PYTHON_SERVICE_URL: process.env.PYTHON_SERVICE_URL,
+            NEXT_PUBLIC_PYTHON_SERVICE_URL: process.env.NEXT_PUBLIC_PYTHON_SERVICE_URL,
             NODE_ENV: process.env.NODE_ENV || "development",
         });
         return env;

@@ -1,42 +1,26 @@
-import { NextResponse } from "next/server";
-import { requireAuth, unauthorizedResponse } from "@/server/utils/auth";
+import { asyncHandler, AppError } from "@/lib/error-handler";
+import { requireAuth } from "@/server/utils/auth";
 import { statsController } from "@/server/controllers/statsController";
+import { createSuccessResponse } from "@/server/utils/response";
 
 /**
  * Get user statistics (avg score, total activities, streak, etc.)
  * GET /api/user/stats
  */
-export async function GET() {
-    try {
-        const session = await requireAuth();
-        const userId = session.user.id;
+export const GET = asyncHandler(async () => {
+    const session = await requireAuth();
+    const userId = session.user.id;
 
-        const result = await statsController.getStats(userId);
+    const result = await statsController.getStats(userId);
 
-        if (!result.success) {
-            return NextResponse.json(
-                { error: "Failed to fetch user stats", success: false },
-                { status: 500 }
-            );
-        }
-
-        return NextResponse.json({ success: true, stats: result.data.stats }, { status: 200 });
-    } catch (error: unknown) {
-        const errorMessage = error instanceof Error ? error.message : "Unknown error";
-        
-        if (errorMessage === "Unauthorized") {
-            return unauthorizedResponse();
-        }
-
-        console.error("[User Stats API] Error:", error);
-        return NextResponse.json(
-            { 
-                success: false,
-                error: errorMessage || "Failed to fetch user stats",
-                stats: null
-            },
-            { status: 500 }
+    if (!result.success || !result.data?.stats) {
+        throw new AppError(
+            "Failed to fetch user stats",
+            500,
+            "STATS_FETCH_ERROR"
         );
     }
-}
+
+    return createSuccessResponse({ stats: result.data.stats });
+});
 

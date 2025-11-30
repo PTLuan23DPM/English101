@@ -106,6 +106,15 @@ export class GoalsController {
                 metadata: data.metadata,
             });
 
+            // Mark set_goals task as completed in Getting Started
+            try {
+                const { gettingStartedService } = await import("../services/gettingStartedService");
+                await gettingStartedService.markTaskCompleted(userId, "set_goals");
+            } catch (error) {
+                console.warn("[GoalsController] Failed to mark getting started task:", error);
+                // Don't fail the request if this fails
+            }
+
             return {
                 success: true,
                 data: { goal },

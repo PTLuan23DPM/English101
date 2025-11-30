@@ -43,6 +43,20 @@ type DashboardStats = {
     submittedAt: Date | null;
     metadata?: { taskTitle?: string; taskType?: string; targetWords?: string };
   }>;
+  gettingStarted?: {
+    tasks: Array<{
+      id: string;
+      type: string;
+      title: string;
+      description: string;
+      link: string;
+      completed: boolean;
+      order: number;
+    }>;
+    progress: number;
+    totalTasks: number;
+    completedTasks: number;
+  };
 };
 
 export default function DashboardPage() {
@@ -82,6 +96,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     fetchDashboardStats();
+    fetchGettingStartedTasks();
     
     // Check if there's activity completed today and trigger glow
     checkTodayActivity();
@@ -132,13 +147,19 @@ export default function DashboardPage() {
 
   // Listen for activity completion events to refresh streak
   useEffect(() => {
-    const handleActivityCompleted = () => {
+    const handleActivityCompleted = async () => {
+      console.log('[Dashboard] Activity completed event received, refreshing stats...');
+      // Small delay to ensure database is fully updated
+      await new Promise(resolve => setTimeout(resolve, 300));
       // Refresh stats and show glow
-      fetchDashboardStats(true);
+      await fetchDashboardStats(true);
+      // Also refresh getting started tasks
+      await fetchGettingStartedTasks();
     };
 
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'activityCompleted' && e.newValue === 'true') {
+        console.log('[Dashboard] Storage event detected, refreshing stats...');
         handleActivityCompleted();
         localStorage.removeItem('activityCompleted');
       }
@@ -152,6 +173,7 @@ export default function DashboardPage() {
     // Also check localStorage periodically (fallback)
     const checkInterval = setInterval(() => {
       if (localStorage.getItem('activityCompleted') === 'true') {
+        console.log('[Dashboard] Polling detected activity completion, refreshing stats...');
         handleActivityCompleted();
         localStorage.removeItem('activityCompleted');
       }
@@ -164,61 +186,134 @@ export default function DashboardPage() {
     };
   }, []);
 
-  const fetchDashboardStats = async (showGlow = false) => {
+  const fetchGettingStartedTasks = async () => {
     try {
-      // Fetch user stats from API
-      const res = await fetch("/api/user/stats");
+      const res = await fetch("/api/getting-started");
       if (res.ok) {
         const data = await res.json();
-        if (data.success) {
-          // Check if streak increased
-          if (showGlow && stats && data.stats.streak > (stats.stats.streak || 0)) {
-            setStreakGlow(true);
-            setTimeout(() => setStreakGlow(false), 3000);
-          }
-          
-          // Transform API data to dashboard format
-          const transformedStats = {
-            user: {
-              name: data.stats.name || "Student",
-              email: data.stats.email || "student@example.com",
-              image: data.stats.image || null,
-            },
-            stats: {
-              streak: data.stats.streak || 0,
-              completedUnits: data.stats.completedUnits || 0, // Days with completed activities
-              inProgressUnits: 0,
-              totalAttempts: data.stats.totalActivities || 0, // Total completed activities
-              avgScore: data.stats.avgScore || 0,
-            },
-            skillsBreakdown: Object.entries(data.stats.skillScores || {}).map(([skill, scoreData]) => {
-                const score = scoreData as { count?: number; avg?: number };
-                return {
-                    skill: skill.toUpperCase(),
-                    completed: score.count || 0,
-                    avgScore: Math.round((score.avg || 0) * 10), // Convert to percentage
-                };
-            }),
-            recentProgress: [],
-            recentAttempts: data.stats.recentActivities?.map((act: unknown) => {
-                const activity = act as { id?: string; metadata?: { taskId?: string; level?: string; taskTitle?: string; taskType?: string; targetWords?: string }; skill?: string; score?: number; date?: string };
-                return {
-                    id: activity.id,
-                    activityTitle: activity.metadata?.taskId || "Practice Activity",
-                    skill: activity.skill,
-                    level: activity.metadata?.level || "B1",
-                    score: activity.score ? Math.round(activity.score * 10) : null,
-                    maxScore: 100,
-                    submittedAt: activity.date,
-                    metadata: activity.metadata as { taskTitle?: string; taskType?: string; targetWords?: string } | undefined,
-                };
-            }) || [],
-          };
-          setStats(transformedStats);
-          return;
+        if (data.tasks) {
+          setStats(prev => ({
+            ...prev!,
+            gettingStarted: data,
+          }));
         }
       }
-      // Don't use mock data - show empty state instead
+    } catch (error) {
+      console.error("Failed to fetch getting started tasks:", error);
+    }
+  };
+
+  const fetchDashboardStats = async (showGlow = false) => {
+    try {
+      console.log('[Dashboard] Fetching stats...');
+      // Fetch user stats from API with cache busting
+      const res = await fetch("/api/user/stats", {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache',
+        },
+      });
+      
+      if (!res.ok) {
+        const errorText = await res.text().catch(() => 'Unknown error');
+        console.error('[Dashboard] API request failed:', {
+          status: res.status,
+          statusText: res.statusText,
+          error: errorText
+        });
+        throw new Error(`API request failed: ${res.status} ${res.statusText}`);
+      }
+      
+      const data = await res.json();
+      console.log('[Dashboard] Stats received:', data);
+      
+      if (data.success && data.data?.stats) {
+        // Use data.data.stats instead of data.stats (from createSuccessResponse)
+        const statsData = data.data.stats;
+        // Check if streak increased
+        if (showGlow && stats && statsData?.streak && statsData.streak > (stats.stats?.streak || 0)) {
+          setStreakGlow(true);
+          setTimeout(() => setStreakGlow(false), 3000);
+        }
+        
+        // Transform API data to dashboard format
+        const transformedStats: DashboardStats = {
+          user: {
+            name: statsData?.name || "Student",
+            email: statsData?.email || "student@example.com",
+            image: statsData?.image || null,
+          },
+          stats: {
+            streak: statsData?.streak || 0,
+            completedUnits: statsData?.completedUnits || 0, // Days with completed activities
+            inProgressUnits: 0,
+            totalAttempts: statsData?.totalActivities || 0, // Total completed activities
+            avgScore: statsData?.avgScore || 0,
+          },
+          skillsBreakdown: Object.entries(statsData?.skillScores || {})
+              .map(([skill, scoreData]) => {
+                  const score = scoreData as { count?: number; avg?: number };
+                  // avg is already in 0-10 scale, convert to percentage (0-100)
+                  const avgPercent = score.avg ? Math.round(score.avg * 10) : 0;
+                  return {
+                      skill: skill.toUpperCase(),
+                      completed: score.count || 0,
+                      avgScore: avgPercent,
+                  };
+              })
+              .sort((a, b) => b.avgScore - a.avgScore), // Sort by score descending
+          recentProgress: [],
+          recentAttempts: statsData?.recentActivities?.map((act: unknown, idx: number) => {
+              const activity = act as { 
+                  id?: string; 
+                  skill?: string; 
+                  activityType?: string;
+                  score?: number | null; 
+                  date?: string | null;
+                  metadata?: { 
+                      taskId?: string; 
+                      taskTitle?: string;
+                      taskType?: string;
+                      level?: string; 
+                      targetWords?: string;
+                  }; 
+              };
+              
+              // Convert score from 0-10 to percentage (0-100)
+              const scorePercent = activity.score !== null && activity.score !== undefined 
+                  ? Math.round(activity.score * 10) 
+                  : null;
+              
+              // Format skill name
+              const skillName = activity.skill?.toLowerCase() || "unknown";
+              
+              return {
+                  id: activity.id || `activity_${Date.now()}_${idx}`,
+                  activityTitle: activity.metadata?.taskTitle || activity.metadata?.taskId || `${skillName.charAt(0).toUpperCase() + skillName.slice(1)} Exercise`,
+                  skill: skillName,
+                  level: activity.metadata?.level || "B1",
+                  score: scorePercent,
+                  maxScore: 100,
+                  submittedAt: activity.date || null,
+                  metadata: {
+                      ...activity.metadata,
+                      taskType: activity.metadata?.taskType || activity.activityType,
+                  },
+              };
+          }) || [],
+          gettingStarted: stats?.gettingStarted, // Preserve getting started data
+        };
+        console.log('[Dashboard] Updating stats state:', transformedStats);
+        setStats(transformedStats);
+        return;
+      } else {
+        console.warn('[Dashboard] API returned success=false or no stats:', data);
+        if (data.error) {
+          console.error('[Dashboard] API error:', data.error, data.code, data.details);
+        }
+      }
+      
+      // If we reach here, something went wrong - set empty state
       console.error("Failed to fetch dashboard stats: API returned error or no data");
       setStats({
         user: {
@@ -236,6 +331,7 @@ export default function DashboardPage() {
         skillsBreakdown: [],
         recentProgress: [],
         recentAttempts: [],
+        gettingStarted: stats?.gettingStarted, // Preserve getting started data
       });
     } catch (error) {
       // Don't use mock data - show empty state instead
@@ -256,6 +352,7 @@ export default function DashboardPage() {
         skillsBreakdown: [],
         recentProgress: [],
         recentAttempts: [],
+        gettingStarted: stats?.gettingStarted, // Preserve getting started data
       });
     } finally {
       setLoading(false);
@@ -377,60 +474,80 @@ export default function DashboardPage() {
               </svg>
               <div>
                 <h3 style={{ margin: 0 }}>Getting Started</h3>
-                <span className="progress-percent">25%</span>
+                <span className="progress-percent">{stats?.gettingStarted?.progress || 0}%</span>
               </div>
             </div>
             
             <div className="progress-bar" style={{ marginBottom: "20px" }}>
-              <div className="progress-fill" style={{ width: "25%" }} />
+              <div className="progress-fill" style={{ width: `${stats?.gettingStarted?.progress || 0}%` }} />
             </div>
 
             <div className="checklist">
-              <Link href="/english/goals" className="checklist-item completed">
-                <div className="check-icon-wrapper">
-                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                    <circle cx="10" cy="10" r="10" fill="#10b981"/>
-                    <path d="M6 10L9 13L14 7" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </div>
-                <span className="check-text">Set your learning goals</span>
-              </Link>
-
-              <Link href="/english/test" className="checklist-item current">
-                <div className="check-icon-wrapper">
-                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                    <circle cx="10" cy="10" r="9" stroke="#6366f1" strokeWidth="2" fill="white"/>
-                  </svg>
-                </div>
-                <span className="check-text">Take placement test</span>
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ marginLeft: "auto" }}>
-                  <path d="M6 4L10 8L6 12" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </Link>
-
-              <Link href="/english/writing" className="checklist-item">
-                <div className="check-icon-wrapper">
-                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                    <circle cx="10" cy="10" r="9" stroke="#64748b" strokeWidth="2" fill="white"/>
-                  </svg>
-                </div>
-                <span className="check-text">Complete your first writing task</span>
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ marginLeft: "auto" }}>
-                  <path d="M6 4L10 8L6 12" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </Link>
-
-              <Link href="/english/progress" className="checklist-item">
-                <div className="check-icon-wrapper">
-                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                    <circle cx="10" cy="10" r="9" stroke="#64748b" strokeWidth="2" fill="white"/>
-                  </svg>
-                </div>
-                <span className="check-text">Review your progress</span>
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ marginLeft: "auto" }}>
-                  <path d="M6 4L10 8L6 12" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </Link>
+              {stats?.gettingStarted?.tasks && stats.gettingStarted.tasks.length > 0 ? (
+                stats.gettingStarted.tasks.map((task, index) => {
+                  const isCompleted = task.completed;
+                  const isCurrent = !isCompleted && index === stats.gettingStarted.tasks.findIndex(t => !t.completed);
+                  
+                  return (
+                    <Link 
+                      key={task.id} 
+                      href={task.link} 
+                      className={`checklist-item ${isCompleted ? 'completed' : isCurrent ? 'current' : ''}`}
+                      onClick={async () => {
+                        // Refresh getting started tasks when navigating
+                        setTimeout(() => {
+                          fetchGettingStartedTasks();
+                        }, 1000);
+                      }}
+                    >
+                      <div className="check-icon-wrapper">
+                        {isCompleted ? (
+                          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <circle cx="10" cy="10" r="10" fill="#10b981"/>
+                            <path d="M6 10L9 13L14 7" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        ) : (
+                          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <circle cx="10" cy="10" r="9" stroke={isCurrent ? "#6366f1" : "#64748b"} strokeWidth="2" fill="white"/>
+                          </svg>
+                        )}
+                      </div>
+                      <span className="check-text">{task.title}</span>
+                      {!isCompleted && (
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ marginLeft: "auto" }}>
+                          <path d="M6 4L10 8L6 12" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      )}
+                    </Link>
+                  );
+                })
+              ) : (
+                // Fallback to default tasks while loading
+                <>
+                  <Link href="/english/goals" className="checklist-item">
+                    <div className="check-icon-wrapper">
+                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <circle cx="10" cy="10" r="9" stroke="#64748b" strokeWidth="2" fill="white"/>
+                      </svg>
+                    </div>
+                    <span className="check-text">Set your learning goals</span>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ marginLeft: "auto" }}>
+                      <path d="M6 4L10 8L6 12" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </Link>
+                  <Link href="/english/test" className="checklist-item">
+                    <div className="check-icon-wrapper">
+                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <circle cx="10" cy="10" r="9" stroke="#64748b" strokeWidth="2" fill="white"/>
+                      </svg>
+                    </div>
+                    <span className="check-text">Take placement test</span>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ marginLeft: "auto" }}>
+                      <path d="M6 4L10 8L6 12" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </Link>
+                </>
+              )}
             </div>
           </div>
 

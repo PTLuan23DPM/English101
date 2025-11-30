@@ -31,6 +31,7 @@ export function handleError(error: unknown): NextResponse {
     if (error instanceof ZodError) {
         return NextResponse.json(
             {
+                success: false,
                 error: "Validation error",
                 details: error.errors.map((e) => ({
                     path: e.path.join("."),
@@ -46,31 +47,45 @@ export function handleError(error: unknown): NextResponse {
         switch (error.code) {
             case "P2002":
                 return NextResponse.json(
-                    { error: "A record with this value already exists" },
+                    { success: false, error: "A record with this value already exists", code: error.code },
                     { status: 409 }
                 );
             case "P2025":
                 return NextResponse.json(
-                    { error: "Record not found" },
+                    { success: false, error: "Record not found", code: error.code },
                     { status: 404 }
                 );
             case "P2003":
                 return NextResponse.json(
-                    { error: "Invalid reference" },
+                    { success: false, error: "Invalid reference", code: error.code },
                     { status: 400 }
+                );
+            case "P1001":
+                return NextResponse.json(
+                    { success: false, error: "Database connection failed. Please check your database configuration.", code: error.code },
+                    { status: 503 }
                 );
             default:
                 return NextResponse.json(
-                    { error: "Database error", code: error.code },
+                    { success: false, error: "Database error", code: error.code },
                     { status: 500 }
                 );
         }
+    }
+    
+    // Prisma client initialization errors
+    if (error instanceof Prisma.PrismaClientInitializationError) {
+        return NextResponse.json(
+            { success: false, error: "Database connection error", code: "P1001" },
+            { status: 503 }
+        );
     }
 
     // Custom AppError
     if (error instanceof AppError) {
         return NextResponse.json(
             {
+                success: false,
                 error: error.message,
                 code: error.code,
                 details: error.details,
@@ -83,6 +98,7 @@ export function handleError(error: unknown): NextResponse {
     if (error instanceof Error) {
         return NextResponse.json(
             {
+                success: false,
                 error: process.env.NODE_ENV === "production"
                     ? "Internal server error"
                     : error.message,
@@ -93,7 +109,7 @@ export function handleError(error: unknown): NextResponse {
 
     // Unknown errors
     return NextResponse.json(
-        { error: "An unexpected error occurred" },
+        { success: false, error: "An unexpected error occurred" },
         { status: 500 }
     );
 }

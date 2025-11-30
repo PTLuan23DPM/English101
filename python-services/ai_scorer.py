@@ -105,17 +105,69 @@ def validate_writing_input(text: str) -> Tuple[bool, str]:
     return True, ""
 
 # Audio Utils (Speaking)
+def check_ffmpeg_available() -> bool:
+    """Check if ffmpeg is available in the system"""
+    try:
+        result = subprocess.run(
+            ['ffmpeg', '-version'],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            timeout=5
+        )
+        return result.returncode == 0
+    except (FileNotFoundError, subprocess.TimeoutExpired):
+        return False
+
 def convert_webm_to_wav(input_path: str, output_path: str) -> bool:
     """Convert audio to WAV 16kHz Mono using ffmpeg"""
+    # Check if ffmpeg is available
+    if not check_ffmpeg_available():
+        logger.error("FFmpeg is not installed or not in PATH. Please install ffmpeg first.")
+        return False
+    
     try:
+        # Use more robust ffmpeg options to handle Opus/WebM files
+        # -err_detect ignore_err: Ignore minor errors like Opus packet header warnings
+        # -f webm: Explicitly specify input format
+        # -c:a pcm_s16le: Explicitly specify output audio codec
         cmd = [
-            'ffmpeg', '-y', '-v', 'error',
+            'ffmpeg', '-y',
+            '-loglevel', 'error',  # Only show errors, suppress warnings
+            '-err_detect', 'ignore_err',  # Ignore minor parsing errors
+            '-f', 'webm',  # Explicitly specify input format
             '-i', input_path,
-            '-ac', '1', '-ar', '16000',
+            '-ac', '1',  # Mono
+            '-ar', '16000',  # 16kHz sample rate
+            '-c:a', 'pcm_s16le',  # PCM 16-bit little-endian
             output_path
         ]
-        subprocess.run(cmd, check=True, timeout=30)
-        return True
+        
+        # Run ffmpeg and suppress stderr to hide Opus warnings
+        # Opus packet header warnings are non-fatal and can be safely ignored
+        with open(os.devnull, 'w') as devnull:
+            result = subprocess.run(
+                cmd, 
+                check=True, 
+                timeout=30,
+                stdout=subprocess.PIPE,
+                stderr=devnull,  # Completely suppress stderr to hide Opus warnings
+            )
+        
+        # Check if output file was created successfully
+        if os.path.exists(output_path) and os.path.getsize(output_path) > 0:
+            return True
+        else:
+            logger.error(f"FFmpeg conversion failed: output file not created or empty")
+            return False
+            
+    except subprocess.CalledProcessError as e:
+        # Check if file was created despite the error (Opus warnings are non-fatal)
+        if os.path.exists(output_path) and os.path.getsize(output_path) > 0:
+            # File was created successfully, Opus warnings can be ignored
+            return True
+        # If file wasn't created, log the error
+        logger.error(f"FFmpeg conversion failed with exit code {e.returncode}")
+        return False
     except Exception as e:
         logger.error(f"FFmpeg Error: {e}")
         return False
@@ -145,7 +197,17 @@ def score_writing():
         return jsonify({'error': 'Writing module not loaded'}), 503
         
     try:
-        data = request.json
+        # Try to get JSON data, force=True allows parsing even without correct Content-Type
+        data = request.get_json(force=True, silent=True)
+        if data is None:
+            # If JSON parsing failed, try to get from form data
+            data = {
+                'text': request.form.get('text', ''),
+                'prompt': request.form.get('prompt', ''),
+                'level': request.form.get('level', 'B2'),
+                'task_type': request.form.get('task_type', 'essay')
+            }
+        
         text = data.get('text', '').strip()
         prompt = data.get('prompt', '').strip()
         level = data.get('level', 'B2')
@@ -233,10 +295,18 @@ def score_speech():
         score_10 = round(min(10, final / 10), 1)
         cefr, desc = score_to_cefr(score_10)
         
+        # Extract values from result for easy access
+        transcription = result.get('transcription', '')
+        content_accuracy = result.get('content_accuracy', 0)
+        pronunciation_score = result.get('pronunciation_score', 0)
+        
         response = {
             'score_10': score_10,
             'overall_score': score_10,
             'cefr_level': cefr,
+            'transcription': transcription,  # Add transcription at top level
+            'content_accuracy': content_accuracy,  # Add content_accuracy at top level
+            'pronunciation_score': pronunciation_score,  # Add pronunciation_score at top level
             'details': result,
             'mode': mode
         }
@@ -250,6 +320,16 @@ def score_speech():
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
+    # Check for required system dependencies
+    if not check_ffmpeg_available():
+        logger.warning("⚠️  FFmpeg is not available. Audio conversion features will not work.")
+        logger.warning("   Please install ffmpeg:")
+        logger.warning("   - Windows: Download from https://ffmpeg.org/download.html or use: choco install ffmpeg")
+        logger.warning("   - Linux: sudo apt-get install ffmpeg")
+        logger.warning("   - Mac: brew install ffmpeg")
+    else:
+        logger.info("✅ FFmpeg is available")
+    
     port = int(os.environ.get('PORT', 8080))
     logger.info(f"🚀 AI Scorer running on port {port}")
     app.run(host='0.0.0.0', port=port)

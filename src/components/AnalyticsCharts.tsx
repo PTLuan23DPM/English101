@@ -49,19 +49,36 @@ export default function AnalyticsCharts({
   const COLORS = ["#6366f1", "#8b5cf6", "#ec4899", "#f59e0b", "#10b981", "#06b6d4"];
 
   useEffect(() => {
-    // Prepare skills chart data
-    const skills = skillsBreakdown.map((item) => ({
-      skill: item.skill.replace("_", " ").replace("WRITING", "Writing").replace("READING", "Reading").replace("LISTENING", "Listening").replace("SPEAKING", "Speaking"),
-      value: item.avgScore || 0,
-      fullMark: 100,
-    }));
+    // Format skill names
+    const formatSkillName = (skill: string) => {
+      return skill
+        .replace(/_/g, " ")
+        .replace("WRITING", "Writing")
+        .replace("READING", "Reading")
+        .replace("LISTENING", "Listening")
+        .replace("SPEAKING", "Speaking")
+        .replace("GRAMMAR", "Grammar")
+        .replace("VOCABULARY", "Vocabulary")
+        .replace("PRONUNCIATION", "Pronunciation");
+    };
+
+    // Prepare skills chart data (sorted by score for better visualization)
+    const skills = skillsBreakdown
+      .map((item) => ({
+        skill: formatSkillName(item.skill),
+        value: item.avgScore || 0,
+        fullMark: 100,
+      }))
+      .sort((a, b) => b.value - a.value); // Sort by score descending
 
     // Prepare performance bar chart data
-    const performance = skillsBreakdown.map((item) => ({
-      skill: item.skill.replace("_", " ").replace("WRITING", "Writing").replace("READING", "Reading").replace("LISTENING", "Listening").replace("SPEAKING", "Speaking"),
-      completed: item.completed,
-      avgScore: item.avgScore || 0,
-    }));
+    const performance = skillsBreakdown
+      .map((item) => ({
+        skill: formatSkillName(item.skill),
+        completed: item.completed,
+        avgScore: item.avgScore || 0,
+      }))
+      .sort((a, b) => b.avgScore - a.avgScore); // Sort by score descending
 
     setSkillsData(skills);
     setPerformanceData(performance);

@@ -1,13 +1,29 @@
-__pycache__
-*.pyc
-*.pyo
-*.pyd
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
 .Python
+
+# Virtual environments
 venv/
 env/
-.venv
-*.log
-.DS_Store
-.vscode
-.idea
+ENV/
 
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+logs/
+*.log
+
+# Model files (will be mounted as volume)
+ai-models/*.pth
+ai-models/*.h5
+ai-models/*.pb
+
+# Keep directory structure but ignore large files
+!ai-models/.gitkeep

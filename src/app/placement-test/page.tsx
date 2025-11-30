@@ -171,8 +171,40 @@ export default function PlacementTestPage() {
       if (!response.ok) {
         // Response was parsed successfully, but contains error
         const errorMessage = result?.error || result?.message || response.statusText || "Failed to submit test";
-        console.error("Submit failed:", response.status, errorMessage);
-        throw new Error(errorMessage);
+        const errorDetails = result?.details || result?.message;
+        
+        // Log error for debugging (only in development)
+        if (process.env.NODE_ENV === "development") {
+          console.error("Submit failed:", {
+            status: response.status,
+            statusText: response.statusText,
+            error: errorMessage,
+            details: errorDetails,
+            fullResponse: result
+          });
+        }
+        
+        // Handle different error types
+        let userFriendlyMessage = "Failed to submit test. Please try again.";
+        
+        if (response.status === 401) {
+          userFriendlyMessage = "Your session has expired. Please log in again.";
+          // Optionally redirect to login
+          setTimeout(() => {
+            window.location.href = "/authentication/login?callbackUrl=/placement-test";
+          }, 2000);
+        } else if (response.status === 500) {
+          userFriendlyMessage = `Server error: ${errorMessage}`;
+          if (errorDetails && process.env.NODE_ENV === "development") {
+            userFriendlyMessage += ` (${errorDetails})`;
+          }
+        } else if (response.status === 400) {
+          userFriendlyMessage = errorMessage || "Invalid request. Please check your answers.";
+        } else {
+          userFriendlyMessage = errorMessage;
+        }
+        
+        throw new Error(userFriendlyMessage);
       }
 
       // Show result modal instead of toast

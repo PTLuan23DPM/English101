@@ -10,6 +10,13 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [emailErr, setEmailErr] = useState("");
   const [pwErr, setPwErr] = useState("");
+  
+  // Helper to get callbackUrl from query params
+  const getCallbackUrl = () => {
+    if (typeof window === "undefined") return null;
+    const params = new URLSearchParams(window.location.search);
+    return params.get("callbackUrl");
+  };
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -45,13 +52,48 @@ export default function LoginPage() {
           description: "Invalid email or password. Please try again.",
         });
       } else if (result?.ok) {
-        toast.success("Login successful!", {
-          description: "Redirecting to your dashboard...",
-        });
-        // Redirect to dashboard
-        setTimeout(() => {
-          window.location.href = "/english/dashboard";
-        }, 1000);
+        // Wait a bit for session to update, then check role
+        setTimeout(async () => {
+          try {
+            // Fetch session to get user role
+            const response = await fetch("/api/auth/session");
+            const sessionData = await response.json();
+            const userRole = sessionData?.user?.role || "USER";
+            const placementTestCompleted = sessionData?.user?.placementTestCompleted || false;
+            
+            // Check callbackUrl from query params
+            const callbackUrl = getCallbackUrl();
+            
+            // Determine redirect destination
+            let redirectPath = "/english/dashboard";
+            
+            if (userRole === "ADMIN") {
+              // Admin always goes to admin dashboard
+              redirectPath = callbackUrl?.startsWith("/admin-dashboard") 
+                ? callbackUrl 
+                : "/admin-dashboard/dashboard";
+              toast.success("Login successful!", {
+                description: "Redirecting to admin dashboard...",
+              });
+            } else {
+              // Regular users
+              if (callbackUrl && !callbackUrl.startsWith("/admin-dashboard")) {
+                redirectPath = callbackUrl;
+              } else if (!placementTestCompleted) {
+                redirectPath = "/placement-test";
+              }
+              toast.success("Login successful!", {
+                description: "Redirecting to your dashboard...",
+              });
+            }
+            
+            window.location.href = redirectPath;
+          } catch (error) {
+            console.error("Error fetching session:", error);
+            // Fallback: redirect to dashboard
+            window.location.href = "/english/dashboard";
+          }
+        }, 500);
       }
     } catch (error) {
       console.error("Login error:", error);
@@ -84,7 +126,11 @@ export default function LoginPage() {
             <button
               className="google-auth-btn"
               type="button"
-              onClick={() => signIn("google", { callbackUrl: "/english/dashboard" })}
+              onClick={async () => {
+                const callbackUrl = getCallbackUrl();
+                const redirectUrl = callbackUrl || "/english/dashboard";
+                await signIn("google", { callbackUrl: redirectUrl });
+              }}
             >
               <svg className="google-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>

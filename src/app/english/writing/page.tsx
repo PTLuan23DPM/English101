@@ -104,9 +104,12 @@ export default function WritingPage() {
   const [showExpandMenu, setShowExpandMenu] = useState(false);
   const [showSelfReview, setShowSelfReview] = useState(false);
 
+  // Use only hardcoded tasks for user page
+  const SOURCE_TASKS: WritingTask[] = WRITING_TASKS;
+
   // Filter tasks by type, level, and search
   const filteredTasks = useMemo(() => {
-    return WRITING_TASKS.filter(task => {
+    return SOURCE_TASKS.filter(task => {
       const matchesType = filterType === "All types" || task.type === filterType;
       const matchesLevel = levelFilter === "All levels" || task.level === levelFilter;
       const matchesSearch = !searchTerm || 
@@ -115,10 +118,10 @@ export default function WritingPage() {
         task.type.toLowerCase().includes(searchTerm.toLowerCase());
       return matchesType && matchesLevel && matchesSearch;
     });
-  }, [filterType, levelFilter, searchTerm]);
+  }, [SOURCE_TASKS, filterType, levelFilter, searchTerm]);
 
-  const uniqueTypes = ["All types", ...Array.from(new Set(WRITING_TASKS.map(t => t.type)))];
-  const uniqueLevels = ["All levels", ...Array.from(new Set(WRITING_TASKS.map(t => t.level)))];
+  const uniqueTypes = ["All types", ...Array.from(new Set(SOURCE_TASKS.map(t => t.type)))];
+  const uniqueLevels = ["All levels", ...Array.from(new Set(SOURCE_TASKS.map(t => t.level)))];
 
   const currentPrompt = selectedTask || null;
 

@@ -104,6 +104,17 @@ enum MediaType {
   PDF
 }
 
+enum NotificationType {
+  AUTOMATIC
+  MANUAL
+}
+
+enum NotificationTrigger {
+  STREAK_WARNING      // Thông báo sắp hết chuỗi
+  PRACTICE_REMINDER   // Nhắc nhở làm bài tập
+  STREAK_EXPIRED      // Quá hạn, nhắc vào học để giữ chuỗi
+}
+
 // ------------------------------------------------------
 // Auth (NextAuth.js 5+)
 // ------------------------------------------------------
@@ -647,7 +658,18 @@ model Notification {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // New fields for notification management
+  notificationType NotificationType @default(MANUAL) // AUTOMATIC or MANUAL
+  trigger          NotificationTrigger? // For automatic notifications
+  active           Boolean            @default(true) // Enable/disable notification
+  scheduleTime     DateTime?          // For scheduled notifications
+  conditions       Json?              // Additional conditions for automatic notifications
+  targetUserIds    Json?              // Array of user IDs for targeted automatic notifications (null = all users)
+
   @@index([authorId])
+  @@index([notificationType])
+  @@index([trigger])
+  @@index([active])
 }
 
 // User-specific notifications (sent to individual users)
@@ -664,8 +686,149 @@ model UserNotification {
   readAt    DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  
+  // Link to notification template (for automatic notifications)
+  notificationId String? // Reference to Notification model if sent automatically
 
   @@index([userId])
   @@index([userId, read])
   @@index([sentBy])
+  @@index([notificationId])
+}
+
+// ------------------------------------------------------
+// Writing Tasks (for Writing Practice)
+// ------------------------------------------------------
+model WritingTask {
+  id          String   @id @default(cuid())
+  title       String
+  type        String   // Sentence Building, Paragraph Writing, Email Writing, etc.
+  level       String   // A1, A2, B1, B2, C1, C2
+  prompt      String   @db.Text
+  targetWords String   // e.g., "50-80 words"
+  tips        String[] // Array of tip strings
+  recommended Boolean  @default(false)
+  icon        String?  @default("📝")
+  color       String?  @default("blue")
+  order       Int      @default(0)
+  active      Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([level])
+  @@index([type])
+  @@index([active, order])
+}
+
+// ------------------------------------------------------
+// Reading Tasks (for Reading Practice)
+// ------------------------------------------------------
+model ReadingTask {
+  id            String   @id @default(cuid())
+  title         String
+  subtitle      String?
+  cefr          String   // A1, A2, B1, B2, C1, C2
+  genre         String   // Workplace Drama, News Article, etc.
+  source        String?
+  tags          String[] // Array of tag strings
+  estimatedTime Int?     // minutes
+  wordCount     Int?
+  coverEmoji    String?  @default("📖")
+  gradient      String?  // CSS gradient string
+  readingSkills String[] // Array of skill strings
+  keyIdeas      String[] // Array of key idea strings
+  vocabulary    Json?    // Array of {word, meaning, example}
+  contentSections Json?  // Array of {heading, summary?, paragraphs[]}
+  exercises     Json?    // Array of exercise objects
+  recommended   Boolean  @default(false)
+  order         Int      @default(0)
+  active        Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([cefr])
+  @@index([genre])
+  @@index([active, order])
+}
+
+// ------------------------------------------------------
+// Listening Tasks (for Listening Practice)
+// ------------------------------------------------------
+model ListeningTask {
+  id          String   @id @default(cuid())
+  title       String
+  type        String   // Conversation, Podcast, Lecture, etc.
+  level       String   // A1, A2, B1, B2, C1, C2
+  description String   @db.Text
+  duration    String   // e.g., "4:10"
+  speakers    String   // e.g., "2 speakers"
+  accent      String   // e.g., "American", "British"
+  questions   Int      @default(0)
+  tags        String[] // Array of tag strings
+  recommended Boolean  @default(false)
+  icon        String?  @default("🎧")
+  color       String?  @default("blue")
+  order       Int      @default(0)
+  active      Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([level])
+  @@index([type])
+  @@index([active, order])
+}
+
+// ------------------------------------------------------
+// Speaking Tasks (for Speaking Practice)
+// ------------------------------------------------------
+model SpeakingTask {
+  id          String   @id @default(cuid())
+  title       String
+  type        String   // Pronunciation, Topic Discussion, Role Play, etc.
+  level       String   // A1, A2, B1, B2, C1, C2
+  prompt      String   @db.Text
+  timeLimit   String   // e.g., "2 min", "3 min"
+  tips        String[] // Array of tip strings
+  vocab       Json?    // Array of {word, ipa}
+  phrases     String[] // Array of phrase strings
+  recommended Boolean  @default(false)
+  icon        String?  @default("🎤")
+  color       String?  @default("blue")
+  order       Int      @default(0)
+  active      Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([level])
+  @@index([type])
+  @@index([active, order])
+}
+
+// ------------------------------------------------------
+// Grammar Tasks (for Grammar Practice)
+// ------------------------------------------------------
+model GrammarTask {
+  id          String   @id @default(cuid())
+  title       String
+  level       String   // A1-A2, B1-B2, C1
+  introduction String  @db.Text
+  examples    Json?    // Array of example objects
+  exercises   Json?    // Array of exercise objects
+  exampleCount Int     @default(0)
+  exerciseCount Int    @default(0)
+  category    String?  // e.g., "Tenses", "Conditionals"
+  recommended Boolean  @default(false)
+  order       Int      @default(0)
+  active      Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([level])
+  @@index([category])
+  @@index([active, order])
 }

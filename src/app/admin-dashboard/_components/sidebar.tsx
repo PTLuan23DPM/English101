@@ -22,7 +22,7 @@ const navItems = [
         <path d="M13 3.13C13.8604 3.35031 14.623 3.85071 15.1676 4.55232C15.7122 5.25392 16.0078 6.11683 16.0078 7.005C16.0078 7.89318 15.7122 8.75608 15.1676 9.45769C14.623 10.1593 13.8604 10.6597 13 10.88" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
       </svg>
     ) },
-  { id: "courses", label: "Quản Lý Khóa Học", href: "/admin-dashboard/courses", icon: (
+  { id: "courses", label: "Quản Lý Bài Tập", href: "/admin-dashboard/courses", icon: (
       <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M2 6C2 4.89543 2.89543 4 4 4H16C17.1046 4 18 4.89543 18 6V16C18 17.1046 17.1046 18 16 18H4C2.89543 18 2 17.1046 2 16V6Z" stroke="currentColor" strokeWidth="1.5" fill="none"/>
         <path d="M2 8H18M6 4V8M14 4V8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
@@ -40,12 +40,6 @@ const navItems = [
   { id: "notifications", label: "Quản lí thông báo", href: "/admin-dashboard/notifications", icon: (
       <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M10 2C6.68629 2 4 4.68629 4 8V11.5858L2.29289 13.2929C2.10536 13.4804 2 13.7348 2 14V16C2 16.5523 2.44772 17 3 17H17C17.5523 17 18 16.5523 18 16V14C18 13.7348 17.8946 13.4804 17.7071 13.2929L16 11.5858V8C16 4.68629 13.3137 2 10 2Z" stroke="currentColor" strokeWidth="1.5" fill="none" />
-      </svg>
-    ) },
-  { id: "settings", label: "Settings", href: "/admin-dashboard/settings", icon: (
-      <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="10" cy="10" r="2" fill="currentColor" />
-        <path d="M10 0V3M10 17V20M0 10H3M17 10H20M2.34 2.34L4.46 4.46M15.54 15.54L17.66 17.66M17.66 2.34L15.54 4.46M4.46 15.54L2.34 17.66" stroke="currentColor" strokeWidth="1.5" />
       </svg>
     ) },
 ];

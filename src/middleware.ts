@@ -77,18 +77,32 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  // Admin users don't need placement test - skip all placement test checks for admins
+  const isAdmin = userRole === "ADMIN";
+
   // If user is logged in but hasn't completed placement test
-  if (isLoggedIn && !placementTestCompleted && isProtectedRoute && !isPlacementTestRoute) {
+  // Skip this check for admin users
+  if (isLoggedIn && !isAdmin && !placementTestCompleted && isProtectedRoute && !isPlacementTestRoute) {
     return NextResponse.redirect(new URL("/placement-test", request.url));
   }
 
   // If user completed test but still trying to access placement test
-  if (isLoggedIn && placementTestCompleted && isPlacementTestRoute) {
-    return NextResponse.redirect(new URL("/english/dashboard", request.url));
+  // Admin should not access placement test
+  if (isLoggedIn && isPlacementTestRoute) {
+    if (isAdmin) {
+      return NextResponse.redirect(new URL("/admin-dashboard/dashboard", request.url));
+    }
+    if (placementTestCompleted) {
+      return NextResponse.redirect(new URL("/english/dashboard", request.url));
+    }
   }
 
   // If the user is logged in and trying to access auth routes
   if (isAuthRoute && isLoggedIn) {
+    // Admin goes to admin dashboard, regular users go to placement test or dashboard
+    if (isAdmin) {
+      return NextResponse.redirect(new URL("/admin-dashboard/dashboard", request.url));
+    }
     // If they haven't completed placement test, send them there
     if (!placementTestCompleted) {
       return NextResponse.redirect(new URL("/placement-test", request.url));
@@ -98,10 +112,18 @@ export async function middleware(request: NextRequest) {
 
   // Redirect from root /english to dashboard if logged in
   if (pathname === "/english" && isLoggedIn) {
+    if (isAdmin) {
+      return NextResponse.redirect(new URL("/admin-dashboard/dashboard", request.url));
+    }
     if (!placementTestCompleted) {
       return NextResponse.redirect(new URL("/placement-test", request.url));
     }
     return NextResponse.redirect(new URL("/english/dashboard", request.url));
+  }
+
+  // Redirect from /admin-dashboard to /admin-dashboard/dashboard
+  if (pathname === "/admin-dashboard" && isLoggedIn && isAdmin) {
+    return NextResponse.redirect(new URL("/admin-dashboard/dashboard", request.url));
   }
 
   // Allow homepage (/) for everyone - no redirect

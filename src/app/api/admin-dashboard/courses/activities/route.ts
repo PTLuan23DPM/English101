@@ -4,7 +4,8 @@ import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { handleError } from "@/lib/error-handler";
 
-// GET: Lấy danh sách activities (có thể filter theo unitId)
+// GET: Lấy danh sách activities (có thể filter theo unitId, skill)
+// For WRITING skill, reuse the same query logic as user page to ensure data matches
 export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -25,9 +26,123 @@ export async function GET(req: NextRequest) {
 
     const searchParams = req.nextUrl.searchParams;
     const unitId = searchParams.get("unitId");
+    const skill = searchParams.get("skill");
+    const level = searchParams.get("level");
+    const type = searchParams.get("type");
 
+    // For WRITING skill, use the same query logic as user page
+    // Reuse the exact same where clause and orderBy from activityService.getActivitiesBySkill
+    if (skill && skill.toUpperCase() === "WRITING") {
+      try {
+        // Build where clause exactly like activityService.getActivitiesBySkill
+        const whereClause: any = {
+          skill: "WRITING",
+          ...(level && { level: level as any }),
+          ...(type && { type: type as any }),
+        };
+
+        console.log("[Admin Activities API] WRITING skill query:", JSON.stringify(whereClause, null, 2));
+
+        // Use the same orderBy as user page: [{ level: "asc" }, { createdAt: "desc" }]
+        // Use the EXACT same baseInclude as activityService.getActivitiesBySkill for WRITING
+        // Then enhance with admin-specific fields
+        const baseInclude: any = {
+          unit: {
+            select: {
+              title: true,
+              level: true,
+              // Add id and module for admin (not in user query, but needed for admin display)
+              id: true,
+              module: {
+                select: {
+                  id: true,
+                  code: true,
+                  title: true,
+                },
+              },
+            },
+          },
+          questions: {
+            select: {
+              id: true,
+              order: true,
+              type: true,
+              score: true,
+            },
+          },
+          _count: {
+            select: {
+              questions: true,
+            },
+          },
+        };
+
+        // Admin-specific includes (thêm vào, không thay đổi base)
+        const adminInclude = {
+          author: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+          media: {
+            select: {
+              id: true,
+              url: true,
+              type: true,
+              durationS: true,
+            },
+          },
+        };
+
+        const activities = await prisma.activity.findMany({
+          where: whereClause,
+          orderBy: [
+            { level: "asc" },
+            { createdAt: "desc" },
+          ],
+          include: {
+            ...baseInclude,
+            ...adminInclude,
+          },
+        });
+
+        console.log(`[Admin Activities API] Found ${activities.length} WRITING activities`);
+
+        return NextResponse.json({
+          success: true,
+          activities,
+        });
+      } catch (dbError: any) {
+        if (
+          dbError?.code === "P2021" ||
+          dbError?.message?.includes("does not exist")
+        ) {
+          return NextResponse.json(
+            {
+              error: "Database table not found. Please run migrations: npm run db:migrate",
+              details: "The Activity table does not exist in the database.",
+              migrationCommand: "npm run db:migrate",
+            },
+            { status: 500 }
+          );
+        }
+        throw dbError;
+      }
+    }
+
+    // For other skills, use the original query logic
     const where: any = {};
     if (unitId) where.unitId = unitId;
+    if (skill) {
+      // Ensure skill is a valid enum value
+      where.skill = skill.toUpperCase();
+    }
+    if (level) where.level = level;
+    if (type) where.type = type;
+    
+    console.log("[Activities API] Query params:", { unitId, skill, level, type, where });
 
     let activities;
     try {

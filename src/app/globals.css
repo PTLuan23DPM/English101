@@ -14262,6 +14262,37 @@ input:checked+.toggle-slider:before {
   gap: 16px;
 }
 
+.view-toggle {
+  display: flex;
+  gap: 8px;
+  background: var(--color-gray-100);
+  padding: 4px;
+  border-radius: 8px;
+}
+
+.view-toggle-btn {
+  padding: 8px 16px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-slate-600);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.view-toggle-btn:hover {
+  color: var(--color-teal-600);
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.view-toggle-btn.active {
+  background: white;
+  color: var(--color-teal-600);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
 .manager-filters {
   display: flex;
   gap: 8px;
@@ -15128,7 +15159,8 @@ input:checked+.toggle-slider:before {
 .modules-manager,
 .units-manager,
 .activities-manager,
-.questions-manager {
+.questions-manager,
+.skill-content-manager {
   width: 100%;
 }
 

@@ -25,9 +25,16 @@ export async function GET(req: NextRequest) {
 
     const searchParams = req.nextUrl.searchParams;
     const moduleId = searchParams.get("moduleId");
+    const skill = searchParams.get("skill");
 
     const where: any = {};
     if (moduleId) where.moduleId = moduleId;
+    if (skill) {
+      // Ensure skill is a valid enum value
+      where.skill = skill.toUpperCase();
+    }
+    
+    console.log("[Units API] Query params:", { moduleId, skill, where });
 
     let units;
     try {

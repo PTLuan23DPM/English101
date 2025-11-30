@@ -36,35 +36,59 @@ export class PlacementTestService {
             answers: any[];
         }
     ) {
-        const { level, description } = this.determineCEFRLevel(data.score);
+        try {
+            console.log("[PlacementTestService] Saving test result for user:", userId);
+            const { level, description } = this.determineCEFRLevel(data.score);
+            console.log("[PlacementTestService] Determined CEFR level:", level);
 
-        // Save test result
-        const testResult = await prisma.placementTestResult.create({
-            data: {
-                userId,
-                score: data.score,
-                totalQuestions: data.totalQuestions,
+            // Check if user exists
+            const userExists = await prisma.user.findUnique({
+                where: { id: userId },
+                select: { id: true }
+            });
+
+            if (!userExists) {
+                console.error("[PlacementTestService] User not found:", userId);
+                throw new Error(`User with ID ${userId} not found`);
+            }
+
+            // Save test result
+            console.log("[PlacementTestService] Creating PlacementTestResult...");
+            const testResult = await prisma.placementTestResult.create({
+                data: {
+                    userId,
+                    score: data.score,
+                    totalQuestions: data.totalQuestions,
+                    cefrLevel: level,
+                    answers: data.answers,
+                },
+            });
+            console.log("[PlacementTestService] PlacementTestResult created:", testResult.id);
+
+            // Update user's level and mark test as completed
+            console.log("[PlacementTestService] Updating User...");
+            await prisma.user.update({
+                where: { id: userId },
+                data: {
+                    placementTestCompleted: true,
+                    cefrLevel: level,
+                    placementScore: data.score,
+                    lastActive: new Date(),
+                },
+            });
+            console.log("[PlacementTestService] User updated successfully");
+
+            return {
+                testResult,
                 cefrLevel: level,
-                answers: data.answers,
-            },
-        });
-
-        // Update user's level and mark test as completed
-        await prisma.user.update({
-            where: { id: userId },
-            data: {
-                placementTestCompleted: true,
-                cefrLevel: level,
-                placementScore: data.score,
-                lastActive: new Date(),
-            },
-        });
-
-        return {
-            testResult,
-            cefrLevel: level,
-            description,
-        };
+                description,
+            };
+        } catch (error: any) {
+            console.error("[PlacementTestService] Error in saveTestResult:", error);
+            console.error("[PlacementTestService] Error code:", error?.code);
+            console.error("[PlacementTestService] Error message:", error?.message);
+            throw error;
+        }
     }
 
     /**

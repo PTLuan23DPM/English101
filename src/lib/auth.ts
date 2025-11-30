@@ -68,6 +68,7 @@ export const authOptions: NextAuthOptions = {
             return baseUrl + "/english/dashboard";
         },
         async jwt({ token, user, account, trigger }) {
+            // Always preserve token.id if it exists
             if (user) {
                 token.id = user.id;
                 token.role = ((user as { role?: "USER" | "ADMIN" }).role ?? "USER") as "USER" | "ADMIN";
@@ -75,13 +76,31 @@ export const authOptions: NextAuthOptions = {
                 token.cefrLevel = (user as { cefrLevel?: string | null }).cefrLevel || null;
                 token.language = (user as { language?: string }).language || "en";
                 token.theme = (user as { theme?: string }).theme || "light";
+            } else if (!token.id && token.email) {
+                // Fallback: If token.id is missing but we have email, fetch user from DB
+                try {
+                    const dbUser = await prisma.user.findUnique({
+                        where: { email: token.email as string },
+                        select: { id: true, role: true, placementTestCompleted: true, cefrLevel: true, language: true, theme: true }
+                    });
+                    if (dbUser) {
+                        token.id = dbUser.id;
+                        token.role = dbUser.role;
+                        token.placementTestCompleted = dbUser.placementTestCompleted || false;
+                        token.cefrLevel = dbUser.cefrLevel;
+                        token.language = dbUser.language || "en";
+                        token.theme = dbUser.theme || "light";
+                    }
+                } catch (error) {
+                    console.error("[JWT] Error fetching user:", error);
+                }
             }
             // Store provider info for first-time login
             if (account) {
                 token.provider = account.provider;
             }
             // Refresh token data on update
-            if (trigger === "update") {
+            if (trigger === "update" && token.id) {
                 const updatedUser = await prisma.user.findUnique({
                     where: { id: token.id as string },
                     select: {
@@ -104,7 +123,27 @@ export const authOptions: NextAuthOptions = {
         },
         async session({ session, token }) {
             if (session.user) {
-                session.user.id = token.id as string;
+                // Ensure token.id exists, if not try to get from email
+                if (!token.id && session.user.email) {
+                    try {
+                        const dbUser = await prisma.user.findUnique({
+                            where: { email: session.user.email },
+                            select: { id: true }
+                        });
+                        if (dbUser) {
+                            token.id = dbUser.id;
+                        }
+                    } catch (error) {
+                        console.error("[Session] Error fetching user ID:", error);
+                    }
+                }
+                
+                if (token.id) {
+                    session.user.id = token.id as string;
+                } else {
+                    console.warn("[Session] No user ID in token, session may be invalid");
+                }
+                
                 session.user.role = (token.role as "USER" | "ADMIN") || "USER";
                 (session.user as { placementTestCompleted?: boolean }).placementTestCompleted = token.placementTestCompleted || false;
                 (session.user as { cefrLevel?: string | null }).cefrLevel = token.cefrLevel || null;

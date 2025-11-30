@@ -3,15 +3,15 @@
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import ModulesManager from "./_components/ModulesManager";
-import UnitsManager from "./_components/UnitsManager";
-import ActivitiesManager from "./_components/ActivitiesManager";
-import QuestionsManager from "./_components/QuestionsManager";
+import { Skill } from "@prisma/client";
+import SkillContentManager from "./_components/SkillContentManager";
+
+type SkillTab = "WRITING" | "READING" | "LISTENING" | "SPEAKING" | "GRAMMAR";
 
 export default function CoursesManagementPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<"modules" | "units" | "activities" | "questions">("modules");
+  const [activeTab, setActiveTab] = useState<SkillTab>("WRITING");
 
   useEffect(() => {
     if (status === "loading") return;
@@ -40,41 +40,44 @@ export default function CoursesManagementPage() {
   return (
     <div className="courses-management-page">
       <div className="courses-management-header">
-        <h1 className="courses-management-title">Quản Lý Khóa Học & Bài Học</h1>
+        <h1 className="courses-management-title">Quản Lý Bài Tập</h1>
       </div>
 
       <div className="courses-tabs">
         <button
-          className={`courses-tab ${activeTab === "modules" ? "active" : ""}`}
-          onClick={() => setActiveTab("modules")}
+          className={`courses-tab ${activeTab === "WRITING" ? "active" : ""}`}
+          onClick={() => setActiveTab("WRITING")}
         >
-          Modules
+          Writing
         </button>
         <button
-          className={`courses-tab ${activeTab === "units" ? "active" : ""}`}
-          onClick={() => setActiveTab("units")}
+          className={`courses-tab ${activeTab === "READING" ? "active" : ""}`}
+          onClick={() => setActiveTab("READING")}
         >
-          Units (Bài Học)
+          Reading
         </button>
         <button
-          className={`courses-tab ${activeTab === "activities" ? "active" : ""}`}
-          onClick={() => setActiveTab("activities")}
+          className={`courses-tab ${activeTab === "LISTENING" ? "active" : ""}`}
+          onClick={() => setActiveTab("LISTENING")}
         >
-          Activities (Bài Tập)
+          Listening
         </button>
         <button
-          className={`courses-tab ${activeTab === "questions" ? "active" : ""}`}
-          onClick={() => setActiveTab("questions")}
+          className={`courses-tab ${activeTab === "SPEAKING" ? "active" : ""}`}
+          onClick={() => setActiveTab("SPEAKING")}
         >
-          Questions (Câu Hỏi)
+          Speaking
+        </button>
+        <button
+          className={`courses-tab ${activeTab === "GRAMMAR" ? "active" : ""}`}
+          onClick={() => setActiveTab("GRAMMAR")}
+        >
+          Grammar
         </button>
       </div>
 
       <div className="courses-tab-content">
-        {activeTab === "modules" && <ModulesManager />}
-        {activeTab === "units" && <UnitsManager />}
-        {activeTab === "activities" && <ActivitiesManager />}
-        {activeTab === "questions" && <QuestionsManager />}
+        <SkillContentManager skill={activeTab as Skill} />
       </div>
     </div>
   );

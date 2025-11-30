@@ -1,5 +1,9 @@
 import { PrismaClient, CEFRLevel, Skill, ModuleType, ActivityType, QuestionType } from '@prisma/client';
 import bcrypt from 'bcryptjs';
+import { WRITING_TASKS } from '../src/app/english/writing/data/writingTasks';
+import { READING_LESSONS } from '../src/data/readingLessons';
+import { LISTENING_TASKS } from '../src/app/english/listening/data/listeningTasks';
+import { SPEAKING_TASKS } from '../src/app/english/speaking/data/speakingTasks';
 
 const prisma = new PrismaClient();
 
@@ -841,7 +845,516 @@ async function main() {
         ],
     });
 
+    // ===== SEED WRITING TASKS =====
+    console.log('📝 Seeding writing tasks...');
+    
+    const writingTasksData = [
+        {
+            id: "sentence-daily",
+            icon: "📝",
+            title: "Daily Routine",
+            type: "Sentence Building",
+            level: "A2",
+            prompt: "Write 5-7 sentences about your daily morning routine. Use simple present tense and time expressions.",
+            targetWords: "50-80 words",
+            tips: [
+                "Use time expressions: in the morning, at 7 AM, after breakfast",
+                "Use simple present tense: I wake up, I have breakfast",
+                "Connect sentences with: then, after that, finally",
+            ],
+            recommended: true,
+            color: "blue",
+            order: 1,
+        },
+        {
+            id: "sentence-weekend",
+            icon: "☀️",
+            title: "Weekend Activities",
+            type: "Sentence Building",
+            level: "A2",
+            prompt: "Describe what you usually do on weekends. Write 5-7 complete sentences.",
+            targetWords: "50-80 words",
+            tips: [
+                "Use frequency adverbs: usually, sometimes, often",
+                "Mention different activities",
+                "Use linking words to connect ideas",
+            ],
+            recommended: false,
+            color: "blue",
+            order: 2,
+        },
+        {
+            id: "para-hobby",
+            icon: "🎨",
+            title: "My Favorite Hobby",
+            type: "Paragraph Writing",
+            level: "B1",
+            prompt: "Describe your favorite hobby and explain why you enjoy it. Include details about how you got started and what you have learned.",
+            targetWords: "100-150 words",
+            tips: [
+                "Start with a topic sentence introducing your hobby",
+                "Use specific examples and details",
+                "End with a concluding sentence",
+            ],
+            recommended: true,
+            color: "green",
+            order: 3,
+        },
+        {
+            id: "para-travel",
+            icon: "✈️",
+            title: "A Memorable Trip",
+            type: "Paragraph Writing",
+            level: "B1",
+            prompt: "Write about a memorable trip or vacation. Describe where you went, what you did, and why it was special.",
+            targetWords: "120-150 words",
+            tips: [
+                "Use past tense to describe events",
+                "Include sensory details (what you saw, heard, felt)",
+                "Explain why this experience was meaningful",
+            ],
+            recommended: false,
+            color: "green",
+            order: 4,
+        },
+        {
+            id: "email-formal",
+            icon: "📧",
+            title: "Extension Request",
+            type: "Email Writing",
+            level: "B1",
+            prompt: "Write a formal email to your professor requesting an extension for your assignment. Explain your situation politely.",
+            targetWords: "120-180 words",
+            tips: [
+                "Start with: Dear Professor [Name],",
+                "Be polite and professional",
+                "End with: Best regards, [Your name]",
+            ],
+            recommended: false,
+            color: "purple",
+            order: 5,
+        },
+        {
+            id: "email-complaint",
+            icon: "💼",
+            title: "Product Complaint",
+            type: "Email Writing",
+            level: "B2",
+            prompt: "Write a formal complaint email to a company about a defective product you purchased. Request a refund or replacement.",
+            targetWords: "150-200 words",
+            tips: [
+                "State the problem clearly",
+                "Include relevant details (order number, date)",
+                "Be firm but polite",
+                "Clearly state what you want",
+            ],
+            recommended: false,
+            color: "purple",
+            order: 6,
+        },
+        {
+            id: "essay-discussion",
+            icon: "💬",
+            title: "Work From Home vs Office",
+            type: "Discussion",
+            level: "B2",
+            prompt: "Some people prefer to work from home, while others prefer to work in an office. Discuss both views and give your opinion.",
+            targetWords: "250-300 words",
+            tips: [
+                "Introduction: state the topic and your thesis",
+                "Body paragraph 1: advantages of working from home",
+                "Body paragraph 2: advantages of office work",
+                "Conclusion: summarize and state your opinion",
+            ],
+            recommended: true,
+            color: "teal",
+            order: 7,
+        },
+        {
+            id: "essay-advantage",
+            icon: "⚖️",
+            title: "Online Shopping",
+            type: "Advantage-Disadvantage",
+            level: "B2",
+            prompt: "Online shopping is becoming increasingly popular. Discuss the advantages and disadvantages of buying products online.",
+            targetWords: "250-300 words",
+            tips: [
+                "Introduction: introduce the topic",
+                "Body 1: discuss advantages with examples",
+                "Body 2: discuss disadvantages with examples",
+                "Conclusion: balanced summary",
+            ],
+            recommended: true,
+            color: "teal",
+            order: 8,
+        },
+        {
+            id: "essay-opinion",
+            icon: "📊",
+            title: "University Education",
+            type: "Opinion",
+            level: "B2",
+            prompt: "Some people believe university education should be free for all students. To what extent do you agree or disagree?",
+            targetWords: "250-300 words",
+            tips: [
+                "Introduction: clearly state your position",
+                "Body: provide 2-3 main arguments",
+                "Use examples and evidence",
+                "Conclusion: restate your opinion",
+            ],
+            recommended: false,
+            color: "teal",
+            order: 9,
+        },
+        {
+            id: "essay-problem",
+            icon: "🌍",
+            title: "Environmental Pollution",
+            type: "Problem-Solution",
+            level: "C1",
+            prompt: "Environmental pollution is a growing concern. What are the main causes of this problem and what solutions can you suggest?",
+            targetWords: "250-300 words",
+            tips: [
+                "Introduction: present the problem",
+                "Body 1: discuss main causes",
+                "Body 2: propose practical solutions",
+                "Conclusion: summarize key points",
+            ],
+            recommended: false,
+            color: "teal",
+            order: 10,
+        },
+        {
+            id: "essay-two-part",
+            icon: "❓",
+            title: "Technology and Children",
+            type: "Multi-Part",
+            level: "B2",
+            prompt: "Many children spend several hours per day on screens. Why is this the case? What are the effects on their development?",
+            targetWords: "250-300 words",
+            tips: [
+                "Introduction: acknowledge both questions",
+                "Body 1: answer first question (reasons)",
+                "Body 2: answer second question (effects)",
+                "Conclusion: brief summary",
+            ],
+            recommended: false,
+            color: "teal",
+            order: 11,
+        },
+    ];
+
+    for (const taskData of writingTasksData) {
+        await prisma.writingTask.upsert({
+            where: { id: taskData.id },
+            update: {
+                title: taskData.title,
+                icon: taskData.icon,
+                type: taskData.type,
+                level: taskData.level,
+                prompt: taskData.prompt,
+                targetWords: taskData.targetWords,
+                tips: taskData.tips,
+                recommended: taskData.recommended,
+                color: taskData.color,
+                order: taskData.order,
+                active: true,
+            },
+            create: {
+                id: taskData.id,
+                title: taskData.title,
+                icon: taskData.icon,
+                type: taskData.type,
+                level: taskData.level,
+                prompt: taskData.prompt,
+                targetWords: taskData.targetWords,
+                tips: taskData.tips,
+                recommended: taskData.recommended,
+                color: taskData.color,
+                order: taskData.order,
+                active: true,
+            },
+        });
+    }
+
+    console.log(`✅ Seeded ${writingTasksData.length} writing tasks`);
+
     console.log('✅ Database seeded successfully! 🎉');
+    // ===== 7. SEED WRITING TASKS =====
+    console.log('📝 Seeding Writing tasks...');
+    
+    for (let i = 0; i < WRITING_TASKS.length; i++) {
+        const task = WRITING_TASKS[i];
+        await prisma.writingTask.upsert({
+            where: { id: task.id },
+            update: {
+                title: task.title,
+                type: task.type,
+                level: task.level,
+                prompt: task.prompt,
+                targetWords: task.targetWords,
+                tips: task.tips,
+                recommended: task.recommended || false,
+                icon: task.icon,
+                color: task.color,
+                order: i,
+                active: true,
+            },
+            create: {
+                id: task.id,
+                title: task.title,
+                type: task.type,
+                level: task.level,
+                prompt: task.prompt,
+                targetWords: task.targetWords,
+                tips: task.tips,
+                recommended: task.recommended || false,
+                icon: task.icon,
+                color: task.color,
+                order: i,
+                active: true,
+            },
+        });
+    }
+    
+    console.log(`✅ Seeded ${WRITING_TASKS.length} Writing tasks`);
+
+    // ===== 8. SEED READING TASKS =====
+    console.log('📖 Seeding Reading tasks...');
+    
+    for (let i = 0; i < READING_LESSONS.length; i++) {
+        const lesson = READING_LESSONS[i];
+        await prisma.readingTask.upsert({
+            where: { id: lesson.id },
+            update: {
+                title: lesson.title,
+                subtitle: lesson.subtitle,
+                cefr: lesson.cefr,
+                genre: lesson.genre,
+                source: lesson.source,
+                tags: lesson.tags,
+                estimatedTime: lesson.estimatedTime,
+                wordCount: lesson.wordCount,
+                coverEmoji: lesson.coverEmoji,
+                gradient: lesson.gradient,
+                readingSkills: lesson.readingSkills,
+                keyIdeas: lesson.keyIdeas,
+                vocabulary: lesson.vocabulary as any,
+                contentSections: lesson.contentSections as any,
+                exercises: lesson.exercises as any,
+                recommended: false,
+                order: i,
+                active: true,
+            },
+            create: {
+                id: lesson.id,
+                title: lesson.title,
+                subtitle: lesson.subtitle,
+                cefr: lesson.cefr,
+                genre: lesson.genre,
+                source: lesson.source,
+                tags: lesson.tags,
+                estimatedTime: lesson.estimatedTime,
+                wordCount: lesson.wordCount,
+                coverEmoji: lesson.coverEmoji,
+                gradient: lesson.gradient,
+                readingSkills: lesson.readingSkills,
+                keyIdeas: lesson.keyIdeas,
+                vocabulary: lesson.vocabulary as any,
+                contentSections: lesson.contentSections as any,
+                exercises: lesson.exercises as any,
+                recommended: false,
+                order: i,
+                active: true,
+            },
+        });
+    }
+    
+    console.log(`✅ Seeded ${READING_LESSONS.length} Reading tasks`);
+
+    // ===== 9. SEED LISTENING TASKS =====
+    console.log('🎧 Seeding Listening tasks...');
+    
+    for (let i = 0; i < LISTENING_TASKS.length; i++) {
+        const task = LISTENING_TASKS[i];
+        await prisma.listeningTask.upsert({
+            where: { id: task.id },
+            update: {
+                title: task.title,
+                type: task.type,
+                level: task.level,
+                description: task.description,
+                duration: task.duration,
+                speakers: task.speakers,
+                accent: task.accent,
+                questions: task.questions,
+                tags: task.tags,
+                recommended: task.recommended || false,
+                icon: task.icon || "🎧",
+                color: task.color || "blue",
+                order: i,
+                active: true,
+            },
+            create: {
+                id: task.id,
+                title: task.title,
+                type: task.type,
+                level: task.level,
+                description: task.description,
+                duration: task.duration,
+                speakers: task.speakers,
+                accent: task.accent,
+                questions: task.questions,
+                tags: task.tags,
+                recommended: task.recommended || false,
+                icon: task.icon || "🎧",
+                color: task.color || "blue",
+                order: i,
+                active: true,
+            },
+        });
+    }
+    
+    console.log(`✅ Seeded ${LISTENING_TASKS.length} Listening tasks`);
+
+    // ===== 10. SEED SPEAKING TASKS =====
+    console.log('🎤 Seeding Speaking tasks...');
+    
+    for (let i = 0; i < SPEAKING_TASKS.length; i++) {
+        const task = SPEAKING_TASKS[i];
+        await prisma.speakingTask.upsert({
+            where: { id: task.id },
+            update: {
+                title: task.title,
+                type: task.type,
+                level: task.level,
+                prompt: task.prompt,
+                timeLimit: task.timeLimit,
+                tips: task.tips,
+                vocab: task.vocab as any,
+                phrases: task.phrases,
+                recommended: task.recommended || false,
+                icon: task.icon || "🎤",
+                color: task.color || "blue",
+                order: i,
+                active: true,
+            },
+            create: {
+                id: task.id,
+                title: task.title,
+                type: task.type,
+                level: task.level,
+                prompt: task.prompt,
+                timeLimit: task.timeLimit,
+                tips: task.tips,
+                vocab: task.vocab as any,
+                phrases: task.phrases,
+                recommended: task.recommended || false,
+                icon: task.icon || "🎤",
+                color: task.color || "blue",
+                order: i,
+                active: true,
+            },
+        });
+    }
+    
+    console.log(`✅ Seeded ${SPEAKING_TASKS.length} Speaking tasks`);
+
+    // ===== 11. SEED GRAMMAR TASKS =====
+    console.log('📚 Seeding Grammar tasks...');
+    
+    try {
+        // Read from grammar_file directory directly
+        const { readdir, readFile } = await import('fs/promises');
+        const { join } = await import('path');
+        
+        const GRAMMAR_FILES_DIR = join(process.cwd(), "grammar_file");
+        let grammarTaskCount = 0;
+        
+        async function scanGrammarFiles(dir: string, currentLevel?: string): Promise<void> {
+            try {
+                const entries = await readdir(dir, { withFileTypes: true });
+                
+                for (const entry of entries) {
+                    const entryPath = join(dir, entry.name);
+                    
+                    if (entry.isFile() && entry.name.endsWith(".json")) {
+                        try {
+                            const fileContent = await readFile(entryPath, "utf-8");
+                            const lessonData = JSON.parse(fileContent);
+                            
+                            let levelFromPath = currentLevel;
+                            if (!levelFromPath) {
+                                const pathParts = entryPath.split(/[/\\]/);
+                                for (let i = pathParts.length - 1; i >= 0; i--) {
+                                    const part = pathParts[i];
+                                    if (["A1-A2", "B1-B2", "C1"].includes(part)) {
+                                        levelFromPath = part;
+                                        break;
+                                    }
+                                }
+                            }
+                            
+                            const taskId = lessonData.id || entry.name.replace(".json", "");
+                            
+                            await prisma.grammarTask.upsert({
+                                where: { id: taskId },
+                                update: {
+                                    title: lessonData.title || entry.name.replace(".json", ""),
+                                    level: levelFromPath || "A1-A2",
+                                    introduction: lessonData.introduction || "",
+                                    examples: lessonData.examples || null,
+                                    exercises: lessonData.exercises || null,
+                                    exampleCount: lessonData.examples?.length || 0,
+                                    exerciseCount: lessonData.exercises?.length || 0,
+                                    category: lessonData.category || null,
+                                    recommended: false,
+                                    order: grammarTaskCount,
+                                    active: true,
+                                },
+                                create: {
+                                    id: taskId,
+                                    title: lessonData.title || entry.name.replace(".json", ""),
+                                    level: levelFromPath || "A1-A2",
+                                    introduction: lessonData.introduction || "",
+                                    examples: lessonData.examples || null,
+                                    exercises: lessonData.exercises || null,
+                                    exampleCount: lessonData.examples?.length || 0,
+                                    exerciseCount: lessonData.exercises?.length || 0,
+                                    category: lessonData.category || null,
+                                    recommended: false,
+                                    order: grammarTaskCount,
+                                    active: true,
+                                },
+                            });
+                            grammarTaskCount++;
+                        } catch (error) {
+                            console.error(`Error reading ${entry.name}:`, error);
+                        }
+                    } else if (entry.isDirectory()) {
+                        let nextLevel = currentLevel;
+                        if (["A1-A2", "B1-B2", "C1"].includes(entry.name)) {
+                            nextLevel = entry.name;
+                        }
+                        await scanGrammarFiles(entryPath, nextLevel);
+                    }
+                }
+            } catch (error) {
+                console.error(`Error reading directory ${dir}:`, error);
+            }
+        }
+        
+        try {
+            await scanGrammarFiles(GRAMMAR_FILES_DIR);
+            console.log(`✅ Seeded ${grammarTaskCount} Grammar tasks from grammar_file directory`);
+        } catch (dirError) {
+            console.warn(`⚠️  Could not read grammar_file directory: ${dirError}`);
+            console.warn(`   Make sure the grammar_file directory exists in the project root.`);
+        }
+    } catch (grammarError) {
+        console.error(`❌ Error seeding Grammar tasks:`, grammarError);
+    }
+
     console.log('\n📋 Login credentials:');
     console.log('   Email: test@example.com');
     console.log('   Password: password123');

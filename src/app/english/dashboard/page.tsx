@@ -49,6 +49,7 @@ export default function DashboardPage() {
   const router = useRouter();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [streakGlow, setStreakGlow] = useState(false);
   
   // Quick Dictionary
   const [quickWord, setQuickWord] = useState("");
@@ -82,6 +83,9 @@ export default function DashboardPage() {
   useEffect(() => {
     fetchDashboardStats();
     
+    // Check if there's activity completed today and trigger glow
+    checkTodayActivity();
+    
     // Additional scroll attempts after render
     const scrollToTop = () => {
       window.scrollTo(0, 0);
@@ -108,13 +112,71 @@ export default function DashboardPage() {
     };
   }, []);
 
-  const fetchDashboardStats = async () => {
+  // Check if user has completed activity today
+  const checkTodayActivity = async () => {
+    try {
+      const res = await fetch("/api/progress/stats");
+      if (res.ok) {
+        const data = await res.json();
+        if (data.completedActivities > 0 && data.streak > 0) {
+          // Show glow if there's activity today
+          setStreakGlow(true);
+          // Remove glow after animation
+          setTimeout(() => setStreakGlow(false), 3000);
+        }
+      }
+    } catch (error) {
+      console.error("Error checking today activity:", error);
+    }
+  };
+
+  // Listen for activity completion events to refresh streak
+  useEffect(() => {
+    const handleActivityCompleted = () => {
+      // Refresh stats and show glow
+      fetchDashboardStats(true);
+    };
+
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'activityCompleted' && e.newValue === 'true') {
+        handleActivityCompleted();
+        localStorage.removeItem('activityCompleted');
+      }
+    };
+
+    // Listen for custom event (same tab)
+    window.addEventListener('activityCompleted', handleActivityCompleted);
+    // Listen for storage event (other tabs)
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Also check localStorage periodically (fallback)
+    const checkInterval = setInterval(() => {
+      if (localStorage.getItem('activityCompleted') === 'true') {
+        handleActivityCompleted();
+        localStorage.removeItem('activityCompleted');
+      }
+    }, 2000);
+
+    return () => {
+      window.removeEventListener('activityCompleted', handleActivityCompleted);
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(checkInterval);
+    };
+  }, []);
+
+  const fetchDashboardStats = async (showGlow = false) => {
     try {
       // Fetch user stats from API
       const res = await fetch("/api/user/stats");
       if (res.ok) {
         const data = await res.json();
         if (data.success) {
+          // Check if streak increased
+          if (showGlow && stats && data.stats.streak > (stats.stats.streak || 0)) {
+            setStreakGlow(true);
+            setTimeout(() => setStreakGlow(false), 3000);
+          }
+          
           // Transform API data to dashboard format
           const transformedStats = {
             user: {
@@ -124,9 +186,9 @@ export default function DashboardPage() {
             },
             stats: {
               streak: data.stats.streak || 0,
-              completedUnits: 0, // Can be calculated from activities
+              completedUnits: data.stats.completedUnits || 0, // Days with completed activities
               inProgressUnits: 0,
-              totalAttempts: data.stats.totalActivities || 0,
+              totalAttempts: data.stats.totalActivities || 0, // Total completed activities
               avgScore: data.stats.avgScore || 0,
             },
             skillsBreakdown: Object.entries(data.stats.skillScores || {}).map(([skill, scoreData]) => {
@@ -156,11 +218,45 @@ export default function DashboardPage() {
           return;
         }
       }
-      // Fallback to mock data
-      setStats(getMockStats());
+      // Don't use mock data - show empty state instead
+      console.error("Failed to fetch dashboard stats: API returned error or no data");
+      setStats({
+        user: {
+          name: null,
+          email: null,
+          image: null,
+        },
+        stats: {
+          streak: 0,
+          completedUnits: 0,
+          inProgressUnits: 0,
+          totalAttempts: 0,
+          avgScore: 0,
+        },
+        skillsBreakdown: [],
+        recentProgress: [],
+        recentAttempts: [],
+      });
     } catch (error) {
+      // Don't use mock data - show empty state instead
       console.error("Failed to fetch dashboard stats:", error);
-      setStats(getMockStats());
+      setStats({
+        user: {
+          name: null,
+          email: null,
+          image: null,
+        },
+        stats: {
+          streak: 0,
+          completedUnits: 0,
+          inProgressUnits: 0,
+          totalAttempts: 0,
+          avgScore: 0,
+        },
+        skillsBreakdown: [],
+        recentProgress: [],
+        recentAttempts: [],
+      });
     } finally {
       setLoading(false);
     }
@@ -232,7 +328,7 @@ export default function DashboardPage() {
         {/* Welcome & Usage Stats */}
         <div className="welcome-section">
           <div className="welcome-card">
-            <div className="streak-badge-card">
+            <div className={`streak-badge-card ${streakGlow ? 'streak-glow' : ''}`}>
               <div className="streak-icon-wrapper">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
                   <path d="M12 2L15 8L22 9L17 14L18 21L12 18L6 21L7 14L2 9L9 8L12 2Z" fill="url(#streak-gradient)" stroke="url(#streak-gradient)" strokeWidth="1"/>

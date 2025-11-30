@@ -160,18 +160,34 @@ export default function PlacementTestPage() {
       });
 
       // Parse response (only once)
-      let result;
-      try {
-        result = await response.json();
-      } catch (parseError) {
-        console.error("Failed to parse response:", parseError);
-        throw new Error("Invalid response from server");
+      let result: any = {};
+      const contentType = response.headers.get("content-type");
+      
+      if (contentType && contentType.includes("application/json")) {
+        try {
+          const text = await response.text();
+          if (text) {
+            result = JSON.parse(text);
+          }
+        } catch (parseError) {
+          console.error("Failed to parse response:", parseError);
+          throw new Error("Invalid response from server");
+        }
       }
 
       if (!response.ok) {
         // Response was parsed successfully, but contains error
-        const errorMessage = result?.error || result?.message || response.statusText || "Failed to submit test";
-        console.error("Submit failed:", response.status, errorMessage);
+        const errorMessage = result?.error || result?.message || result?.details || response.statusText || `Failed to submit test (${response.status})`;
+        console.error("Submit failed:", {
+          status: response.status,
+          statusText: response.statusText,
+          contentType,
+          error: result?.error,
+          message: result?.message,
+          details: result?.details,
+          fullResult: result,
+          resultKeys: result ? Object.keys(result) : []
+        });
         throw new Error(errorMessage);
       }
 
@@ -187,9 +203,19 @@ export default function PlacementTestPage() {
       setSubmitting(false);
     } catch (error) {
       console.error("Submit error:", error);
-      const errorMessage = error instanceof Error ? error.message : "Failed to submit test. Please try again.";
+      let errorMessage = "Failed to submit test. Please try again.";
+      
+      if (error instanceof Error) {
+        errorMessage = error.message;
+        // If it's a database connection error, show more helpful message
+        if (error.message.includes("Database connection failed") || error.message.includes("DATABASE_URL")) {
+          errorMessage = "Database connection failed. Please contact support or try again later.";
+        }
+      }
+      
       toast.error("Failed to submit test", {
         description: errorMessage,
+        duration: 5000,
       });
       setSubmitting(false);
     }

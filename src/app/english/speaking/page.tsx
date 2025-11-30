@@ -485,9 +485,24 @@ export default function SpeakingPage() {
       if (response.ok) {
         const data = await response.json();
         setActivityCompleted(true);
+        
+        // Show streak update message if available
+        const streakMessage = data.streak 
+          ? data.isNewDay 
+            ? `🔥 Streak updated! ${data.streak} days in a row!`
+            : `🔥 Keep it up! ${data.streak} day streak!`
+          : undefined;
+        
         toast.success("Activity completed successfully!", {
-          description: `Your score: ${score}/10`,
+          description: streakMessage || `Your score: ${score}/10`,
         });
+        
+        // Notify dashboard to refresh streak
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('activityCompleted', 'true');
+          // Trigger custom event for same-tab communication
+          window.dispatchEvent(new Event('activityCompleted'));
+        }
         
         // Wait a bit then go back to task selection
         setTimeout(() => {

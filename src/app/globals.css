@@ -11276,6 +11276,64 @@ input:checked+.toggle-slider:before {
   box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
 }
 
+/* Streak Glow Animation */
+.streak-badge-card.streak-glow,
+.streak-badge.streak-glow {
+  animation: streakGlow 3s ease-in-out;
+  position: relative;
+}
+
+.streak-badge-card.streak-glow::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #f59e0b, #ef4444, #f59e0b);
+  background-size: 200% 200%;
+  animation: streakGlowBorder 3s ease-in-out;
+  z-index: -1;
+  opacity: 0.6;
+  filter: blur(8px);
+}
+
+.streak-badge.streak-glow {
+  animation: streakGlowPulse 3s ease-in-out;
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.6);
+}
+
+@keyframes streakGlow {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 8px 24px rgba(245, 158, 11, 0.6);
+  }
+}
+
+@keyframes streakGlowBorder {
+  0%, 100% {
+    background-position: 0% 50%;
+    opacity: 0.3;
+  }
+  50% {
+    background-position: 100% 50%;
+    opacity: 0.8;
+  }
+}
+
+@keyframes streakGlowPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
+  }
+  50% {
+    transform: scale(1.1);
+    box-shadow: 0 0 25px rgba(245, 158, 11, 0.8);
+  }
+}
+
 /* ========================================
    AI CHATBOT - IMPROVED UI
    ======================================== */

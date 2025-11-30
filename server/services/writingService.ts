@@ -134,6 +134,56 @@ export class WritingService {
     }
 
     /**
+     * Get or create a practice Activity for writing tasks
+     */
+    private async getOrCreatePracticeActivity(taskId: string, taskTitle?: string, level?: string): Promise<string> {
+        try {
+            // Try to find existing practice activity for this task
+            const existing = await prisma.activity.findFirst({
+                where: {
+                    skill: "WRITING",
+                    title: taskTitle || `Writing Practice ${taskId}`,
+                },
+                select: { id: true },
+            });
+
+            if (existing) {
+                return existing.id;
+            }
+
+            // Find a writing unit to attach to (or create a dummy unit)
+            const writingUnit = await prisma.unit.findFirst({
+                where: {
+                    skill: "WRITING",
+                },
+                select: { id: true },
+            });
+
+            if (!writingUnit) {
+                // If no writing unit exists, we can't create activity
+                // Return a placeholder ID (this should be handled better in production)
+                throw new Error("No writing unit found in database");
+            }
+
+            // Create a new activity for this writing practice
+            const activity = await prisma.activity.create({
+                data: {
+                    unitId: writingUnit.id,
+                    type: "WRITE_PARAGRAPH",
+                    title: taskTitle || `Writing Practice ${taskId}`,
+                    level: (level?.toUpperCase() as any) || "B1",
+                    skill: "WRITING",
+                },
+            });
+
+            return activity.id;
+        } catch (error) {
+            console.error("[WritingService] Error getting/creating activity:", error);
+            throw error;
+        }
+    }
+
+    /**
      * Save writing task completion
      */
     async saveCompletion(
@@ -151,26 +201,31 @@ export class WritingService {
         }
     ) {
         try {
-            return await prisma.userActivity.create({
+            // Get or create activity for this writing task
+            const activityId = await this.getOrCreatePracticeActivity(data.taskId, data.taskTitle, data.level);
+
+            // Create attempt record
+            const attempt = await prisma.attempt.create({
                 data: {
                     userId,
-                    skill: "writing",
-                    activityType: "exercise",
-                    completed: true,
-                    score: parseFloat(data.score.toString()),
-                    duration: data.duration || null,
-                    date: new Date(),
-                    metadata: {
+                    activityId,
+                    submittedAt: new Date(),
+                    score: Math.round(parseFloat(data.score.toString()) * 10), // Convert to 0-100 scale
+                    status: "completed",
+                    meta: {
                         taskId: data.taskId,
                         taskTitle: data.taskTitle,
                         taskType: data.taskType,
                         targetWords: data.targetWords,
                         level: data.level,
                         wordCount: data.text?.split(/\s+/).length || 0,
-                        scoringDetails: (data.scoringDetails || {}) as Prisma.InputJsonValue,
-                    },
+                        scoringDetails: data.scoringDetails || {},
+                        duration: data.duration,
+                    } as Prisma.InputJsonValue,
                 },
             });
+
+            return attempt;
         } catch (error) {
             console.error("[WritingService] Error saving completion:", error);
             throw error;

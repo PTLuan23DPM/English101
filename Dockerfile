@@ -11,7 +11,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
-ENV NEXTAUTH_SECRET="dummy-secret-for-build"
+ENV NEXTAUTH_SECRET="sG0peXoJJeMyodpAapvYZvV30uAPP4za/cSxN+sXXyI="
 ENV NEXTAUTH_URL="http://localhost:3000"
 
 RUN npx prisma generate

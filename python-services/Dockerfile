@@ -36,5 +36,6 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD python -c "import requests; requests.get('http://localhost:8080/health')" || exit 1
 
 # Run the application
-CMD ["python", "ai_scorer.py"]
-
+# Sử dụng exec và :$PORT để nhận cổng từ Google Cloud Run
+# --timeout 0 để gunicorn không tự kill khi AI load lâu
+CMD exec gunicorn --bind :$PORT --workers 1 --threads 8 --timeout 0 ai_scorer:app

@@ -17,3 +17,4 @@ openai-whisper>=20231117
 librosa>=0.10.0
 fastdtw>=0.3.4
 scipy>=1.11.0
+gunicorn>=21.2.0

@@ -9,6 +9,11 @@ FROM node:18-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+
+ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
+ENV NEXTAUTH_SECRET="dummy-secret-for-build"
+ENV NEXTAUTH_URL="http://localhost:3000"
+
 RUN npx prisma generate
 RUN npm run build
 

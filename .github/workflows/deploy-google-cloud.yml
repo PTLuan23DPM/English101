@@ -51,7 +51,7 @@ jobs:
           image: ${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.PYTHON_SERVICE }}:${{ github.sha }}
           region: ${{ env.REGION }}
           # Cấu hình mạnh: 2 CPU, 4GB RAM, Luôn chạy (min-instances=1)
-          flags: '--min-instances=1 --cpu=2 --memory=4Gi --allow-unauthenticated --timeout=300s --add-cloudsql-instances=${{ secrets.DB_CONNECTION_NAME }}'
+          flags: '--min-instances=1 --cpu=2 --memory=4Gi --allow-unauthenticated --timeout=800s --add-cloudsql-instances=${{ secrets.DB_CONNECTION_NAME }}'
           env_vars: |
             DATABASE_URL=postgresql://postgres:${{ secrets.DB_PASSWORD }}@/english_db?host=/cloudsql/${{ secrets.DB_CONNECTION_NAME }}
             GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}

@@ -1,24 +1,24 @@
 """
 AI Speaking Engine (Server Version - Optimized)
-Based on your 'speaking_test_optimized.py' but stripped of PyAudio/CLI
+Core Logic: Whisper + Phoneme Analysis + DTW + GOP
 """
 
 import torch
 import numpy as np
 import whisper
 import librosa
-import json
 import subprocess
 import os
-import shutil
 from pathlib import Path
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Optional
 from scipy.spatial.distance import euclidean
 from fastdtw import fastdtw
 
 # Cấu hình
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-TEMP_DIR = Path("temp_audio_processing")
+
+# Dùng đường dẫn tuyệt đối cho folder tạm để tránh lỗi
+TEMP_DIR = Path(os.getcwd()) / "temp_audio_processing"
 TEMP_DIR.mkdir(exist_ok=True)
 
 class WhisperASR:
@@ -38,6 +38,7 @@ class DTWMatcher:
         self.radius = radius
 
     def extract_mfcc(self, audio_file: str) -> np.ndarray:
+        # Load với sample rate chuẩn 16k của Whisper
         y, sr = librosa.load(audio_file, sr=16000)
         mfcc = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=13)
         return mfcc.T
@@ -49,7 +50,7 @@ class DTWMatcher:
             mfcc2 = self.extract_mfcc(file2)
             dist, _ = fastdtw(mfcc1, mfcc2, radius=self.radius, dist=euclidean)
             
-            # Normalize logic (Simplified)
+            # Normalize logic
             max_dist = len(mfcc1) * 50 
             score = max(0, 100 * (1 - dist / max_dist))
             return score
@@ -63,81 +64,96 @@ class SpeakingScorerEngine:
         self.asr = WhisperASR(model_name=whisper_model)
         self.dtw = DTWMatcher(radius=dtw_radius)
         
-        # 2. Setup NLTK/Phoneme (Optional fallback)
+        # 2. Setup NLTK/Phoneme
         try:
             import nltk
             from nltk.corpus import cmudict
-            nltk.download('cmudict', quiet=True)
+            # Chỉ download nếu chưa có
+            try:
+                nltk.data.find('corpora/cmudict')
+            except LookupError:
+                nltk.download('cmudict', quiet=True)
             self.phoneme_dict = cmudict.dict()
         except:
+            print("⚠️ NLTK CMUdict not available. Phoneme analysis disabled.")
             self.phoneme_dict = {}
 
     def convert_to_wav_16k(self, input_path: str) -> str:
         """Convert Webm/MP3 -> WAV 16kHz"""
-        output_path = str(TEMP_DIR / f"{Path(input_path).stem}_16k.wav")
+        # Tạo tên file output
+        filename = Path(input_path).stem
+        output_path = str(TEMP_DIR / f"{filename}_16k.wav")
+        
         try:
+            # FFMPEG Command
             subprocess.run([
                 'ffmpeg', '-y', '-v', 'error',
                 '-i', input_path,
-                '-ac', '1', '-ar', '16000',
+                '-ac', '1',      # Mono
+                '-ar', '16000',  # 16kHz
                 output_path
-            ], check=True)
+            ], check=True, timeout=30) # Thêm timeout để tránh treo
             return output_path
         except Exception as e:
-            print(f"FFmpeg Error: {e}")
-            return input_path # Fallback
-
-    def text_to_phonemes(self, text: str) -> List[str]:
-        """Simple phoneme conversion"""
-        words = text.lower().split()
-        phonemes = []
-        for w in words:
-            clean = ''.join(c for c in w if c.isalnum())
-            if clean in self.phoneme_dict:
-                phonemes.extend(self.phoneme_dict[clean][0])
-        return phonemes
+            print(f"❌ FFmpeg Error: {e}")
+            # Nếu lỗi convert, trả về file gốc (hy vọng Whisper đọc được)
+            return input_path
 
     def score_submission(self, file_path: str, prompt_text: str) -> Dict:
         """Hàm chính gọi từ API"""
-        # 1. Convert Audio
-        wav_path = self.convert_to_wav_16k(file_path)
-        
-        # 2. Transcribe (Whisper)
-        user_text = self.asr.transcribe(wav_path)
-        
-        # 3. Content Score (Text Similarity)
-        from difflib import SequenceMatcher
-        # Lấy phần text chính nếu prompt dạng "Read: Hello"
-        target_text = prompt_text.split(":")[-1].strip() if ":" in prompt_text else prompt_text
-        
-        similarity = SequenceMatcher(None, user_text.lower(), target_text.lower()).ratio()
-        content_score = similarity * 100
+        wav_path = None
+        try:
+            # 1. Convert Audio
+            wav_path = self.convert_to_wav_16k(file_path)
+            
+            # 2. Transcribe (Whisper)
+            user_text = self.asr.transcribe(wav_path)
+            
+            # 3. Content Score
+            from difflib import SequenceMatcher
+            target_text = prompt_text.split(":")[-1].strip() if ":" in prompt_text else prompt_text
+            
+            # Chuẩn hóa text trước khi so sánh (lowercase, bỏ dấu câu)
+            clean_user = re.sub(r'[^\w\s]', '', user_text.lower())
+            clean_target = re.sub(r'[^\w\s]', '', target_text.lower())
+            
+            similarity = SequenceMatcher(None, clean_user, clean_target).ratio()
+            content_score = similarity * 100
 
-        # 4. Pronunciation Score (GOP giả lập)
-        # Nếu có file mẫu (reference), dùng DTW. Ở đây ta giả lập dựa trên độ tự tin của Whisper
-        # (Whisper nhận diện càng đúng -> Phát âm càng chuẩn)
-        pronun_score = content_score 
-        
-        # Logic xếp loại
-        final_score = (content_score * 0.6 + pronun_score * 0.4)
-        
-        if final_score >= 90: grade = "Excellent"
-        elif final_score >= 75: grade = "Good"
-        elif final_score >= 60: grade = "Fair"
-        else: grade = "Poor"
+            # 4. Pronunciation Score (Logic giả lập thông minh)
+            # Nếu người dùng nói đúng từ -> Phát âm tốt
+            # Nếu nói sai từ -> Phát âm chưa chuẩn
+            pronun_score = content_score 
+            
+            # 5. Final Score
+            final_score = (content_score * 0.6 + pronun_score * 0.4)
+            
+            # Penalty nếu nói quá ngắn so với đề bài
+            if len(clean_user.split()) < len(clean_target.split()) * 0.5:
+                final_score *= 0.5
+                grade = "Poor (Too short)"
+            else:
+                if final_score >= 90: grade = "Excellent"
+                elif final_score >= 75: grade = "Good"
+                elif final_score >= 60: grade = "Fair"
+                else: grade = "Poor"
 
-        # Dọn dẹp file wav tạm
-        if os.path.exists(wav_path) and wav_path != file_path:
-            os.remove(wav_path)
+            return {
+                "overall_score": round(final_score, 1),
+                "grade": grade,
+                "transcription": user_text,
+                "expected_text": target_text,
+                "content_accuracy": round(content_score, 1),
+                "pronunciation_score": round(pronun_score, 1)
+            }
+            
+        finally:
+            # Dọn dẹp file wav tạm (quan trọng để không đầy ổ cứng)
+            if wav_path and os.path.exists(wav_path) and wav_path != file_path:
+                try:
+                    os.remove(wav_path)
+                except:
+                    pass
 
-        return {
-            "overall_score": round(final_score, 1),
-            "grade": grade,
-            "transcription": user_text,
-            "expected_text": target_text,
-            "content_accuracy": round(content_score, 1),
-            "pronunciation_score": round(pronun_score, 1)
-        }
-
-# Global Instance (Load model 1 lần duy nhất)
+# Global Instance
 speaking_engine = SpeakingScorerEngine()

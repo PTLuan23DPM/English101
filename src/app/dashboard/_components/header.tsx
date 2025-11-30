@@ -27,6 +27,7 @@ export default function DashboardHeader() {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [streak, setStreak] = useState(0);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [streakGlow, setStreakGlow] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   // Fetch user stats and notifications
@@ -41,7 +42,13 @@ export default function DashboardHeader() {
         if (statsRes.ok) {
           const statsData = await statsRes.json();
           if (statsData.success) {
-            setStreak(statsData.stats.streak || 0);
+            const newStreak = statsData.stats.streak || 0;
+            // If streak increased, show glow
+            if (newStreak > streak && streak > 0) {
+              setStreakGlow(true);
+              setTimeout(() => setStreakGlow(false), 3000);
+            }
+            setStreak(newStreak);
           }
         }
 
@@ -57,7 +64,11 @@ export default function DashboardHeader() {
     };
 
     fetchData();
-  }, []);
+    
+    // Refresh stats every 30 seconds to catch streak updates
+    const interval = setInterval(fetchData, 30000);
+    return () => clearInterval(interval);
+  }, [streak]);
 
   const pageTitle = PAGE_TITLES[pathname] || "English101";
 
@@ -83,7 +94,7 @@ export default function DashboardHeader() {
         <LanguageSelector />
         
         {/* Streak Display */}
-        <div className="streak-badge" title="Current learning streak">
+        <div className={`streak-badge ${streakGlow ? 'streak-glow' : ''}`} title="Current learning streak">
           <svg className="streak-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
             <path d="M10 2L13 8L19 9L14.5 13.5L15.5 19.5L10 16.5L4.5 19.5L5.5 13.5L1 9L7 8L10 2Z" fill="currentColor"/>
           </svg>

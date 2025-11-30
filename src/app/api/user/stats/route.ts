@@ -13,7 +13,14 @@ export async function GET() {
 
         const result = await statsController.getStats(userId);
 
-        return NextResponse.json(result.data, { status: result.success ? 200 : 500 });
+        if (!result.success) {
+            return NextResponse.json(
+                { error: "Failed to fetch user stats", success: false },
+                { status: 500 }
+            );
+        }
+
+        return NextResponse.json({ success: true, stats: result.data.stats }, { status: 200 });
     } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : "Unknown error";
         
@@ -23,7 +30,11 @@ export async function GET() {
 
         console.error("[User Stats API] Error:", error);
         return NextResponse.json(
-            { error: errorMessage || "Failed to fetch user stats" },
+            { 
+                success: false,
+                error: errorMessage || "Failed to fetch user stats",
+                stats: null
+            },
             { status: 500 }
         );
     }

@@ -9,28 +9,39 @@ datasource db {
 }
 
 model User {
-  id                    String                @id @default(cuid())
-  name                  String?
-  email                 String?               @unique
-  emailVerified         DateTime?
-  image                 String?
-  role                  Role                  @default(USER)
-  createdAt             DateTime              @default(now())
-  updatedAt             DateTime              @updatedAt
-  password              String?
-  accounts              Account[]
-  activities            Activity[]            @relation("AuthorActivities")
-  attempts              Attempt[]
-  contents              Content[]             @relation("AuthorContents")
-  authoredNotifications Notification[]        @relation("AuthoredNotifications")
-  placementTests        PlacementTestResult[]
-  questions             Question[]            @relation("AuthorQuestions")
-  recordings            Recording[]
-  sessions              Session[]
-  gradedSubs            Submission[]          @relation("SubmissionGrader")
-  submissions           Submission[]          @relation("SubmissionOwner")
-  userNotifications     UserNotification[]    @relation("UserNotifications")
-  progress              UserProgress[]
+  id                     String                @id @default(cuid())
+  name                   String?
+  email                  String?               @unique
+  emailVerified          DateTime?
+  image                  String?
+  role                   Role                  @default(USER)
+  createdAt              DateTime              @default(now())
+  updatedAt              DateTime              @updatedAt
+  password               String?
+  cefrLevel              String?
+  lastActive             DateTime?
+  longestStreak          Int                   @default(0)
+  placementScore         Int?
+  placementTestCompleted Boolean               @default(false)
+  streak                 Int                   @default(0)
+  language               String                @default("en")
+  theme                  String                @default("light")
+  accounts               Account[]
+  activities             Activity[]            @relation("AuthorActivities")
+  attempts               Attempt[]
+  contents               Content[]             @relation("AuthorContents")
+  authoredNotifications  Notification[]        @relation("AuthoredNotifications")
+  placementTests         PlacementTestResult[]
+  questions              Question[]            @relation("AuthorQuestions")
+  recordings             Recording[]
+  sessions               Session[]
+  gradedSubs             Submission[]          @relation("SubmissionGrader")
+  submissions            Submission[]          @relation("SubmissionOwner")
+  UserActivity           UserActivity[]
+  UserGoal               UserGoal[]
+  userNotifications      UserNotification[]    @relation("UserNotifications")
+  progress               UserProgress[]
+  WritingLLMUsage        WritingLLMUsage[]
 }
 
 model Account {
@@ -422,8 +433,8 @@ model PlacementTestResult {
   totalQuestions Int       @default(20)
   cefrLevel      String
   answers        Json
-  startedAt      DateTime?
   completedAt    DateTime  @default(now())
+  startedAt      DateTime?
   timeSpent      Int?
   skillScores    Json?
   correctAnswers Int?
@@ -435,6 +446,55 @@ model PlacementTestResult {
   @@index([userId])
   @@index([userId, completedAt])
   @@index([cefrLevel])
+}
+
+model UserActivity {
+  id           String   @id
+  userId       String
+  date         DateTime @default(now())
+  skill        String
+  activityType String
+  duration     Int?
+  score        Float?
+  completed    Boolean  @default(false)
+  metadata     Json?
+  createdAt    DateTime @default(now())
+  User         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, date])
+  @@index([userId, skill])
+}
+
+model UserGoal {
+  id        String    @id
+  userId    String
+  type      String
+  target    Int
+  current   Int       @default(0)
+  deadline  DateTime?
+  completed Boolean   @default(false)
+  metadata  Json?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime
+  User      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, completed])
+  @@index([userId])
+}
+
+model WritingLLMUsage {
+  id        String   @id
+  userId    String
+  taskId    String?
+  feature   String
+  usedAt    DateTime @default(now())
+  metadata  Json?
+  createdAt DateTime @default(now())
+  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([usedAt])
+  @@index([userId, feature])
+  @@index([userId, taskId, feature])
 }
 
 enum Role {

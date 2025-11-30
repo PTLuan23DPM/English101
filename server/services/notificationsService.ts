@@ -48,6 +48,11 @@ export class NotificationsService {
             }));
         } catch (error: any) {
             console.error("[NotificationsService] Error fetching notifications:", error);
+            // Handle database connection errors
+            if (error?.code === "P1001" || error?.message?.includes("Authentication failed") || error?.message?.includes("database credentials")) {
+                console.error("[NotificationsService] Database connection error:", error.message);
+                return [];
+            }
             // If table doesn't exist (P2021) or model not found, return empty array
             if (error?.code === "P2021" || error?.message?.includes("does not exist") || error?.message?.includes("userNotification")) {
                 console.warn("[NotificationsService] UserNotification table not found, returning empty array");
@@ -125,6 +130,11 @@ export class NotificationsService {
             return count;
         } catch (error: any) {
             console.error("[NotificationsService] Error getting unread count:", error);
+            // Handle database connection errors
+            if (error?.code === "P1001" || error?.message?.includes("Authentication failed") || error?.message?.includes("database credentials")) {
+                console.error("[NotificationsService] Database connection error:", error.message);
+                return 0;
+            }
             // If table doesn't exist (P2021) or model not found, return 0
             if (error?.code === "P2021" || error?.message?.includes("does not exist") || error?.message?.includes("userNotification")) {
                 console.warn("[NotificationsService] UserNotification table not found, returning 0");

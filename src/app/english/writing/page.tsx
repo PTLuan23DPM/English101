@@ -352,6 +352,10 @@ export default function WritingPage() {
         } else {
           const saveData = await saveResponse.json();
           console.log("Completion saved successfully:", saveData);
+          
+          // Trigger activity completed event to update dashboard and show star
+          localStorage.setItem('activityCompleted', 'true');
+          window.dispatchEvent(new Event('activityCompleted'));
         }
       } catch (saveError) {
         console.error("Error saving completion:", saveError);

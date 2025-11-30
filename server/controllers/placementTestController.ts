@@ -42,6 +42,29 @@ export class PlacementTestController {
             );
         } catch (error: any) {
             console.error("[PlacementTestController] Error submitting test:", error);
+            console.error("[PlacementTestController] Error details:", {
+                code: error?.code,
+                message: error?.message,
+                name: error?.name,
+                stack: error?.stack
+            });
+
+            // Handle database connection errors
+            const errorMessage = error?.message || "";
+            if (error?.code === "P1001" || 
+                errorMessage.includes("Authentication failed") || 
+                errorMessage.includes("database credentials") || 
+                errorMessage.includes("Database connection failed") ||
+                errorMessage.includes("DATABASE_URL")) {
+                return createResponse(
+                    { 
+                        error: "Database connection failed", 
+                        details: "Please check your DATABASE_URL environment variable.",
+                        message: errorMessage 
+                    },
+                    500
+                );
+            }
 
             // Handle Prisma errors
             if (error && typeof error === "object" && "code" in error) {
@@ -53,10 +76,16 @@ export class PlacementTestController {
                 }
             }
 
-            return createResponse(
-                { error: "Failed to submit test", details: error.message },
-                500
-            );
+            // Always return a valid response with error details
+            const errorDetails = {
+                error: "Failed to submit test",
+                details: error?.message || error?.toString() || "Unknown error occurred",
+                message: error?.message || "An unexpected error occurred while submitting the test"
+            };
+            
+            console.error("[PlacementTestController] Returning error response:", errorDetails);
+            
+            return createResponse(errorDetails, 500);
         }
     }
 

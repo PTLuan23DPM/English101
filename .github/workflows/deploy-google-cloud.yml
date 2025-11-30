@@ -76,7 +76,7 @@ jobs:
           image: ${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.NODE_SERVICE }}:${{ github.sha }}
           region: ${{ env.REGION }}
           # Cấu hình nhẹ cho Web: 1GB RAM
-          flags: '--memory=1Gi --allow-unauthenticated --add-cloudsql-instances=${{ secrets.DB_CONNECTION_NAME }}'
+          flags: '--memory=2Gi --cpu=2 --allow-unauthenticated --add-cloudsql-instances=${{ secrets.DB_CONNECTION_NAME }}'
           env_vars: |
             DATABASE_URL=postgresql://postgres:${{ secrets.DB_PASSWORD }}@localhost/english_db?host=/cloudsql/${{ secrets.DB_CONNECTION_NAME }}
             SCORING_SERVICE_URL=${{ env.SCORING_URL }}

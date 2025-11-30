@@ -1,7 +1,7 @@
 @echo off
 echo.
 echo ========================================
-echo   IELTS Writing Scorer Service
+echo   AI Scorer Service (Writing & Speaking)
 echo ========================================
 echo.
 
@@ -46,13 +46,13 @@ if not exist "..\ai-models\writing-scorer\models" (
 )
 
 REM Start service
-echo [INFO] Starting Writing Scorer Service...
-echo [INFO] Service will run on: http://localhost:5001
+echo [INFO] Starting AI Scorer Service (Writing & Speaking)...
+echo [INFO] Service will run on: http://localhost:8080
 echo [INFO] Press Ctrl+C to stop
 echo.
 echo ========================================
 echo.
 
-python writing_scorer.py
+python ai_scorer.py
 
 pause

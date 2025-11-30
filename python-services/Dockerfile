@@ -15,7 +15,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
-COPY writing_scorer.py .
+COPY ai_scorer.py .
 
 # Copy other Python files that might be needed
 COPY *.py ./
@@ -29,12 +29,12 @@ RUN mkdir -p ./ai-models
 COPY ai-models ./ai-models/
 
 # Expose port
-EXPOSE 5001
+EXPOSE 8080
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD python -c "import requests; requests.get('http://localhost:5001/health')" || exit 1
+    CMD python -c "import requests; requests.get('http://localhost:8080/health')" || exit 1
 
 # Run the application
-CMD ["python", "writing_scorer.py"]
+CMD ["python", "ai_scorer.py"]
 

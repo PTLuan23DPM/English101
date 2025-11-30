@@ -53,7 +53,7 @@ jobs:
           # Cấu hình mạnh: 2 CPU, 4GB RAM, Luôn chạy (min-instances=1)
           flags: '--min-instances=1 --cpu=2 --memory=8Gi --allow-unauthenticated --timeout=1200s --add-cloudsql-instances=${{ secrets.DB_CONNECTION_NAME }}'
           env_vars: |
-            DATABASE_URL=postgresql://postgres:${{ secrets.DB_PASSWORD }}@/english_db?host=/cloudsql/${{ secrets.DB_CONNECTION_NAME }}
+            DATABASE_URL=postgresql://postgres:${{ secrets.DB_PASSWORD }}@localhost/english_db?host=/cloudsql/${{ secrets.DB_CONNECTION_NAME }}
             GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
 
       # Lưu URL của Python Service
@@ -78,7 +78,7 @@ jobs:
           # Cấu hình nhẹ cho Web: 1GB RAM
           flags: '--memory=1Gi --allow-unauthenticated --add-cloudsql-instances=${{ secrets.DB_CONNECTION_NAME }}'
           env_vars: |
-            DATABASE_URL=postgresql://postgres:${{ secrets.DB_PASSWORD }}@/english_db?host=/cloudsql/${{ secrets.DB_CONNECTION_NAME }}
+            DATABASE_URL=postgresql://postgres:${{ secrets.DB_PASSWORD }}@localhost/english_db?host=/cloudsql/${{ secrets.DB_CONNECTION_NAME }}
             SCORING_SERVICE_URL=${{ env.SCORING_URL }}
             JWT_SECRET=${{ secrets.JWT_SECRET }}
 

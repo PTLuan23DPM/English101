@@ -1,0 +1,131 @@
+{
+  "id": "present-simple",
+  "title": "Present simple",
+  "level": "A1-A2",
+  "introduction": "Do you know how to use the present simple? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "We can use the present simple to talk about things we do regularly.",
+  "rules": [],
+  "keyPoints": [
+    "the negative, we use don't or doesn't",
+    "questions, we use do or does"
+  ],
+  "examples": [
+    "I eat a lot of fruit and vegetables.\n\nMy dad phones me every day.\n\nShe doesn't like her job.\n\nWhat time do you get up at weekends?",
+    "I go to the gym three times a week.\n\nWe drink coffee at work.",
+    "She loves her job.\n\nA lot of people work at home now.",
+    "My favourite TV show starts at 8 o'clock.\n\nShe finishes work early on Fridays.\n\nMy brother studies at university.",
+    "He has a flat in the city centre.\n\nShe does yoga on Tuesdays.\n\nMy dog goes for a walk every morning.",
+    "We don't eat meat.\n\nShe doesn't have a lot of free time.",
+    "Do you watch a lot of films?\n\nDoes he speak English?"
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct word to complete the sentence:",
+      "sentence": "I eat a lot of fruit and vegetables. My dad phones me every _____ She doesn't like her job. What time do you get up at weekends?",
+      "options": [
+        "day.",
+        "day.s",
+        "day.ed",
+        "very day."
+      ],
+      "correct": 0,
+      "explanation": "The correct answer is 'day.' because..."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct word to complete the sentence:",
+      "sentence": "I go to the gym three times _____ week. We drink coffee at work.",
+      "options": [
+        "a",
+        "some",
+        "any",
+        "this"
+      ],
+      "correct": 0,
+      "explanation": "The correct answer is 'a' because..."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct word to complete the sentence:",
+      "sentence": "She loves her job. A lot _____ people work at home now.",
+      "options": [
+        "of",
+        "ofs",
+        "ofed",
+        "very of"
+      ],
+      "correct": 0,
+      "explanation": "The correct answer is 'of' because..."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank:",
+      "sentence": "My favourite TV show starts at 8 o'clock. She _____ work early on Fridays. My brother studies at university.",
+      "correct": "finishes",
+      "hint": "Think about present simple",
+      "explanation": "The answer is 'finishes'"
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank:",
+      "sentence": "He has a flat in the city centre. She does _____ on Tuesdays. My dog goes for a walk every morning.",
+      "correct": "yoga",
+      "hint": "Think about present simple",
+      "explanation": "The answer is 'yoga'"
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank:",
+      "sentence": "We don't eat meat. She doesn't _____ a lot of free time.",
+      "correct": "have",
+      "hint": "Think about present simple",
+      "explanation": "The answer is 'have'"
+    },
+    {
+      "type": "true_false",
+      "question": "Is this statement true or false?",
+      "statement": "This sentence demonstrates correct usage: Do you watch a lot of films?\n\nDoes he speak English?",
+      "correct": true,
+      "explanation": "This sentence correctly demonstrates the grammar rule."
+    },
+    {
+      "type": "matching",
+      "question": "Match the words with their correct usage:",
+      "pairs": [
+        {
+          "key": "I",
+          "value": "eat a lot of fruit and vegetables. My dad phones me every day. She doesn't like her job. What time do you get up at weekends?"
+        },
+        {
+          "key": "I",
+          "value": "go to the gym three times a week. We drink coffee at work."
+        },
+        {
+          "key": "She",
+          "value": "loves her job. A lot of people work at home now."
+        },
+        {
+          "key": "My",
+          "value": "favourite TV show starts at 8 o'clock. She finishes work early on Fridays. My brother studies at university."
+        }
+      ],
+      "explanation": "Match each word with its correct context."
+    },
+    {
+      "type": "transformation",
+      "question": "Rewrite this sentence using the grammar rule:",
+      "original": "I eat a lot of fruit and vegetables.\n\nMy dad phones me every day.\n\nShe doesn't like her job.\n\nWhat time do you get up at weekends?",
+      "hint": "Apply the rule: Present simple",
+      "explanation": "Transform the sentence while maintaining the same meaning."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank:",
+      "sentence": "She loves her job. A lot _____ people work at home now.",
+      "correct": "of",
+      "hint": "Think about present simple",
+      "explanation": "The answer is 'of'"
+    }
+  ]
+}

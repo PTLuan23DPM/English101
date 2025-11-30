@@ -1,0 +1,100 @@
+{
+  "id": "past-continuous-and-past-simple",
+  "title": "Past continuous and past simple",
+  "level": "A1-A2",
+  "introduction": "Do you know how to use the past continuous and past simple? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "The past continuous and the past simple help us to show how two past actions or situations are connected.",
+  "rules": [
+    "This means that I started studying before 8 p."
+  ],
+  "keyPoints": [
+    "the guests arrived, Jane cooked dinner"
+  ],
+  "examples": [
+    "When I woke up this morning, it was snowing.",
+    "I was sleeping when you called me.",
+    "My parents called me yesterday.",
+    "I woke up early this morning.",
+    "Sam played basketball when he was at university.",
+    "My parents didn't call me yesterday.",
+    "I didn't wake up early this morning.",
+    "Did you wake up early this morning?",
+    "Did Sam play basketball when he was at university?",
+    "What were you doing at 8 p.m. last night? I was studying.",
+    "We were cleaning the house all morning.",
+    "She couldn't come to the party. She was working.",
+    "Three years ago, we were living in my home town.",
+    "I tried to give him some advice, but he wasn't listening.",
+    "What were you doing this time last year?",
+    "While I was studying, I suddenly felt sleepy.",
+    "I broke my leg when I was skiing.",
+    "As I was going to work, I saw an old friend.",
+    "We were watching television when the power went off.",
+    "When the guests arrived, Jane was cooking dinner."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "My parents called me _____.",
+      "options": [
+        "yesterday",
+        "yesterdays",
+        "yesterdayed",
+        "not yesterday"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to past continuous and past simple usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "My parents didn't call me _____.",
+      "options": [
+        "yesterday",
+        "yesterdays",
+        "yesterdayed",
+        "not yesterday"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to past continuous and past simple usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "_____ you wake up early this morning?",
+      "options": [
+        "Did",
+        "dids",
+        "dided",
+        "not did"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to past continuous and past simple usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "_____ Sam play basketball when he was at university?",
+      "correct": "Did",
+      "hint": "Apply the rule for past continuous and past simple.",
+      "explanation": "The correct form here is 'Did'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "What were you doing at 8 p.m. _____ night? I was studying.",
+      "correct": "last",
+      "hint": "Apply the rule for past continuous and past simple.",
+      "explanation": "The correct form here is 'last'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "Three years _____, we were living in my home town.",
+      "correct": "ago",
+      "hint": "Apply the rule for past continuous and past simple.",
+      "explanation": "The correct form here is 'ago'."
+    }
+  ]
+}

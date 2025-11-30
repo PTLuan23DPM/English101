@@ -1,0 +1,66 @@
+{
+  "id": "present-perfect-simple-and-continuous",
+  "title": "Present perfect simple and continuous",
+  "level": "B1-B2",
+  "introduction": "Do you know the difference between We've painted the room and We've been painting the room? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "We use both the present perfect simple (have or has + past participle) and the present perfect continuous (have or has + been + -ing form) to talk about past actions or states which are still connected to the present.",
+  "rules": [],
+  "keyPoints": [
+    "we can see evidence of recent activity"
+  ],
+  "examples": [
+    "Do you know the difference between We've painted the room and We've been painting the room?",
+    "Look at these examples to see how the present perfect simple and continuous are used.",
+    "I've had three coffees already today!",
+    "She's read ten books this summer.",
+    "When we can see evidence of recent activity",
+    "The grass looks wet.",
+    "How long have you known each other?",
+    "We've known each other since we were at school.",
+    "How long have they been playing tennis?",
+    "They've been playing tennis for an hour.",
+    "They've been playing tennis every Sunday for years.",
+    "Sometimes the present perfect continuous can emphasise that a situation is temporary."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "I've had three coffees _____ today!",
+      "options": [
+        "already",
+        "alreadys",
+        "alreadyed",
+        "not already"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to present perfect simple and continuous usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "How long _____ you known each other?",
+      "options": [
+        "have",
+        "having",
+        "hasn't",
+        "haven't"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to present perfect simple and continuous usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "How long _____ they been playing tennis?",
+      "options": [
+        "have",
+        "having",
+        "hasn't",
+        "haven't"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to present perfect simple and continuous usage."
+    }
+  ]
+}

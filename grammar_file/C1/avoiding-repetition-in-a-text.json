@@ -1,0 +1,100 @@
+{
+  "id": "avoiding-repetition-in-a-text",
+  "title": "Avoiding repetition in a text",
+  "level": "C1",
+  "introduction": "Do you know how to use words like this, that, such and so to avoid repetition in a text? Read the explanation to find out and do the interactive exercises to practise.",
+  "explanation": "We commonly use words like it, this/these, that/those, such and do so, as well as synonyms, to avoid repetition. This can make a text shorter, easier to understand and more interesting.",
+  "rules": [
+    "It is used to refer to something we are already talking or writing about, with no particular emphasis.",
+    "Again, in more formal English, do so can be used to mean 'to behave in the way mentioned'. It is used to avoid repeating the verb.",
+    "Those who means 'the people who'."
+  ],
+  "keyPoints": [],
+  "examples": [
+    "Do you know how to use words like this, that, such and so to avoid repetition in a text?",
+    "Look at these examples to see some different ways to avoid repetition in a text:",
+    "The composition of chimpanzee muscle was found to differ from that of humans, which explains their greater strength.",
+    "Featuring holes at an altitude of 2,895m, it is the only such golf course in the world.",
+    "Some birds can find their way without any landmarks, and we still don't know for sure how they do so.",
+    "Growing numbers of people are buying food that is grown without artificial chemicals.",
+    "Grammar explanation",
+    "We commonly use words like it, this/these, that/those, such and do so, as well as synonyms, to avoid repetition.",
+    "It, this and that in texts",
+    "It, this/these and that/those can all be used to refer to something that has just been mentioned or that has been mentioned previously.",
+    "It is used to refer to something we are already talking or writing about, with no particular emphasis.",
+    "We watched the latest episode last night.",
+    "This (or these) is more emphatic and often shows that something is new or interesting.",
+    "More funding has been approved for primary schools in the area.",
+    "That (or those) is also more emphatic than it and is used in a similar way to this.",
+    "A: I refuse to do this any more!",
+    "Or that/those can refer to an idea mentioned further back in the text:",
+    "A classic mistake inexperienced hikers make is to pack things they don't really need.",
+    "That and those meaning 'the one(s)'",
+    "In more formal English, that and those can be used to mean 'the one' or 'the ones'."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Do you know how _____ use words like this, that, such and so to avoid repetition in a text?",
+      "options": [
+        "to",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to avoiding repetition in a text usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Look at these examples _____ see some different ways to avoid repetition in a text:",
+      "options": [
+        "to",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to avoiding repetition in a text usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "The composition of chimpanzee muscle was found _____ differ from that of humans, which explains their greater strength.",
+      "options": [
+        "to",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to avoiding repetition in a text usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "Featuring holes at an altitude of 2,895m, it _____ the only such golf course in the world.",
+      "correct": "is",
+      "hint": "Apply the rule for avoiding repetition in a text.",
+      "explanation": "The correct form here is 'is'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "Some birds _____ find their way without any landmarks, and we still don't know for sure how they do so.",
+      "correct": "can",
+      "hint": "Apply the rule for avoiding repetition in a text.",
+      "explanation": "The correct form here is 'can'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "Growing numbers of people _____ buying food that is grown without artificial chemicals.",
+      "correct": "are",
+      "hint": "Apply the rule for avoiding repetition in a text.",
+      "explanation": "The correct form here is 'are'."
+    }
+  ]
+}

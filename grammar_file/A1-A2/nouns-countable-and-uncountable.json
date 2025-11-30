@@ -1,0 +1,84 @@
+{
+  "id": "nouns-countable-and-uncountable",
+  "title": "Nouns: countable and uncountable",
+  "level": "A1-A2",
+  "introduction": "Do you know how to use a, some, any, much and many? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "Nouns can be countable or uncountable. Countable nouns can be counted, e.g. an apple, two apples, three apples, etc. Uncountable nouns cannot be counted, e.g. air, rice, water, etc. When you learn a new noun, you should check if it is countable or uncountable and note how it is used in a sentence.",
+  "rules": [
+    "when we are offering something or asking for something, we normally use some."
+  ],
+  "keyPoints": [
+    "positive sentences we can use a/an for singular nouns or some for plurals",
+    "negatives we can use a/an for singular nouns or any for plurals"
+  ],
+  "examples": [
+    "I'm making a cup of tea.",
+    "There's some money on the table.",
+    "Have we got any bread?",
+    "How many chairs do we need?",
+    "How much milk have we got?",
+    "There's a man at the door.",
+    "I have some friends in New York.",
+    "I don't have a dog.",
+    "There aren't any seats.",
+    "There's some milk in the fridge.",
+    "There isn't any coffee.",
+    "Is there an email address to write to?",
+    "Are there any chairs?",
+    "How many chairs are there?",
+    "Is there any sugar?",
+    "How much orange juice is there?",
+    "Do you want some chocolate?",
+    "Can we have some more chairs, please?",
+    "Have you got some new glasses?",
+    "There are lots of apples on the trees."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "_____ there any chairs?",
+      "options": [
+        "Are",
+        "be",
+        "been",
+        "being"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to nouns: countable and uncountable usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "How many chairs _____ there?",
+      "options": [
+        "are",
+        "be",
+        "been",
+        "being"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to nouns: countable and uncountable usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "There _____ lots of apples on the trees.",
+      "options": [
+        "are",
+        "be",
+        "been",
+        "being"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to nouns: countable and uncountable usage."
+    },
+    {
+      "type": "true_false",
+      "question": "Is this statement correct?",
+      "statement": "when we are offering something or asking for something, we normally use some.",
+      "correct": true,
+      "explanation": "This reflects the rule from the lesson."
+    }
+  ]
+}

@@ -1,0 +1,99 @@
+{
+  "id": "present-simple-have-got",
+  "title": "Present simple: 'have got'",
+  "level": "A1-A2",
+  "introduction": "Do you know how to use have and have got? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "We use I/you/we/they + have got or he/she/it + has got to talk about things that we have.",
+  "rules": [
+    "We use I/you/we/they + have got or he/she/it + has got to talk about things that we have.",
+    "they + have got or he/she/it + has got to talk about things that we have."
+  ],
+  "keyPoints": [],
+  "examples": [
+    "I've got a big family.",
+    "We haven't got a garden.",
+    "Have you got any pets?",
+    "They have got a big garden. = They have a big garden.",
+    "She has got a good job. = She has a good job.",
+    "I have got brown hair. = I've got brown hair.",
+    "My sister has got long hair. = My sister's got long hair.",
+    "He has not got many friends. = He hasn't got many friends.",
+    "They have got a new car. = They've got a new car.",
+    "They've got basketball practice this evening.",
+    "He's got a terrible cold.",
+    "I've got a good idea!",
+    "I had got a red bike when I was young.",
+    "I had a red bike when I was young.",
+    "Do you know how to use have and have got?",
+    "Look at these examples to see how we use have/has got.",
+    "Grammar explanation",
+    "We use I/you/we/they + have got or he/she/it + has got to talk about things that we have.",
+    "In many situations, have and have got mean the same thing.",
+    "She has got a good job."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "_____ you got any pets?",
+      "options": [
+        "Have",
+        "having",
+        "hasn't",
+        "haven't"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to present simple: 'have got' usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "They _____ got a big garden. = They have a big garden.",
+      "options": [
+        "have",
+        "having",
+        "hasn't",
+        "haven't"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to present simple: 'have got' usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "She _____ got a good job. = She has a good job.",
+      "options": [
+        "has",
+        "having",
+        "hasn't",
+        "haven't"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to present simple: 'have got' usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "I _____ got brown hair. = I've got brown hair.",
+      "correct": "have",
+      "hint": "Apply the rule for present simple: 'have got'.",
+      "explanation": "The correct form here is 'have'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "My sister _____ got long hair. = My sister's got long hair.",
+      "correct": "has",
+      "hint": "Apply the rule for present simple: 'have got'.",
+      "explanation": "The correct form here is 'has'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "He _____ not got many friends. = He hasn't got many friends.",
+      "correct": "has",
+      "hint": "Apply the rule for present simple: 'have got'.",
+      "explanation": "The correct form here is 'has'."
+    }
+  ]
+}

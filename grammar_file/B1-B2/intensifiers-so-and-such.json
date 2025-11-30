@@ -1,0 +1,102 @@
+{
+  "id": "intensifiers-so-and-such",
+  "title": "Intensifiers: 'so' and 'such'",
+  "level": "B1-B2",
+  "introduction": "Do you know how to use the words so and such? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "We can use so and such to intensify adjectives, adverbs and nouns.",
+  "rules": [
+    "we use so much to make it stronger.",
+    "we use such to make it stronger.",
+    "we use much, many, little and few with a noun, we use so to make it stronger.",
+    "when we use much, many, little and few with a noun, we use so to make it stronger.",
+    "Nouns\n\nWith a noun or adjective + noun, we use such to make it stronger."
+  ],
+  "keyPoints": [
+    "we are using the comparative form of the adjective or adverb, we use so much to make it stronger",
+    "a noun or adjective + noun, we use such to make it stronger"
+  ],
+  "examples": [
+    "Do you know how to use the words so and such?",
+    "Look at these examples to see how so and such are used.",
+    "Traffic in the city centre is such a nightmare!",
+    "Grammar explanation",
+    "We can use so and such to intensify adjectives, adverbs and nouns.",
+    "Adjectives and adverbs",
+    "We can use so with an adjective or adverb to make it stronger.",
+    "If we are using the comparative form of the adjective or adverb, we use so much to make it stronger.",
+    "They were so much more innocent when they were younger.",
+    "I work so much more quickly when I can concentrate.",
+    "There are so many people here!",
+    "I've had so little time to myself this week.",
+    "Saying the result",
+    "We often use these so and such structures with that and a clause to say what the result is.",
+    "It was so cold that the water in the lake froze.",
+    "He was such a good teacher that we all passed the exam.",
+    "There's so much noise that I can't think!"
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Do you know how _____ use the words so and such?",
+      "options": [
+        "to",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to intensifiers: 'so' and 'such' usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Look at these examples _____ see how so and such are used.",
+      "options": [
+        "to",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to intensifiers: 'so' and 'such' usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "We can use so and such _____ intensify adjectives, adverbs and nouns.",
+      "options": [
+        "to",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to intensifiers: 'so' and 'such' usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "We can use so with an adjective or adverb _____ make it stronger.",
+      "correct": "to",
+      "hint": "Apply the rule for intensifiers: 'so' and 'such'.",
+      "explanation": "The correct form here is 'to'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "If we are using the comparative form of the adjective or adverb, we use so much _____ make it stronger.",
+      "correct": "to",
+      "hint": "Apply the rule for intensifiers: 'so' and 'such'.",
+      "explanation": "The correct form here is 'to'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "I've had so little time _____ myself this week.",
+      "correct": "to",
+      "hint": "Apply the rule for intensifiers: 'so' and 'such'.",
+      "explanation": "The correct form here is 'to'."
+    }
+  ]
+}

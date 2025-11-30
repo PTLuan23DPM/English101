@@ -124,19 +124,20 @@ export default function AIAssistant({ text, textareaRef, onSuggestionAccept }: A
           duration: 5000,
         });
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Grammar check error:", error);
       
       // Reset loading state on error
       setLoading(false);
       
-      if (error.name === 'AbortError') {
+      if (error instanceof Error && error.name === 'AbortError') {
         toast.error("Request timeout", {
           description: "Grammar check took too long. Please try again.",
         });
       } else {
+        const errorMessage = error instanceof Error ? error.message : "Make sure the Python service is running on port 5001";
         toast.error("Grammar check failed", {
-          description: error.message || "Make sure the Python service is running on port 5001",
+          description: errorMessage,
         });
       }
       
@@ -241,10 +242,11 @@ export default function AIAssistant({ text, textareaRef, onSuggestionAccept }: A
       toast.success("Suggestions generated!", {
         description: `Found ${newSuggestions.length} ways to improve your writing`,
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Suggestions error:", error);
+      const errorMessage = error instanceof Error ? error.message : "An error occurred while generating suggestions";
       toast.error("Failed to generate suggestions", {
-        description: error.message || "An error occurred while generating suggestions",
+        description: errorMessage,
       });
     } finally {
       // Ensure loading is always reset
@@ -347,8 +349,9 @@ export default function AIAssistant({ text, textareaRef, onSuggestionAccept }: A
       
       if (contextMatches.length > 0) {
         // If multiple context matches, find the one closest to original offset
+        const issueOffset = issue.offset ?? 0;
         const bestMatch = contextMatches.reduce((prev, curr) => 
-          Math.abs(curr - issue.offset) < Math.abs(prev - issue.offset) ? curr : prev
+          Math.abs(curr - issueOffset) < Math.abs(prev - issueOffset) ? curr : prev
         );
         
         // Find the issue text within the context
@@ -437,8 +440,9 @@ export default function AIAssistant({ text, textareaRef, onSuggestionAccept }: A
           const candidates = wordBoundaryMatches.length > 0 ? wordBoundaryMatches : allMatches;
           
           // Among candidates, pick the one closest to original offset
+          const issueOffset = issue.offset ?? 0;
           const bestMatch = candidates.reduce((prev, curr) => 
-            Math.abs(curr.offset - issue.offset) < Math.abs(prev.offset - issue.offset) ? curr : prev
+            Math.abs(curr.offset - issueOffset) < Math.abs(prev.offset - issueOffset) ? curr : prev
           );
           
           actualOffset = bestMatch.offset;

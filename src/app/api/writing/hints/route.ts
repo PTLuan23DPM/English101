@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
         // Validate and provide defaults if missing
         const validatedResult = {
             grammarHints: Array.isArray(result.grammarHints)
-                ? result.grammarHints.map((hint, idx) => ({
+                ? result.grammarHints.map((hint) => ({
                     location: hint.location || "Unknown location",
                     issue: hint.issue || "Grammar issue",
                     hint: hint.hint || "Check grammar",
@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
                 }))
                 : [],
             coherenceHints: Array.isArray(result.coherenceHints)
-                ? result.coherenceHints.map((hint, idx) => ({
+                ? result.coherenceHints.map((hint) => ({
                     location: hint.location || "Unknown location",
                     issue: hint.issue || "Coherence issue",
                     suggestion: hint.suggestion || "Improve coherence",

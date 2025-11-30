@@ -1,0 +1,146 @@
+{
+  "id": "comparative-adjectives",
+  "title": "Comparative adjectives",
+  "level": "A1-A2",
+  "introduction": "Do you know how to use comparative adjectives like older, better and more interesting? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "We use comparative adjectives to compare two things or show change. The comparative form depends on the number of syllables in the adjective.",
+  "rules": [
+    "We use more to make comparative forms for most other two-syllable adjectives and for all adjectives with three or more syllables:",
+    "When we want to say which person or thing we are comparing with, we can use than:",
+    "We use comparative adjectives to compare two things or show change."
+  ],
+  "keyPoints": [
+    "an adjective ends in -e, we add -r:",
+    "an adjective ends in a vowel and a consonant, we usually double the consonant:",
+    "a two-syllable adjective ends in a consonant and -y, we change -y to -i and add -er:",
+    "we want to say which person or thing we are comparing with, we can use than:"
+  ],
+  "examples": [
+    "The city is more interesting than the countryside.\n\nThis house is older than my house.\n\nShe's better at cooking now than before.",
+    "old → older\nclean → cleaner\nslow → slower",
+    "safe → safer\nnice → nicer",
+    "big → bigger\nhot → hotter",
+    "noisy → noisier\nhappy → happier\neasy → easier",
+    "crowded → more crowded\nstressful → more stressful\ndangerous → more dangerous",
+    "I think life in the countryside is simpler than in the city.\n\nIt's more simple to live in the city because everything you need is there.",
+    "good → better\nbad → worse\nfar → further/farther",
+    "Their house is cleaner than ours.\n\nTraffic is slower in the city than in the countryside.\n\nAfter the race I was more tired than Anne.",
+    "common",
+    "gentle",
+    "handsome",
+    "likely",
+    "narrow",
+    "pleasant",
+    "polite",
+    "simple and stupid"
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct word to complete the sentence:",
+      "sentence": "The city is more interesting than the countryside. This house is _____ than my house. She's better at cooking now than before.",
+      "options": [
+        "older",
+        "olders",
+        "oldered",
+        "very older"
+      ],
+      "correct": 0,
+      "explanation": "The correct answer is 'older' because..."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct word to complete the sentence:",
+      "sentence": "old → older clean _____ cleaner slow → slower",
+      "options": [
+        "→",
+        "→s",
+        "→ed",
+        "very →"
+      ],
+      "correct": 0,
+      "explanation": "The correct answer is '→' because..."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct word to complete the sentence:",
+      "sentence": "safe → safer _____ → nicer",
+      "options": [
+        "nice",
+        "nices",
+        "niceed",
+        "very nice"
+      ],
+      "correct": 0,
+      "explanation": "The correct answer is 'nice' because..."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank:",
+      "sentence": "big → bigger _____ → hotter",
+      "correct": "hot",
+      "hint": "Think about comparative adjectives",
+      "explanation": "The answer is 'hot'"
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank:",
+      "sentence": "noisy → noisier happy _____ happier easy → easier",
+      "correct": "→",
+      "hint": "Think about comparative adjectives",
+      "explanation": "The answer is '→'"
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank:",
+      "sentence": "crowded → more crowded stressful → _____ stressful dangerous → more dangerous",
+      "correct": "more",
+      "hint": "Think about comparative adjectives",
+      "explanation": "The answer is 'more'"
+    },
+    {
+      "type": "true_false",
+      "question": "Is this statement true or false?",
+      "statement": "This sentence demonstrates correct usage: I think life in the countryside is simpler than in the city.\n\nIt's more simple to live in the city because everything you need is there.",
+      "correct": true,
+      "explanation": "This sentence correctly demonstrates the grammar rule."
+    },
+    {
+      "type": "true_false",
+      "question": "Is this statement true or false?",
+      "statement": "This sentence demonstrates correct usage: good → better\nbad → worse\nfar → further/farther",
+      "correct": true,
+      "explanation": "This sentence correctly demonstrates the grammar rule."
+    },
+    {
+      "type": "matching",
+      "question": "Match the words with their correct usage:",
+      "pairs": [
+        {
+          "key": "The",
+          "value": "city is more interesting than the countryside. This house is older than my house. She's better at cooking now than before."
+        },
+        {
+          "key": "old",
+          "value": "→ older clean → cleaner slow → slower"
+        },
+        {
+          "key": "safe",
+          "value": "→ safer nice → nicer"
+        },
+        {
+          "key": "big",
+          "value": "→ bigger hot → hotter"
+        }
+      ],
+      "explanation": "Match each word with its correct context."
+    },
+    {
+      "type": "transformation",
+      "question": "Rewrite this sentence using the grammar rule:",
+      "original": "The city is more interesting than the countryside.\n\nThis house is older than my house.\n\nShe's better at cooking now than before.",
+      "hint": "Apply the rule: We use more to make comparative forms for most other two-syllable adjectives and for all adjectives with three or more syllables:",
+      "explanation": "Transform the sentence while maintaining the same meaning."
+    }
+  ]
+}

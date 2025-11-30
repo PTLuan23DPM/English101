@@ -22,6 +22,15 @@ try:
 except ImportError:
     TORCH_AVAILABLE = False
 
+try:
+    from ml_assess import QuestionAssessor, AttentionLayer
+    ML_ASSESS_AVAILABLE = True
+except Exception as exc:
+    ML_ASSESS_AVAILABLE = False
+    QuestionAssessor = None  # type: ignore
+    AttentionLayer = None  # type: ignore
+    print(f"[WARNING] QuestionAssessor not available: {exc}")
+
 
 class ModelLoader:
     """Load and manage different types of IELTS scoring models"""
@@ -79,8 +88,15 @@ class ModelLoader:
             # Load sentence transformer model
             encoder = sentence_transformers.SentenceTransformer(encoder_name)
             
+            custom_objects = {}
+            if AttentionLayer is not None:
+                custom_objects['AttentionLayer'] = AttentionLayer
+            
             # Load Keras model
-            model = keras.models.load_model(str(model_path))
+            if custom_objects:
+                model = keras.models.load_model(str(model_path), custom_objects=custom_objects)
+            else:
+                model = keras.models.load_model(str(model_path))
             
             # Load scaler if available
             scaler = None
@@ -123,8 +139,15 @@ class ModelLoader:
             # Load sentence transformer model
             encoder = sentence_transformers.SentenceTransformer(encoder_name)
             
+            custom_objects = {}
+            if AttentionLayer is not None:
+                custom_objects['AttentionLayer'] = AttentionLayer
+            
             # Load Keras model
-            model = keras.models.load_model(str(model_path))
+            if custom_objects:
+                model = keras.models.load_model(str(model_path), custom_objects=custom_objects)
+            else:
+                model = keras.models.load_model(str(model_path))
             
             # Load scaler if available
             scaler = None
@@ -261,6 +284,47 @@ class ModelLoader:
         except Exception as e:
             print(f"BERT PRO prediction error: {e}")
             raise
+    
+    def load_bert_question_model(self, model_dir: Path, use_question: bool = True) -> Dict:
+        """Load QuestionAssessor model trained via ml_assess.py"""
+        if not ML_ASSESS_AVAILABLE:
+            return {
+                'type': 'bert_question',
+                'loaded': False,
+                'error': 'ml_assess QuestionAssessor not available'
+            }
+        
+        if not model_dir.exists():
+            return {
+                'type': 'bert_question',
+                'loaded': False,
+                'error': f'Model directory not found: {model_dir}'
+            }
+        
+        try:
+            assessor = QuestionAssessor(use_question=use_question)
+            assessor.load_model(str(model_dir))
+            return {
+                'type': 'bert_question',
+                'assessor': assessor,
+                'use_question': use_question,
+                'loaded': True
+            }
+        except Exception as exc:
+            print(f"Failed to load QuestionAssessor model from {model_dir}: {exc}")
+            return {
+                'type': 'bert_question',
+                'loaded': False,
+                'error': str(exc)
+            }
+    
+    def predict_bert_question(self, model_info: Dict, essay: str, prompt: str = "", task_type: int = 2) -> float:
+        """Predict using the QuestionAssessor (ml_assess) model"""
+        if not model_info.get('loaded'):
+            raise ValueError("QuestionAssessor model not loaded")
+        assessor: QuestionAssessor = model_info['assessor']
+        result = assessor.predict(essay=essay, task_type=task_type, question=prompt or "")
+        return float(result.get('score', 0.0))
 
 
 def load_all_models(models_base_dir: Path) -> Tuple[Dict[str, Dict], ModelLoader]:
@@ -318,6 +382,21 @@ def load_all_models(models_base_dir: Path) -> Tuple[Dict[str, Dict], ModelLoader
         if model_path.exists():
             models['bert_pro'] = loader.load_bert_pro_model(model_path)
             print(f"[OK] BERT PRO model loaded from {bert_pro_dir}")
+    
+    # 5. Question-aware BERT model trained via ml_assess.py
+    question_model_dir = models_base_dir / 'bert_question_model'
+    if not question_model_dir.exists():
+        fallback_dir = models_dir / 'bert_question_model'
+        if fallback_dir.exists():
+            question_model_dir = fallback_dir
+    if question_model_dir.exists():
+        models['bert_question'] = loader.load_bert_question_model(question_model_dir, use_question=True)
+        if models['bert_question'].get('loaded'):
+            print(f"[OK] Question-aware BERT model loaded from {question_model_dir}")
+        else:
+            print(f"[WARNING] Failed to load QuestionAssessor model: {models['bert_question'].get('error')}")
+    else:
+        print("[INFO] QuestionAssessor model directory not found, skipping")
     
     return models, loader
 

@@ -1,6 +1,7 @@
 import "./globals.css";
 import { Providers } from "./providers";
 import { Toaster } from "sonner";
+import InstantLookup from "@/components/InstantLookup";
 
 export const metadata = {
   title: "English101 - Master English with CEFR Levels",
@@ -22,6 +23,7 @@ export default function RootLayout({
           closeButton
           theme="light"
         />
+        <InstantLookup />
       </body>
     </html>
   );

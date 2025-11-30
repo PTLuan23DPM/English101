@@ -1,0 +1,92 @@
+{
+  "id": "modals-deductions-about-the-past",
+  "title": "Modals: deductions about the past",
+  "level": "B1-B2",
+  "introduction": "Do you know how to use modal verbs to show how certain you are about past events? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "We can use modal verbs for deduction – guessing if something is true using the available information. The modal verb we choose shows how certain we are about the possibility. This page focuses on making deductions about the past.",
+  "rules": [
+    "must have\n\nWe use must have + past participle when we feel sure about what happened.",
+    "may have\n\nWe can use might have or may have + past participle when we think it's possible that something happened.",
+    "t have + past participle when we think it's not possible that something happened."
+  ],
+  "keyPoints": [],
+  "examples": [
+    "Do you know how to use modal verbs to show how certain you are about past events?",
+    "Look at these examples to see how must, might, may, could, can't and couldn't are used in the past.",
+    "How did she fail that exam?",
+    "Grammar explanation",
+    "We can use modal verbs for deduction – guessing if something is true using the available information.",
+    "Who told the newspapers about the prime minister's plans?",
+    "The thief must have had a key.",
+    "I think I might have left the air conditioning on.",
+    "Police think the suspect may have left the country using a fake passport.",
+    "May have is more formal than might have.",
+    "She can't have driven there.",
+    "I thought I saw Adnan this morning but it couldn't have been him – he's in Greece this week."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Look at these examples to see how must, might, may, _____, can't and couldn't are used in the past.",
+      "options": [
+        "could",
+        "will",
+        "would",
+        "shall"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to modals: deductions about the past usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "We _____ use modal verbs for deduction – guessing if something is true using the available information.",
+      "options": [
+        "can",
+        "will",
+        "would",
+        "shall"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to modals: deductions about the past usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "The thief _____ have had a key.",
+      "options": [
+        "must",
+        "will",
+        "would",
+        "shall"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to modals: deductions about the past usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "I think I _____ have left the air conditioning on.",
+      "correct": "might",
+      "hint": "Apply the rule for modals: deductions about the past.",
+      "explanation": "The correct form here is 'might'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "Police think the suspect may _____ left the country using a fake passport.",
+      "correct": "have",
+      "hint": "Apply the rule for modals: deductions about the past.",
+      "explanation": "The correct form here is 'have'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "May have is more formal than _____ have.",
+      "correct": "might",
+      "hint": "Apply the rule for modals: deductions about the past.",
+      "explanation": "The correct form here is 'might'."
+    }
+  ]
+}

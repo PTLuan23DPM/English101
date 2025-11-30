@@ -1,0 +1,139 @@
+{
+  "id": "advanced-passives-review",
+  "title": "Advanced passives review",
+  "level": "C1",
+  "introduction": "Do you know how to use all the different forms of the passive? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "We can use the passive voice to change the focus of the sentence.",
+  "rules": [],
+  "keyPoints": [
+    "we prefer not to mention who or what does the action (for example, it's not known, it's obvious or we don't want to say)",
+    "the infinitive can be simple (as above), perfect (for a past action) or continuous (for an action in progress)"
+  ],
+  "examples": [
+    "The interview was recorded yesterday.\n\nCleaner sources of energy must be developed.\n\nAn electrical fault is believed to have caused the power cut.",
+    "The new smoke alarm was installed yesterday.",
+    "The new smoke alarm was installed yesterday by the company director herself.",
+    "A podcast can be made with minimal resources. \n\nThe accident must be reported to the police.\n\nNew laws should be created to regulate electric scooters.",
+    "My bicycle got stolen last night.\n\n(= My bicycle was stolen last night.)",
+    "It is estimated that millions of people visit the site every year.\n\nIt is believed that the walls date from the third century BCE.\n\nIt is reported that mosquitoes transmit the disease.",
+    "Millions of people are estimated to visit the site every year.\n\nThe walls are believed to date from the third century BCE.\n\nMosquitoes are reported to transmit the disease.",
+    "must and should",
+    "by using modal + be + past participle",
+    "allege",
+    "believe",
+    "consider",
+    "estimate",
+    "expect",
+    "report",
+    "understand"
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct word to complete the sentence:",
+      "sentence": "The interview was recorded yesterday. Cleaner sources of energy must be _____ An electrical fault is believed to have caused the power cut.",
+      "options": [
+        "developed.",
+        "developed.s",
+        "developed.ed",
+        "very developed."
+      ],
+      "correct": 0,
+      "explanation": "The correct answer is 'developed.' because..."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct word to complete the sentence:",
+      "sentence": "The new smoke _____ was installed yesterday.",
+      "options": [
+        "alarm",
+        "alarms",
+        "alarmed",
+        "very alarm"
+      ],
+      "correct": 0,
+      "explanation": "The correct answer is 'alarm' because..."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct word to complete the sentence:",
+      "sentence": "The new smoke alarm was installed _____ by the company director herself.",
+      "options": [
+        "yesterday",
+        "yesterdays",
+        "yesterdayed",
+        "very yesterday"
+      ],
+      "correct": 0,
+      "explanation": "The correct answer is 'yesterday' because..."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank:",
+      "sentence": "A podcast can be made with minimal resources. The accident must be _____ to the police. New laws should be created to regulate electric scooters.",
+      "correct": "reported",
+      "hint": "Think about advanced passives review",
+      "explanation": "The answer is 'reported'"
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank:",
+      "sentence": "My bicycle got stolen last night. _____ My bicycle was stolen last night.)",
+      "correct": "(=",
+      "hint": "Think about advanced passives review",
+      "explanation": "The answer is '(='"
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank:",
+      "sentence": "It is estimated that millions of people visit the site every year. It is believed that _____ walls date from the third century BCE. It is reported that mosquitoes transmit the disease.",
+      "correct": "the",
+      "hint": "Think about advanced passives review",
+      "explanation": "The answer is 'the'"
+    },
+    {
+      "type": "true_false",
+      "question": "Is this statement true or false?",
+      "statement": "This sentence demonstrates correct usage: Millions of people are estimated to visit the site every year.\n\nThe walls are believed to date from the third century BCE.\n\nMosquitoes are reported to transmit the disease.",
+      "correct": true,
+      "explanation": "This sentence correctly demonstrates the grammar rule."
+    },
+    {
+      "type": "true_false",
+      "question": "Is this statement true or false?",
+      "statement": "This sentence demonstrates correct usage: must and should",
+      "correct": true,
+      "explanation": "This sentence correctly demonstrates the grammar rule."
+    },
+    {
+      "type": "matching",
+      "question": "Match the words with their correct usage:",
+      "pairs": [
+        {
+          "key": "The",
+          "value": "interview was recorded yesterday. Cleaner sources of energy must be developed. An electrical fault is believed to have caused the power cut."
+        },
+        {
+          "key": "The",
+          "value": "new smoke alarm was installed yesterday."
+        },
+        {
+          "key": "The",
+          "value": "new smoke alarm was installed yesterday by the company director herself."
+        },
+        {
+          "key": "A",
+          "value": "podcast can be made with minimal resources. The accident must be reported to the police. New laws should be created to regulate electric scooters."
+        }
+      ],
+      "explanation": "Match each word with its correct context."
+    },
+    {
+      "type": "transformation",
+      "question": "Rewrite this sentence using the grammar rule:",
+      "original": "The interview was recorded yesterday.\n\nCleaner sources of energy must be developed.\n\nAn electrical fault is believed to have caused the power cut.",
+      "hint": "Apply the rule: Advanced passives review",
+      "explanation": "Transform the sentence while maintaining the same meaning."
+    }
+  ]
+}

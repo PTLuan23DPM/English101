@@ -1,0 +1,101 @@
+{
+  "id": "using-as-and-like",
+  "title": "Using 'as' and 'like'",
+  "level": "B1-B2",
+  "introduction": "Do you know how to use like and as? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "as and like are often confused since they can both be used for comparisons. There are, however, important differences.",
+  "rules": [
+    "Making comparisons\n\nas + adjective + as and as much as",
+    "like + noun",
+    "as though + clause",
+    "Talking about a job or function\n\nWe can use as + noun to talk about a job or function."
+  ],
+  "keyPoints": [],
+  "examples": [
+    "to give examples",
+    "Do you know how to use like and as?",
+    "Look at these examples to see how as and like are used.",
+    "He looks as if he hasn't slept.",
+    "As you know, this is the third time I've had to complain.",
+    "He looks like his dad.",
+    "She's like a sister to me.",
+    "Try to do something relaxing, like reading a book or having a bath.",
+    "Grammar explanation",
+    "as and like are often confused since they can both be used for comparisons.",
+    "She loves curry as much as I do.",
+    "He's not as tall as his brother.",
+    "That dog is as big as that child!",
+    "You also have to use as in the expression the same as.",
+    "Your phone is the same as mine.",
+    "Texting is not the same as speaking in person.",
+    "In the following comparisons, like is followed by a noun or a pronoun to say that two things are similar.",
+    "There are lots of people like us.",
+    "It is also common to make comparisons using like with verbs of the senses.",
+    "As if and as though can be used to compare a real situation to an imaginary situation."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "_____ give examples",
+      "options": [
+        "to",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to using 'as' and 'like' usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Do you know how to use _____ and as?",
+      "options": [
+        "like",
+        "likes",
+        "likeed",
+        "not like"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to using 'as' and 'like' usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Look at these examples to see how as and _____ are used.",
+      "options": [
+        "like",
+        "likes",
+        "likeed",
+        "not like"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to using 'as' and 'like' usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "As you know, this is the third time I've had _____ complain.",
+      "correct": "to",
+      "hint": "Apply the rule for using 'as' and 'like'.",
+      "explanation": "The correct form here is 'to'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "He looks _____ his dad.",
+      "correct": "like",
+      "hint": "Apply the rule for using 'as' and 'like'.",
+      "explanation": "The correct form here is 'like'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "She's _____ a sister to me.",
+      "correct": "like",
+      "hint": "Apply the rule for using 'as' and 'like'.",
+      "explanation": "The correct form here is 'like'."
+    }
+  ]
+}

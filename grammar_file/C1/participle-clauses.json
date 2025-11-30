@@ -1,0 +1,100 @@
+{
+  "id": "participle-clauses",
+  "title": "Participle clauses",
+  "level": "C1",
+  "introduction": "Do you know how to use participle clauses to say information in a more economical way? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "Participle clauses enable us to say information in a more economical way. They are formed using present participles (going, reading, seeing, walking, etc.), past participles (gone, read, seen, walked, etc.) or perfect participles (having gone, having read, having seen, having walked, etc.).",
+  "rules": [
+    "we use present participle clauses. Note that present participles have a similar meaning to active verbs."
+  ],
+  "keyPoints": [
+    "a similar meaning to an if condition"
+  ],
+  "examples": [
+    "while and in spite of",
+    "Do you know how to use participle clauses to say information in a more economical way?",
+    "Look at these examples to see how participle clauses are used.",
+    "Looked after carefully, these boots will last for many years.",
+    "Not wanting to hurt his feelings, I avoided the question.",
+    "Having lived through difficult times together, they were very close friends.",
+    "Participle clauses do not have a specific tense.",
+    "Participle clauses are mainly used in written texts, particularly in a literary, academic or journalistic style.",
+    "Present participle clauses",
+    "Here are some common ways we use present participle clauses.",
+    "To talk about an action that happened at the same time as another action",
+    "Standing in the queue, I realised I didn't have any money.",
+    "Past participle clauses",
+    "Here are some common ways that we use past participle clauses.",
+    "With a similar meaning to an if condition",
+    "Used in this way, participles can make your writing more concise.",
+    "Perfect participle clauses",
+    "Perfect participle clauses show that the action they describe was finished before the action in the main clause.",
+    "Having got dressed, he slowly went downstairs.",
+    "Having finished their training, they will be fully qualified doctors."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Do you know how _____ use participle clauses to say information in a more economical way?",
+      "options": [
+        "to",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to participle clauses usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Look at these examples _____ see how participle clauses are used.",
+      "options": [
+        "to",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to participle clauses usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Not wanting _____ hurt his feelings, I avoided the question.",
+      "options": [
+        "to",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to participle clauses usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "Participle clauses do not _____ a specific tense.",
+      "correct": "have",
+      "hint": "Apply the rule for participle clauses.",
+      "explanation": "The correct form here is 'have'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "_____ talk about an action that happened at the same time as another action",
+      "correct": "To",
+      "hint": "Apply the rule for participle clauses.",
+      "explanation": "The correct form here is 'To'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "Standing in the queue, I realised I didn't _____ any money.",
+      "correct": "have",
+      "hint": "Apply the rule for participle clauses.",
+      "explanation": "The correct form here is 'have'."
+    }
+  ]
+}

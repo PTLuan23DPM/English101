@@ -1,0 +1,103 @@
+{
+  "id": "present-perfect",
+  "title": "Present perfect",
+  "level": "B1-B2",
+  "introduction": "Do you know how to use phrases like She's called every day this week, I've broken my leg and Have you ever been to Scotland? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "We use the present perfect simple (have or has + past participle) to talk about past actions or states which are still connected to the present.",
+  "rules": [
+    "We use the present perfect simple (have or has + past participle) to talk about past actions or states which are still connected to the present.",
+    "when something happened, or we feel that that part of our life is finished, we use the past simple.",
+    "when it happened, we use the past simple.",
+    "have or has + past participle) to talk about past actions or states which are still connected to the present."
+  ],
+  "keyPoints": [
+    "we say when something happened, or we feel that that part of our life is finished, we use the past simple"
+  ],
+  "examples": [
+    "He's been to ten different countries.",
+    "I haven't seen her today.",
+    "My phone's run out of battery. Can I use yours?",
+    "Have you ever dyed your hair a different colour?",
+    "They've been on holiday twice this year.",
+    "We haven't had a lot of positive feedback so far.",
+    "I'm sure I've seen that film before.",
+    "I've worked for six different companies.",
+    "He's never won a gold medal.",
+    "Have you ever been to Australia?",
+    "She's wanted to be a police officer since she was a child.",
+    "I haven't known him for very long.",
+    "How long have you had that phone?",
+    "We visited Russia for the first time in 1992.",
+    "I went to three different primary schools.",
+    "Before she retired, she worked in several different countries.",
+    "We knew all our neighbours when we were children.",
+    "I didn't like bananas for a really long time. Now I love them!",
+    "He's broken his leg so he can't go on holiday.",
+    "There's been an accident on the main road, so let's take a different route."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "He's been _____ ten different countries.",
+      "options": [
+        "to",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to present perfect usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "_____ you ever dyed your hair a different colour?",
+      "options": [
+        "Have",
+        "having",
+        "hasn't",
+        "haven't"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to present perfect usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "He's _____ won a gold medal.",
+      "options": [
+        "never",
+        "nevers",
+        "nevered",
+        "not never"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to present perfect usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "_____ you ever been to Australia?",
+      "correct": "Have",
+      "hint": "Apply the rule for present perfect.",
+      "explanation": "The correct form here is 'Have'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "She's wanted _____ be a police officer since she was a child.",
+      "correct": "to",
+      "hint": "Apply the rule for present perfect.",
+      "explanation": "The correct form here is 'to'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "How long _____ you had that phone?",
+      "correct": "have",
+      "hint": "Apply the rule for present perfect.",
+      "explanation": "The correct form here is 'have'."
+    }
+  ]
+}

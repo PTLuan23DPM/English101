@@ -1,0 +1,68 @@
+{
+  "id": "possession-and-noun-modifiers",
+  "title": "Possession and noun modifiers",
+  "level": "C1",
+  "introduction": "Do you know how to use noun modifiers or different possessive forms? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "Possession with 's",
+  "rules": [
+    "We use apostrophes to show that something belongs to a person or an animal."
+  ],
+  "keyPoints": [
+    "we're talking about a place or group made up of people",
+    "some time expressions",
+    "the word 'life'",
+    "things, ideas, etc",
+    "the words expressing units here are singular, not plural"
+  ],
+  "examples": [
+    "the beginning of",
+    "the side of",
+    "Do you know how to use noun modifiers or different possessive forms?",
+    "Nelson Mandela's words",
+    "the dogs' blankets",
+    "people's busy working days",
+    "We don't usually use 's with things.",
+    "We normally use of to talk about position or to say which part of something we are referring to.",
+    "Sometimes, both 's and of are possible.",
+    "In these cases, it is a matter of the writer's or speaker's preference in that particular context.",
+    "Or they can show that one thing is a part of something else.",
+    "London interior designers",
+    "a home office chair",
+    "Measurements, ages and values can also be used as noun modifiers."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Do you know how _____ use noun modifiers or different possessive forms?",
+      "options": [
+        "to",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to possession and noun modifiers usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "We normally use of _____ talk about position or to say which part of something we are referring to.",
+      "options": [
+        "to",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to possession and noun modifiers usage."
+    },
+    {
+      "type": "true_false",
+      "question": "Is this statement correct?",
+      "statement": "We use apostrophes to show that something belongs to a person or an animal.",
+      "correct": true,
+      "explanation": "This reflects the rule from the lesson."
+    }
+  ]
+}

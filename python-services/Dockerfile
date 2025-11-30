@@ -1,40 +1,37 @@
-# Sử dụng Python 3.10 slim để nhẹ
 FROM python:3.10-slim
-
-# Thiết lập biến môi trường để pip không cache (tiết kiệm disk) và tăng timeout
-ENV PIP_NO_CACHE_DIR=1 \
-    PIP_DEFAULT_TIMEOUT=100 \
-    PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-# 1. Cài đặt System Dependencies
+# Cài system deps và dọn dẹp ngay lập tức
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    gcc \
-    g++ \
-    ffmpeg \
-    libsndfile1 \
-    git \
+    gcc g++ ffmpeg libsndfile1 git \
     && rm -rf /var/lib/apt/lists/*
 
-# 2. Nâng cấp pip trước
-RUN pip install --upgrade pip
+# Upgrade pip
+RUN pip install --no-cache-dir --upgrade pip
 
-# 3. Copy requirements
+# --- CHIẾN THUẬT CHIA NHỎ ---
+
+# 1. Cài Torch CPU trước (Nặng nhất ~200MB whl -> 800MB installed)
+RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu
+
+# 2. Cài Transformers & Sentence-Transformers (Khá nặng)
+RUN pip install --no-cache-dir transformers sentence-transformers
+
+# 3. Cài Whisper & Librosa (Nặng trung bình)
+RUN pip install --no-cache-dir openai-whisper librosa soundfile scipy fastdtw
+
+# 4. Cài các thư viện nhẹ còn lại (Flask, Gunicorn...)
 COPY requirements.txt .
+# Dùng grep để loại bỏ các thư viện đã cài ở trên khỏi file requirements để tránh cài lại
+RUN grep -vE "torch|transformers|sentence-transformers|openai-whisper|librosa|soundfile|scipy|fastdtw" requirements.txt > req_light.txt && \
+    pip install --no-cache-dir -r req_light.txt
 
-# 4. Cài đặt Python Dependencies (Chia nhỏ để tránh lỗi mạng/bộ nhớ)
-# Cài các gói nặng trước (Torch CPU version để nhẹ)
-RUN pip install torch --index-url https://download.pytorch.org/whl/cpu
+# ----------------------------
 
-# Cài các gói còn lại với retry
-RUN pip install -r requirements.txt --retries 5
-
-# 5. Copy code
 COPY . .
-
-# Tạo thư mục temp
 RUN mkdir -p temp_audio
+ENV PYTHONUNBUFFERED=1
+EXPOSE 8080
 
-# 6. Lệnh chạy Server
 CMD sh -c "gunicorn --bind 0.0.0.0:$PORT --workers 1 --threads 8 --timeout 0 ai_scorer:app"

@@ -1,46 +1,38 @@
+# Sử dụng Python 3.10 slim để nhẹ
 FROM python:3.10-slim
 
+# Thiết lập thư mục làm việc
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
+# 1. Cài đặt System Dependencies (Gộp chung 1 lệnh để tối ưu layer)
+# gcc, g++: Cho các thư viện Python cần biên dịch
+# ffmpeg, libsndfile1: Cho xử lý Audio (Speaking)
+RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     g++ \
-    && rm -rf /var/lib/apt/lists/*
-
-# Copy requirements
-COPY requirements.txt .
-
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy application code
-COPY ai_scorer.py .
-
-RUN apt-get update && apt-get install -y --no-install-recommends \
     ffmpeg \
     libsndfile1 \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy other Python files that might be needed
-COPY *.py ./
+# 2. Cài đặt Python Dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
-# Create ai-models directory (will be empty if ai-models not in build context)
-RUN mkdir -p ./ai-models
+# 3. Copy toàn bộ code vào (Bao gồm ai_scorer.py và các module khác)
+COPY . .
 
-# Copy ai-models directory if it exists in build context
-# Note: If ai-models is empty or doesn't exist, this will create an empty directory
-# which is fine - the application should handle missing models gracefully
-COPY ai-models ./ai-models/
+# Tạo thư mục temp để xử lý audio (nếu chưa có)
+RUN mkdir -p temp_audio
 
-# Expose port
+# 4. Cấu hình biến môi trường
+# PYTHONUNBUFFERED=1: Log hiện ngay lập tức (quan trọng để debug trên Cloud Run)
+ENV PYTHONUNBUFFERED=1
+
+# EXPOSE chỉ để document, Cloud Run sẽ tự map port
 EXPOSE 8080
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD python -c "import requests; requests.get('http://localhost:8080/health')" || exit 1
-
-# Run the application
-# Sử dụng exec và :$PORT để nhận cổng từ Google Cloud Run
-# --timeout 0 để gunicorn không tự kill khi AI load lâu
-CMD exec gunicorn --bind :$PORT --workers 1 --threads 8 --timeout 0 ai_scorer:app
+# 5. Lệnh chạy Server (Quan trọng)
+# Dùng 'sh -c' để biến $PORT được hiểu đúng
+# --timeout 0: Vô hiệu hóa timeout của Gunicorn worker (để AI load lâu không bị kill)
+CMD sh -c "gunicorn --bind 0.0.0.0:$PORT --workers 1 --threads 8 --timeout 0 ai_scorer:app"

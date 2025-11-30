@@ -1,0 +1,95 @@
+{
+  "id": "different-uses-of-used-to",
+  "title": "Different uses of 'used to'",
+  "level": "B1-B2",
+  "introduction": "Do you know the difference between I used to drive on the left and I'm used to driving on the left? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "Used to + infinitive and be/get used to + -ing look similar but they have very different uses.",
+  "rules": [
+    "We use used to + infinitive to talk about a past situation that is no longer true.",
+    "We use get used to to talk about the process of becoming familiar with something.",
+    "Be used to means 'be familiar with' or 'be accustomed to'.",
+    "Grammar explanation\n\nUsed to + infinitive and be/get used to + -ing look similar but they have very different uses."
+  ],
+  "keyPoints": [],
+  "examples": [
+    "Do you know the difference between I used to drive on the left and I'm used to driving on the left?",
+    "Look at these examples to see how used to, get used to and be used to are used.",
+    "I used to want to be a lawyer but then I realised how hard they work!",
+    "Grammar explanation",
+    "Used to + infinitive and be/get used to + -ing look similar but they have very different uses.",
+    "She used to be a long-distance runner when she was younger.",
+    "I didn't use to sleep very well, but then I started doing yoga and it really helps.",
+    "Did you use to come here as a child?",
+    "She's used to the city now and doesn't get lost any more.",
+    "He wasn't used to walking so much and his legs hurt after the hike.",
+    "I'm finding this new job hard but I'm sure I'll get used to it soon.",
+    "It took my mother years to get used to living in London after moving from Pakistan.",
+    "I'm getting used to the noise now.",
+    "Be used to and get used to are followed by a noun, pronoun or the -ing form of a verb, and can be used about the past, present or future."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Do you know the difference between I used _____ drive on the left and I'm used to driving on the left?",
+      "options": [
+        "to",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to different uses of 'used to' usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Look at these examples _____ see how used to, get used to and be used to are used.",
+      "options": [
+        "to",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to different uses of 'used to' usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "I used _____ want to be a lawyer but then I realised how hard they work!",
+      "options": [
+        "to",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to different uses of 'used to' usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "Used to + _____ + -ing look similar but they have very different uses.",
+      "correct": "infinitive and be/get used to",
+      "hint": "Apply the rule for different uses of 'used to'.",
+      "explanation": "The correct form here is 'infinitive and be/get used to'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "She used _____ be a long-distance runner when she was younger.",
+      "correct": "to",
+      "hint": "Apply the rule for different uses of 'used to'.",
+      "explanation": "The correct form here is 'to'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "I didn't use _____ sleep very well, but then I started doing yoga and it really helps.",
+      "correct": "to",
+      "hint": "Apply the rule for different uses of 'used to'.",
+      "explanation": "The correct form here is 'to'."
+    }
+  ]
+}

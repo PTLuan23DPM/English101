@@ -28,6 +28,8 @@ services:
     volumes:
       - ./python-services/ai-models:/app/ai-models
       - ./ai-models:/app/ai-models:ro
+    env_file:
+      - .env
     environment:
       - FLASK_ENV=production
       - PYTHONUNBUFFERED=1

@@ -1,0 +1,266 @@
+{
+  "prompt": "Please read: The quick brown fox jumps over the lazy dog.",
+  "expected_text": "The quick brown fox jumps over the lazy dog.",
+  "transcription": "The quick brown fox jumps over the lazy dog.",
+  "audio_file": "speed_demo\\recording.wav",
+  "phoneme_sequence": [
+    {
+      "word": "the",
+      "phonemes": [
+        "DH",
+        "AH0"
+      ]
+    },
+    {
+      "word": "quick",
+      "phonemes": [
+        "K",
+        "W",
+        "IH1",
+        "K"
+      ]
+    },
+    {
+      "word": "brown",
+      "phonemes": [
+        "B",
+        "R",
+        "AW1",
+        "N"
+      ]
+    },
+    {
+      "word": "fox",
+      "phonemes": [
+        "F",
+        "AA1",
+        "K",
+        "S"
+      ]
+    },
+    {
+      "word": "jumps",
+      "phonemes": [
+        "JH",
+        "AH1",
+        "M",
+        "P",
+        "S"
+      ]
+    },
+    {
+      "word": "over",
+      "phonemes": [
+        "OW1",
+        "V",
+        "ER0"
+      ]
+    },
+    {
+      "word": "the",
+      "phonemes": [
+        "DH",
+        "AH0"
+      ]
+    },
+    {
+      "word": "lazy",
+      "phonemes": [
+        "L",
+        "EY1",
+        "Z",
+        "IY0"
+      ]
+    },
+    {
+      "word": "dog",
+      "phonemes": [
+        "D",
+        "AO1",
+        "G"
+      ]
+    }
+  ],
+  "dtw_results": null,
+  "gop_results": {
+    "word_scores": [
+      {
+        "word": "the",
+        "expected_word": "the",
+        "phonemes": [
+          "DH",
+          "AH0"
+        ],
+        "expected_phonemes": [
+          "DH",
+          "AH0"
+        ],
+        "phoneme_match": 1.0,
+        "gop": -0.0,
+        "quality": "Excellent"
+      },
+      {
+        "word": "quick",
+        "expected_word": "quick",
+        "phonemes": [
+          "K",
+          "W",
+          "IH1",
+          "K"
+        ],
+        "expected_phonemes": [
+          "K",
+          "W",
+          "IH1",
+          "K"
+        ],
+        "phoneme_match": 1.0,
+        "gop": -0.0,
+        "quality": "Excellent"
+      },
+      {
+        "word": "brown",
+        "expected_word": "brown",
+        "phonemes": [
+          "B",
+          "R",
+          "AW1",
+          "N"
+        ],
+        "expected_phonemes": [
+          "B",
+          "R",
+          "AW1",
+          "N"
+        ],
+        "phoneme_match": 1.0,
+        "gop": -0.0,
+        "quality": "Excellent"
+      },
+      {
+        "word": "fox",
+        "expected_word": "fox",
+        "phonemes": [
+          "F",
+          "AA1",
+          "K",
+          "S"
+        ],
+        "expected_phonemes": [
+          "F",
+          "AA1",
+          "K",
+          "S"
+        ],
+        "phoneme_match": 1.0,
+        "gop": -0.0,
+        "quality": "Excellent"
+      },
+      {
+        "word": "jumps",
+        "expected_word": "jumps",
+        "phonemes": [
+          "JH",
+          "AH1",
+          "M",
+          "P",
+          "S"
+        ],
+        "expected_phonemes": [
+          "JH",
+          "AH1",
+          "M",
+          "P",
+          "S"
+        ],
+        "phoneme_match": 1.0,
+        "gop": -0.0,
+        "quality": "Excellent"
+      },
+      {
+        "word": "over",
+        "expected_word": "over",
+        "phonemes": [
+          "OW1",
+          "V",
+          "ER0"
+        ],
+        "expected_phonemes": [
+          "OW1",
+          "V",
+          "ER0"
+        ],
+        "phoneme_match": 1.0,
+        "gop": -0.0,
+        "quality": "Excellent"
+      },
+      {
+        "word": "the",
+        "expected_word": "the",
+        "phonemes": [
+          "DH",
+          "AH0"
+        ],
+        "expected_phonemes": [
+          "DH",
+          "AH0"
+        ],
+        "phoneme_match": 1.0,
+        "gop": -0.0,
+        "quality": "Excellent"
+      },
+      {
+        "word": "lazy",
+        "expected_word": "lazy",
+        "phonemes": [
+          "L",
+          "EY1",
+          "Z",
+          "IY0"
+        ],
+        "expected_phonemes": [
+          "L",
+          "EY1",
+          "Z",
+          "IY0"
+        ],
+        "phoneme_match": 1.0,
+        "gop": -0.0,
+        "quality": "Excellent"
+      },
+      {
+        "word": "dog",
+        "expected_word": "dog",
+        "phonemes": [
+          "D",
+          "AO1",
+          "G"
+        ],
+        "expected_phonemes": [
+          "D",
+          "AO1",
+          "G"
+        ],
+        "phoneme_match": 1.0,
+        "gop": -0.0,
+        "quality": "Excellent"
+      }
+    ],
+    "overall_gop": 0.0,
+    "overall_quality": "Excellent",
+    "expected_phoneme_count": 31,
+    "actual_phoneme_count": 31,
+    "matching_phonemes": 26,
+    "phoneme_accuracy": 1.0,
+    "phoneme_match_score": 1.0,
+    "acoustic_quality_score": 1.0
+  },
+  "final_score": {
+    "final_score": 100.0,
+    "grade": "A",
+    "gop_component": 100.0,
+    "content_accuracy": 100.0,
+    "content_matched": true,
+    "dtw_component": null
+  }
+}

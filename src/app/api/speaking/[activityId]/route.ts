@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import prisma from "@/lib/prisma";
+import { requireAuth, unauthorizedResponse } from "@/server/utils/auth";
+import { activityController } from "@/server/controllers/activityController";
 
 /**
  * @swagger
  * /api/speaking/{activityId}:
  *   get:
- *     summary: Get speaking activity detail with prompts
+ *     summary: Get speaking activity detail
  *     tags: [Speaking]
  *     parameters:
  *       - in: path
@@ -17,7 +16,7 @@ import prisma from "@/lib/prisma";
  *           type: string
  *     responses:
  *       200:
- *         description: Activity details with speaking prompts
+ *         description: Activity details
  *       401:
  *         description: Unauthorized
  *       404:
@@ -28,71 +27,27 @@ export async function GET(
   { params }: { params: Promise<{ activityId: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    await requireAuth();
 
     const { activityId } = await params;
-    const activity = await prisma.activity.findUnique({
-      where: { id: activityId },
-      include: {
-        unit: {
-          select: {
-            title: true,
-            level: true,
-          },
-        },
-        questions: {
-          include: {
-            media: {
-              select: {
-                id: true,
-                url: true,
-                type: true,
-              },
-            },
-          },
-          orderBy: { order: 'asc' },
-        },
-      },
-    });
+    const result = await activityController.getActivityById(activityId, "SPEAKING");
 
-    if (!activity) {
-      return NextResponse.json({ error: "Activity not found" }, { status: 404 });
+    return NextResponse.json(result.data);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    
+    if (errorMessage === "Unauthorized") {
+      return unauthorizedResponse();
     }
 
-    // Format questions for speaking
-    const prompts = activity.questions.map((q) => ({
-      id: q.id,
-      order: q.order,
-      type: q.type,
-      prompt: q.prompt,
-      score: q.score,
-      preparationTime: 30, // seconds to prepare
-      recordingTime: 60, // seconds to record
-      sampleAudio: Array.isArray(q.media) ? q.media[0]?.url : undefined, // Optional sample answer
-    }));
+    if (errorMessage === "Activity not found") {
+      return NextResponse.json({ error: errorMessage }, { status: 404 });
+    }
 
-    return NextResponse.json({
-      activity: {
-        id: activity.id,
-        title: activity.title,
-        instruction: activity.instruction,
-        level: activity.level,
-        type: activity.type,
-        maxScore: activity.maxScore,
-        timeLimitSec: activity.timeLimitSec,
-        unitTitle: activity.unit.title,
-      },
-      prompts,
-    });
-  } catch (error) {
     console.error("Error fetching speaking activity:", error);
     return NextResponse.json(
-      { error: "Failed to fetch activity" },
+      { error: errorMessage || "Failed to fetch activity" },
       { status: 500 }
     );
   }
 }
-

@@ -1,0 +1,101 @@
+{
+  "id": "past-ability",
+  "title": "Past ability",
+  "level": "B1-B2",
+  "introduction": "Do you know how to use could, was able to and managed to to talk about past abilities? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "General ability",
+  "rules": [
+    "we use was/were able to (= had the ability to) and managed to (= succeeded in doing something difficult).",
+    "When we talk about achieving something on a specific occasion in the past, we use was/were able to (= had the ability to) and managed to (= succeeded in doing something difficult).",
+    "When we talk about a specific occasion when someone didn't have the ability to do something, we can use wasn't/weren't able to, didn't manage to or couldn't."
+  ],
+  "keyPoints": [
+    "I lived next to the pool, I could go swimming every day",
+    "wasn't/weren't able to is more formal than couldn't, while didn't manage to emphasises that the thing was difficult to do"
+  ],
+  "examples": [
+    "Do you know how to use could, was able to and managed to to talk about past abilities?",
+    "Look at these examples to see how could, was able to and managed to are used.",
+    "I could play the guitar when I was seven years old.",
+    "The police weren't able to catch the speeding car.",
+    "Grammar explanation",
+    "General ability",
+    "We usually use could or couldn't to talk about general abilities in the past.",
+    "She could paint before she started school.",
+    "I couldn't cook until I went to university.",
+    "When I lived next to the pool, I could go swimming every day.",
+    "The burglar was able to get in through the bathroom window.",
+    "The burglar managed to get in through the bathroom window even though it was locked.",
+    "Could is not usually correct when we're talking about ability at a specific moment in the past.",
+    "Ability on one occasion – unsuccessful",
+    "When we talk about a specific occasion when someone didn't have the ability to do something, we can use wasn't/weren't able to, didn't manage to or couldn't.",
+    "The speaker wasn't able to attend the conference due to illness.",
+    "She couldn't watch the match because she was working.",
+    "They worked on it for months but they didn't manage to find a solution."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Do you know how to use could, _____ able to and managed to to talk about past abilities?",
+      "options": [
+        "was",
+        "be",
+        "been",
+        "being"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to past ability usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Look at these examples to see how could, _____ able to and managed to are used.",
+      "options": [
+        "was",
+        "be",
+        "been",
+        "being"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to past ability usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "I could play the guitar when I _____ seven years old.",
+      "options": [
+        "was",
+        "be",
+        "been",
+        "being"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to past ability usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "The police weren't able _____ catch the speeding car.",
+      "correct": "to",
+      "hint": "Apply the rule for past ability.",
+      "explanation": "The correct form here is 'to'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "We usually use could or couldn't _____ talk about general abilities in the past.",
+      "correct": "to",
+      "hint": "Apply the rule for past ability.",
+      "explanation": "The correct form here is 'to'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "I couldn't cook until I went _____ university.",
+      "correct": "to",
+      "hint": "Apply the rule for past ability.",
+      "explanation": "The correct form here is 'to'."
+    }
+  ]
+}

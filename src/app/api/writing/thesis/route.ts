@@ -23,18 +23,47 @@ export async function POST(req: NextRequest) {
         const prompt = buildThesisPrompt(level, type, topic, stance);
         const response = await callGemini(prompt, SYSTEM_INSTRUCTIONS.THESIS, {
             temperature: 0.7,
-            maxTokens: 2000, // Increased to prevent truncation
+            maxTokens: 2500, // Increased to prevent truncation
         });
 
         console.log("[Thesis API] Raw Gemini response length:", response.length);
+        console.log("[Thesis API] Raw Gemini response (first 500 chars):", response.substring(0, 500));
 
-        const result = parseGeminiJSON<{
-            options?: Array<{
-                thesis?: string;
-                mainPoints?: string[];
-                approach?: string;
-            }>;
-        }>(response);
+        let result;
+        try {
+            result = parseGeminiJSON<{
+                options?: Array<{
+                    thesis?: string;
+                    mainPoints?: string[];
+                    approach?: string;
+                }>;
+            }>(response);
+
+            console.log("[Thesis API] Parsed result:", JSON.stringify(result, null, 2));
+        } catch (parseError) {
+            console.error("[Thesis API] JSON parsing failed:", parseError);
+            console.error("[Thesis API] Full response:", response);
+            // Return default result instead of throwing
+            return NextResponse.json({
+                options: [
+                    {
+                        thesis: `This essay will discuss ${topic} from a ${type} perspective at ${level} level.`,
+                        mainPoints: ["Main point 1", "Main point 2", "Main point 3"],
+                        approach: "General approach for this essay type",
+                    },
+                    {
+                        thesis: `The essay explores ${topic} through the lens of ${type} analysis.`,
+                        mainPoints: ["Key aspect 1", "Key aspect 2"],
+                        approach: "Alternative approach",
+                    },
+                    {
+                        thesis: `This writing addresses ${topic} using a ${type} framework.`,
+                        mainPoints: ["Important point 1", "Important point 2", "Important point 3"],
+                        approach: "Structured approach",
+                    },
+                ],
+            });
+        }
 
         // Validate and provide defaults if missing
         if (!result.options || !Array.isArray(result.options) || result.options.length === 0) {
@@ -60,8 +89,25 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ options: validatedOptions });
     } catch (error) {
         console.error("Thesis generation error:", error);
+        const errorMessage = error instanceof Error ? error.message : "Failed to generate thesis";
+        
+        // Handle 503 errors from Gemini
+        const geminiError = error as { code?: number; status?: string; error?: { code?: number; message?: string } };
+        if (geminiError.code === 503 || geminiError.status === "UNAVAILABLE" || geminiError.error?.code === 503) {
+            return NextResponse.json(
+                {
+                    error: {
+                        code: 503,
+                        message: geminiError.error?.message || "The model is overloaded. Please try again later.",
+                        status: "UNAVAILABLE",
+                    },
+                },
+                { status: 503 }
+            );
+        }
+
         return NextResponse.json(
-            { error: error instanceof Error ? error.message : "Failed to generate thesis" },
+            { error: errorMessage },
             { status: 500 }
         );
     }

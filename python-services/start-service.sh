@@ -2,7 +2,7 @@
 
 echo ""
 echo "========================================"
-echo "  IELTS Writing Scorer Service"
+echo "  AI Scorer Service (Writing & Speaking)"
 echo "========================================"
 echo ""
 
@@ -45,12 +45,12 @@ if [ ! -d "../ai-models/writing-scorer/models" ]; then
 fi
 
 # Start service
-echo "[INFO] Starting Writing Scorer Service..."
-echo "[INFO] Service will run on: http://localhost:5001"
+echo "[INFO] Starting AI Scorer Service (Writing & Speaking)..."
+echo "[INFO] Service will run on: http://localhost:8080"
 echo "[INFO] Press Ctrl+C to stop"
 echo ""
 echo "========================================"
 echo ""
 
-python3 writing_scorer.py
+python3 ai_scorer.py
 

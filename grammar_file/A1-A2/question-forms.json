@@ -1,0 +1,99 @@
+{
+  "id": "question-forms",
+  "title": "Question forms",
+  "level": "A1-A2",
+  "introduction": "Do you know how to make questions? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "To make questions, we often put the verb before the subject. This is called inversion.",
+  "rules": [],
+  "keyPoints": [
+    "did you get here?",
+    "there is a question word (why, what, where, how, etc",
+    "other verbs in the present simple, we use the auxiliary verb do/does in the question"
+  ],
+  "examples": [
+    "They are waiting",
+    "Do you know how to make questions?",
+    "Look at these examples to see how questions are made.",
+    "Is he a teacher?",
+    "Does she eat meat?",
+    "When did you get here?",
+    "How much does a train ticket cost?",
+    "She is sleeping.",
+    "We have met before.",
+    "If there is a question word (why, what, where, how, etc.",
+    "Question / Question with question word",
+    "Are you late?",
+    "Have we met before?",
+    "Questions in the present simple and past simple",
+    "For other verbs in the present simple, we use the auxiliary verb do/does in the question.",
+    "Subject questions",
+    "In some questions, who or what is the subject of the verb.",
+    "Who broke the window?",
+    "Who is knocking on the door?"
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Do you know _____ to make questions?",
+      "options": [
+        "how",
+        "hows",
+        "howed",
+        "not how"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to question forms usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Look at these examples to _____ how questions are made.",
+      "options": [
+        "see",
+        "sees",
+        "seeed",
+        "not see"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to question forms usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Is he _____ teacher?",
+      "options": [
+        "a",
+        "some",
+        "any",
+        "one"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to question forms usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "Does she _____ meat?",
+      "correct": "eat",
+      "hint": "Apply the rule for question forms.",
+      "explanation": "The correct form here is 'eat'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "When did _____ get here?",
+      "correct": "you",
+      "hint": "Apply the rule for question forms.",
+      "explanation": "The correct form here is 'you'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "How much does _____ train ticket cost?",
+      "correct": "a",
+      "hint": "Apply the rule for question forms.",
+      "explanation": "The correct form here is 'a'."
+    }
+  ]
+}

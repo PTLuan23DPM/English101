@@ -1,0 +1,105 @@
+{
+  "id": "comparative-adjectives",
+  "title": "Comparative adjectives",
+  "level": "A1-A2",
+  "introduction": "Do you know how to use comparative adjectives like older, better and more interesting? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "We use comparative adjectives to compare two things or show change. The comparative form depends on the number of syllables in the adjective.",
+  "rules": [
+    "We use comparative adjectives to compare two things or show change.",
+    "We use more to make comparative forms for most other two-syllable adjectives and for all adjectives with three or more syllables:",
+    "When we want to say which person or thing we are comparing with, we can use than:"
+  ],
+  "keyPoints": [
+    "an adjective ends in -e, we add -r:",
+    "an adjective ends in a vowel and a consonant, we usually double the consonant:",
+    "a two-syllable adjective ends in a consonant and -y, we change -y to -i and add -er:",
+    "we want to say which person or thing we are comparing with, we can use than:"
+  ],
+  "examples": [
+    "The city is more interesting than the countryside.",
+    "This house is older than my house.",
+    "She's better at cooking now than before.",
+    "old → older",
+    "clean → cleaner",
+    "slow → slower",
+    "safe → safer",
+    "nice → nicer",
+    "big → bigger",
+    "hot → hotter",
+    "noisy → noisier",
+    "happy → happier",
+    "easy → easier",
+    "crowded → more crowded",
+    "stressful → more stressful",
+    "dangerous → more dangerous",
+    "I think life in the countryside is simpler than in the city.",
+    "It's more simple to live in the city because everything you need is there.",
+    "good → better",
+    "bad → worse"
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "The city is more interesting _____ the countryside.",
+      "options": [
+        "than",
+        "thans",
+        "thaned",
+        "not than"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to comparative adjectives usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "This house is older _____ my house.",
+      "options": [
+        "than",
+        "thans",
+        "thaned",
+        "not than"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to comparative adjectives usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "She's better at cooking now _____ before.",
+      "options": [
+        "than",
+        "thans",
+        "thaned",
+        "not than"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to comparative adjectives usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "crowded → _____ crowded",
+      "correct": "more",
+      "hint": "Apply the rule for comparative adjectives.",
+      "explanation": "The correct form here is 'more'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "stressful → _____ stressful",
+      "correct": "more",
+      "hint": "Apply the rule for comparative adjectives.",
+      "explanation": "The correct form here is 'more'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "dangerous → _____ dangerous",
+      "correct": "more",
+      "hint": "Apply the rule for comparative adjectives.",
+      "explanation": "The correct form here is 'more'."
+    }
+  ]
+}

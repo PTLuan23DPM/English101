@@ -56,10 +56,10 @@ export async function POST(req: NextRequest) {
         console.log("[Gemini Scoring] Parsed result:", JSON.stringify(result, null, 2));
 
         // Calculate statistics
-        const words = text.split(/\s+/).filter(w => w.length > 0);
-        const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
-        const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim().length > 0);
-        const uniqueWords = new Set(words.map(w => w.toLowerCase()));
+        const words = text.split(/\s+/).filter((w: string) => w.length > 0);
+        const sentences = text.split(/[.!?]+/).filter((s: string) => s.trim().length > 0);
+        const paragraphs = text.split(/\n\s*\n/).filter((p: string) => p.trim().length > 0);
+        const uniqueWords = new Set(words.map((w: string) => w.toLowerCase()));
 
         const statistics = {
             words: words.length,

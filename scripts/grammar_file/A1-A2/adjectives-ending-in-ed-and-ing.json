@@ -1,0 +1,108 @@
+{
+  "id": "adjectives-ending-in-ed-and-ing",
+  "title": "Adjectives ending in '-ed' and '-ing'",
+  "level": "A1-A2",
+  "introduction": "Do you know the difference between bored and boring? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "Adjectives that end in -ed (e.g. bored, interested) and adjectives that end in -ing (e.g. boring, interesting) are often confused.",
+  "rules": [],
+  "keyPoints": [],
+  "examples": [
+    "I was really bored in that presentation.\n\nThat was a really boring presentation.",
+    "Have you seen that film? It's really frightening.\n\nI could listen to her for hours. She's so interesting.\n\nI can't sleep! That noise is really annoying!",
+    "interested) and adjectives that end in -ing (e"
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct word to complete the sentence:",
+      "sentence": "I was really bored in that _____ That was a really boring presentation.",
+      "options": [
+        "presentation.",
+        "presentation.s",
+        "presentation.ed",
+        "very presentation."
+      ],
+      "correct": 0,
+      "explanation": "The correct answer is 'presentation.' because..."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct word to complete the sentence:",
+      "sentence": "Have you seen that film? It's really frightening. I could listen to her _____ hours. She's so interesting. I can't sleep! That noise is really annoying!",
+      "options": [
+        "for",
+        "fors",
+        "fored",
+        "very for"
+      ],
+      "correct": 0,
+      "explanation": "The correct answer is 'for' because..."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct word to complete the sentence:",
+      "sentence": "interested) and adjectives that _____ in -ing (e",
+      "options": [
+        "end",
+        "ends",
+        "ended",
+        "very end"
+      ],
+      "correct": 0,
+      "explanation": "The correct answer is 'end' because..."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank:",
+      "sentence": "I was really bored in that _____ That was a really boring presentation.",
+      "correct": "presentation.",
+      "hint": "Think about adjectives ending in '-ed' and '-ing'",
+      "explanation": "The answer is 'presentation.'"
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank:",
+      "sentence": "Have you seen that film? It's really frightening. I could listen to her _____ hours. She's so interesting. I can't sleep! That noise is really annoying!",
+      "correct": "for",
+      "hint": "Think about adjectives ending in '-ed' and '-ing'",
+      "explanation": "The answer is 'for'"
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank:",
+      "sentence": "interested) and adjectives that _____ in -ing (e",
+      "correct": "end",
+      "hint": "Think about adjectives ending in '-ed' and '-ing'",
+      "explanation": "The answer is 'end'"
+    },
+    {
+      "type": "true_false",
+      "question": "Is this statement true or false?",
+      "statement": "This sentence demonstrates correct usage: I was really bored in that presentation.\n\nThat was a really boring presentation.",
+      "correct": true,
+      "explanation": "This sentence correctly demonstrates the grammar rule."
+    },
+    {
+      "type": "true_false",
+      "question": "Is this statement true or false?",
+      "statement": "This sentence demonstrates correct usage: Have you seen that film? It's really frightening.\n\nI could listen to her for hours. She's so interesting.\n\nI can't sleep! That noise is really annoying!",
+      "correct": true,
+      "explanation": "This sentence correctly demonstrates the grammar rule."
+    },
+    {
+      "type": "transformation",
+      "question": "Rewrite this sentence using the grammar rule:",
+      "original": "I was really bored in that presentation.\n\nThat was a really boring presentation.",
+      "hint": "Apply the rule: Adjectives ending in '-ed' and '-ing'",
+      "explanation": "Transform the sentence while maintaining the same meaning."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank:",
+      "sentence": "I was really bored in that _____ That was a really boring presentation.",
+      "correct": "presentation.",
+      "hint": "Think about adjectives ending in '-ed' and '-ing'",
+      "explanation": "The answer is 'presentation.'"
+    }
+  ]
+}

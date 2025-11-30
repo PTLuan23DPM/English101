@@ -1,0 +1,97 @@
+{
+  "id": "future-continuous-and-future-perfect",
+  "title": "Future continuous and future perfect",
+  "level": "B1-B2",
+  "introduction": "Do you know how to use phrases like I'll be studying or I'll have finished? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "Future continuous",
+  "rules": [
+    "We use the future perfect simple (will/won't have + past participle) to talk about something that will be completed before a specific time in the future.",
+    "t be + -ing form) to talk about future actions that:",
+    "t have + past participle) to talk about something that will be completed before a specific time in the future."
+  ],
+  "keyPoints": [
+    "you come out of school tomorrow, I'll be boarding a plane"
+  ],
+  "examples": [
+    "Do you know how to use phrases like I'll be studying or I'll have finished?",
+    "Look at these examples to see how the future continuous and future perfect are used.",
+    "In five years' time, I'll have finished studying medicine.",
+    "You can visit us during the first week of July.",
+    "He'll be staying with his parents for several months while his father is in recovery.",
+    "Will you be starting work earlier with your new job?",
+    "Future perfect",
+    "We use the future perfect simple (will/won't have + past participle) to talk about something that will be completed before a specific time in the future.",
+    "The guests are coming at 8 p.",
+    "On 9 October we'll have been married for 50 years.",
+    "Will you have gone to bed when I get back?",
+    "I won't have written all the reports by next week.",
+    "By the time we arrive, the kids will have gone to bed.",
+    "I'll have finished in an hour and then we can watch a film.",
+    "In three years' time, I'll have graduated from university."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Do you know how to use phrases like I'll be studying or I'll _____ finished?",
+      "options": [
+        "have",
+        "having",
+        "hasn't",
+        "haven't"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to future continuous and future perfect usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Look at these examples _____ see how the future continuous and future perfect are used.",
+      "options": [
+        "to",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to future continuous and future perfect usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "In five years' time, I'll _____ finished studying medicine.",
+      "options": [
+        "have",
+        "having",
+        "hasn't",
+        "haven't"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to future continuous and future perfect usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "_____ you be starting work earlier with your new job?",
+      "correct": "Will",
+      "hint": "Apply the rule for future continuous and future perfect.",
+      "explanation": "The correct form here is 'Will'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "We use the future perfect simple (will/won'_____ + past participle) to talk about something that will be completed before a specific time in the future.",
+      "correct": "t have",
+      "hint": "Apply the rule for future continuous and future perfect.",
+      "explanation": "The correct form here is 't have'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "On 9 October we'll _____ been married for 50 years.",
+      "correct": "have",
+      "hint": "Apply the rule for future continuous and future perfect.",
+      "explanation": "The correct form here is 'have'."
+    }
+  ]
+}

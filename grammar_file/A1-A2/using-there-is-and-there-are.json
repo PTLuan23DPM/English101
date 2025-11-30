@@ -1,0 +1,104 @@
+{
+  "id": "using-there-is-and-there-are",
+  "title": "Using 'there is' and 'there are'",
+  "level": "A1-A2",
+  "introduction": "Do you know how to use there is and there are? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "Affirmative",
+  "rules": [
+    "We use there is to say that something exists or is in a place.",
+    "When we are speaking informally and make a list of things, we often use there is or there's instead of there are.",
+    "t a + singular noun, there isn't any + uncountable noun and there aren't any + plural noun."
+  ],
+  "keyPoints": [
+    "we are speaking informally and make a list of things, we often use there is or there's instead of there are",
+    "negatives, we use there isn't or there's not (= there is not) for singular and there aren't (= there are not) for plural",
+    "questions, we say Is there for singular nouns and uncountable nouns and Are there for plural nouns"
+  ],
+  "examples": [
+    "Do you know how to use there is and there are?",
+    "Look at these examples to see how we use there is and there are.",
+    "There aren't any street markets.",
+    "There are no restaurants in the station.",
+    "Grammar explanation",
+    "Affirmative",
+    "We use there is to say that something exists or is in a place.",
+    "There is a bridge in the park.",
+    "There is a restaurant in the station.",
+    "There are two cafés in the shopping centre.",
+    "There are two cafés.",
+    "When we are speaking informally and make a list of things, we often use there is or there's instead of there are.",
+    "For negatives, we use there isn't or there's not (= there is not) for singular and there aren't (= there are not) for plural.",
+    "There isn't a pharmacy near the hotel.",
+    "There aren't any restaurants near the hotel.",
+    "There isn't a café near here.",
+    "There isn't any milk.",
+    "There aren't any toilets in the park.",
+    "To show that the negative is important, we also often use there is no + uncountable noun and there are no + plural noun.",
+    "There are no toilets in the park."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Do you know how to use there is and there _____?",
+      "options": [
+        "are",
+        "be",
+        "been",
+        "being"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to using 'there is' and 'there are' usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Look at these examples to see how we use there is and there _____.",
+      "options": [
+        "are",
+        "be",
+        "been",
+        "being"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to using 'there is' and 'there are' usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "There _____ no restaurants in the station.",
+      "options": [
+        "are",
+        "be",
+        "been",
+        "being"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to using 'there is' and 'there are' usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "We use there is _____ say that something exists or is in a place.",
+      "correct": "to",
+      "hint": "Apply the rule for using 'there is' and 'there are'.",
+      "explanation": "The correct form here is 'to'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "There _____ a bridge in the park.",
+      "correct": "is",
+      "hint": "Apply the rule for using 'there is' and 'there are'.",
+      "explanation": "The correct form here is 'is'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "There _____ a restaurant in the station.",
+      "correct": "is",
+      "hint": "Apply the rule for using 'there is' and 'there are'.",
+      "explanation": "The correct form here is 'is'."
+    }
+  ]
+}

@@ -1,0 +1,99 @@
+{
+  "id": "prepositions-of-time-at-in-on",
+  "title": "Prepositions of time: 'at', 'in', 'on'",
+  "level": "A1-A2",
+  "introduction": "Do you know how and when to use at, in and on to talk about time? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "We use the prepositions in, on or at to say when something happens.",
+  "rules": [
+    "we use at, in and on to talk about time.",
+    "We use the prepositions in, on or at to say when something happens."
+  ],
+  "keyPoints": [],
+  "examples": [
+    "At weekends, I love to go skiing.",
+    "In spring, the weather is warmer.",
+    "On Mondays, I work from home.",
+    "In the afternoon, I do activities.",
+    "On weekdays, I work until 12.",
+    "At 5 o'clock, I do two or three more hours of work.",
+    "I get up at 6.30 a.m. and go for a run.",
+    "She doesn't like to leave the office at lunchtime.",
+    "At the weekend, I can spend the days how I like.",
+    "She's a nurse and she works at night.",
+    "The baby often wakes up in the night.",
+    "The weather is very cold here at Christmas.",
+    "At Chinese New Year, many people go home to their families.",
+    "I usually relax in the evening.",
+    "In summer it's too hot to do anything.",
+    "I'm always really busy in December.",
+    "On Fridays, I have a long lunch.",
+    "It's his birthday on 19 October.",
+    "at the weekend and at night",
+    "seasons and years"
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "At weekends, I love _____ go skiing.",
+      "options": [
+        "to",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to prepositions of time: 'at', 'in', 'on' usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "_____ spring, the weather is warmer.",
+      "options": [
+        "In",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to prepositions of time: 'at', 'in', 'on' usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "On Mondays, I work _____ home.",
+      "options": [
+        "from",
+        "froms",
+        "fromed",
+        "not from"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to prepositions of time: 'at', 'in', 'on' usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "_____ the afternoon, I do activities.",
+      "correct": "In",
+      "hint": "Apply the rule for prepositions of time: 'at', 'in', 'on'.",
+      "explanation": "The correct form here is 'In'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "_____ weekdays, I work until 12.",
+      "correct": "On",
+      "hint": "Apply the rule for prepositions of time: 'at', 'in', 'on'.",
+      "explanation": "The correct form here is 'On'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "_____ 5 o'clock, I do two or three more hours of work.",
+      "correct": "At",
+      "hint": "Apply the rule for prepositions of time: 'at', 'in', 'on'.",
+      "explanation": "The correct form here is 'At'."
+    }
+  ]
+}

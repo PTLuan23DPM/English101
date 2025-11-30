@@ -1,0 +1,97 @@
+{
+  "id": "verbs-followed-by-ing-or-infinitive",
+  "title": "Verbs followed by '-ing' or infinitive",
+  "level": "A1-A2",
+  "introduction": "Do you know when to use -ing and when to use to + infinitive after a verb? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "A verb can be followed by another verb. The second one usually needs to change into the -ing form or the to + infinitive form. Which form you need depends on what the first verb is.",
+  "rules": [
+    "ing form or the to + infinitive form. Which form you need depends on what the first verb is.",
+    "ing form and the to + infinitive form. They are both correct.",
+    "Verbs followed by to + infinitive form",
+    "it must be in the to + infinitive form."
+  ],
+  "keyPoints": [
+    "enjoy, admit and mind are followed by another verb, it must be in the -ing form",
+    "want, learn and offer are followed by another verb, it must be in the to + infinitive form"
+  ],
+  "examples": [
+    "Do you know when to use -ing and when to use to + infinitive after a verb?",
+    "Look at these examples to see how the verb forms are used.",
+    "Grammar explanation",
+    "A verb can be followed by another verb.",
+    "Verbs followed by the -ing form",
+    "When enjoy, admit and mind are followed by another verb, it must be in the -ing form.",
+    "I don't mind waiting if you're busy.",
+    "Other verbs in this group include avoid, can't help, consider, dislike, feel like, finish, give up, miss, practise and suggest.",
+    "Like and love can be followed by the -ing form and the to + infinitive form.",
+    "Verbs followed by to + infinitive form",
+    "When want, learn and offer are followed by another verb, it must be in the to + infinitive form.",
+    "He offered to help us wash up.",
+    "Other verbs in this group include afford, agree, ask, choose, decide, expect, hope, plan, prepare, promise, refuse and would like."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Do you know when to use -_____ and when to use to + infinitive after a verb?",
+      "options": [
+        "ing",
+        "ingly",
+        "ed",
+        "s"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to verbs followed by '-ing' or infinitive usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Look at these examples to see how the verb forms _____ used.",
+      "options": [
+        "are",
+        "be",
+        "been",
+        "being"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to verbs followed by '-ing' or infinitive usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Verbs followed by the -_____ form",
+      "options": [
+        "ing",
+        "ingly",
+        "ed",
+        "s"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to verbs followed by '-ing' or infinitive usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "When enjoy, admit and mind are followed by another verb, it _____ be in the -ing form.",
+      "correct": "must",
+      "hint": "Apply the rule for verbs followed by '-ing' or infinitive.",
+      "explanation": "The correct form here is 'must'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "Like and love can be followed by the -_____ + infinitive form.",
+      "correct": "ing form and the to",
+      "hint": "Apply the rule for verbs followed by '-ing' or infinitive.",
+      "explanation": "The correct form here is 'ing form and the to'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "_____ + infinitive form",
+      "correct": "Verbs followed by to",
+      "hint": "Apply the rule for verbs followed by '-ing' or infinitive.",
+      "explanation": "The correct form here is 'Verbs followed by to'."
+    }
+  ]
+}

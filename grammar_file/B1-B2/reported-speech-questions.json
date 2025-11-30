@@ -1,0 +1,96 @@
+{
+  "id": "reported-speech-questions",
+  "title": "Reported speech: questions",
+  "level": "B1-B2",
+  "introduction": "Do you know how to report a question that somebody asked? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "A reported question is when we tell someone what another person asked. To do this, we can use direct speech or indirect speech.",
+  "rules": [
+    "we use if or whether to report the question.",
+    "we use the question word to report the question.",
+    "when we tell someone what another person asked. To do this, we can use direct speech or indirect speech.",
+    "when or how questions, we use the question word to report the question.",
+    "for example offer + infinitive, ask + infinitive or suggest + ing."
+  ],
+  "keyPoints": [],
+  "examples": [
+    "Do you like) to a statement structure (e",
+    "have done → had done",
+    "today → that day)",
+    "offer + infinitive",
+    "ask + infinitive or suggest + ing",
+    "Do you know how to report a question that somebody asked?",
+    "Look at these examples to see how we can tell someone what another person asked.",
+    "Grammar explanation",
+    "A reported question is when we tell someone what another person asked.",
+    "He asked me if I was going to the Helsinki conference.",
+    "She asked us whether we'd finished the project yet.",
+    "Reporting verbs",
+    "The most common reporting verb for questions is ask, but we can also use verbs like enquire, want to know or wonder.",
+    "He wondered when we could get it done by."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Do you like) _____ a statement structure (e",
+      "options": [
+        "to",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to reported speech: questions usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "today → _____ day)",
+      "options": [
+        "that",
+        "thats",
+        "thated",
+        "not that"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to reported speech: questions usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "ask + _____ + ing",
+      "options": [
+        "infinitive or suggest",
+        "infinitive or suggests",
+        "infinitive or suggested",
+        "not infinitive or suggest"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to reported speech: questions usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "Do you know how to report a question that somebody _____?",
+      "correct": "asked",
+      "hint": "Apply the rule for reported speech: questions.",
+      "explanation": "The correct form here is 'asked'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "Look at these examples to see how we can tell someone what another person _____.",
+      "correct": "asked",
+      "hint": "Apply the rule for reported speech: questions.",
+      "explanation": "The correct form here is 'asked'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "A reported question is when we tell someone what another person _____.",
+      "correct": "asked",
+      "hint": "Apply the rule for reported speech: questions.",
+      "explanation": "The correct form here is 'asked'."
+    }
+  ]
+}

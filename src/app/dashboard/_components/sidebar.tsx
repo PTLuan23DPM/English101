@@ -91,16 +91,6 @@ const advanced = [
       </svg>
     ),
   },
-  {
-    id: "functional",
-    label: "Functional",
-    href: "/english/functional",
-    icon: (
-      <svg viewBox="0 0 20 20" fill="none">
-        <path d="M6 10L8 12L14 6M10 18C5.6 18 2 14.4 2 10C2 5.6 5.6 2 10 2C14.4 2 18 5.6 18 10C18 14.4 14.4 18 10 18Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      </svg>
-    ),
-  },
 ];
 
 const evaluation = [
@@ -116,21 +106,19 @@ const evaluation = [
       </svg>
     ),
   },
-  {
-    id: "assessment",
-    label: "Assessment",
-    href: "/english/assessment",
-    icon: (
-      <svg viewBox="0 0 20 20" fill="none">
-        <path d="M4 3H16V17H4V3Z" stroke="currentColor" strokeWidth="1.5" />
-        <path d="M7 7H13M7 10H13M7 13H10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-        <path d="M12 13L13 14L15 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      </svg>
-    ),
-  },
 ];
 
 const account = [
+  {
+    id: "notifications",
+    label: "Notifications",
+    href: "/english/notifications",
+    icon: (
+      <svg viewBox="0 0 20 20" fill="none">
+        <path d="M10 2C6.68629 2 4 4.68629 4 8V11.5858L2.29289 13.2929C2.10536 13.4804 2 13.7348 2 14V16C2 16.5523 2.44772 17 3 17H17C17.5523 17 18 16.5523 18 16V14C18 13.7348 17.8946 13.4804 17.7071 13.2929L16 11.5858V8C16 4.68629 13.3137 2 10 2Z" stroke="currentColor" strokeWidth="1.5"/>
+      </svg>
+    ),
+  },
   {
     id: "profile",
     label: "Profile Settings",
@@ -150,6 +138,17 @@ const account = [
       <svg viewBox="0 0 20 20" fill="none">
         <path d="M2 10H18V18H2V10Z" stroke="currentColor" strokeWidth="1.5" fill="none"/>
         <path d="M5 6L8 9L11 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
+      </svg>
+    ),
+  },
+  {
+    id: "reports",
+    label: "Reports",
+    href: "/english/reports",
+    icon: (
+      <svg viewBox="0 0 20 20" fill="none">
+        <rect x="3" y="3" width="14" height="14" rx="2" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+        <path d="M7 7H13M7 10H13M7 13H10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
       </svg>
     ),
   },
@@ -199,7 +198,19 @@ export default function Sidebar() {
     <aside className={`sidebar-v2 ${isMinimized ? "minimized" : ""}`}>
       {/* Logo + Toggle */}
       <div className="sidebar-v2__header">
-        <Link href="/english/dashboard" className="sidebar-v2__logo">
+        <Link 
+          href="/english/dashboard" 
+          className="sidebar-v2__logo"
+          onClick={(e) => {
+            // If already on dashboard, prevent navigation and just scroll
+            if (pathname === "/english/dashboard") {
+              e.preventDefault();
+              window.scrollTo(0, 0);
+              document.documentElement.scrollTop = 0;
+              document.body.scrollTop = 0;
+            }
+          }}
+        >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
             <rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" strokeWidth="2" />
             <path d="M9 12L11 14L15 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -226,6 +237,15 @@ export default function Sidebar() {
             href={item.href}
             className={`sidebar-v2__item ${isActive(item.href) ? "active" : ""}`}
             title={isMinimized ? item.label : undefined}
+            onClick={(e) => {
+              // Scroll to top when navigating to dashboard
+              if (item.href === "/english/dashboard" && pathname === "/english/dashboard") {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: 'instant' });
+                document.documentElement.scrollTop = 0;
+                document.body.scrollTop = 0;
+              }
+            }}
           >
             <span className="sidebar-v2__icon">{item.icon}</span>
             {!isMinimized && <span className="sidebar-v2__label">{item.label}</span>}

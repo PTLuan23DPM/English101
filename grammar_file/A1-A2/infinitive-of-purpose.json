@@ -1,0 +1,92 @@
+{
+  "id": "infinitive-of-purpose",
+  "title": "Infinitive of purpose",
+  "level": "A1-A2",
+  "introduction": "Do you know how and when to use an infinitive to talk about purpose? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "When we want to answer the question why?, we can use an infinitive of purpose. Most of the time, we use the to-infinitive.",
+  "rules": [
+    "When we want to answer the question why?, we can use an infinitive of purpose."
+  ],
+  "keyPoints": [
+    "we want to answer the question why?, we can use an infinitive of purpose"
+  ],
+  "examples": [
+    "He went to the shops to buy some shoes.",
+    "I'm writing to ask for your help.",
+    "My father runs every day to keep healthy.",
+    "Why do you have the LearnEnglish Grammar app?",
+    "To improve my grammar.",
+    "Why do we always eat at home?",
+    "We eat at home to save money.",
+    "Why do you have a bicycle?",
+    "I use it to go to work.",
+    "Why does she run every morning?",
+    "She runs to keep fit.",
+    "Do you know how and when to use an infinitive to talk about purpose?"
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "He went _____ the shops to buy some shoes.",
+      "options": [
+        "to",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to infinitive of purpose usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "I'm writing _____ ask for your help.",
+      "options": [
+        "to",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to infinitive of purpose usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "My father runs every day _____ keep healthy.",
+      "options": [
+        "to",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to infinitive of purpose usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "_____ improve my grammar.",
+      "correct": "To",
+      "hint": "Apply the rule for infinitive of purpose.",
+      "explanation": "The correct form here is 'To'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "We eat at home _____ save money.",
+      "correct": "to",
+      "hint": "Apply the rule for infinitive of purpose.",
+      "explanation": "The correct form here is 'to'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "I use it _____ go to work.",
+      "correct": "to",
+      "hint": "Apply the rule for infinitive of purpose.",
+      "explanation": "The correct form here is 'to'."
+    }
+  ]
+}

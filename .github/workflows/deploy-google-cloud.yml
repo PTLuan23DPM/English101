@@ -1,0 +1,92 @@
+name: Deploy to Google Cloud Run
+
+on:
+  push:
+    branches: [ "main" ] # Chạy tự động khi bạn push code vào nhánh main
+  workflow_dispatch:      # Cho phép bấm nút chạy thủ công để test
+
+env:
+  REGION: asia-southeast1 # Khu vực server (Singapore)
+  REPO_NAME: english-repo # Tên kho chứa Docker
+  PYTHON_SERVICE: ai-service
+  NODE_SERVICE: node-app
+
+jobs:
+  deploy-pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Lấy code về
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Đăng nhập Google Cloud
+      - name: Google Auth
+        id: auth
+        uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+
+      - name: Set up Cloud SDK
+        uses: 'google-github-actions/setup-gcloud@v2'
+
+      - name: Configure Docker
+        run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
+
+      # ========================================
+      # PHẦN A: DEPLOY PYTHON AI (Nặng nhất)
+      # ========================================
+      - name: Build & Push Python AI
+        run: |
+          cd python-services
+          # Build Image
+          docker build -t ${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.PYTHON_SERVICE }}:${{ github.sha }} .
+          # Push lên Google
+          docker push ${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.PYTHON_SERVICE }}:${{ github.sha }}
+
+      - name: Deploy Python AI to Cloud Run
+        id: deploy-python
+        uses: 'google-github-actions/deploy-cloudrun@v2'
+        with:
+          service: ${{ env.PYTHON_SERVICE }}
+          image: ${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.PYTHON_SERVICE }}:${{ github.sha }}
+          region: ${{ env.REGION }}
+          # Cấu hình mạnh: 2 CPU, 4GB RAM, Luôn chạy (min-instances=1)
+          flags: '--min-instances=1 --cpu=2 --memory=8Gi --allow-unauthenticated --timeout=1200s --add-cloudsql-instances=${{ secrets.DB_CONNECTION_NAME }}'
+          env_vars: |
+            DATABASE_URL=postgresql://postgres:${{ secrets.DB_PASSWORD }}@/english_db?host=/cloudsql/${{ secrets.DB_CONNECTION_NAME }}
+            GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
+
+      # Lưu URL của Python Service
+      - name: Save Python URL
+        run: echo "SCORING_URL=${{ steps.deploy-python.outputs.url }}" >> $GITHUB_ENV
+
+      # ========================================
+      # PHẦN B: DEPLOY NODE.JS (Web App)
+      # ========================================
+      - name: Build & Push Node App
+        run: |
+          docker build -t ${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.NODE_SERVICE }}:${{ github.sha }} .
+          docker push ${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.NODE_SERVICE }}:${{ github.sha }}
+
+      - name: Deploy Node App to Cloud Run
+        id: deploy-node
+        uses: 'google-github-actions/deploy-cloudrun@v2'
+        with:
+          service: ${{ env.NODE_SERVICE }}
+          image: ${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.NODE_SERVICE }}:${{ github.sha }}
+          region: ${{ env.REGION }}
+          # Cấu hình nhẹ cho Web: 1GB RAM
+          flags: '--memory=1Gi --allow-unauthenticated --add-cloudsql-instances=${{ secrets.DB_CONNECTION_NAME }}'
+          env_vars: |
+            DATABASE_URL=postgresql://postgres:${{ secrets.DB_PASSWORD }}@/english_db?host=/cloudsql/${{ secrets.DB_CONNECTION_NAME }}
+            SCORING_SERVICE_URL=${{ env.SCORING_URL }}
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+
+      # ========================================
+      # KẾT QUẢ
+      # ========================================
+      - name: Show Result
+        run: |
+          echo "🎉 DEPLOY THÀNH CÔNG!"
+          echo "🌍 Web App URL: ${{ steps.deploy-node.outputs.url }}"
+          echo "🧠 AI Service URL: ${{ env.SCORING_URL }}"

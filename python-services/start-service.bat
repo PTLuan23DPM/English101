@@ -1,7 +1,7 @@
 @echo off
 echo.
 echo ========================================
-echo   IELTS Writing Scorer Service
+echo   AI Scorer Service - Writing and Speaking
 echo ========================================
 echo.
 
@@ -27,7 +27,20 @@ if not exist "venv" (
 
 REM Activate venv
 echo [INFO] Activating virtual environment...
-call venv\Scripts\activate.bat
+if exist venv\Scripts\activate.bat (
+    call venv\Scripts\activate.bat
+    if errorlevel 1 (
+        echo [ERROR] Failed to activate virtual environment!
+        pause
+        exit /b 1
+    )
+    echo [DONE] Virtual environment activated
+) else (
+    echo [ERROR] Virtual environment activation script not found!
+    echo Please recreate the virtual environment.
+    pause
+    exit /b 1
+)
 
 REM Check if requirements are installed
 python -c "import flask" 2>nul
@@ -36,6 +49,15 @@ if errorlevel 1 (
     pip install -r requirements.txt
     echo [DONE] Dependencies installed
     echo.
+) else (
+    REM Check if whisper is installed (it might be missing)
+    python -c "import whisper" 2>nul
+    if errorlevel 1 (
+        echo [INFO] Installing missing dependencies whisper etc
+        pip install -r requirements.txt
+        echo [DONE] Missing dependencies installed
+        echo.
+    )
 )
 
 REM Check if models directory exists
@@ -46,13 +68,13 @@ if not exist "..\ai-models\writing-scorer\models" (
 )
 
 REM Start service
-echo [INFO] Starting Writing Scorer Service...
-echo [INFO] Service will run on: http://localhost:5001
+echo [INFO] Starting AI Scorer Service - Writing and Speaking
+echo [INFO] Service will run on: http://localhost:8080
 echo [INFO] Press Ctrl+C to stop
 echo.
 echo ========================================
 echo.
 
-python writing_scorer.py
+python ai_scorer.py
 
 pause

@@ -1,0 +1,45 @@
+{
+  "words": [
+    {
+      "word": "Big",
+      "start": 0,
+      "end": 1.024
+    },
+    {
+      "word": "Brown",
+      "start": 1.024,
+      "end": 2.048
+    },
+    {
+      "word": "Fox",
+      "start": 2.048,
+      "end": 3.072
+    },
+    {
+      "word": "jumps",
+      "start": 3.072,
+      "end": 4.096
+    },
+    {
+      "word": "over",
+      "start": 4.096,
+      "end": 5.12
+    },
+    {
+      "word": "the",
+      "start": 5.12,
+      "end": 6.144
+    },
+    {
+      "word": "lazy",
+      "start": 6.144,
+      "end": 7.168
+    },
+    {
+      "word": "door.",
+      "start": 7.168,
+      "end": 8.192
+    }
+  ],
+  "phones": []
+}

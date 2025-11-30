@@ -1,0 +1,130 @@
+{
+  "id": "adjectives-and-prepositions",
+  "title": "Adjectives and prepositions",
+  "level": "A1-A2",
+  "introduction": "Do you know how to use adjectives with prepositions like interested in or similar to? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "Some adjectives go with certain prepositions. There are no grammatical rules for which preposition is used with which adjective, so it's a good idea to try to learn them together. To help you do this, write new vocabulary in your notebook in a sentence or phrase.",
+  "rules": [
+    "We use at with adjectives like good/bad/amazing/brilliant/terrible, etc. to talk about skills and abilities."
+  ],
+  "keyPoints": [],
+  "examples": [
+    "I'm interested in the idea.\n\nMy jacket is similar to yours.\n\nShe's brilliant at maths.\n\nMy neighbour is angry about the party.",
+    "He's really good at English.\n\nShe's amazing at the piano.\n\nThey're terrible at organising anything.\n\nI'm not very good at drawing.",
+    "I'm angry about the decision.\n\nHe's nervous about the presentation.\n\nShe's excited about the new job.\n\nThey were worried about the exam.",
+    "She was afraid of telling her mum.\n\nI'm frightened of having an accident.\n\nHe's scared of flying.\n\nYou should be proud of your progress.",
+    "He's married to the director.\n\nI'm addicted to my phone.\n\nI'm allergic to nuts.\n\nIt's similar to the old one.",
+    "They were really friendly to me.\n\nWas he nice to you?\n\nHe is always polite to everyone.\n\nShe was very rude to the waitress.",
+    "Exercise is good for you.\n\nStress is bad for you.\n\nThe town is famous for its cheese.\n\nI'm responsible for the financial side of the business."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct word to complete the sentence:",
+      "sentence": "I'm interested in the idea. My jacket is similar to yours. _____ brilliant at maths. My neighbour is angry about the party.",
+      "options": [
+        "She's",
+        "She'ss",
+        "She'sed",
+        "very She's"
+      ],
+      "correct": 0,
+      "explanation": "The correct answer is 'She's' because..."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct word to complete the sentence:",
+      "sentence": "He's really good at English. She's amazing at the piano. _____ terrible at organising anything. I'm not very good at drawing.",
+      "options": [
+        "They're",
+        "They'res",
+        "They'reed",
+        "very They're"
+      ],
+      "correct": 0,
+      "explanation": "The correct answer is 'They're' because..."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct word to complete the sentence:",
+      "sentence": "I'm angry about the decision. He's nervous about the presentation. She's _____ about the new job. They were worried about the exam.",
+      "options": [
+        "excited",
+        "exciteds",
+        "exciteded",
+        "very excited"
+      ],
+      "correct": 0,
+      "explanation": "The correct answer is 'excited' because..."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank:",
+      "sentence": "She was afraid of telling her mum. I'm frightened of having an _____ He's scared of flying. You should be proud of your progress.",
+      "correct": "accident.",
+      "hint": "Think about adjectives and prepositions",
+      "explanation": "The answer is 'accident.'"
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank:",
+      "sentence": "He's married to the director. I'm addicted to my phone. _____ allergic to nuts. It's similar to the old one.",
+      "correct": "I'm",
+      "hint": "Think about adjectives and prepositions",
+      "explanation": "The answer is 'I'm'"
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank:",
+      "sentence": "They were really friendly to me. Was he nice to you? He _____ always polite to everyone. She was very rude to the waitress.",
+      "correct": "is",
+      "hint": "Think about adjectives and prepositions",
+      "explanation": "The answer is 'is'"
+    },
+    {
+      "type": "true_false",
+      "question": "Is this statement true or false?",
+      "statement": "This sentence demonstrates correct usage: Exercise is good for you.\n\nStress is bad for you.\n\nThe town is famous for its cheese.\n\nI'm responsible for the financial side of the business.",
+      "correct": true,
+      "explanation": "This sentence correctly demonstrates the grammar rule."
+    },
+    {
+      "type": "matching",
+      "question": "Match the words with their correct usage:",
+      "pairs": [
+        {
+          "key": "I'm",
+          "value": "interested in the idea. My jacket is similar to yours. She's brilliant at maths. My neighbour is angry about the party."
+        },
+        {
+          "key": "He's",
+          "value": "really good at English. She's amazing at the piano. They're terrible at organising anything. I'm not very good at drawing."
+        },
+        {
+          "key": "I'm",
+          "value": "angry about the decision. He's nervous about the presentation. She's excited about the new job. They were worried about the exam."
+        },
+        {
+          "key": "She",
+          "value": "was afraid of telling her mum. I'm frightened of having an accident. He's scared of flying. You should be proud of your progress."
+        }
+      ],
+      "explanation": "Match each word with its correct context."
+    },
+    {
+      "type": "transformation",
+      "question": "Rewrite this sentence using the grammar rule:",
+      "original": "I'm interested in the idea.\n\nMy jacket is similar to yours.\n\nShe's brilliant at maths.\n\nMy neighbour is angry about the party.",
+      "hint": "Apply the rule: We use at with adjectives like good/bad/amazing/brilliant/terrible, etc. to talk about skills and abilities.",
+      "explanation": "Transform the sentence while maintaining the same meaning."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank:",
+      "sentence": "I'm angry about the decision. He's nervous about the presentation. She's _____ about the new job. They were worried about the exam.",
+      "correct": "excited",
+      "hint": "Think about adjectives and prepositions",
+      "explanation": "The answer is 'excited'"
+    }
+  ]
+}

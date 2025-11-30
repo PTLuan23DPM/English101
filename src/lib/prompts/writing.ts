@@ -151,20 +151,39 @@ export function buildRephrasePrompt(
     formal: "formal, sophisticated language (C1+ level)",
   };
 
+  // Escape text to prevent JSON issues: escape quotes, newlines, and backslashes
+  // Limit to 150 chars to ensure we have enough tokens for the response
+  const escapedText = text
+    .replace(/\\/g, "\\\\")  // Escape backslashes first
+    .replace(/"/g, '\\"')     // Escape double quotes
+    .replace(/\n/g, "\\n")    // Escape newlines
+    .replace(/\r/g, "\\r")    // Escape carriage returns
+    .replace(/\t/g, "\\t")    // Escape tabs
+    .substring(0, 150);       // Limit length to prevent MAX_TOKENS issues
+
   return `Rephrase the following text in 3 different ways using ${styleMap[style]}:
 
-Original text: "${text}"
+Original text: "${escapedText}"
 Target CEFR level: ${targetLevel}
 Style: ${style}
 
 Maintain the original meaning but adjust the complexity and vocabulary for the target level.
 
-Return a JSON object with this structure:
+CRITICAL INSTRUCTIONS:
+1. Keep rephrased text BRIEF and CONCISE (max 100 words per option to avoid token limits)
+2. Keep notes VERY SHORT (max 30 words per note)
+3. All string values MUST be properly escaped in JSON
+4. Replace all double quotes (") inside strings with \\"
+5. Replace all newlines (\\n) inside strings with spaces
+6. Replace all backslashes (\\) inside strings with \\\\
+7. Return COMPLETE JSON - do not truncate the response
+
+Return a JSON object with this EXACT structure:
 {
   "options": [
-    {"text": "Rephrased version 1", "notes": "Why this version works"},
-    {"text": "Rephrased version 2", "notes": "Why this version works"},
-    {"text": "Rephrased version 3", "notes": "Why this version works"}
+    {"text": "Brief rephrased version 1", "notes": "Short explanation"},
+    {"text": "Brief rephrased version 2", "notes": "Short explanation"},
+    {"text": "Brief rephrased version 3", "notes": "Short explanation"}
   ]
 }`;
 }
@@ -194,27 +213,60 @@ Return a JSON object with this structure:
 export function buildThesisPrompt(level: string, type: string, topic: string, stance?: string): string {
   const stanceText = stance ? `The writer's stance: ${stance}` : "No specific stance required";
 
+  // Escape topic and stance to prevent JSON issues
+  const escapedTopic = topic.replace(/"/g, '\\"').replace(/\n/g, " ").substring(0, 200);
+  const escapedStance = stance ? stance.replace(/"/g, '\\"').replace(/\n/g, " ").substring(0, 100) : "";
+
   return `Generate 3 thesis statement options for:
 
 CEFR Level: ${level}
 Essay Type: ${type}
-Topic: ${topic}
-${stanceText}
+Topic: ${escapedTopic}
+${escapedStance ? `The writer's stance: ${escapedStance}` : "No specific stance required"}
 
 Each thesis should:
 - Clearly state the main argument
 - Include 2-3 main points to be discussed
 - Be appropriate for ${level} level writing
 - Match the ${type} essay structure
+- Use clear, direct language without unnecessary quotation marks
 
-Return a JSON object with this structure:
+CRITICAL INSTRUCTIONS FOR JSON FORMAT:
+- All string values MUST be properly escaped
+- Replace all double quotes (") inside strings with \\"
+- Replace all newlines (\\n) inside strings with spaces
+- Keep thesis statements concise (max 150 words each)
+- Keep mainPoints concise (max 20 words each)
+- Keep approach descriptions concise (max 50 words each)
+
+Return a JSON object with this EXACT structure:
 {
   "options": [
-    {"thesis": "Thesis statement 1", "mainPoints": ["Point 1", "Point 2", "Point 3"], "approach": "Description of approach"},
-    {"thesis": "Thesis statement 2", "mainPoints": ["Point 1", "Point 2"], "approach": "Description of approach"},
-    {"thesis": "Thesis statement 3", "mainPoints": ["Point 1", "Point 2", "Point 3"], "approach": "Description of approach"}
+    {
+      "thesis": "Thesis statement 1 (properly escaped, no unescaped quotes)",
+      "mainPoints": ["Point 1", "Point 2", "Point 3"],
+      "approach": "Description of approach"
+    },
+    {
+      "thesis": "Thesis statement 2 (properly escaped, no unescaped quotes)",
+      "mainPoints": ["Point 1", "Point 2"],
+      "approach": "Description of approach"
+    },
+    {
+      "thesis": "Thesis statement 3 (properly escaped, no unescaped quotes)",
+      "mainPoints": ["Point 1", "Point 2", "Point 3"],
+      "approach": "Description of approach"
+    }
   ]
-}`;
+}
+
+IMPORTANT:
+- Do NOT include any explanatory text before or after the JSON
+- Do NOT use single quotes in place of double quotes
+- All quotes inside strings MUST be escaped with \\"
+- Return ONLY the JSON object, nothing else
+- Ensure all brackets and braces are properly matched
+- Keep all text fields concise to avoid truncation`;
 }
 
 export function buildExpandPrompt(sentence: string, mode: "reason" | "example" | "contrast"): string {
@@ -284,10 +336,31 @@ export function buildNextTaskPrompt(
     coherence?: number;
     lexical?: number;
     grammar?: number;
+  },
+  scoringFeedback?: {
+    taskResponse?: string[];
+    coherence?: string[];
+    lexical?: string[];
+    grammar?: string[];
   }
 ): string {
   // Find weakest area
   const weakestArea = Object.entries(errorProfile).sort((a, b) => a[1]! - b[1]!)[0];
+
+  // Build concise feedback summary - truncate long feedback to prevent token limit issues
+  const truncateFeedback = (feedbackArray: string[] | undefined, maxLength: number = 100): string => {
+    if (!feedbackArray || feedbackArray.length === 0) return "No specific feedback";
+    const joined = feedbackArray.slice(0, 2).join("; ");
+    return joined.length > maxLength ? joined.substring(0, maxLength) + "..." : joined;
+  };
+
+  const feedbackSummary = scoringFeedback ? `
+Scoring Feedback (Key Points):
+${errorProfile.taskResponse !== undefined ? `- Task Response (${errorProfile.taskResponse}/10): ${truncateFeedback(scoringFeedback.taskResponse, 80)}` : ""}
+${errorProfile.coherence !== undefined ? `- Coherence (${errorProfile.coherence}/10): ${truncateFeedback(scoringFeedback.coherence, 80)}` : ""}
+${errorProfile.lexical !== undefined ? `- Lexical (${errorProfile.lexical}/10): ${truncateFeedback(scoringFeedback.lexical, 80)}` : ""}
+${errorProfile.grammar !== undefined ? `- Grammar (${errorProfile.grammar}/10): ${truncateFeedback(scoringFeedback.grammar, 80)}` : ""}
+` : "";
 
   return `Recommend the next writing task for this student:
 
@@ -300,11 +373,13 @@ Error Profile:
 - Coherence: ${errorProfile.coherence ?? "N/A"}
 - Lexical Resource: ${errorProfile.lexical ?? "N/A"}
 - Grammar: ${errorProfile.grammar ?? "N/A"}
+${feedbackSummary}
 
 Based on this, recommend:
 1. Task type that addresses the weakness
 2. Appropriate difficulty level (same/easier/harder)
 3. Specific focus areas
+4. Detailed feedback on performance (what went well, what needs improvement)
 
 CRITICAL: You must return a valid JSON object with this EXACT structure:
 {
@@ -312,16 +387,25 @@ CRITICAL: You must return a valid JSON object with this EXACT structure:
     "type": "Essay type (e.g., Opinion Essay, Compare and Contrast, Cause and Effect)",
     "level": "CEFR level (e.g., A2, B1, B2, C1)",
     "focusAreas": ["Area 1", "Area 2", "Area 3"],
-    "reasoning": "A clear explanation of why this task is appropriate for this student (2-3 sentences)"
+    "reasoning": "A clear explanation of why this task is appropriate (2-3 sentences, keep concise)"
   },
-  "specificSuggestions": ["Specific suggestion 1", "Specific suggestion 2", "Specific suggestion 3"]
+  "specificSuggestions": ["Suggestion 1 (concise)", "Suggestion 2 (concise)", "Suggestion 3 (concise)"],
+  "feedback": {
+    "strengths": ["Strength 1 (brief)", "Strength 2 (brief)"],
+    "weaknesses": ["Weakness 1 (brief)", "Weakness 2 (brief)"],
+    "overallComment": "Overall feedback (2-3 sentences, concise and encouraging)"
+  }
 }
 
 IMPORTANT: 
 - The "recommendedTask" object is REQUIRED and must not be null or missing
 - All fields in "recommendedTask" are REQUIRED
-- "focusAreas" must be an array with at least 2 items
-- "specificSuggestions" must be an array with at least 2 items
+- "focusAreas" must be an array with at least 2 items (keep items concise, max 3 words each)
+- "specificSuggestions" must be an array with at least 2 items (keep items concise, max 15 words each)
+- "feedback" object is REQUIRED with "strengths", "weaknesses", and "overallComment"
+- "strengths" and "weaknesses" must be arrays with at least 2 items each (keep items concise, max 20 words each)
+- "overallComment" must be a string (2-3 sentences, max 150 words total)
+- Keep ALL text fields CONCISE to avoid token limit issues
 - Return ONLY the JSON object, no additional text before or after`;
 }
 

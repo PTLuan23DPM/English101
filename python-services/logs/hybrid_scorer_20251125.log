@@ -1,0 +1,1453 @@
+2025-11-25 01:59:09,012 - [INFO] - Task fulfillment checker and task response analyzer available
+2025-11-25 01:59:15,240 - [WARNING] - From C:\Users\ADMIN\Desktop\English101\python-services\venv\Lib\site-packages\tf_keras\src\losses.py:2976: The name tf.losses.sparse_softmax_cross_entropy is deprecated. Please use tf.compat.v1.losses.sparse_softmax_cross_entropy instead.
+
+2025-11-25 01:59:15,551 - [WARNING] -  * Debugger is active!
+2025-11-25 01:59:15,553 - [INFO] -  * Debugger PIN: 737-614-385
+2025-11-25 01:59:24,973 - [INFO] - 127.0.0.1 - - [25/Nov/2025 01:59:24] "GET /health HTTP/1.1" 200 -
+2025-11-25 01:59:50,115 - [INFO] - 127.0.0.1 - - [25/Nov/2025 01:59:50] "OPTIONS /score HTTP/1.1" 200 -
+2025-11-25 01:59:50,857 - [INFO] - ============================================================
+2025-11-25 01:59:50,857 - [INFO] - BERT SEMANTIC SIMILARITY CALCULATION
+2025-11-25 01:59:50,858 - [INFO] - ============================================================
+2025-11-25 01:59:50,858 - [INFO] - Input Essay: On weekends, I usually spend more time doing the things I enjoy. In the morning, I often go for a walk in the park near my house to get some fresh air. After that, I help my mom with cooking or cleani...
+2025-11-25 01:59:50,858 - [INFO] - Input Prompt: Write about a memorable trip or vacation. Describe where you went, what you did, and why it was special.
+2025-11-25 01:59:50,858 - [INFO] - ============================================================
+2025-11-25 01:59:50,859 - [INFO] - BERT SEMANTIC SIMILARITY
+2025-11-25 01:59:50,859 - [INFO] - Input: Essay length=479 chars, 91 words | Prompt length=104 chars, 19 words
+2025-11-25 01:59:50,859 - [INFO] - BERT model not available (BERT_AVAILABLE=False), using Gemini only
+2025-11-25 01:59:50,859 - [WARNING] - BERT similarity not available
+2025-11-25 01:59:50,859 - [INFO] - ============================================================
+2025-11-25 01:59:50,860 - [INFO] - Step 3: Quick contradiction check...
+2025-11-25 01:59:50,860 - [INFO] - ============================================================
+2025-11-25 01:59:50,860 - [WARNING] - ============================================================
+2025-11-25 01:59:50,860 - [WARNING] - ⚠️ TOPIC CONTRADICTION DETECTED!
+2025-11-25 01:59:50,861 - [WARNING] - Reasons: ['Essay uses present/habitual tense but prompt asks about past experience']
+2025-11-25 01:59:50,861 - [WARNING] - ============================================================
+2025-11-25 01:59:50,862 - [INFO] - 127.0.0.1 - - [25/Nov/2025 01:59:50] "POST /score HTTP/1.1" 200 -
+2025-11-25 01:59:55,318 - [INFO] - 127.0.0.1 - - [25/Nov/2025 01:59:55] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:00:24,987 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:00:24] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:00:55,309 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:00:55] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:01:25,624 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:01:25] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:01:37,074 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:01:37] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:01:37,383 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:01:37] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:01:56,481 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:01:56] "OPTIONS /score HTTP/1.1" 200 -
+2025-11-25 02:01:57,074 - [INFO] - ============================================================
+2025-11-25 02:01:57,074 - [INFO] - BERT SEMANTIC SIMILARITY CALCULATION
+2025-11-25 02:01:57,075 - [INFO] - ============================================================
+2025-11-25 02:01:57,075 - [INFO] - Input Essay: On weekends, I usually spend more time doing the things I enjoy. In the morning, I often go for a walk in the park near my house to get some fresh air. After that, I help my mom with cooking or cleani...
+2025-11-25 02:01:57,075 - [INFO] - Input Prompt: Write a formal email to your professor requesting an extension for your assignment. Explain your situation politely.
+2025-11-25 02:01:57,076 - [INFO] - ============================================================
+2025-11-25 02:01:57,076 - [INFO] - BERT SEMANTIC SIMILARITY
+2025-11-25 02:01:57,077 - [INFO] - Input: Essay length=479 chars, 91 words | Prompt length=116 chars, 17 words
+2025-11-25 02:01:57,077 - [INFO] - BERT model not available (BERT_AVAILABLE=False), using Gemini only
+2025-11-25 02:01:57,077 - [WARNING] - BERT similarity not available
+2025-11-25 02:01:57,078 - [INFO] - ============================================================
+2025-11-25 02:01:57,078 - [INFO] - Step 3: Quick contradiction check...
+2025-11-25 02:01:57,078 - [INFO] - ============================================================
+2025-11-25 02:01:57,079 - [INFO] - Step 3.1: Quick keyword check for obvious off-topic...
+2025-11-25 02:01:57,079 - [WARNING] - Quick check: NO keyword matches found (0/10)
+2025-11-25 02:01:57,079 - [WARNING] - Main topic: formal email your, Topic keywords: ['formal', 'email', 'your', 'professor', 'requesting']
+2025-11-25 02:01:57,079 - [WARNING] - Likely completely off-topic - will verify with generic detection
+2025-11-25 02:01:57,079 - [WARNING] - Quick check: Potential off-topic - No topic keywords found in essay (expected: formal, email, your, professor, requesting)
+2025-11-25 02:01:57,079 - [WARNING] - Will verify with generic detection method
+2025-11-25 02:01:57,079 - [INFO] - ============================================================
+2025-11-25 02:01:57,080 - [INFO] - GEMINI CONTENT VALIDATION
+2025-11-25 02:01:57,080 - [INFO] - ============================================================
+2025-11-25 02:01:57,080 - [INFO] - Input Essay: On weekends, I usually spend more time doing the things I enjoy. In the morning, I often go for a walk in the park near my house to get some fresh air. After that, I help my mom with cooking or cleani...
+2025-11-25 02:01:57,080 - [INFO] - Input Prompt: Write a formal email to your professor requesting an extension for your assignment. Explain your situation politely.
+2025-11-25 02:02:01,850 - [INFO] - ============================================================
+2025-11-25 02:02:01,850 - [INFO] - GEMINI VALIDATION RESULTS
+2025-11-25 02:02:01,850 - [INFO] - Overall Relevance: 5%
+2025-11-25 02:02:01,850 - [INFO] - Is On-topic: False
+2025-11-25 02:02:01,850 - [INFO] - Confidence: 1.00
+2025-11-25 02:02:01,851 - [INFO] - Off-topic Reason: The student's essay describes personal weekend activities and routines. It completely fails to address the prompt's requirement of writing a formal email to a professor requesting an assignment extension and explaining the situation. There is no mention of a professor, an assignment, an extension, or any formal email structure.
+2025-11-25 02:02:01,851 - [INFO] - Topic Relevance Score: 5
+2025-11-25 02:02:01,851 - [INFO] - Addressed Elements: []
+2025-11-25 02:02:01,851 - [INFO] - Missing Elements: []
+2025-11-25 02:02:01,851 - [INFO] - ============================================================
+2025-11-25 02:02:01,851 - [INFO] - ============================================================
+2025-11-25 02:02:01,851 - [INFO] - GENERIC OFF-TOPIC DETECTION
+2025-11-25 02:02:01,851 - [INFO] - ============================================================
+2025-11-25 02:02:01,851 - [INFO] - Keyword Coverage: 0/10 = 0.00%
+2025-11-25 02:02:01,851 - [INFO] - Matched keywords: []
+2025-11-25 02:02:01,852 - [INFO] - Missing keywords: ['formal', 'email', 'your', 'professor', 'requesting']
+2025-11-25 02:02:01,852 - [INFO] - BERT Semantic Similarity: 0.0000 (0.0%)
+2025-11-25 02:02:01,852 - [INFO] - Gemini Relevance: 5%
+2025-11-25 02:02:01,852 - [INFO] - Gemini On-topic: False
+2025-11-25 02:02:01,853 - [INFO] - Combined Relevance: 1.2%
+2025-11-25 02:02:01,853 - [INFO] - ============================================================
+2025-11-25 02:02:01,853 - [INFO] - TASK FULFILLMENT CHECKER ANALYSIS
+2025-11-25 02:02:01,853 - [INFO] - ============================================================
+2025-11-25 02:02:01,856 - [INFO] - Is Off-topic: False
+2025-11-25 02:02:01,856 - [INFO] - Confidence: 0.00
+2025-11-25 02:02:01,856 - [INFO] - Keyword Coverage: 80.00%
+2025-11-25 02:02:01,856 - [INFO] - Matched Keywords: []
+2025-11-25 02:02:01,856 - [INFO] - Missing Keywords: ['formal', 'email', 'situation', 'politely', 'professor', 'assignment', 'requesting', 'extension']
+2025-11-25 02:02:01,857 - [INFO] - Reasons: []
+2025-11-25 02:02:01,857 - [INFO] - ============================================================
+2025-11-25 02:02:01,857 - [INFO] - Off-topic Level: complete
+2025-11-25 02:02:01,857 - [INFO] - Is Off-topic: True
+2025-11-25 02:02:01,857 - [INFO] - Confidence: 0.95
+2025-11-25 02:02:01,857 - [INFO] - Reasons: ['No topic keywords found in essay (expected: formal, email, your, professor, requesting)', 'Both BERT (0.0%) and Gemini (5%) indicate low relevance', 'Essay does not address the prompt topic at all']
+2025-11-25 02:02:01,857 - [INFO] - ============================================================
+2025-11-25 02:02:01,857 - [INFO] - Gemini assessment:
+2025-11-25 02:02:01,857 - [INFO] -   Relevance score: 5/100
+2025-11-25 02:02:01,858 - [INFO] -   Is on topic: False
+2025-11-25 02:02:01,858 - [INFO] -   Confidence: 1.00
+2025-11-25 02:02:01,858 - [WARNING] - BERT similarity not available, using Gemini only
+2025-11-25 02:02:01,858 - [WARNING] - Classification: COMPLETE OFF-TOPIC (relevance < 50: 5.0%)
+2025-11-25 02:02:01,858 - [WARNING] - Reason: The student's essay describes personal weekend activities and routines. It completely fails to address the prompt's requirement of writing a formal email to a professor requesting an assignment extension and explaining the situation. There is no mention of a professor, an assignment, an extension, or any formal email structure.
+2025-11-25 02:02:01,858 - [INFO] - Final result:
+2025-11-25 02:02:01,858 - [INFO] -   Off-topic level: complete
+2025-11-25 02:02:01,859 - [INFO] -   Final relevance: 5/100
+2025-11-25 02:02:01,859 - [INFO] -   Is on topic: False
+2025-11-25 02:02:01,859 - [INFO] - ============================================================
+2025-11-25 02:02:02,257 - [INFO] - Task Response Analyzer relevance: 0.0%
+2025-11-25 02:02:02,258 - [WARNING] - Task Response Analyzer indicates low relevance (0.0%)
+2025-11-25 02:02:02,258 - [INFO] - ============================================================
+2025-11-25 02:02:02,258 - [INFO] - MERGING OFF-TOPIC DETECTION RESULTS
+2025-11-25 02:02:02,258 - [INFO] - ============================================================
+2025-11-25 02:02:02,259 - [INFO] - Generic Detection: level=complete, relevance=1%
+2025-11-25 02:02:02,259 - [INFO] - Improved Detection: level=complete, relevance=5%
+2025-11-25 02:02:02,259 - [INFO] - Final Merged Result: level=complete, relevance=1%
+2025-11-25 02:02:02,259 - [INFO] - ============================================================
+2025-11-25 02:02:02,260 - [WARNING] - ============================================================
+2025-11-25 02:02:02,260 - [WARNING] - Essay is completely off-topic - returning 0 score immediately
+2025-11-25 02:02:02,260 - [WARNING] - Relevance: 1%
+2025-11-25 02:02:02,260 - [WARNING] - Reason: No topic keywords found in essay (expected: formal, email, your, professor, requesting); Both BERT (0.0%) and Gemini (5%) indicate low relevance; Essay does not address the prompt topic at all
+2025-11-25 02:02:02,260 - [WARNING] - ============================================================
+2025-11-25 02:02:02,261 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:02:02] "POST /score HTTP/1.1" 200 -
+2025-11-25 02:02:07,315 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:02:07] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:02:34,237 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:02:34] "OPTIONS /score HTTP/1.1" 200 -
+2025-11-25 02:02:34,906 - [INFO] - ============================================================
+2025-11-25 02:02:34,907 - [INFO] - BERT SEMANTIC SIMILARITY CALCULATION
+2025-11-25 02:02:34,907 - [INFO] - ============================================================
+2025-11-25 02:02:34,907 - [INFO] - Input Essay: On weekends, I usually spend more time doing the things I enjoy. In the morning, I often go for a walk in the park near my house to get some fresh air. After that, I help my mom with cooking or cleani...
+2025-11-25 02:02:34,908 - [INFO] - Input Prompt: Many children spend several hours per day on screens. Why is this the case? What are the effects on their development?
+2025-11-25 02:02:34,908 - [INFO] - ============================================================
+2025-11-25 02:02:34,908 - [INFO] - BERT SEMANTIC SIMILARITY
+2025-11-25 02:02:34,908 - [INFO] - Input: Essay length=479 chars, 91 words | Prompt length=118 chars, 21 words
+2025-11-25 02:02:34,909 - [INFO] - BERT model not available (BERT_AVAILABLE=False), using Gemini only
+2025-11-25 02:02:34,909 - [WARNING] - BERT similarity not available
+2025-11-25 02:02:34,909 - [INFO] - ============================================================
+2025-11-25 02:02:34,909 - [INFO] - Step 3: Quick contradiction check...
+2025-11-25 02:02:34,910 - [INFO] - ============================================================
+2025-11-25 02:02:34,910 - [INFO] - Step 3.1: Quick keyword check for obvious off-topic...
+2025-11-25 02:02:34,910 - [INFO] - ============================================================
+2025-11-25 02:02:34,910 - [INFO] - GEMINI CONTENT VALIDATION
+2025-11-25 02:02:34,912 - [INFO] - ============================================================
+2025-11-25 02:02:34,913 - [INFO] - Input Essay: On weekends, I usually spend more time doing the things I enjoy. In the morning, I often go for a walk in the park near my house to get some fresh air. After that, I help my mom with cooking or cleani...
+2025-11-25 02:02:34,915 - [INFO] - Input Prompt: Many children spend several hours per day on screens. Why is this the case? What are the effects on their development?
+2025-11-25 02:02:37,076 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:02:37] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:02:40,449 - [INFO] - ============================================================
+2025-11-25 02:02:40,449 - [INFO] - GEMINI VALIDATION RESULTS
+2025-11-25 02:02:40,449 - [INFO] - Overall Relevance: 0%
+2025-11-25 02:02:40,450 - [INFO] - Is On-topic: False
+2025-11-25 02:02:40,450 - [INFO] - Confidence: 1.00
+2025-11-25 02:02:40,450 - [INFO] - Off-topic Reason: The student essay describes personal weekend activities and preferences, such as walking, helping with chores, playing sports, and watching movies. It completely fails to address the prompt's core topic of children's screen time, its causes, or its effects on development. There is no mention of 'children', 'screens', 'reasons', or 'effects on development' in the essay. It is a completely different subject.
+2025-11-25 02:02:40,451 - [INFO] - Topic Relevance Score: 0
+2025-11-25 02:02:40,451 - [INFO] - Addressed Elements: []
+2025-11-25 02:02:40,451 - [INFO] - Missing Elements: []
+2025-11-25 02:02:40,451 - [INFO] - ============================================================
+2025-11-25 02:02:40,452 - [INFO] - ============================================================
+2025-11-25 02:02:40,452 - [INFO] - GENERIC OFF-TOPIC DETECTION
+2025-11-25 02:02:40,452 - [INFO] - ============================================================
+2025-11-25 02:02:40,453 - [INFO] - Keyword Coverage: 1/10 = 10.00%
+2025-11-25 02:02:40,453 - [INFO] - Matched keywords: ['spend']
+2025-11-25 02:02:40,453 - [INFO] - Missing keywords: ['many', 'children', 'several', 'hours', 'screens']
+2025-11-25 02:02:40,453 - [INFO] - Elements Coverage: 0/2 = 0.00%
+2025-11-25 02:02:40,455 - [INFO] - Addressed: []
+2025-11-25 02:02:40,455 - [INFO] - Missing: ['what', 'why']
+2025-11-25 02:02:40,457 - [INFO] - BERT Semantic Similarity: 0.0000 (0.0%)
+2025-11-25 02:02:40,458 - [INFO] - Gemini Relevance: 0%
+2025-11-25 02:02:40,458 - [INFO] - Gemini On-topic: False
+2025-11-25 02:02:40,459 - [INFO] - Combined Relevance: 3.0%
+2025-11-25 02:02:40,460 - [INFO] - ============================================================
+2025-11-25 02:02:40,460 - [INFO] - TASK FULFILLMENT CHECKER ANALYSIS
+2025-11-25 02:02:40,460 - [INFO] - ============================================================
+2025-11-25 02:02:40,462 - [INFO] - Is Off-topic: False
+2025-11-25 02:02:40,462 - [INFO] - Confidence: 0.00
+2025-11-25 02:02:40,462 - [INFO] - Keyword Coverage: 82.86%
+2025-11-25 02:02:40,462 - [INFO] - Matched Keywords: ['spend']
+2025-11-25 02:02:40,462 - [INFO] - Missing Keywords: ['development', 'screens', 'effects', 'several', 'hours', 'children']
+2025-11-25 02:02:40,463 - [INFO] - Reasons: []
+2025-11-25 02:02:40,463 - [INFO] - ============================================================
+2025-11-25 02:02:40,463 - [INFO] - Off-topic Level: complete
+2025-11-25 02:02:40,464 - [INFO] - Is Off-topic: True
+2025-11-25 02:02:40,465 - [INFO] - Confidence: 0.95
+2025-11-25 02:02:40,465 - [INFO] - Reasons: ['Missing most required elements (2/2)', 'Both BERT (0.0%) and Gemini (0%) indicate low relevance', 'Essay does not address the prompt topic at all']
+2025-11-25 02:02:40,466 - [INFO] - ============================================================
+2025-11-25 02:02:40,466 - [INFO] - Gemini assessment:
+2025-11-25 02:02:40,467 - [INFO] -   Relevance score: 0/100
+2025-11-25 02:02:40,467 - [INFO] -   Is on topic: False
+2025-11-25 02:02:40,467 - [INFO] -   Confidence: 1.00
+2025-11-25 02:02:40,468 - [WARNING] - BERT similarity not available, using Gemini only
+2025-11-25 02:02:40,468 - [WARNING] - Classification: COMPLETE OFF-TOPIC (relevance < 50: 0.0%)
+2025-11-25 02:02:40,468 - [WARNING] - Reason: The student essay describes personal weekend activities and preferences, such as walking, helping with chores, playing sports, and watching movies. It completely fails to address the prompt's core topic of children's screen time, its causes, or its effects on development. There is no mention of 'children', 'screens', 'reasons', or 'effects on development' in the essay. It is a completely different subject.
+2025-11-25 02:02:40,470 - [INFO] - Final result:
+2025-11-25 02:02:40,471 - [INFO] -   Off-topic level: complete
+2025-11-25 02:02:40,471 - [INFO] -   Final relevance: 0/100
+2025-11-25 02:02:40,471 - [INFO] -   Is on topic: False
+2025-11-25 02:02:40,472 - [INFO] - ============================================================
+2025-11-25 02:02:40,871 - [INFO] - Task Response Analyzer relevance: 33.0%
+2025-11-25 02:02:40,871 - [WARNING] - Task Response Analyzer indicates low relevance (33.0%)
+2025-11-25 02:02:40,872 - [INFO] - ============================================================
+2025-11-25 02:02:40,872 - [INFO] - MERGING OFF-TOPIC DETECTION RESULTS
+2025-11-25 02:02:40,872 - [INFO] - ============================================================
+2025-11-25 02:02:40,872 - [INFO] - Generic Detection: level=complete, relevance=3%
+2025-11-25 02:02:40,872 - [INFO] - Improved Detection: level=complete, relevance=0%
+2025-11-25 02:02:40,872 - [INFO] - Final Merged Result: level=complete, relevance=0%
+2025-11-25 02:02:40,873 - [INFO] - ============================================================
+2025-11-25 02:02:40,873 - [WARNING] - ============================================================
+2025-11-25 02:02:40,873 - [WARNING] - Essay is completely off-topic - returning 0 score immediately
+2025-11-25 02:02:40,873 - [WARNING] - Relevance: 0%
+2025-11-25 02:02:40,873 - [WARNING] - Reason: The student essay describes personal weekend activities and preferences, such as walking, helping with chores, playing sports, and watching movies. It completely fails to address the prompt's core topic of children's screen time, its causes, or its effects on development. There is no mention of 'children', 'screens', 'reasons', or 'effects on development' in the essay. It is a completely different subject.
+2025-11-25 02:02:40,873 - [WARNING] - ============================================================
+2025-11-25 02:02:40,874 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:02:40] "POST /score HTTP/1.1" 200 -
+2025-11-25 02:03:07,378 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:03:07] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:03:09,159 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:03:09] "OPTIONS /score HTTP/1.1" 200 -
+2025-11-25 02:03:09,957 - [INFO] - ============================================================
+2025-11-25 02:03:09,957 - [INFO] - BERT SEMANTIC SIMILARITY CALCULATION
+2025-11-25 02:03:09,958 - [INFO] - ============================================================
+2025-11-25 02:03:09,958 - [INFO] - Input Essay: On weekends, I usually spend more time doing the things I enjoy. In the morning, I often go for a walk in the park near my house to get some fresh air. After that, I help my mom with cooking or cleani...
+2025-11-25 02:03:09,958 - [INFO] - Input Prompt: Describe your favorite hobby and explain why you enjoy it. Include details about how you got started and what you have learned.
+2025-11-25 02:03:09,958 - [INFO] - ============================================================
+2025-11-25 02:03:09,958 - [INFO] - BERT SEMANTIC SIMILARITY
+2025-11-25 02:03:09,958 - [INFO] - Input: Essay length=479 chars, 91 words | Prompt length=127 chars, 22 words
+2025-11-25 02:03:09,958 - [INFO] - BERT model not available (BERT_AVAILABLE=False), using Gemini only
+2025-11-25 02:03:09,959 - [WARNING] - BERT similarity not available
+2025-11-25 02:03:09,959 - [INFO] - ============================================================
+2025-11-25 02:03:09,959 - [INFO] - Step 3: Quick contradiction check...
+2025-11-25 02:03:09,959 - [INFO] - ============================================================
+2025-11-25 02:03:09,959 - [INFO] - Step 3.1: Quick keyword check for obvious off-topic...
+2025-11-25 02:03:09,959 - [INFO] - ============================================================
+2025-11-25 02:03:09,959 - [INFO] - GEMINI CONTENT VALIDATION
+2025-11-25 02:03:09,959 - [INFO] - ============================================================
+2025-11-25 02:03:09,960 - [INFO] - Input Essay: On weekends, I usually spend more time doing the things I enjoy. In the morning, I often go for a walk in the park near my house to get some fresh air. After that, I help my mom with cooking or cleani...
+2025-11-25 02:03:09,960 - [INFO] - Input Prompt: Describe your favorite hobby and explain why you enjoy it. Include details about how you got started and what you have learned.
+2025-11-25 02:03:20,283 - [INFO] - ============================================================
+2025-11-25 02:03:20,283 - [INFO] - GEMINI VALIDATION RESULTS
+2025-11-25 02:03:20,283 - [INFO] - Overall Relevance: 35%
+2025-11-25 02:03:20,284 - [INFO] - Is On-topic: False
+2025-11-25 02:03:20,284 - [INFO] - Confidence: 0.95
+2025-11-25 02:03:20,284 - [INFO] - Off-topic Reason: The essay describes general weekend activities rather than focusing on a single 'favorite hobby' as explicitly requested. It lists multiple activities but fails to identify one as 'favorite' and completely omits details about why it is enjoyed, how the student got started with it, or what they have learned from it, which were all mandatory components of the prompt. The essay reads more like a description of a typical weekend than an essay about a specific hobby.
+2025-11-25 02:03:20,284 - [INFO] - Topic Relevance Score: 35
+2025-11-25 02:03:20,284 - [INFO] - Addressed Elements: []
+2025-11-25 02:03:20,284 - [INFO] - Missing Elements: []
+2025-11-25 02:03:20,284 - [INFO] - ============================================================
+2025-11-25 02:03:20,285 - [INFO] - ============================================================
+2025-11-25 02:03:20,285 - [INFO] - GENERIC OFF-TOPIC DETECTION
+2025-11-25 02:03:20,285 - [INFO] - ============================================================
+2025-11-25 02:03:20,285 - [INFO] - Keyword Coverage: 2/10 = 20.00%
+2025-11-25 02:03:20,285 - [INFO] - Matched keywords: ['favorite', 'enjoy']
+2025-11-25 02:03:20,286 - [INFO] - Missing keywords: ['your', 'hobby', 'include', 'details', 'started']
+2025-11-25 02:03:20,286 - [INFO] - Elements Coverage: 0/2 = 0.00%
+2025-11-25 02:03:20,286 - [INFO] - Addressed: []
+2025-11-25 02:03:20,286 - [INFO] - Missing: ['what', 'why']
+2025-11-25 02:03:20,286 - [INFO] - BERT Semantic Similarity: 0.0000 (0.0%)
+2025-11-25 02:03:20,286 - [INFO] - Gemini Relevance: 35%
+2025-11-25 02:03:20,286 - [INFO] - Gemini On-topic: False
+2025-11-25 02:03:20,287 - [INFO] - Combined Relevance: 14.8%
+2025-11-25 02:03:20,287 - [INFO] - ============================================================
+2025-11-25 02:03:20,287 - [INFO] - TASK FULFILLMENT CHECKER ANALYSIS
+2025-11-25 02:03:20,287 - [INFO] - ============================================================
+2025-11-25 02:03:20,288 - [INFO] - Is Off-topic: False
+2025-11-25 02:03:20,288 - [INFO] - Confidence: 0.00
+2025-11-25 02:03:20,288 - [INFO] - Keyword Coverage: 85.71%
+2025-11-25 02:03:20,288 - [INFO] - Matched Keywords: ['favorite', 'enjoy']
+2025-11-25 02:03:20,288 - [INFO] - Missing Keywords: ['hobby', 'started', 'details', 'include', 'learned']
+2025-11-25 02:03:20,288 - [INFO] - Reasons: []
+2025-11-25 02:03:20,289 - [INFO] - ============================================================
+2025-11-25 02:03:20,289 - [INFO] - Off-topic Level: complete
+2025-11-25 02:03:20,289 - [INFO] - Is Off-topic: True
+2025-11-25 02:03:20,289 - [INFO] - Confidence: 0.95
+2025-11-25 02:03:20,289 - [INFO] - Reasons: ['Missing most required elements (2/2)', 'Both BERT (0.0%) and Gemini (35%) indicate low relevance', 'Essay does not address the prompt topic at all']
+2025-11-25 02:03:20,289 - [INFO] - ============================================================
+2025-11-25 02:03:20,289 - [INFO] - Gemini assessment:
+2025-11-25 02:03:20,290 - [INFO] -   Relevance score: 35/100
+2025-11-25 02:03:20,290 - [INFO] -   Is on topic: False
+2025-11-25 02:03:20,290 - [INFO] -   Confidence: 0.95
+2025-11-25 02:03:20,290 - [WARNING] - BERT similarity not available, using Gemini only
+2025-11-25 02:03:20,290 - [WARNING] - Classification: COMPLETE OFF-TOPIC (relevance < 50: 20.0%)
+2025-11-25 02:03:20,290 - [WARNING] - Reason: The essay describes general weekend activities rather than focusing on a single 'favorite hobby' as explicitly requested. It lists multiple activities but fails to identify one as 'favorite' and completely omits details about why it is enjoyed, how the student got started with it, or what they have learned from it, which were all mandatory components of the prompt. The essay reads more like a description of a typical weekend than an essay about a specific hobby.
+2025-11-25 02:03:20,290 - [INFO] - Final result:
+2025-11-25 02:03:20,290 - [INFO] -   Off-topic level: complete
+2025-11-25 02:03:20,291 - [INFO] -   Final relevance: 20/100
+2025-11-25 02:03:20,291 - [INFO] -   Is on topic: False
+2025-11-25 02:03:20,291 - [INFO] - ============================================================
+2025-11-25 02:03:20,769 - [INFO] - Task Response Analyzer relevance: 55.0%
+2025-11-25 02:03:20,770 - [INFO] - ============================================================
+2025-11-25 02:03:20,770 - [INFO] - MERGING OFF-TOPIC DETECTION RESULTS
+2025-11-25 02:03:20,770 - [INFO] - ============================================================
+2025-11-25 02:03:20,771 - [INFO] - Generic Detection: level=complete, relevance=14%
+2025-11-25 02:03:20,771 - [INFO] - Improved Detection: level=complete, relevance=20%
+2025-11-25 02:03:20,772 - [INFO] - Final Merged Result: level=complete, relevance=14%
+2025-11-25 02:03:20,772 - [INFO] - ============================================================
+2025-11-25 02:03:20,773 - [WARNING] - ============================================================
+2025-11-25 02:03:20,773 - [WARNING] - Essay is completely off-topic - returning 0 score immediately
+2025-11-25 02:03:20,774 - [WARNING] - Relevance: 14%
+2025-11-25 02:03:20,774 - [WARNING] - Reason: Missing most required elements (2/2); Both BERT (0.0%) and Gemini (35%) indicate low relevance; Essay does not address the prompt topic at all
+2025-11-25 02:03:20,775 - [WARNING] - ============================================================
+2025-11-25 02:03:20,776 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:03:20] "POST /score HTTP/1.1" 200 -
+2025-11-25 02:03:37,075 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:03:37] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:04:07,613 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:04:07] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:04:37,309 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:04:37] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:05:07,620 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:05:07] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:05:25,334 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:05:25] "OPTIONS /score HTTP/1.1" 200 -
+2025-11-25 02:05:26,113 - [INFO] - ============================================================
+2025-11-25 02:05:26,114 - [INFO] - BERT SEMANTIC SIMILARITY CALCULATION
+2025-11-25 02:05:26,114 - [INFO] - ============================================================
+2025-11-25 02:05:26,115 - [INFO] - Input Essay: Many people think that university education should be free for all students, but others say that it is not possible. In my opinion, I agree to some extent, but I think it should not be completely free...
+2025-11-25 02:05:26,115 - [INFO] - Input Prompt: Some people believe university education should be free for all students. To what extent do you agree or disagree?
+2025-11-25 02:05:26,115 - [INFO] - ============================================================
+2025-11-25 02:05:26,116 - [INFO] - BERT SEMANTIC SIMILARITY
+2025-11-25 02:05:26,116 - [INFO] - Input: Essay length=1232 chars, 213 words | Prompt length=114 chars, 19 words
+2025-11-25 02:05:26,116 - [INFO] - BERT model not available (BERT_AVAILABLE=False), using Gemini only
+2025-11-25 02:05:26,117 - [WARNING] - BERT similarity not available
+2025-11-25 02:05:26,117 - [INFO] - ============================================================
+2025-11-25 02:05:26,118 - [INFO] - Step 3: Quick contradiction check...
+2025-11-25 02:05:26,118 - [INFO] - ============================================================
+2025-11-25 02:05:26,119 - [INFO] - Step 3.1: Quick keyword check for obvious off-topic...
+2025-11-25 02:05:26,119 - [INFO] - ============================================================
+2025-11-25 02:05:26,120 - [INFO] - GEMINI CONTENT VALIDATION
+2025-11-25 02:05:26,120 - [INFO] - ============================================================
+2025-11-25 02:05:26,121 - [INFO] - Input Essay: Many people think that university education should be free for all students, but others say that it is not possible. In my opinion, I agree to some extent, but I think it should not be completely free...
+2025-11-25 02:05:26,121 - [INFO] - Input Prompt: Some people believe university education should be free for all students. To what extent do you agree or disagree?
+2025-11-25 02:05:31,721 - [INFO] - ============================================================
+2025-11-25 02:05:31,722 - [INFO] - GEMINI VALIDATION RESULTS
+2025-11-25 02:05:31,722 - [INFO] - Overall Relevance: 95%
+2025-11-25 02:05:31,723 - [INFO] - Is On-topic: True
+2025-11-25 02:05:31,723 - [INFO] - Confidence: 1.00
+2025-11-25 02:05:31,724 - [INFO] - Off-topic Reason: 
+2025-11-25 02:05:31,724 - [INFO] - Topic Relevance Score: 95
+2025-11-25 02:05:31,725 - [INFO] - Addressed Elements: []
+2025-11-25 02:05:31,725 - [INFO] - Missing Elements: []
+2025-11-25 02:05:31,725 - [INFO] - ============================================================
+2025-11-25 02:05:31,726 - [INFO] - ============================================================
+2025-11-25 02:05:31,726 - [INFO] - GENERIC OFF-TOPIC DETECTION
+2025-11-25 02:05:31,727 - [INFO] - ============================================================
+2025-11-25 02:05:31,727 - [INFO] - Keyword Coverage: 8/10 = 80.00%
+2025-11-25 02:05:31,727 - [INFO] - Matched keywords: ['some', 'people', 'university', 'education', 'should']
+2025-11-25 02:05:31,728 - [INFO] - Missing keywords: ['believe', 'what']
+2025-11-25 02:05:31,728 - [INFO] - Elements Coverage: 1/2 = 50.00%
+2025-11-25 02:05:31,729 - [INFO] - Addressed: ['who']
+2025-11-25 02:05:31,729 - [INFO] - Missing: ['what']
+2025-11-25 02:05:31,729 - [INFO] - BERT Semantic Similarity: 0.0000 (0.0%)
+2025-11-25 02:05:31,730 - [INFO] - Gemini Relevance: 95%
+2025-11-25 02:05:31,731 - [INFO] - Gemini On-topic: True
+2025-11-25 02:05:31,731 - [INFO] - Combined Relevance: 57.7%
+2025-11-25 02:05:31,731 - [INFO] - ============================================================
+2025-11-25 02:05:31,732 - [INFO] - TASK FULFILLMENT CHECKER ANALYSIS
+2025-11-25 02:05:31,732 - [INFO] - ============================================================
+2025-11-25 02:05:31,733 - [INFO] - Is Off-topic: False
+2025-11-25 02:05:31,734 - [INFO] - Confidence: 0.00
+2025-11-25 02:05:31,734 - [INFO] - Keyword Coverage: 93.33%
+2025-11-25 02:05:31,734 - [INFO] - Matched Keywords: ['students', 'extent']
+2025-11-25 02:05:31,734 - [INFO] - Missing Keywords: ['university education']
+2025-11-25 02:05:31,734 - [INFO] - Reasons: []
+2025-11-25 02:05:31,735 - [INFO] - ============================================================
+2025-11-25 02:05:31,735 - [INFO] - Off-topic Level: incomplete
+2025-11-25 02:05:31,735 - [INFO] - Is Off-topic: False
+2025-11-25 02:05:31,736 - [INFO] - Confidence: 0.80
+2025-11-25 02:05:31,736 - [INFO] - Reasons: ['Essay addresses the topic but is missing some required elements']
+2025-11-25 02:05:31,736 - [INFO] - ============================================================
+2025-11-25 02:05:31,737 - [INFO] - Gemini assessment:
+2025-11-25 02:05:31,737 - [INFO] -   Relevance score: 95/100
+2025-11-25 02:05:31,737 - [INFO] -   Is on topic: True
+2025-11-25 02:05:31,738 - [INFO] -   Confidence: 1.00
+2025-11-25 02:05:31,738 - [WARNING] - BERT similarity not available, using Gemini only
+2025-11-25 02:05:31,738 - [INFO] - Classification: ON-TOPIC (relevance >= 70: 95.0%)
+2025-11-25 02:05:31,738 - [INFO] - Final result:
+2025-11-25 02:05:31,739 - [INFO] -   Off-topic level: none
+2025-11-25 02:05:31,739 - [INFO] -   Final relevance: 95/100
+2025-11-25 02:05:31,739 - [INFO] -   Is on topic: True
+2025-11-25 02:05:31,739 - [INFO] - ============================================================
+2025-11-25 02:05:32,137 - [INFO] - Task Response Analyzer relevance: 100.0%
+2025-11-25 02:05:32,138 - [INFO] - ============================================================
+2025-11-25 02:05:32,139 - [INFO] - MERGING OFF-TOPIC DETECTION RESULTS
+2025-11-25 02:05:32,140 - [INFO] - ============================================================
+2025-11-25 02:05:32,141 - [INFO] - Generic Detection: level=incomplete, relevance=57%
+2025-11-25 02:05:32,142 - [INFO] - Improved Detection: level=none, relevance=95%
+2025-11-25 02:05:32,143 - [INFO] - Final Merged Result: level=none, relevance=57%
+2025-11-25 02:05:32,144 - [INFO] - ============================================================
+2025-11-25 02:05:32,550 - [INFO] - Task Response Analyzer: relevance=10.0, coverage=7.0
+2025-11-25 02:05:32,550 - [INFO] - Task Response Analyzer score (100): 88.0
+2025-11-25 02:05:32,550 - [INFO] - Task Response: On-topic (relevance=57.0%) → base score=57.0
+2025-11-25 02:05:32,551 - [INFO] - Task Response: On-topic with good quality → 10% bonus
+2025-11-25 02:05:32,551 - [INFO] - Task Response: Final score=61.4/100 (base=57.0, quality=95)
+2025-11-25 02:05:32,551 - [INFO] - Task Response Analyzer gives higher score (88.0 vs 61) → Using higher score
+2025-11-25 02:05:32,553 - [INFO] - Spelling errors from Gemini: 0
+2025-11-25 02:05:32,553 - [INFO] - Vocabulary error categorization:
+2025-11-25 02:05:32,553 - [INFO] -   Basic errors (wrong word, collocation): 0
+2025-11-25 02:05:32,554 - [INFO] -   Advanced errors (style, nuance): 0
+2025-11-25 02:05:32,554 - [INFO] -   Spelling errors: 0
+2025-11-25 02:05:32,554 - [INFO] - No vocab errors detected → no score cap applied
+2025-11-25 02:05:32,555 - [INFO] - ============================================================
+2025-11-25 02:05:32,555 - [INFO] - GRAMMAR ERROR DETECTION
+2025-11-25 02:05:32,555 - [INFO] - Errors from Gemini: 0 errors
+2025-11-25 02:05:32,556 - [INFO] - Spelling errors from Gemini (affecting grammar): 0
+2025-11-25 02:05:32,556 - [INFO] - Total grammar errors detected: 0
+2025-11-25 02:05:32,556 - [INFO] - Breakdown: From Gemini=0, Spelling=0, Mechanics=0
+2025-11-25 02:05:32,556 - [INFO] - ============================================================
+2025-11-25 02:05:32,557 - [INFO] - Grammar error categorization:
+2025-11-25 02:05:32,557 - [INFO] -   Basic errors (subject-verb, tense, articles): 0 (VERY SEVERE)
+2025-11-25 02:05:32,557 - [INFO] -   Advanced errors (complex structures): 0
+2025-11-25 02:05:32,557 - [INFO] -   Spelling errors: 0
+2025-11-25 02:05:32,558 - [INFO] -   Mechanics errors (punctuation/capitalization): 0
+2025-11-25 02:05:32,558 - [INFO] -   Total: 0
+2025-11-25 02:05:32,558 - [INFO] - No grammar errors detected → no score cap applied
+2025-11-25 02:05:32,562 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:05:32] "POST /score HTTP/1.1" 200 -
+2025-11-25 02:05:37,077 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:05:37] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:06:07,396 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:06:07] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:06:37,305 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:06:37] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:06:56,409 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:06:56] "OPTIONS /score HTTP/1.1" 200 -
+2025-11-25 02:06:56,673 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:06:56] "POST /score HTTP/1.1" 200 -
+2025-11-25 02:07:21,926 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:07:21] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:07:52,616 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:07:52] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:08:22,311 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:08:22] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:08:52,629 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:08:52] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:09:22,313 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:09:22] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:09:52,618 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:09:52] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:10:14,450 - [INFO] -  * Detected change in 'C:\\Users\\ADMIN\\Desktop\\English101\\python-services\\writing_scorer.py', reloading
+2025-11-25 02:14:49,900 - [INFO] - Task fulfillment checker and task response analyzer available
+2025-11-25 02:14:55,756 - [WARNING] - From C:\Users\ADMIN\Desktop\English101\python-services\venv\Lib\site-packages\tf_keras\src\losses.py:2976: The name tf.losses.sparse_softmax_cross_entropy is deprecated. Please use tf.compat.v1.losses.sparse_softmax_cross_entropy instead.
+
+2025-11-25 02:14:57,246 - [INFO] - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.1.120:5001
+2025-11-25 02:14:57,246 - [INFO] - [33mPress CTRL+C to quit[0m
+2025-11-25 02:14:57,247 - [INFO] -  * Restarting with stat
+2025-11-25 02:14:57,518 - [INFO] - Task fulfillment checker and task response analyzer available
+2025-11-25 02:14:59,150 - [WARNING] - From C:\Users\ADMIN\Desktop\English101\python-services\venv\Lib\site-packages\tf_keras\src\losses.py:2976: The name tf.losses.sparse_softmax_cross_entropy is deprecated. Please use tf.compat.v1.losses.sparse_softmax_cross_entropy instead.
+
+2025-11-25 02:15:02,050 - [WARNING] -  * Debugger is active!
+2025-11-25 02:15:02,051 - [INFO] -  * Debugger PIN: 737-614-385
+2025-11-25 02:15:07,616 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:15:07] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:15:34,318 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:15:34] "OPTIONS /score HTTP/1.1" 200 -
+2025-11-25 02:15:34,628 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:15:34] "POST /score HTTP/1.1" 200 -
+2025-11-25 02:16:07,446 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:16:07] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:16:37,751 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:16:37] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:17:08,313 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:17:08] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:17:38,618 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:17:38] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:18:08,320 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:18:08] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:18:38,626 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:18:38] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:19:08,314 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:19:08] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:19:38,616 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:19:38] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:20:08,310 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:20:08] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:20:54,617 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:20:54] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:21:27,760 - [INFO] - Task fulfillment checker and task response analyzer available
+2025-11-25 02:21:33,260 - [WARNING] - From C:\Users\ADMIN\Desktop\English101\python-services\venv\Lib\site-packages\tf_keras\src\losses.py:2976: The name tf.losses.sparse_softmax_cross_entropy is deprecated. Please use tf.compat.v1.losses.sparse_softmax_cross_entropy instead.
+
+2025-11-25 02:21:34,776 - [INFO] - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.1.120:5001
+2025-11-25 02:21:34,776 - [INFO] - [33mPress CTRL+C to quit[0m
+2025-11-25 02:21:34,779 - [INFO] -  * Restarting with stat
+2025-11-25 02:21:35,008 - [INFO] - Task fulfillment checker and task response analyzer available
+2025-11-25 02:21:36,681 - [WARNING] - From C:\Users\ADMIN\Desktop\English101\python-services\venv\Lib\site-packages\tf_keras\src\losses.py:2976: The name tf.losses.sparse_softmax_cross_entropy is deprecated. Please use tf.compat.v1.losses.sparse_softmax_cross_entropy instead.
+
+2025-11-25 02:21:39,614 - [WARNING] -  * Debugger is active!
+2025-11-25 02:21:39,616 - [INFO] -  * Debugger PIN: 737-614-385
+2025-11-25 02:21:54,627 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:21:54] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:22:08,318 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:22:08] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:22:30,327 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:22:30] "OPTIONS /score HTTP/1.1" 200 -
+2025-11-25 02:22:31,074 - [INFO] - ============================================================
+2025-11-25 02:22:31,075 - [INFO] - BERT SEMANTIC SIMILARITY CALCULATION
+2025-11-25 02:22:31,075 - [INFO] - ============================================================
+2025-11-25 02:22:31,075 - [INFO] - Input Essay: Whether university education should be free for every student is a question that has sparked debate in many countries. Some people argue that making higher education free would create equal opportunit...
+2025-11-25 02:22:31,075 - [INFO] - Input Prompt: Some people believe university education should be free for all students. To what extent do you agree or disagree?
+2025-11-25 02:22:31,075 - [INFO] - ============================================================
+2025-11-25 02:22:31,075 - [INFO] - BERT SEMANTIC SIMILARITY
+2025-11-25 02:22:31,075 - [INFO] - Input: Essay length=2284 chars, 337 words | Prompt length=114 chars, 19 words
+2025-11-25 02:22:31,075 - [INFO] - BERT model not available (BERT_AVAILABLE=False), using Gemini only
+2025-11-25 02:22:31,075 - [WARNING] - BERT similarity not available
+2025-11-25 02:22:31,076 - [INFO] - ============================================================
+2025-11-25 02:22:31,076 - [INFO] - Step 3: Quick contradiction check...
+2025-11-25 02:22:31,076 - [INFO] - ============================================================
+2025-11-25 02:22:31,076 - [INFO] - Step 3.1: Quick keyword check for obvious off-topic...
+2025-11-25 02:22:31,076 - [INFO] - ============================================================
+2025-11-25 02:22:31,077 - [INFO] - GEMINI CONTENT VALIDATION
+2025-11-25 02:22:31,077 - [INFO] - ============================================================
+2025-11-25 02:22:31,077 - [INFO] - Input Essay: Whether university education should be free for every student is a question that has sparked debate in many countries. Some people argue that making higher education free would create equal opportunit...
+2025-11-25 02:22:31,078 - [INFO] - Input Prompt: Some people believe university education should be free for all students. To what extent do you agree or disagree?
+2025-11-25 02:22:37,448 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:22:37] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:22:38,162 - [INFO] - ============================================================
+2025-11-25 02:22:38,163 - [INFO] - GEMINI VALIDATION RESULTS
+2025-11-25 02:22:38,163 - [INFO] - Overall Relevance: 100%
+2025-11-25 02:22:38,163 - [INFO] - Is On-topic: True
+2025-11-25 02:22:38,164 - [INFO] - Confidence: 1.00
+2025-11-25 02:22:38,164 - [INFO] - Off-topic Reason: 
+2025-11-25 02:22:38,164 - [INFO] - Topic Relevance Score: 100
+2025-11-25 02:22:38,165 - [INFO] - Addressed Elements: []
+2025-11-25 02:22:38,165 - [INFO] - Missing Elements: []
+2025-11-25 02:22:38,166 - [INFO] - ============================================================
+2025-11-25 02:22:38,166 - [INFO] - ============================================================
+2025-11-25 02:22:38,167 - [INFO] - GENERIC OFF-TOPIC DETECTION
+2025-11-25 02:22:38,167 - [INFO] - ============================================================
+2025-11-25 02:22:38,168 - [INFO] - Keyword Coverage: 8/10 = 80.00%
+2025-11-25 02:22:38,168 - [INFO] - Matched keywords: ['some', 'people', 'believe', 'university', 'education']
+2025-11-25 02:22:38,168 - [INFO] - Missing keywords: ['what', 'extent']
+2025-11-25 02:22:38,168 - [INFO] - Elements Coverage: 1/2 = 50.00%
+2025-11-25 02:22:38,169 - [INFO] - Addressed: ['who']
+2025-11-25 02:22:38,169 - [INFO] - Missing: ['what']
+2025-11-25 02:22:38,169 - [INFO] - BERT Semantic Similarity: 0.0000 (0.0%)
+2025-11-25 02:22:38,169 - [INFO] - Gemini Relevance: 100%
+2025-11-25 02:22:38,170 - [INFO] - Gemini On-topic: True
+2025-11-25 02:22:38,170 - [INFO] - Combined Relevance: 59.0%
+2025-11-25 02:22:38,170 - [INFO] - ============================================================
+2025-11-25 02:22:38,171 - [INFO] - TASK FULFILLMENT CHECKER ANALYSIS
+2025-11-25 02:22:38,171 - [INFO] - ============================================================
+2025-11-25 02:22:38,173 - [INFO] - Is Off-topic: False
+2025-11-25 02:22:38,174 - [INFO] - Confidence: 0.00
+2025-11-25 02:22:38,174 - [INFO] - Keyword Coverage: 86.67%
+2025-11-25 02:22:38,174 - [INFO] - Matched Keywords: ['students']
+2025-11-25 02:22:38,174 - [INFO] - Missing Keywords: ['university education', 'extent']
+2025-11-25 02:22:38,175 - [INFO] - Reasons: []
+2025-11-25 02:22:38,175 - [INFO] - ============================================================
+2025-11-25 02:22:38,175 - [INFO] - Off-topic Level: incomplete
+2025-11-25 02:22:38,175 - [INFO] - Is Off-topic: False
+2025-11-25 02:22:38,176 - [INFO] - Confidence: 0.80
+2025-11-25 02:22:38,176 - [INFO] - Reasons: ['Essay addresses the topic but is missing some required elements']
+2025-11-25 02:22:38,176 - [INFO] - ============================================================
+2025-11-25 02:22:38,177 - [INFO] - Gemini assessment:
+2025-11-25 02:22:38,177 - [INFO] -   Relevance score: 100/100
+2025-11-25 02:22:38,177 - [INFO] -   Is on topic: True
+2025-11-25 02:22:38,177 - [INFO] -   Confidence: 1.00
+2025-11-25 02:22:38,178 - [WARNING] - BERT similarity not available, using Gemini only
+2025-11-25 02:22:38,178 - [INFO] - Classification: ON-TOPIC (relevance >= 70: 100.0%)
+2025-11-25 02:22:38,178 - [INFO] - Final result:
+2025-11-25 02:22:38,178 - [INFO] -   Off-topic level: none
+2025-11-25 02:22:38,179 - [INFO] -   Final relevance: 100/100
+2025-11-25 02:22:38,179 - [INFO] -   Is on topic: True
+2025-11-25 02:22:38,179 - [INFO] - ============================================================
+2025-11-25 02:22:38,576 - [INFO] - Task Response Analyzer relevance: 100.0%
+2025-11-25 02:22:38,576 - [INFO] - ============================================================
+2025-11-25 02:22:38,577 - [INFO] - MERGING OFF-TOPIC DETECTION RESULTS
+2025-11-25 02:22:38,577 - [INFO] - ============================================================
+2025-11-25 02:22:38,577 - [INFO] - Generic Detection: level=incomplete, relevance=59%
+2025-11-25 02:22:38,577 - [INFO] - Improved Detection: level=none, relevance=100%
+2025-11-25 02:22:38,577 - [INFO] - Final Merged Result: level=none, relevance=59%
+2025-11-25 02:22:38,578 - [INFO] - ============================================================
+2025-11-25 02:22:39,061 - [INFO] - Task Response Analyzer: relevance=10.0, coverage=7.0
+2025-11-25 02:22:39,062 - [INFO] - Task Response Analyzer score (100): 88.0
+2025-11-25 02:22:39,062 - [INFO] - Task Response: On-topic (relevance=59.0%) → base score=59.0
+2025-11-25 02:22:39,062 - [INFO] - Task Response: Word count penalty=0.95
+2025-11-25 02:22:39,062 - [INFO] - Task Response: On-topic with good quality → 10% bonus
+2025-11-25 02:22:39,063 - [INFO] - Task Response: Final score=61.7/100 (base=56.0, quality=100)
+2025-11-25 02:22:39,063 - [INFO] - Task Response Analyzer gives higher score (88.0 vs 61) → Using higher score
+2025-11-25 02:22:39,063 - [INFO] - Spelling errors from Gemini: 0
+2025-11-25 02:22:39,064 - [INFO] - Vocabulary error categorization:
+2025-11-25 02:22:39,064 - [INFO] -   Basic errors (wrong word, collocation): 0
+2025-11-25 02:22:39,064 - [INFO] -   Advanced errors (style, nuance): 0
+2025-11-25 02:22:39,064 - [INFO] -   Spelling errors: 0
+2025-11-25 02:22:39,065 - [INFO] - No vocab errors detected → no score cap applied
+2025-11-25 02:22:39,066 - [INFO] - ============================================================
+2025-11-25 02:22:39,066 - [INFO] - GRAMMAR ERROR DETECTION
+2025-11-25 02:22:39,066 - [INFO] - Errors from Gemini: 0 errors
+2025-11-25 02:22:39,066 - [INFO] - Spelling errors from Gemini (affecting grammar): 0
+2025-11-25 02:22:39,067 - [INFO] - Total grammar errors detected: 0
+2025-11-25 02:22:39,067 - [INFO] - Breakdown: From Gemini=0, Spelling=0, Mechanics=0
+2025-11-25 02:22:39,067 - [INFO] - ============================================================
+2025-11-25 02:22:39,068 - [INFO] - Grammar error categorization:
+2025-11-25 02:22:39,068 - [INFO] -   Basic errors (subject-verb, tense, articles): 0 (VERY SEVERE)
+2025-11-25 02:22:39,068 - [INFO] -   Advanced errors (complex structures): 0
+2025-11-25 02:22:39,068 - [INFO] -   Spelling errors: 0
+2025-11-25 02:22:39,068 - [INFO] -   Mechanics errors (punctuation/capitalization): 0
+2025-11-25 02:22:39,069 - [INFO] -   Total: 0
+2025-11-25 02:22:39,069 - [INFO] - No grammar errors detected → no score cap applied
+2025-11-25 02:22:39,073 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:22:39] "POST /score HTTP/1.1" 200 -
+2025-11-25 02:23:07,760 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:23:07] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:23:22,121 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:23:22] "OPTIONS /score HTTP/1.1" 200 -
+2025-11-25 02:23:22,429 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:23:22] "POST /score HTTP/1.1" 200 -
+2025-11-25 02:24:01,192 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:24:01] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:24:31,621 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:24:31] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:25:01,623 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:25:01] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:25:31,313 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:25:31] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:26:01,609 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:26:01] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:26:31,305 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:26:31] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:27:01,618 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:27:01] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:27:02,906 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:27:02] "OPTIONS /score HTTP/1.1" 200 -
+2025-11-25 02:27:03,218 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:27:03] "POST /score HTTP/1.1" 200 -
+2025-11-25 02:27:31,198 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:27:31] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:27:31,977 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:27:31] "OPTIONS /score HTTP/1.1" 200 -
+2025-11-25 02:27:32,757 - [INFO] - ============================================================
+2025-11-25 02:27:32,757 - [INFO] - BERT SEMANTIC SIMILARITY CALCULATION
+2025-11-25 02:27:32,757 - [INFO] - ============================================================
+2025-11-25 02:27:32,757 - [INFO] - Input Essay: Whether university education should be free for every student is a question that has sparked debate in many countries. Some people argue that making higher education free would create equal opportunit...
+2025-11-25 02:27:32,758 - [INFO] - Input Prompt: Environmental pollution is a growing concern. What are the main causes of this problem and what solutions can you suggest?
+2025-11-25 02:27:32,758 - [INFO] - ============================================================
+2025-11-25 02:27:32,758 - [INFO] - BERT SEMANTIC SIMILARITY
+2025-11-25 02:27:32,758 - [INFO] - Input: Essay length=2284 chars, 337 words | Prompt length=122 chars, 20 words
+2025-11-25 02:27:32,758 - [INFO] - BERT model not available (BERT_AVAILABLE=False), using Gemini only
+2025-11-25 02:27:32,759 - [WARNING] - BERT similarity not available
+2025-11-25 02:27:32,759 - [INFO] - ============================================================
+2025-11-25 02:27:32,759 - [INFO] - Step 3: Quick contradiction check...
+2025-11-25 02:27:32,759 - [INFO] - ============================================================
+2025-11-25 02:27:32,759 - [INFO] - Step 3.1: Quick keyword check for obvious off-topic...
+2025-11-25 02:27:32,760 - [INFO] - ============================================================
+2025-11-25 02:27:32,760 - [INFO] - GEMINI CONTENT VALIDATION
+2025-11-25 02:27:32,760 - [INFO] - ============================================================
+2025-11-25 02:27:32,760 - [INFO] - Input Essay: Whether university education should be free for every student is a question that has sparked debate in many countries. Some people argue that making higher education free would create equal opportunit...
+2025-11-25 02:27:32,761 - [INFO] - Input Prompt: Environmental pollution is a growing concern. What are the main causes of this problem and what solutions can you suggest?
+2025-11-25 02:27:37,538 - [INFO] - ============================================================
+2025-11-25 02:27:37,538 - [INFO] - GEMINI VALIDATION RESULTS
+2025-11-25 02:27:37,538 - [INFO] - Overall Relevance: 0%
+2025-11-25 02:27:37,538 - [INFO] - Is On-topic: False
+2025-11-25 02:27:37,539 - [INFO] - Confidence: 1.00
+2025-11-25 02:27:37,539 - [INFO] - Off-topic Reason: The student essay discusses the topic of 'free university education' and its associated arguments, benefits, drawbacks, and proposed solutions (e.g., scholarships, loans). This topic is entirely unrelated to the prompt's core subject of 'environmental pollution' and its causes and solutions.
+2025-11-25 02:27:37,539 - [INFO] - Topic Relevance Score: 0
+2025-11-25 02:27:37,540 - [INFO] - Addressed Elements: []
+2025-11-25 02:27:37,540 - [INFO] - Missing Elements: []
+2025-11-25 02:27:37,541 - [INFO] - ============================================================
+2025-11-25 02:27:37,542 - [INFO] - ============================================================
+2025-11-25 02:27:37,542 - [INFO] - GENERIC OFF-TOPIC DETECTION
+2025-11-25 02:27:37,543 - [INFO] - ============================================================
+2025-11-25 02:27:37,544 - [INFO] - Keyword Coverage: 2/10 = 20.00%
+2025-11-25 02:27:37,544 - [INFO] - Matched keywords: ['this', 'problem']
+2025-11-25 02:27:37,545 - [INFO] - Missing keywords: ['environmental', 'pollution', 'growing', 'concern', 'what']
+2025-11-25 02:27:37,545 - [INFO] - Elements Coverage: 0/1 = 0.00%
+2025-11-25 02:27:37,546 - [INFO] - Addressed: []
+2025-11-25 02:27:37,546 - [INFO] - Missing: ['what']
+2025-11-25 02:27:37,547 - [INFO] - BERT Semantic Similarity: 0.0000 (0.0%)
+2025-11-25 02:27:37,547 - [INFO] - Gemini Relevance: 0%
+2025-11-25 02:27:37,548 - [INFO] - Gemini On-topic: False
+2025-11-25 02:27:37,548 - [INFO] - Combined Relevance: 6.0%
+2025-11-25 02:27:37,549 - [INFO] - ============================================================
+2025-11-25 02:27:37,550 - [INFO] - TASK FULFILLMENT CHECKER ANALYSIS
+2025-11-25 02:27:37,550 - [INFO] - ============================================================
+2025-11-25 02:27:37,553 - [INFO] - Is Off-topic: False
+2025-11-25 02:27:37,553 - [INFO] - Confidence: 0.00
+2025-11-25 02:27:37,553 - [INFO] - Keyword Coverage: 82.86%
+2025-11-25 02:27:37,553 - [INFO] - Matched Keywords: ['problem']
+2025-11-25 02:27:37,554 - [INFO] - Missing Keywords: ['environmental pollution', 'causes', 'growing', 'suggest', 'concern', 'solutions']
+2025-11-25 02:27:37,554 - [INFO] - Reasons: []
+2025-11-25 02:27:37,554 - [INFO] - ============================================================
+2025-11-25 02:27:37,554 - [INFO] - Off-topic Level: complete
+2025-11-25 02:27:37,555 - [INFO] - Is Off-topic: True
+2025-11-25 02:27:37,555 - [INFO] - Confidence: 0.95
+2025-11-25 02:27:37,555 - [INFO] - Reasons: ['Missing most required elements (1/1)', 'Both BERT (0.0%) and Gemini (0%) indicate low relevance', 'Essay does not address the prompt topic at all']
+2025-11-25 02:27:37,555 - [INFO] - ============================================================
+2025-11-25 02:27:37,556 - [INFO] - Gemini assessment:
+2025-11-25 02:27:37,556 - [INFO] -   Relevance score: 0/100
+2025-11-25 02:27:37,556 - [INFO] -   Is on topic: False
+2025-11-25 02:27:37,557 - [INFO] -   Confidence: 1.00
+2025-11-25 02:27:37,557 - [WARNING] - BERT similarity not available, using Gemini only
+2025-11-25 02:27:37,557 - [WARNING] - Classification: COMPLETE OFF-TOPIC (relevance < 50: 0.0%)
+2025-11-25 02:27:37,557 - [WARNING] - Reason: The student essay discusses the topic of 'free university education' and its associated arguments, benefits, drawbacks, and proposed solutions (e.g., scholarships, loans). This topic is entirely unrelated to the prompt's core subject of 'environmental pollution' and its causes and solutions.
+2025-11-25 02:27:37,558 - [INFO] - Final result:
+2025-11-25 02:27:37,558 - [INFO] -   Off-topic level: complete
+2025-11-25 02:27:37,558 - [INFO] -   Final relevance: 0/100
+2025-11-25 02:27:37,558 - [INFO] -   Is on topic: False
+2025-11-25 02:27:37,559 - [INFO] - ============================================================
+2025-11-25 02:27:38,026 - [INFO] - Task Response Analyzer relevance: 33.0%
+2025-11-25 02:27:38,026 - [WARNING] - Task Response Analyzer indicates low relevance (33.0%)
+2025-11-25 02:27:38,027 - [INFO] - ============================================================
+2025-11-25 02:27:38,027 - [INFO] - MERGING OFF-TOPIC DETECTION RESULTS
+2025-11-25 02:27:38,028 - [INFO] - ============================================================
+2025-11-25 02:27:38,028 - [INFO] - Generic Detection: level=complete, relevance=6%
+2025-11-25 02:27:38,028 - [INFO] - Improved Detection: level=complete, relevance=0%
+2025-11-25 02:27:38,028 - [INFO] - Final Merged Result: level=complete, relevance=0%
+2025-11-25 02:27:38,029 - [INFO] - ============================================================
+2025-11-25 02:27:38,029 - [WARNING] - ============================================================
+2025-11-25 02:27:38,029 - [WARNING] - Essay is completely off-topic - returning 0 score immediately
+2025-11-25 02:27:38,030 - [WARNING] - Relevance: 0%
+2025-11-25 02:27:38,030 - [WARNING] - Reason: The student essay discusses the topic of 'free university education' and its associated arguments, benefits, drawbacks, and proposed solutions (e.g., scholarships, loans). This topic is entirely unrelated to the prompt's core subject of 'environmental pollution' and its causes and solutions.
+2025-11-25 02:27:38,030 - [WARNING] - ============================================================
+2025-11-25 02:27:38,031 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:27:38] "POST /score HTTP/1.1" 200 -
+2025-11-25 02:28:01,306 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:28:01] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:28:18,827 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:28:18] "OPTIONS /score HTTP/1.1" 200 -
+2025-11-25 02:28:19,092 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:28:19] "POST /score HTTP/1.1" 200 -
+2025-11-25 02:28:31,315 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:28:31] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:28:51,939 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:28:51] "OPTIONS /score HTTP/1.1" 200 -
+2025-11-25 02:28:52,610 - [INFO] - ============================================================
+2025-11-25 02:28:52,610 - [INFO] - BERT SEMANTIC SIMILARITY CALCULATION
+2025-11-25 02:28:52,611 - [INFO] - ============================================================
+2025-11-25 02:28:52,611 - [INFO] - Input Essay: Whether university education should be free for every student is a question that has sparked debate in many countries. Some people argue that making higher education free would create equal opportunit...
+2025-11-25 02:28:52,612 - [INFO] - Input Prompt: Some people believe university education should be free for all students. To what extent do you agree or disagree?
+2025-11-25 02:28:52,612 - [INFO] - ============================================================
+2025-11-25 02:28:52,612 - [INFO] - BERT SEMANTIC SIMILARITY
+2025-11-25 02:28:52,612 - [INFO] - Input: Essay length=2284 chars, 337 words | Prompt length=114 chars, 19 words
+2025-11-25 02:28:52,612 - [INFO] - BERT model not available (BERT_AVAILABLE=False), using Gemini only
+2025-11-25 02:28:52,613 - [WARNING] - BERT similarity not available
+2025-11-25 02:28:52,613 - [INFO] - ============================================================
+2025-11-25 02:28:52,613 - [INFO] - Step 3: Quick contradiction check...
+2025-11-25 02:28:52,613 - [INFO] - ============================================================
+2025-11-25 02:28:52,614 - [INFO] - Step 3.1: Quick keyword check for obvious off-topic...
+2025-11-25 02:28:52,614 - [INFO] - ============================================================
+2025-11-25 02:28:52,615 - [INFO] - GEMINI CONTENT VALIDATION
+2025-11-25 02:28:52,615 - [INFO] - ============================================================
+2025-11-25 02:28:52,615 - [INFO] - Input Essay: Whether university education should be free for every student is a question that has sparked debate in many countries. Some people argue that making higher education free would create equal opportunit...
+2025-11-25 02:28:52,615 - [INFO] - Input Prompt: Some people believe university education should be free for all students. To what extent do you agree or disagree?
+2025-11-25 02:28:58,531 - [INFO] - ============================================================
+2025-11-25 02:28:58,531 - [INFO] - GEMINI VALIDATION RESULTS
+2025-11-25 02:28:58,531 - [INFO] - Overall Relevance: 100%
+2025-11-25 02:28:58,531 - [INFO] - Is On-topic: True
+2025-11-25 02:28:58,531 - [INFO] - Confidence: 1.00
+2025-11-25 02:28:58,531 - [INFO] - Off-topic Reason: The essay directly addresses the prompt without any deviation or irrelevant content.
+2025-11-25 02:28:58,531 - [INFO] - Topic Relevance Score: 100
+2025-11-25 02:28:58,531 - [INFO] - Addressed Elements: []
+2025-11-25 02:28:58,531 - [INFO] - Missing Elements: []
+2025-11-25 02:28:58,532 - [INFO] - ============================================================
+2025-11-25 02:28:58,532 - [INFO] - ============================================================
+2025-11-25 02:28:58,532 - [INFO] - GENERIC OFF-TOPIC DETECTION
+2025-11-25 02:28:58,532 - [INFO] - ============================================================
+2025-11-25 02:28:58,532 - [INFO] - Keyword Coverage: 8/10 = 80.00%
+2025-11-25 02:28:58,532 - [INFO] - Matched keywords: ['some', 'people', 'believe', 'university', 'education']
+2025-11-25 02:28:58,532 - [INFO] - Missing keywords: ['what', 'extent']
+2025-11-25 02:28:58,532 - [INFO] - Elements Coverage: 1/2 = 50.00%
+2025-11-25 02:28:58,532 - [INFO] - Addressed: ['who']
+2025-11-25 02:28:58,532 - [INFO] - Missing: ['what']
+2025-11-25 02:28:58,533 - [INFO] - BERT Semantic Similarity: 0.0000 (0.0%)
+2025-11-25 02:28:58,533 - [INFO] - Gemini Relevance: 100%
+2025-11-25 02:28:58,533 - [INFO] - Gemini On-topic: True
+2025-11-25 02:28:58,533 - [INFO] - Combined Relevance: 59.0%
+2025-11-25 02:28:58,533 - [INFO] - ============================================================
+2025-11-25 02:28:58,533 - [INFO] - TASK FULFILLMENT CHECKER ANALYSIS
+2025-11-25 02:28:58,533 - [INFO] - ============================================================
+2025-11-25 02:28:58,534 - [INFO] - Is Off-topic: False
+2025-11-25 02:28:58,534 - [INFO] - Confidence: 0.00
+2025-11-25 02:28:58,534 - [INFO] - Keyword Coverage: 86.67%
+2025-11-25 02:28:58,534 - [INFO] - Matched Keywords: ['students']
+2025-11-25 02:28:58,535 - [INFO] - Missing Keywords: ['university education', 'extent']
+2025-11-25 02:28:58,535 - [INFO] - Reasons: []
+2025-11-25 02:28:58,536 - [INFO] - ============================================================
+2025-11-25 02:28:58,536 - [INFO] - Off-topic Level: incomplete
+2025-11-25 02:28:58,536 - [INFO] - Is Off-topic: False
+2025-11-25 02:28:58,537 - [INFO] - Confidence: 0.80
+2025-11-25 02:28:58,537 - [INFO] - Reasons: ['Essay addresses the topic but is missing some required elements']
+2025-11-25 02:28:58,537 - [INFO] - ============================================================
+2025-11-25 02:28:58,538 - [INFO] - Gemini assessment:
+2025-11-25 02:28:58,538 - [INFO] -   Relevance score: 100/100
+2025-11-25 02:28:58,538 - [INFO] -   Is on topic: True
+2025-11-25 02:28:58,538 - [INFO] -   Confidence: 1.00
+2025-11-25 02:28:58,539 - [WARNING] - BERT similarity not available, using Gemini only
+2025-11-25 02:28:58,539 - [INFO] - Classification: ON-TOPIC (relevance >= 70: 100.0%)
+2025-11-25 02:28:58,539 - [INFO] - Final result:
+2025-11-25 02:28:58,539 - [INFO] -   Off-topic level: none
+2025-11-25 02:28:58,540 - [INFO] -   Final relevance: 100/100
+2025-11-25 02:28:58,540 - [INFO] -   Is on topic: True
+2025-11-25 02:28:58,540 - [INFO] - ============================================================
+2025-11-25 02:28:58,936 - [INFO] - Task Response Analyzer relevance: 100.0%
+2025-11-25 02:28:58,936 - [INFO] - ============================================================
+2025-11-25 02:28:58,937 - [INFO] - MERGING OFF-TOPIC DETECTION RESULTS
+2025-11-25 02:28:58,938 - [INFO] - ============================================================
+2025-11-25 02:28:58,938 - [INFO] - Generic Detection: level=incomplete, relevance=59%
+2025-11-25 02:28:58,939 - [INFO] - Improved Detection: level=none, relevance=100%
+2025-11-25 02:28:58,940 - [INFO] - Final Merged Result: level=none, relevance=59%
+2025-11-25 02:28:58,940 - [INFO] - ============================================================
+2025-11-25 02:28:59,351 - [INFO] - Task Response Analyzer: relevance=10.0, coverage=7.0
+2025-11-25 02:28:59,351 - [INFO] - Task Response Analyzer score (100): 88.0
+2025-11-25 02:28:59,351 - [INFO] - Task Response: On-topic (relevance=59.0%) → base score=59.0
+2025-11-25 02:28:59,352 - [INFO] - Task Response: Word count penalty=0.95
+2025-11-25 02:28:59,352 - [INFO] - Task Response: On-topic with good quality → 10% bonus
+2025-11-25 02:28:59,352 - [INFO] - Task Response: Final score=61.7/100 (base=56.0, quality=100)
+2025-11-25 02:28:59,352 - [INFO] - Task Response Analyzer gives higher score (88.0 vs 61) → Using higher score
+2025-11-25 02:28:59,353 - [INFO] - Spelling errors from Gemini: 0
+2025-11-25 02:28:59,354 - [INFO] - Vocabulary error categorization:
+2025-11-25 02:28:59,354 - [INFO] -   Basic errors (wrong word, collocation): 0
+2025-11-25 02:28:59,354 - [INFO] -   Advanced errors (style, nuance): 0
+2025-11-25 02:28:59,354 - [INFO] -   Spelling errors: 0
+2025-11-25 02:28:59,354 - [INFO] - No vocab errors detected → no score cap applied
+2025-11-25 02:28:59,355 - [INFO] - ============================================================
+2025-11-25 02:28:59,355 - [INFO] - GRAMMAR ERROR DETECTION
+2025-11-25 02:28:59,356 - [INFO] - Errors from Gemini: 0 errors
+2025-11-25 02:28:59,356 - [INFO] - Spelling errors from Gemini (affecting grammar): 0
+2025-11-25 02:28:59,356 - [INFO] - Total grammar errors detected: 0
+2025-11-25 02:28:59,357 - [INFO] - Breakdown: From Gemini=0, Spelling=0, Mechanics=0
+2025-11-25 02:28:59,357 - [INFO] - ============================================================
+2025-11-25 02:28:59,357 - [INFO] - Grammar error categorization:
+2025-11-25 02:28:59,357 - [INFO] -   Basic errors (subject-verb, tense, articles): 0 (VERY SEVERE)
+2025-11-25 02:28:59,358 - [INFO] -   Advanced errors (complex structures): 0
+2025-11-25 02:28:59,358 - [INFO] -   Spelling errors: 0
+2025-11-25 02:28:59,358 - [INFO] -   Mechanics errors (punctuation/capitalization): 0
+2025-11-25 02:28:59,359 - [INFO] -   Total: 0
+2025-11-25 02:28:59,359 - [INFO] - No grammar errors detected → no score cap applied
+2025-11-25 02:28:59,365 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:28:59] "POST /score HTTP/1.1" 200 -
+2025-11-25 02:29:01,198 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:29:01] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:29:25,571 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:29:25] "OPTIONS /score HTTP/1.1" 200 -
+2025-11-25 02:29:26,306 - [INFO] - ============================================================
+2025-11-25 02:29:26,307 - [INFO] - BERT SEMANTIC SIMILARITY CALCULATION
+2025-11-25 02:29:26,307 - [INFO] - ============================================================
+2025-11-25 02:29:26,308 - [INFO] - Input Essay: Many people think that university education should be free for all students, but others say that it is not possible. In my opinion, I agree to some extent, but I think it should not be completely free...
+2025-11-25 02:29:26,309 - [INFO] - Input Prompt: Some people believe university education should be free for all students. To what extent do you agree or disagree?
+2025-11-25 02:29:26,309 - [INFO] - ============================================================
+2025-11-25 02:29:26,310 - [INFO] - BERT SEMANTIC SIMILARITY
+2025-11-25 02:29:26,311 - [INFO] - Input: Essay length=1232 chars, 213 words | Prompt length=114 chars, 19 words
+2025-11-25 02:29:26,311 - [INFO] - BERT model not available (BERT_AVAILABLE=False), using Gemini only
+2025-11-25 02:29:26,312 - [WARNING] - BERT similarity not available
+2025-11-25 02:29:26,313 - [INFO] - ============================================================
+2025-11-25 02:29:26,313 - [INFO] - Step 3: Quick contradiction check...
+2025-11-25 02:29:26,313 - [INFO] - ============================================================
+2025-11-25 02:29:26,313 - [INFO] - Step 3.1: Quick keyword check for obvious off-topic...
+2025-11-25 02:29:26,314 - [INFO] - ============================================================
+2025-11-25 02:29:26,314 - [INFO] - GEMINI CONTENT VALIDATION
+2025-11-25 02:29:26,315 - [INFO] - ============================================================
+2025-11-25 02:29:26,315 - [INFO] - Input Essay: Many people think that university education should be free for all students, but others say that it is not possible. In my opinion, I agree to some extent, but I think it should not be completely free...
+2025-11-25 02:29:26,315 - [INFO] - Input Prompt: Some people believe university education should be free for all students. To what extent do you agree or disagree?
+2025-11-25 02:29:29,966 - [INFO] - ============================================================
+2025-11-25 02:29:29,967 - [INFO] - GEMINI VALIDATION RESULTS
+2025-11-25 02:29:29,968 - [INFO] - Overall Relevance: 95%
+2025-11-25 02:29:29,969 - [INFO] - Is On-topic: True
+2025-11-25 02:29:29,970 - [INFO] - Confidence: 1.00
+2025-11-25 02:29:29,971 - [INFO] - Off-topic Reason: 
+2025-11-25 02:29:29,972 - [INFO] - Topic Relevance Score: 95
+2025-11-25 02:29:29,973 - [INFO] - Addressed Elements: []
+2025-11-25 02:29:29,974 - [INFO] - Missing Elements: []
+2025-11-25 02:29:29,974 - [INFO] - ============================================================
+2025-11-25 02:29:29,975 - [INFO] - ============================================================
+2025-11-25 02:29:29,975 - [INFO] - GENERIC OFF-TOPIC DETECTION
+2025-11-25 02:29:29,976 - [INFO] - ============================================================
+2025-11-25 02:29:29,976 - [INFO] - Keyword Coverage: 8/10 = 80.00%
+2025-11-25 02:29:29,977 - [INFO] - Matched keywords: ['some', 'people', 'university', 'education', 'should']
+2025-11-25 02:29:29,977 - [INFO] - Missing keywords: ['believe', 'what']
+2025-11-25 02:29:29,977 - [INFO] - Elements Coverage: 1/2 = 50.00%
+2025-11-25 02:29:29,978 - [INFO] - Addressed: ['who']
+2025-11-25 02:29:29,978 - [INFO] - Missing: ['what']
+2025-11-25 02:29:29,978 - [INFO] - BERT Semantic Similarity: 0.0000 (0.0%)
+2025-11-25 02:29:29,978 - [INFO] - Gemini Relevance: 95%
+2025-11-25 02:29:29,979 - [INFO] - Gemini On-topic: True
+2025-11-25 02:29:29,979 - [INFO] - Combined Relevance: 57.7%
+2025-11-25 02:29:29,979 - [INFO] - ============================================================
+2025-11-25 02:29:29,980 - [INFO] - TASK FULFILLMENT CHECKER ANALYSIS
+2025-11-25 02:29:29,980 - [INFO] - ============================================================
+2025-11-25 02:29:29,981 - [INFO] - Is Off-topic: False
+2025-11-25 02:29:29,982 - [INFO] - Confidence: 0.00
+2025-11-25 02:29:29,982 - [INFO] - Keyword Coverage: 93.33%
+2025-11-25 02:29:29,982 - [INFO] - Matched Keywords: ['extent', 'students']
+2025-11-25 02:29:29,982 - [INFO] - Missing Keywords: ['university education']
+2025-11-25 02:29:29,983 - [INFO] - Reasons: []
+2025-11-25 02:29:29,983 - [INFO] - ============================================================
+2025-11-25 02:29:29,983 - [INFO] - Off-topic Level: incomplete
+2025-11-25 02:29:29,983 - [INFO] - Is Off-topic: False
+2025-11-25 02:29:29,983 - [INFO] - Confidence: 0.80
+2025-11-25 02:29:29,984 - [INFO] - Reasons: ['Essay addresses the topic but is missing some required elements']
+2025-11-25 02:29:29,984 - [INFO] - ============================================================
+2025-11-25 02:29:29,984 - [INFO] - Gemini assessment:
+2025-11-25 02:29:29,984 - [INFO] -   Relevance score: 95/100
+2025-11-25 02:29:29,984 - [INFO] -   Is on topic: True
+2025-11-25 02:29:29,985 - [INFO] -   Confidence: 1.00
+2025-11-25 02:29:29,985 - [WARNING] - BERT similarity not available, using Gemini only
+2025-11-25 02:29:29,985 - [INFO] - Classification: ON-TOPIC (relevance >= 70: 95.0%)
+2025-11-25 02:29:29,985 - [INFO] - Final result:
+2025-11-25 02:29:29,985 - [INFO] -   Off-topic level: none
+2025-11-25 02:29:29,985 - [INFO] -   Final relevance: 95/100
+2025-11-25 02:29:29,986 - [INFO] -   Is on topic: True
+2025-11-25 02:29:29,986 - [INFO] - ============================================================
+2025-11-25 02:29:30,446 - [INFO] - Task Response Analyzer relevance: 100.0%
+2025-11-25 02:29:30,446 - [INFO] - ============================================================
+2025-11-25 02:29:30,446 - [INFO] - MERGING OFF-TOPIC DETECTION RESULTS
+2025-11-25 02:29:30,446 - [INFO] - ============================================================
+2025-11-25 02:29:30,446 - [INFO] - Generic Detection: level=incomplete, relevance=57%
+2025-11-25 02:29:30,447 - [INFO] - Improved Detection: level=none, relevance=95%
+2025-11-25 02:29:30,447 - [INFO] - Final Merged Result: level=none, relevance=57%
+2025-11-25 02:29:30,447 - [INFO] - ============================================================
+2025-11-25 02:29:30,841 - [INFO] - Task Response Analyzer: relevance=10.0, coverage=7.0
+2025-11-25 02:29:30,841 - [INFO] - Task Response Analyzer score (100): 88.0
+2025-11-25 02:29:30,842 - [INFO] - Task Response: On-topic (relevance=57.0%) → base score=57.0
+2025-11-25 02:29:30,842 - [INFO] - Task Response: On-topic with good quality → 10% bonus
+2025-11-25 02:29:30,842 - [INFO] - Task Response: Final score=61.4/100 (base=57.0, quality=95)
+2025-11-25 02:29:30,842 - [INFO] - Task Response Analyzer gives higher score (88.0 vs 61) → Using higher score
+2025-11-25 02:29:30,843 - [INFO] - Spelling errors from Gemini: 0
+2025-11-25 02:29:30,843 - [INFO] - Vocabulary error categorization:
+2025-11-25 02:29:30,843 - [INFO] -   Basic errors (wrong word, collocation): 0
+2025-11-25 02:29:30,844 - [INFO] -   Advanced errors (style, nuance): 0
+2025-11-25 02:29:30,844 - [INFO] -   Spelling errors: 0
+2025-11-25 02:29:30,845 - [INFO] - No vocab errors detected → no score cap applied
+2025-11-25 02:29:30,845 - [INFO] - ============================================================
+2025-11-25 02:29:30,846 - [INFO] - GRAMMAR ERROR DETECTION
+2025-11-25 02:29:30,846 - [INFO] - Errors from Gemini: 0 errors
+2025-11-25 02:29:30,846 - [INFO] - Spelling errors from Gemini (affecting grammar): 0
+2025-11-25 02:29:30,846 - [INFO] - Total grammar errors detected: 0
+2025-11-25 02:29:30,847 - [INFO] - Breakdown: From Gemini=0, Spelling=0, Mechanics=0
+2025-11-25 02:29:30,847 - [INFO] - ============================================================
+2025-11-25 02:29:30,847 - [INFO] - Grammar error categorization:
+2025-11-25 02:29:30,848 - [INFO] -   Basic errors (subject-verb, tense, articles): 0 (VERY SEVERE)
+2025-11-25 02:29:30,848 - [INFO] -   Advanced errors (complex structures): 0
+2025-11-25 02:29:30,848 - [INFO] -   Spelling errors: 0
+2025-11-25 02:29:30,848 - [INFO] -   Mechanics errors (punctuation/capitalization): 0
+2025-11-25 02:29:30,849 - [INFO] -   Total: 0
+2025-11-25 02:29:30,849 - [INFO] - No grammar errors detected → no score cap applied
+2025-11-25 02:29:30,853 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:29:30] "POST /score HTTP/1.1" 200 -
+2025-11-25 02:29:31,316 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:29:31] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:29:57,018 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:29:57] "OPTIONS /score HTTP/1.1" 200 -
+2025-11-25 02:29:57,764 - [INFO] - ============================================================
+2025-11-25 02:29:57,764 - [INFO] - BERT SEMANTIC SIMILARITY CALCULATION
+2025-11-25 02:29:57,765 - [INFO] - ============================================================
+2025-11-25 02:29:57,765 - [INFO] - Input Essay: Many people think that university education should be free for all students, but others say that it is not possible. In my opinion, I agree to some extent, but I think it should not be completely free...
+2025-11-25 02:29:57,765 - [INFO] - Input Prompt: Some people believe university education should be free for all students. To what extent do you agree or disagree?
+2025-11-25 02:29:57,766 - [INFO] - ============================================================
+2025-11-25 02:29:57,766 - [INFO] - BERT SEMANTIC SIMILARITY
+2025-11-25 02:29:57,766 - [INFO] - Input: Essay length=1232 chars, 213 words | Prompt length=114 chars, 19 words
+2025-11-25 02:29:57,767 - [INFO] - BERT model not available (BERT_AVAILABLE=False), using Gemini only
+2025-11-25 02:29:57,767 - [WARNING] - BERT similarity not available
+2025-11-25 02:29:57,767 - [INFO] - ============================================================
+2025-11-25 02:29:57,768 - [INFO] - Step 3: Quick contradiction check...
+2025-11-25 02:29:57,768 - [INFO] - ============================================================
+2025-11-25 02:29:57,769 - [INFO] - Step 3.1: Quick keyword check for obvious off-topic...
+2025-11-25 02:29:57,769 - [INFO] - ============================================================
+2025-11-25 02:29:57,770 - [INFO] - GEMINI CONTENT VALIDATION
+2025-11-25 02:29:57,770 - [INFO] - ============================================================
+2025-11-25 02:29:57,771 - [INFO] - Input Essay: Many people think that university education should be free for all students, but others say that it is not possible. In my opinion, I agree to some extent, but I think it should not be completely free...
+2025-11-25 02:29:57,771 - [INFO] - Input Prompt: Some people believe university education should be free for all students. To what extent do you agree or disagree?
+2025-11-25 02:30:01,194 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:30:01] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:30:03,562 - [INFO] - ============================================================
+2025-11-25 02:30:03,562 - [INFO] - GEMINI VALIDATION RESULTS
+2025-11-25 02:30:03,562 - [INFO] - Overall Relevance: 95%
+2025-11-25 02:30:03,563 - [INFO] - Is On-topic: True
+2025-11-25 02:30:03,563 - [INFO] - Confidence: 1.00
+2025-11-25 02:30:03,563 - [INFO] - Off-topic Reason: 
+2025-11-25 02:30:03,563 - [INFO] - Topic Relevance Score: 95
+2025-11-25 02:30:03,563 - [INFO] - Addressed Elements: []
+2025-11-25 02:30:03,564 - [INFO] - Missing Elements: []
+2025-11-25 02:30:03,564 - [INFO] - ============================================================
+2025-11-25 02:30:03,564 - [INFO] - ============================================================
+2025-11-25 02:30:03,565 - [INFO] - GENERIC OFF-TOPIC DETECTION
+2025-11-25 02:30:03,565 - [INFO] - ============================================================
+2025-11-25 02:30:03,565 - [INFO] - Keyword Coverage: 8/10 = 80.00%
+2025-11-25 02:30:03,566 - [INFO] - Matched keywords: ['some', 'people', 'university', 'education', 'should']
+2025-11-25 02:30:03,566 - [INFO] - Missing keywords: ['believe', 'what']
+2025-11-25 02:30:03,567 - [INFO] - Elements Coverage: 1/2 = 50.00%
+2025-11-25 02:30:03,567 - [INFO] - Addressed: ['who']
+2025-11-25 02:30:03,567 - [INFO] - Missing: ['what']
+2025-11-25 02:30:03,568 - [INFO] - BERT Semantic Similarity: 0.0000 (0.0%)
+2025-11-25 02:30:03,568 - [INFO] - Gemini Relevance: 95%
+2025-11-25 02:30:03,569 - [INFO] - Gemini On-topic: True
+2025-11-25 02:30:03,569 - [INFO] - Combined Relevance: 57.7%
+2025-11-25 02:30:03,569 - [INFO] - ============================================================
+2025-11-25 02:30:03,570 - [INFO] - TASK FULFILLMENT CHECKER ANALYSIS
+2025-11-25 02:30:03,570 - [INFO] - ============================================================
+2025-11-25 02:30:03,572 - [INFO] - Is Off-topic: False
+2025-11-25 02:30:03,572 - [INFO] - Confidence: 0.00
+2025-11-25 02:30:03,572 - [INFO] - Keyword Coverage: 93.33%
+2025-11-25 02:30:03,573 - [INFO] - Matched Keywords: ['extent', 'students']
+2025-11-25 02:30:03,573 - [INFO] - Missing Keywords: ['university education']
+2025-11-25 02:30:03,573 - [INFO] - Reasons: []
+2025-11-25 02:30:03,574 - [INFO] - ============================================================
+2025-11-25 02:30:03,574 - [INFO] - Off-topic Level: incomplete
+2025-11-25 02:30:03,574 - [INFO] - Is Off-topic: False
+2025-11-25 02:30:03,575 - [INFO] - Confidence: 0.80
+2025-11-25 02:30:03,575 - [INFO] - Reasons: ['Essay addresses the topic but is missing some required elements']
+2025-11-25 02:30:03,575 - [INFO] - ============================================================
+2025-11-25 02:30:03,576 - [INFO] - Gemini assessment:
+2025-11-25 02:30:03,576 - [INFO] -   Relevance score: 95/100
+2025-11-25 02:30:03,576 - [INFO] -   Is on topic: True
+2025-11-25 02:30:03,577 - [INFO] -   Confidence: 1.00
+2025-11-25 02:30:03,577 - [WARNING] - BERT similarity not available, using Gemini only
+2025-11-25 02:30:03,577 - [INFO] - Classification: ON-TOPIC (relevance >= 70: 95.0%)
+2025-11-25 02:30:03,577 - [INFO] - Final result:
+2025-11-25 02:30:03,577 - [INFO] -   Off-topic level: none
+2025-11-25 02:30:03,578 - [INFO] -   Final relevance: 95/100
+2025-11-25 02:30:03,578 - [INFO] -   Is on topic: True
+2025-11-25 02:30:03,578 - [INFO] - ============================================================
+2025-11-25 02:30:03,969 - [INFO] - Task Response Analyzer relevance: 100.0%
+2025-11-25 02:30:03,970 - [INFO] - ============================================================
+2025-11-25 02:30:03,970 - [INFO] - MERGING OFF-TOPIC DETECTION RESULTS
+2025-11-25 02:30:03,970 - [INFO] - ============================================================
+2025-11-25 02:30:03,970 - [INFO] - Generic Detection: level=incomplete, relevance=57%
+2025-11-25 02:30:03,970 - [INFO] - Improved Detection: level=none, relevance=95%
+2025-11-25 02:30:03,970 - [INFO] - Final Merged Result: level=none, relevance=57%
+2025-11-25 02:30:03,970 - [INFO] - ============================================================
+2025-11-25 02:30:04,438 - [INFO] - Task Response Analyzer: relevance=10.0, coverage=7.0
+2025-11-25 02:30:04,439 - [INFO] - Task Response Analyzer score (100): 88.0
+2025-11-25 02:30:04,439 - [INFO] - Task Response: On-topic (relevance=57.0%) → base score=57.0
+2025-11-25 02:30:04,439 - [INFO] - Task Response: On-topic with good quality → 10% bonus
+2025-11-25 02:30:04,439 - [INFO] - Task Response: Final score=61.4/100 (base=57.0, quality=95)
+2025-11-25 02:30:04,440 - [INFO] - Task Response Analyzer gives higher score (88.0 vs 61) → Using higher score
+2025-11-25 02:30:04,441 - [INFO] - Spelling errors from Gemini: 0
+2025-11-25 02:30:04,441 - [INFO] - Vocabulary error categorization:
+2025-11-25 02:30:04,441 - [INFO] -   Basic errors (wrong word, collocation): 0
+2025-11-25 02:30:04,441 - [INFO] -   Advanced errors (style, nuance): 0
+2025-11-25 02:30:04,441 - [INFO] -   Spelling errors: 0
+2025-11-25 02:30:04,442 - [INFO] - No vocab errors detected → no score cap applied
+2025-11-25 02:30:04,442 - [INFO] - ============================================================
+2025-11-25 02:30:04,442 - [INFO] - GRAMMAR ERROR DETECTION
+2025-11-25 02:30:04,442 - [INFO] - Errors from Gemini: 0 errors
+2025-11-25 02:30:04,443 - [INFO] - Spelling errors from Gemini (affecting grammar): 0
+2025-11-25 02:30:04,443 - [INFO] - Total grammar errors detected: 0
+2025-11-25 02:30:04,443 - [INFO] - Breakdown: From Gemini=0, Spelling=0, Mechanics=0
+2025-11-25 02:30:04,444 - [INFO] - ============================================================
+2025-11-25 02:30:04,444 - [INFO] - Grammar error categorization:
+2025-11-25 02:30:04,444 - [INFO] -   Basic errors (subject-verb, tense, articles): 0 (VERY SEVERE)
+2025-11-25 02:30:04,445 - [INFO] -   Advanced errors (complex structures): 0
+2025-11-25 02:30:04,445 - [INFO] -   Spelling errors: 0
+2025-11-25 02:30:04,445 - [INFO] -   Mechanics errors (punctuation/capitalization): 0
+2025-11-25 02:30:04,445 - [INFO] -   Total: 0
+2025-11-25 02:30:04,445 - [INFO] - No grammar errors detected → no score cap applied
+2025-11-25 02:30:04,448 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:30:04] "POST /score HTTP/1.1" 200 -
+2025-11-25 02:30:31,501 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:30:31] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:31:01,319 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:31:01] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:31:31,616 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:31:31] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:32:01,192 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:32:01] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:32:24,683 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:32:24] "OPTIONS /score HTTP/1.1" 200 -
+2025-11-25 02:32:25,449 - [INFO] - ============================================================
+2025-11-25 02:32:25,449 - [INFO] - BERT SEMANTIC SIMILARITY CALCULATION
+2025-11-25 02:32:25,450 - [INFO] - ============================================================
+2025-11-25 02:32:25,450 - [INFO] - Input Essay: In recent years, the debate over whether tertiary education should be fully subsidized by the government has intensified. While providing free university access could promote equality, I believe that ...
+2025-11-25 02:32:25,450 - [INFO] - Input Prompt: Some people believe university education should be free for all students. To what extent do you agree or disagree?
+2025-11-25 02:32:25,450 - [INFO] - ============================================================
+2025-11-25 02:32:25,451 - [INFO] - BERT SEMANTIC SIMILARITY
+2025-11-25 02:32:25,451 - [INFO] - Input: Essay length=1758 chars, 259 words | Prompt length=114 chars, 19 words
+2025-11-25 02:32:25,452 - [INFO] - BERT model not available (BERT_AVAILABLE=False), using Gemini only
+2025-11-25 02:32:25,452 - [WARNING] - BERT similarity not available
+2025-11-25 02:32:25,453 - [INFO] - ============================================================
+2025-11-25 02:32:25,453 - [INFO] - Step 3: Quick contradiction check...
+2025-11-25 02:32:25,454 - [INFO] - ============================================================
+2025-11-25 02:32:25,455 - [INFO] - Step 3.1: Quick keyword check for obvious off-topic...
+2025-11-25 02:32:25,455 - [INFO] - ============================================================
+2025-11-25 02:32:25,456 - [INFO] - GEMINI CONTENT VALIDATION
+2025-11-25 02:32:25,456 - [INFO] - ============================================================
+2025-11-25 02:32:25,457 - [INFO] - Input Essay: In recent years, the debate over whether tertiary education should be fully subsidized by the government has intensified. While providing free university access could promote equality, I believe that ...
+2025-11-25 02:32:25,457 - [INFO] - Input Prompt: Some people believe university education should be free for all students. To what extent do you agree or disagree?
+2025-11-25 02:32:31,196 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:32:31] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:32:33,438 - [INFO] - ============================================================
+2025-11-25 02:32:33,439 - [INFO] - GEMINI VALIDATION RESULTS
+2025-11-25 02:32:33,439 - [INFO] - Overall Relevance: 98%
+2025-11-25 02:32:33,439 - [INFO] - Is On-topic: True
+2025-11-25 02:32:33,440 - [INFO] - Confidence: 1.00
+2025-11-25 02:32:33,440 - [INFO] - Off-topic Reason: 
+2025-11-25 02:32:33,440 - [INFO] - Topic Relevance Score: 98
+2025-11-25 02:32:33,440 - [INFO] - Addressed Elements: []
+2025-11-25 02:32:33,441 - [INFO] - Missing Elements: []
+2025-11-25 02:32:33,441 - [INFO] - ============================================================
+2025-11-25 02:32:33,441 - [INFO] - ============================================================
+2025-11-25 02:32:33,441 - [INFO] - GENERIC OFF-TOPIC DETECTION
+2025-11-25 02:32:33,441 - [INFO] - ============================================================
+2025-11-25 02:32:33,442 - [INFO] - Keyword Coverage: 6/10 = 60.00%
+2025-11-25 02:32:33,442 - [INFO] - Matched keywords: ['believe', 'university', 'education', 'should', 'free']
+2025-11-25 02:32:33,442 - [INFO] - Missing keywords: ['some', 'people', 'what', 'extent']
+2025-11-25 02:32:33,442 - [INFO] - Elements Coverage: 0/2 = 0.00%
+2025-11-25 02:32:33,442 - [INFO] - Addressed: []
+2025-11-25 02:32:33,443 - [INFO] - Missing: ['what', 'who']
+2025-11-25 02:32:33,443 - [INFO] - BERT Semantic Similarity: 0.0000 (0.0%)
+2025-11-25 02:32:33,443 - [INFO] - Gemini Relevance: 98%
+2025-11-25 02:32:33,443 - [INFO] - Gemini On-topic: True
+2025-11-25 02:32:33,444 - [INFO] - Combined Relevance: 42.5%
+2025-11-25 02:32:33,444 - [INFO] - ============================================================
+2025-11-25 02:32:33,444 - [INFO] - TASK FULFILLMENT CHECKER ANALYSIS
+2025-11-25 02:32:33,444 - [INFO] - ============================================================
+2025-11-25 02:32:33,446 - [INFO] - Is Off-topic: False
+2025-11-25 02:32:33,446 - [INFO] - Confidence: 0.00
+2025-11-25 02:32:33,447 - [INFO] - Keyword Coverage: 86.67%
+2025-11-25 02:32:33,447 - [INFO] - Matched Keywords: ['students']
+2025-11-25 02:32:33,447 - [INFO] - Missing Keywords: ['university education', 'extent']
+2025-11-25 02:32:33,447 - [INFO] - Reasons: []
+2025-11-25 02:32:33,447 - [INFO] - ============================================================
+2025-11-25 02:32:33,448 - [INFO] - Off-topic Level: partial
+2025-11-25 02:32:33,448 - [INFO] - Is Off-topic: True
+2025-11-25 02:32:33,448 - [INFO] - Confidence: 0.85
+2025-11-25 02:32:33,448 - [INFO] - Reasons: ['Missing most required elements (2/2)', 'Essay partially addresses the prompt but misses key requirements']
+2025-11-25 02:32:33,449 - [INFO] - ============================================================
+2025-11-25 02:32:33,449 - [INFO] - Gemini assessment:
+2025-11-25 02:32:33,449 - [INFO] -   Relevance score: 98/100
+2025-11-25 02:32:33,450 - [INFO] -   Is on topic: True
+2025-11-25 02:32:33,450 - [INFO] -   Confidence: 1.00
+2025-11-25 02:32:33,451 - [WARNING] - BERT similarity not available, using Gemini only
+2025-11-25 02:32:33,451 - [INFO] - Classification: ON-TOPIC (relevance >= 70: 98.0%)
+2025-11-25 02:32:33,451 - [INFO] - Final result:
+2025-11-25 02:32:33,451 - [INFO] -   Off-topic level: none
+2025-11-25 02:32:33,452 - [INFO] -   Final relevance: 98/100
+2025-11-25 02:32:33,452 - [INFO] -   Is on topic: True
+2025-11-25 02:32:33,452 - [INFO] - ============================================================
+2025-11-25 02:32:33,930 - [INFO] - Task Response Analyzer relevance: 92.0%
+2025-11-25 02:32:33,932 - [INFO] - ============================================================
+2025-11-25 02:32:33,933 - [INFO] - MERGING OFF-TOPIC DETECTION RESULTS
+2025-11-25 02:32:33,933 - [INFO] - ============================================================
+2025-11-25 02:32:33,934 - [INFO] - Generic Detection: level=partial, relevance=42%
+2025-11-25 02:32:33,935 - [INFO] - Improved Detection: level=none, relevance=98%
+2025-11-25 02:32:33,935 - [INFO] - Final Merged Result: level=partial, relevance=42%
+2025-11-25 02:32:33,936 - [INFO] - ============================================================
+2025-11-25 02:32:33,937 - [WARNING] - ============================================================
+2025-11-25 02:32:33,938 - [WARNING] - ⚠️ Relevance too low (42.0% < 50%) - treating as complete off-topic
+2025-11-25 02:32:33,939 - [WARNING] - ============================================================
+2025-11-25 02:32:33,940 - [WARNING] - ============================================================
+2025-11-25 02:32:33,940 - [WARNING] - Essay is completely off-topic - returning 0 score immediately
+2025-11-25 02:32:33,941 - [WARNING] - Relevance: 42%
+2025-11-25 02:32:33,942 - [WARNING] - Reason: Missing most required elements (2/2); Essay partially addresses the prompt but misses key requirements
+2025-11-25 02:32:33,942 - [WARNING] - ============================================================
+2025-11-25 02:32:33,943 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:32:33] "POST /score HTTP/1.1" 200 -
+2025-11-25 02:33:01,615 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:33:01] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:33:06,021 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:33:06] "OPTIONS /score HTTP/1.1" 200 -
+2025-11-25 02:33:06,600 - [INFO] - ============================================================
+2025-11-25 02:33:06,600 - [INFO] - BERT SEMANTIC SIMILARITY CALCULATION
+2025-11-25 02:33:06,601 - [INFO] - ============================================================
+2025-11-25 02:33:06,601 - [INFO] - Input Essay: In recent years, the debate over whether tertiary education should be fully subsidized by the government has intensified. While providing free university access could promote equality, I believe that ...
+2025-11-25 02:33:06,601 - [INFO] - Input Prompt: Some people believe university education should be free for all students. To what extent do you agree or disagree?
+2025-11-25 02:33:06,601 - [INFO] - ============================================================
+2025-11-25 02:33:06,601 - [INFO] - BERT SEMANTIC SIMILARITY
+2025-11-25 02:33:06,601 - [INFO] - Input: Essay length=1758 chars, 259 words | Prompt length=114 chars, 19 words
+2025-11-25 02:33:06,601 - [INFO] - BERT model not available (BERT_AVAILABLE=False), using Gemini only
+2025-11-25 02:33:06,601 - [WARNING] - BERT similarity not available
+2025-11-25 02:33:06,601 - [INFO] - ============================================================
+2025-11-25 02:33:06,602 - [INFO] - Step 3: Quick contradiction check...
+2025-11-25 02:33:06,602 - [INFO] - ============================================================
+2025-11-25 02:33:06,602 - [INFO] - Step 3.1: Quick keyword check for obvious off-topic...
+2025-11-25 02:33:06,602 - [INFO] - ============================================================
+2025-11-25 02:33:06,602 - [INFO] - GEMINI CONTENT VALIDATION
+2025-11-25 02:33:06,602 - [INFO] - ============================================================
+2025-11-25 02:33:06,602 - [INFO] - Input Essay: In recent years, the debate over whether tertiary education should be fully subsidized by the government has intensified. While providing free university access could promote equality, I believe that ...
+2025-11-25 02:33:06,602 - [INFO] - Input Prompt: Some people believe university education should be free for all students. To what extent do you agree or disagree?
+2025-11-25 02:33:13,011 - [INFO] - ============================================================
+2025-11-25 02:33:13,011 - [INFO] - GEMINI VALIDATION RESULTS
+2025-11-25 02:33:13,012 - [INFO] - Overall Relevance: 98%
+2025-11-25 02:33:13,012 - [INFO] - Is On-topic: True
+2025-11-25 02:33:13,013 - [INFO] - Confidence: 1.00
+2025-11-25 02:33:13,013 - [INFO] - Off-topic Reason: 
+2025-11-25 02:33:13,013 - [INFO] - Topic Relevance Score: 98
+2025-11-25 02:33:13,014 - [INFO] - Addressed Elements: []
+2025-11-25 02:33:13,014 - [INFO] - Missing Elements: []
+2025-11-25 02:33:13,015 - [INFO] - ============================================================
+2025-11-25 02:33:13,015 - [INFO] - ============================================================
+2025-11-25 02:33:13,015 - [INFO] - GENERIC OFF-TOPIC DETECTION
+2025-11-25 02:33:13,015 - [INFO] - ============================================================
+2025-11-25 02:33:13,016 - [INFO] - Keyword Coverage: 6/10 = 60.00%
+2025-11-25 02:33:13,016 - [INFO] - Matched keywords: ['believe', 'university', 'education', 'should', 'free']
+2025-11-25 02:33:13,016 - [INFO] - Missing keywords: ['some', 'people', 'what', 'extent']
+2025-11-25 02:33:13,016 - [INFO] - Elements Coverage: 0/2 = 0.00%
+2025-11-25 02:33:13,017 - [INFO] - Addressed: []
+2025-11-25 02:33:13,017 - [INFO] - Missing: ['what', 'who']
+2025-11-25 02:33:13,017 - [INFO] - BERT Semantic Similarity: 0.0000 (0.0%)
+2025-11-25 02:33:13,017 - [INFO] - Gemini Relevance: 98%
+2025-11-25 02:33:13,017 - [INFO] - Gemini On-topic: True
+2025-11-25 02:33:13,017 - [INFO] - Combined Relevance: 42.5%
+2025-11-25 02:33:13,018 - [INFO] - ============================================================
+2025-11-25 02:33:13,018 - [INFO] - TASK FULFILLMENT CHECKER ANALYSIS
+2025-11-25 02:33:13,018 - [INFO] - ============================================================
+2025-11-25 02:33:13,019 - [INFO] - Is Off-topic: False
+2025-11-25 02:33:13,019 - [INFO] - Confidence: 0.00
+2025-11-25 02:33:13,019 - [INFO] - Keyword Coverage: 86.67%
+2025-11-25 02:33:13,019 - [INFO] - Matched Keywords: ['students']
+2025-11-25 02:33:13,020 - [INFO] - Missing Keywords: ['university education', 'extent']
+2025-11-25 02:33:13,020 - [INFO] - Reasons: []
+2025-11-25 02:33:13,020 - [INFO] - ============================================================
+2025-11-25 02:33:13,020 - [INFO] - Off-topic Level: partial
+2025-11-25 02:33:13,020 - [INFO] - Is Off-topic: True
+2025-11-25 02:33:13,020 - [INFO] - Confidence: 0.85
+2025-11-25 02:33:13,020 - [INFO] - Reasons: ['Missing most required elements (2/2)', 'Essay partially addresses the prompt but misses key requirements']
+2025-11-25 02:33:13,020 - [INFO] - ============================================================
+2025-11-25 02:33:13,021 - [INFO] - Gemini assessment:
+2025-11-25 02:33:13,021 - [INFO] -   Relevance score: 98/100
+2025-11-25 02:33:13,021 - [INFO] -   Is on topic: True
+2025-11-25 02:33:13,021 - [INFO] -   Confidence: 1.00
+2025-11-25 02:33:13,021 - [WARNING] - BERT similarity not available, using Gemini only
+2025-11-25 02:33:13,021 - [INFO] - Classification: ON-TOPIC (relevance >= 70: 98.0%)
+2025-11-25 02:33:13,021 - [INFO] - Final result:
+2025-11-25 02:33:13,021 - [INFO] -   Off-topic level: none
+2025-11-25 02:33:13,021 - [INFO] -   Final relevance: 98/100
+2025-11-25 02:33:13,021 - [INFO] -   Is on topic: True
+2025-11-25 02:33:13,022 - [INFO] - ============================================================
+2025-11-25 02:33:13,285 - [INFO] - Task Response Analyzer relevance: 92.0%
+2025-11-25 02:33:13,286 - [INFO] - ============================================================
+2025-11-25 02:33:13,287 - [INFO] - MERGING OFF-TOPIC DETECTION RESULTS
+2025-11-25 02:33:13,287 - [INFO] - ============================================================
+2025-11-25 02:33:13,287 - [INFO] - Generic Detection: level=partial, relevance=42%
+2025-11-25 02:33:13,288 - [INFO] - Improved Detection: level=none, relevance=98%
+2025-11-25 02:33:13,288 - [INFO] - Final Merged Result: level=partial, relevance=42%
+2025-11-25 02:33:13,289 - [INFO] - ============================================================
+2025-11-25 02:33:13,289 - [WARNING] - ============================================================
+2025-11-25 02:33:13,289 - [WARNING] - ⚠️ Relevance too low (42.0% < 50%) - treating as complete off-topic
+2025-11-25 02:33:13,290 - [WARNING] - ============================================================
+2025-11-25 02:33:13,290 - [WARNING] - ============================================================
+2025-11-25 02:33:13,290 - [WARNING] - Essay is completely off-topic - returning 0 score immediately
+2025-11-25 02:33:13,290 - [WARNING] - Relevance: 42%
+2025-11-25 02:33:13,291 - [WARNING] - Reason: Missing most required elements (2/2); Essay partially addresses the prompt but misses key requirements
+2025-11-25 02:33:13,291 - [WARNING] - ============================================================
+2025-11-25 02:33:13,292 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:33:13] "POST /score HTTP/1.1" 200 -
+2025-11-25 02:33:31,307 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:33:31] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:33:51,375 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:33:51] "OPTIONS /score HTTP/1.1" 200 -
+2025-11-25 02:33:52,132 - [INFO] - ============================================================
+2025-11-25 02:33:52,133 - [INFO] - BERT SEMANTIC SIMILARITY CALCULATION
+2025-11-25 02:33:52,134 - [INFO] - ============================================================
+2025-11-25 02:33:52,134 - [INFO] - Input Essay: I think university should be free. It is good for student. Many student have no money. They want learn but cannot pay. This is very sad.
+
+University is important place. People go there to get job. If ...
+2025-11-25 02:33:52,135 - [INFO] - Input Prompt: Some people believe university education should be free for all students. To what extent do you agree or disagree?
+2025-11-25 02:33:52,136 - [INFO] - ============================================================
+2025-11-25 02:33:52,136 - [INFO] - BERT SEMANTIC SIMILARITY
+2025-11-25 02:33:52,137 - [INFO] - Input: Essay length=564 chars, 101 words | Prompt length=114 chars, 19 words
+2025-11-25 02:33:52,137 - [INFO] - BERT model not available (BERT_AVAILABLE=False), using Gemini only
+2025-11-25 02:33:52,138 - [WARNING] - BERT similarity not available
+2025-11-25 02:33:52,138 - [INFO] - ============================================================
+2025-11-25 02:33:52,139 - [INFO] - Step 3: Quick contradiction check...
+2025-11-25 02:33:52,139 - [INFO] - ============================================================
+2025-11-25 02:33:52,140 - [INFO] - Step 3.1: Quick keyword check for obvious off-topic...
+2025-11-25 02:33:52,140 - [INFO] - ============================================================
+2025-11-25 02:33:52,141 - [INFO] - GEMINI CONTENT VALIDATION
+2025-11-25 02:33:52,141 - [INFO] - ============================================================
+2025-11-25 02:33:52,141 - [INFO] - Input Essay: I think university should be free. It is good for student. Many student have no money. They want learn but cannot pay. This is very sad.
+
+University is important place. People go there to get job. If ...
+2025-11-25 02:33:52,142 - [INFO] - Input Prompt: Some people believe university education should be free for all students. To what extent do you agree or disagree?
+2025-11-25 02:33:57,245 - [INFO] - ============================================================
+2025-11-25 02:33:57,245 - [INFO] - GEMINI VALIDATION RESULTS
+2025-11-25 02:33:57,246 - [INFO] - Overall Relevance: 90%
+2025-11-25 02:33:57,246 - [INFO] - Is On-topic: True
+2025-11-25 02:33:57,246 - [INFO] - Confidence: 1.00
+2025-11-25 02:33:57,246 - [INFO] - Off-topic Reason: 
+2025-11-25 02:33:57,246 - [INFO] - Topic Relevance Score: 90
+2025-11-25 02:33:57,246 - [INFO] - Addressed Elements: []
+2025-11-25 02:33:57,246 - [INFO] - Missing Elements: []
+2025-11-25 02:33:57,246 - [INFO] - ============================================================
+2025-11-25 02:33:57,247 - [INFO] - ============================================================
+2025-11-25 02:33:57,247 - [INFO] - GENERIC OFF-TOPIC DETECTION
+2025-11-25 02:33:57,247 - [INFO] - ============================================================
+2025-11-25 02:33:57,247 - [INFO] - Keyword Coverage: 4/10 = 40.00%
+2025-11-25 02:33:57,247 - [INFO] - Matched keywords: ['people', 'university', 'should', 'free']
+2025-11-25 02:33:57,247 - [INFO] - Missing keywords: ['some', 'believe', 'education', 'students', 'what']
+2025-11-25 02:33:57,247 - [INFO] - Elements Coverage: 1/2 = 50.00%
+2025-11-25 02:33:57,247 - [INFO] - Addressed: ['who']
+2025-11-25 02:33:57,247 - [INFO] - Missing: ['what']
+2025-11-25 02:33:57,247 - [INFO] - BERT Semantic Similarity: 0.0000 (0.0%)
+2025-11-25 02:33:57,248 - [INFO] - Gemini Relevance: 90%
+2025-11-25 02:33:57,248 - [INFO] - Gemini On-topic: True
+2025-11-25 02:33:57,248 - [INFO] - Combined Relevance: 44.5%
+2025-11-25 02:33:57,248 - [INFO] - ============================================================
+2025-11-25 02:33:57,248 - [INFO] - TASK FULFILLMENT CHECKER ANALYSIS
+2025-11-25 02:33:57,248 - [INFO] - ============================================================
+2025-11-25 02:33:57,249 - [INFO] - Is Off-topic: True
+2025-11-25 02:33:57,249 - [INFO] - Confidence: 0.40
+2025-11-25 02:33:57,249 - [INFO] - Keyword Coverage: 86.67%
+2025-11-25 02:33:57,249 - [INFO] - Matched Keywords: ['students']
+2025-11-25 02:33:57,249 - [INFO] - Missing Keywords: ['university education', 'extent']
+2025-11-25 02:33:57,249 - [INFO] - Reasons: ['Low fulfillment score (3.0 < 6.0)', 'Missing requirements: WHAT (activities/actions)']
+2025-11-25 02:33:57,249 - [INFO] - ============================================================
+2025-11-25 02:33:57,249 - [INFO] - Off-topic Level: partial
+2025-11-25 02:33:57,250 - [INFO] - Is Off-topic: True
+2025-11-25 02:33:57,250 - [INFO] - Confidence: 0.80
+2025-11-25 02:33:57,250 - [INFO] - Reasons: ['Essay partially addresses the prompt but misses key requirements']
+2025-11-25 02:33:57,250 - [INFO] - ============================================================
+2025-11-25 02:33:57,250 - [INFO] - Gemini assessment:
+2025-11-25 02:33:57,250 - [INFO] -   Relevance score: 90/100
+2025-11-25 02:33:57,250 - [INFO] -   Is on topic: True
+2025-11-25 02:33:57,250 - [INFO] -   Confidence: 1.00
+2025-11-25 02:33:57,250 - [WARNING] - BERT similarity not available, using Gemini only
+2025-11-25 02:33:57,250 - [INFO] - Classification: ON-TOPIC (relevance >= 70: 90.0%)
+2025-11-25 02:33:57,250 - [INFO] - Final result:
+2025-11-25 02:33:57,251 - [INFO] -   Off-topic level: none
+2025-11-25 02:33:57,251 - [INFO] -   Final relevance: 90/100
+2025-11-25 02:33:57,251 - [INFO] -   Is on topic: True
+2025-11-25 02:33:57,251 - [INFO] - ============================================================
+2025-11-25 02:33:57,649 - [INFO] - Task Response Analyzer relevance: 89.0%
+2025-11-25 02:33:57,649 - [INFO] - ============================================================
+2025-11-25 02:33:57,649 - [INFO] - MERGING OFF-TOPIC DETECTION RESULTS
+2025-11-25 02:33:57,650 - [INFO] - ============================================================
+2025-11-25 02:33:57,650 - [INFO] - Generic Detection: level=partial, relevance=44%
+2025-11-25 02:33:57,650 - [INFO] - Improved Detection: level=none, relevance=90%
+2025-11-25 02:33:57,650 - [INFO] - Final Merged Result: level=partial, relevance=44%
+2025-11-25 02:33:57,650 - [INFO] - ============================================================
+2025-11-25 02:33:57,651 - [WARNING] - ============================================================
+2025-11-25 02:33:57,651 - [WARNING] - ⚠️ Relevance too low (44.0% < 50%) - treating as complete off-topic
+2025-11-25 02:33:57,651 - [WARNING] - ============================================================
+2025-11-25 02:33:57,651 - [WARNING] - ============================================================
+2025-11-25 02:33:57,652 - [WARNING] - Essay is completely off-topic - returning 0 score immediately
+2025-11-25 02:33:57,652 - [WARNING] - Relevance: 44%
+2025-11-25 02:33:57,652 - [WARNING] - Reason: Essay partially addresses the prompt but misses key requirements
+2025-11-25 02:33:57,652 - [WARNING] - ============================================================
+2025-11-25 02:33:57,653 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:33:57] "POST /score HTTP/1.1" 200 -
+2025-11-25 02:34:01,305 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:34:01] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:34:22,421 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:34:22] "OPTIONS /score HTTP/1.1" 200 -
+2025-11-25 02:34:23,097 - [INFO] - ============================================================
+2025-11-25 02:34:23,098 - [INFO] - BERT SEMANTIC SIMILARITY CALCULATION
+2025-11-25 02:34:23,098 - [INFO] - ============================================================
+2025-11-25 02:34:23,099 - [INFO] - Input Essay: Free university education is good but asdfjkl; qweruiop zxcvbnm. The education system needs money money money money. 
+Hhjkafdhjk afdhsjkl afdhsjkl gfdhjksl. 
+1234567890 1234567890.
+Uni ver si ty is im...
+2025-11-25 02:34:23,099 - [INFO] - Input Prompt: Some people believe university education should be free for all students. To what extent do you agree or disagree?
+2025-11-25 02:34:23,100 - [INFO] - ============================================================
+2025-11-25 02:34:23,100 - [INFO] - BERT SEMANTIC SIMILARITY
+2025-11-25 02:34:23,100 - [INFO] - Input: Essay length=210 chars, 31 words | Prompt length=114 chars, 19 words
+2025-11-25 02:34:23,101 - [INFO] - BERT model not available (BERT_AVAILABLE=False), using Gemini only
+2025-11-25 02:34:23,101 - [WARNING] - BERT similarity not available
+2025-11-25 02:34:23,101 - [INFO] - ============================================================
+2025-11-25 02:34:23,101 - [INFO] - Step 3: Quick contradiction check...
+2025-11-25 02:34:23,102 - [INFO] - ============================================================
+2025-11-25 02:34:23,102 - [INFO] - Step 3.1: Quick keyword check for obvious off-topic...
+2025-11-25 02:34:23,102 - [INFO] - ============================================================
+2025-11-25 02:34:23,102 - [INFO] - GEMINI CONTENT VALIDATION
+2025-11-25 02:34:23,102 - [INFO] - ============================================================
+2025-11-25 02:34:23,103 - [INFO] - Input Essay: Free university education is good but asdfjkl; qweruiop zxcvbnm. The education system needs money money money money. 
+Hhjkafdhjk afdhsjkl afdhsjkl gfdhjksl. 
+1234567890 1234567890.
+Uni ver si ty is im...
+2025-11-25 02:34:23,103 - [INFO] - Input Prompt: Some people believe university education should be free for all students. To what extent do you agree or disagree?
+2025-11-25 02:34:30,250 - [INFO] - ============================================================
+2025-11-25 02:34:30,251 - [INFO] - GEMINI VALIDATION RESULTS
+2025-11-25 02:34:30,251 - [INFO] - Overall Relevance: 10%
+2025-11-25 02:34:30,251 - [INFO] - Is On-topic: False
+2025-11-25 02:34:30,252 - [INFO] - Confidence: 1.00
+2025-11-25 02:34:30,252 - [INFO] - Off-topic Reason: The essay contains significant portions of gibberish ('asdfjkl; qweruiop zxcvbnm', 'Hhjkafdhjk afdhsjkl afdhsjkl gfdhjksl', '1234567890 1234567890') which makes it largely unintelligible and irrelevant to the prompt. While it briefly mentions 'Free university education' and 'University', it fails to develop any coherent argument, address the specific question of whether it *should be free for all students*, or state an extent of agreement/disagreement. The few coherent phrases are too general and fragmented to constitute a response to the prompt's specific focus.
+2025-11-25 02:34:30,252 - [INFO] - Topic Relevance Score: 10
+2025-11-25 02:34:30,253 - [INFO] - Addressed Elements: []
+2025-11-25 02:34:30,253 - [INFO] - Missing Elements: []
+2025-11-25 02:34:30,253 - [INFO] - ============================================================
+2025-11-25 02:34:30,253 - [INFO] - ============================================================
+2025-11-25 02:34:30,254 - [INFO] - GENERIC OFF-TOPIC DETECTION
+2025-11-25 02:34:30,254 - [INFO] - ============================================================
+2025-11-25 02:34:30,254 - [INFO] - Keyword Coverage: 3/10 = 30.00%
+2025-11-25 02:34:30,254 - [INFO] - Matched keywords: ['university', 'education', 'free']
+2025-11-25 02:34:30,255 - [INFO] - Missing keywords: ['some', 'people', 'believe', 'should', 'students']
+2025-11-25 02:34:30,255 - [INFO] - Elements Coverage: 0/2 = 0.00%
+2025-11-25 02:34:30,255 - [INFO] - Addressed: []
+2025-11-25 02:34:30,255 - [INFO] - Missing: ['what', 'who']
+2025-11-25 02:34:30,255 - [INFO] - BERT Semantic Similarity: 0.0000 (0.0%)
+2025-11-25 02:34:30,255 - [INFO] - Gemini Relevance: 10%
+2025-11-25 02:34:30,256 - [INFO] - Gemini On-topic: False
+2025-11-25 02:34:30,256 - [INFO] - Combined Relevance: 11.5%
+2025-11-25 02:34:30,256 - [INFO] - ============================================================
+2025-11-25 02:34:30,256 - [INFO] - TASK FULFILLMENT CHECKER ANALYSIS
+2025-11-25 02:34:30,257 - [INFO] - ============================================================
+2025-11-25 02:34:30,258 - [INFO] - Is Off-topic: True
+2025-11-25 02:34:30,258 - [INFO] - Confidence: 0.40
+2025-11-25 02:34:30,259 - [INFO] - Keyword Coverage: 80.00%
+2025-11-25 02:34:30,260 - [INFO] - Matched Keywords: []
+2025-11-25 02:34:30,260 - [INFO] - Missing Keywords: ['university education', 'extent', 'students']
+2025-11-25 02:34:30,260 - [INFO] - Reasons: ['Low fulfillment score (3.0 < 6.0)', 'Missing requirements: WHAT (activities/actions)']
+2025-11-25 02:34:30,260 - [INFO] - ============================================================
+2025-11-25 02:34:30,260 - [INFO] - Off-topic Level: complete
+2025-11-25 02:34:30,260 - [INFO] - Is Off-topic: True
+2025-11-25 02:34:30,261 - [INFO] - Confidence: 0.95
+2025-11-25 02:34:30,261 - [INFO] - Reasons: ['Missing most required elements (2/2)', 'Both BERT (0.0%) and Gemini (10%) indicate low relevance', 'Essay does not address the prompt topic at all']
+2025-11-25 02:34:30,261 - [INFO] - ============================================================
+2025-11-25 02:34:30,262 - [INFO] - Gemini assessment:
+2025-11-25 02:34:30,262 - [INFO] -   Relevance score: 10/100
+2025-11-25 02:34:30,263 - [INFO] -   Is on topic: False
+2025-11-25 02:34:30,264 - [INFO] -   Confidence: 1.00
+2025-11-25 02:34:30,265 - [WARNING] - BERT similarity not available, using Gemini only
+2025-11-25 02:34:30,265 - [WARNING] - Classification: COMPLETE OFF-TOPIC (relevance < 50: 10.0%)
+2025-11-25 02:34:30,265 - [WARNING] - Reason: The essay contains significant portions of gibberish ('asdfjkl; qweruiop zxcvbnm', 'Hhjkafdhjk afdhsjkl afdhsjkl gfdhjksl', '1234567890 1234567890') which makes it largely unintelligible and irrelevant to the prompt. While it briefly mentions 'Free university education' and 'University', it fails to develop any coherent argument, address the specific question of whether it *should be free for all students*, or state an extent of agreement/disagreement. The few coherent phrases are too general and fragmented to constitute a response to the prompt's specific focus.
+2025-11-25 02:34:30,265 - [INFO] - Final result:
+2025-11-25 02:34:30,266 - [INFO] -   Off-topic level: complete
+2025-11-25 02:34:30,266 - [INFO] -   Final relevance: 10/100
+2025-11-25 02:34:30,266 - [INFO] -   Is on topic: False
+2025-11-25 02:34:30,266 - [INFO] - ============================================================
+2025-11-25 02:34:30,649 - [INFO] - Task Response Analyzer relevance: 60.0%
+2025-11-25 02:34:30,650 - [INFO] - ============================================================
+2025-11-25 02:34:30,650 - [INFO] - MERGING OFF-TOPIC DETECTION RESULTS
+2025-11-25 02:34:30,650 - [INFO] - ============================================================
+2025-11-25 02:34:30,650 - [INFO] - Generic Detection: level=complete, relevance=11%
+2025-11-25 02:34:30,650 - [INFO] - Improved Detection: level=complete, relevance=10%
+2025-11-25 02:34:30,651 - [INFO] - Final Merged Result: level=complete, relevance=10%
+2025-11-25 02:34:30,651 - [INFO] - ============================================================
+2025-11-25 02:34:30,651 - [WARNING] - ============================================================
+2025-11-25 02:34:30,652 - [WARNING] - Essay is completely off-topic - returning 0 score immediately
+2025-11-25 02:34:30,652 - [WARNING] - Relevance: 10%
+2025-11-25 02:34:30,652 - [WARNING] - Reason: The essay contains significant portions of gibberish ('asdfjkl; qweruiop zxcvbnm', 'Hhjkafdhjk afdhsjkl afdhsjkl gfdhjksl', '1234567890 1234567890') which makes it largely unintelligible and irrelevant to the prompt. While it briefly mentions 'Free university education' and 'University', it fails to develop any coherent argument, address the specific question of whether it *should be free for all students*, or state an extent of agreement/disagreement. The few coherent phrases are too general and fragmented to constitute a response to the prompt's specific focus.
+2025-11-25 02:34:30,653 - [WARNING] - ============================================================
+2025-11-25 02:34:30,653 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:34:30] "POST /score HTTP/1.1" 200 -
+2025-11-25 02:34:31,308 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:34:31] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:35:01,622 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:35:01] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:35:31,314 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:35:31] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:35:58,696 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:35:58] "OPTIONS /score HTTP/1.1" 200 -
+2025-11-25 02:35:59,359 - [INFO] - ============================================================
+2025-11-25 02:35:59,359 - [INFO] - BERT SEMANTIC SIMILARITY CALCULATION
+2025-11-25 02:35:59,359 - [INFO] - ============================================================
+2025-11-25 02:35:59,360 - [INFO] - Input Essay: Some people say that university education should be free for all students, but many others think this is not a good idea. For me, I think free education is good in some ways, but I don’t believe it sh...
+2025-11-25 02:35:59,360 - [INFO] - Input Prompt: Some people believe university education should be free for all students. To what extent do you agree or disagree?
+2025-11-25 02:35:59,360 - [INFO] - ============================================================
+2025-11-25 02:35:59,360 - [INFO] - BERT SEMANTIC SIMILARITY
+2025-11-25 02:35:59,360 - [INFO] - Input: Essay length=2060 chars, 357 words | Prompt length=114 chars, 19 words
+2025-11-25 02:35:59,361 - [INFO] - BERT model not available (BERT_AVAILABLE=False), using Gemini only
+2025-11-25 02:35:59,361 - [WARNING] - BERT similarity not available
+2025-11-25 02:35:59,361 - [INFO] - ============================================================
+2025-11-25 02:35:59,361 - [INFO] - Step 3: Quick contradiction check...
+2025-11-25 02:35:59,361 - [INFO] - ============================================================
+2025-11-25 02:35:59,362 - [INFO] - Step 3.1: Quick keyword check for obvious off-topic...
+2025-11-25 02:35:59,362 - [INFO] - ============================================================
+2025-11-25 02:35:59,362 - [INFO] - GEMINI CONTENT VALIDATION
+2025-11-25 02:35:59,362 - [INFO] - ============================================================
+2025-11-25 02:35:59,362 - [INFO] - Input Essay: Some people say that university education should be free for all students, but many others think this is not a good idea. For me, I think free education is good in some ways, but I don’t believe it sh...
+2025-11-25 02:35:59,363 - [INFO] - Input Prompt: Some people believe university education should be free for all students. To what extent do you agree or disagree?
+2025-11-25 02:36:01,312 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:36:01] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:36:05,301 - [INFO] - ============================================================
+2025-11-25 02:36:05,301 - [INFO] - GEMINI VALIDATION RESULTS
+2025-11-25 02:36:05,301 - [INFO] - Overall Relevance: 95%
+2025-11-25 02:36:05,301 - [INFO] - Is On-topic: True
+2025-11-25 02:36:05,301 - [INFO] - Confidence: 1.00
+2025-11-25 02:36:05,302 - [INFO] - Off-topic Reason: 
+2025-11-25 02:36:05,302 - [INFO] - Topic Relevance Score: 95
+2025-11-25 02:36:05,302 - [INFO] - Addressed Elements: []
+2025-11-25 02:36:05,302 - [INFO] - Missing Elements: []
+2025-11-25 02:36:05,302 - [INFO] - ============================================================
+2025-11-25 02:36:05,302 - [INFO] - ============================================================
+2025-11-25 02:36:05,303 - [INFO] - GENERIC OFF-TOPIC DETECTION
+2025-11-25 02:36:05,303 - [INFO] - ============================================================
+2025-11-25 02:36:05,303 - [INFO] - Keyword Coverage: 8/10 = 80.00%
+2025-11-25 02:36:05,303 - [INFO] - Matched keywords: ['some', 'people', 'believe', 'university', 'education']
+2025-11-25 02:36:05,303 - [INFO] - Missing keywords: ['what', 'extent']
+2025-11-25 02:36:05,303 - [INFO] - Elements Coverage: 1/2 = 50.00%
+2025-11-25 02:36:05,304 - [INFO] - Addressed: ['who']
+2025-11-25 02:36:05,304 - [INFO] - Missing: ['what']
+2025-11-25 02:36:05,304 - [INFO] - BERT Semantic Similarity: 0.0000 (0.0%)
+2025-11-25 02:36:05,304 - [INFO] - Gemini Relevance: 95%
+2025-11-25 02:36:05,304 - [INFO] - Gemini On-topic: True
+2025-11-25 02:36:05,304 - [INFO] - Combined Relevance: 57.7%
+2025-11-25 02:36:05,305 - [INFO] - ============================================================
+2025-11-25 02:36:05,305 - [INFO] - TASK FULFILLMENT CHECKER ANALYSIS
+2025-11-25 02:36:05,305 - [INFO] - ============================================================
+2025-11-25 02:36:05,306 - [INFO] - Is Off-topic: False
+2025-11-25 02:36:05,306 - [INFO] - Confidence: 0.00
+2025-11-25 02:36:05,306 - [INFO] - Keyword Coverage: 86.67%
+2025-11-25 02:36:05,306 - [INFO] - Matched Keywords: ['students']
+2025-11-25 02:36:05,307 - [INFO] - Missing Keywords: ['university education', 'extent']
+2025-11-25 02:36:05,307 - [INFO] - Reasons: []
+2025-11-25 02:36:05,307 - [INFO] - ============================================================
+2025-11-25 02:36:05,307 - [INFO] - Off-topic Level: incomplete
+2025-11-25 02:36:05,307 - [INFO] - Is Off-topic: False
+2025-11-25 02:36:05,307 - [INFO] - Confidence: 0.80
+2025-11-25 02:36:05,308 - [INFO] - Reasons: ['Essay addresses the topic but is missing some required elements']
+2025-11-25 02:36:05,308 - [INFO] - ============================================================
+2025-11-25 02:36:05,308 - [INFO] - Gemini assessment:
+2025-11-25 02:36:05,308 - [INFO] -   Relevance score: 95/100
+2025-11-25 02:36:05,308 - [INFO] -   Is on topic: True
+2025-11-25 02:36:05,308 - [INFO] -   Confidence: 1.00
+2025-11-25 02:36:05,309 - [WARNING] - BERT similarity not available, using Gemini only
+2025-11-25 02:36:05,309 - [INFO] - Classification: ON-TOPIC (relevance >= 70: 95.0%)
+2025-11-25 02:36:05,309 - [INFO] - Final result:
+2025-11-25 02:36:05,309 - [INFO] -   Off-topic level: none
+2025-11-25 02:36:05,309 - [INFO] -   Final relevance: 95/100
+2025-11-25 02:36:05,309 - [INFO] -   Is on topic: True
+2025-11-25 02:36:05,310 - [INFO] - ============================================================
+2025-11-25 02:36:05,709 - [INFO] - Task Response Analyzer relevance: 100.0%
+2025-11-25 02:36:05,711 - [INFO] - ============================================================
+2025-11-25 02:36:05,712 - [INFO] - MERGING OFF-TOPIC DETECTION RESULTS
+2025-11-25 02:36:05,712 - [INFO] - ============================================================
+2025-11-25 02:36:05,712 - [INFO] - Generic Detection: level=incomplete, relevance=57%
+2025-11-25 02:36:05,713 - [INFO] - Improved Detection: level=none, relevance=95%
+2025-11-25 02:36:05,713 - [INFO] - Final Merged Result: level=none, relevance=57%
+2025-11-25 02:36:05,713 - [INFO] - ============================================================
+2025-11-25 02:36:06,103 - [INFO] - Task Response Analyzer: relevance=10.0, coverage=7.0
+2025-11-25 02:36:06,103 - [INFO] - Task Response Analyzer score (100): 88.0
+2025-11-25 02:36:06,104 - [INFO] - Task Response: On-topic (relevance=57.0%) → base score=57.0
+2025-11-25 02:36:06,104 - [INFO] - Task Response: Word count penalty=0.95
+2025-11-25 02:36:06,104 - [INFO] - Task Response: On-topic with good quality → 10% bonus
+2025-11-25 02:36:06,104 - [INFO] - Task Response: Final score=58.4/100 (base=54.1, quality=95)
+2025-11-25 02:36:06,104 - [INFO] - Task Response Analyzer gives higher score (88.0 vs 58) → Using higher score
+2025-11-25 02:36:06,105 - [INFO] - Spelling errors from Gemini: 0
+2025-11-25 02:36:06,106 - [INFO] - Vocabulary error categorization:
+2025-11-25 02:36:06,106 - [INFO] -   Basic errors (wrong word, collocation): 0
+2025-11-25 02:36:06,106 - [INFO] -   Advanced errors (style, nuance): 0
+2025-11-25 02:36:06,107 - [INFO] -   Spelling errors: 0
+2025-11-25 02:36:06,107 - [INFO] - No vocab errors detected → no score cap applied
+2025-11-25 02:36:06,107 - [INFO] - ============================================================
+2025-11-25 02:36:06,107 - [INFO] - GRAMMAR ERROR DETECTION
+2025-11-25 02:36:06,108 - [INFO] - Errors from Gemini: 0 errors
+2025-11-25 02:36:06,108 - [INFO] - Spelling errors from Gemini (affecting grammar): 0
+2025-11-25 02:36:06,108 - [INFO] - Total grammar errors detected: 0
+2025-11-25 02:36:06,108 - [INFO] - Breakdown: From Gemini=0, Spelling=0, Mechanics=0
+2025-11-25 02:36:06,108 - [INFO] - ============================================================
+2025-11-25 02:36:06,108 - [INFO] - Grammar error categorization:
+2025-11-25 02:36:06,109 - [INFO] -   Basic errors (subject-verb, tense, articles): 0 (VERY SEVERE)
+2025-11-25 02:36:06,109 - [INFO] -   Advanced errors (complex structures): 0
+2025-11-25 02:36:06,109 - [INFO] -   Spelling errors: 0
+2025-11-25 02:36:06,109 - [INFO] -   Mechanics errors (punctuation/capitalization): 0
+2025-11-25 02:36:06,110 - [INFO] -   Total: 0
+2025-11-25 02:36:06,110 - [INFO] - No grammar errors detected → no score cap applied
+2025-11-25 02:36:06,113 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:36:06] "POST /score HTTP/1.1" 200 -
+2025-11-25 02:36:31,618 - [INFO] - 127.0.0.1 - - [25/Nov/2025 02:36:31] "GET /health HTTP/1.1" 200 -
+2025-11-25 02:36:57,443 - [INFO] -  * Detected change in 'C:\\Users\\ADMIN\\Desktop\\English101\\python-services\\hybrid_intelligent_scorer.py', reloading
+2025-11-25 02:36:58,560 - [INFO] -  * Restarting with stat
+2025-11-25 02:44:49,900 - [INFO] -  * Restarting with stat
+2025-11-25 02:45:08,226 - [INFO] -  * Restarting with stat
+2025-11-25 02:45:22,106 - [INFO] -  * Restarting with stat
+2025-11-25 02:45:36,811 - [INFO] -  * Restarting with stat

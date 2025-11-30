@@ -22,10 +22,42 @@ const PAGE_TITLES: Record<string, string> = {
 
 export default function DashboardHeader() {
   const pathname = usePathname();
+  const router = useRouter();
   const { data: session } = useSession();
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [streak] = useState(7); // TODO: Fetch from API
+  const [streak, setStreak] = useState(0);
+  const [unreadCount, setUnreadCount] = useState(0);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  // Fetch user stats and notifications
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [statsRes, notifRes] = await Promise.all([
+          fetch("/api/user/stats"),
+          fetch("/api/notifications"),
+        ]);
+
+        if (statsRes.ok) {
+          const statsData = await statsRes.json();
+          if (statsData.success) {
+            setStreak(statsData.stats.streak || 0);
+          }
+        }
+
+        if (notifRes.ok) {
+          const notifData = await notifRes.json();
+          if (notifData.success) {
+            setUnreadCount(notifData.unreadCount || 0);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch header data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const pageTitle = PAGE_TITLES[pathname] || "English101";
 
@@ -60,12 +92,16 @@ export default function DashboardHeader() {
         </div>
 
         {/* Notifications */}
-        <button className="header-action-btn" aria-label="Notifications">
+        <button
+          className="header-action-btn"
+          aria-label="Notifications"
+          onClick={() => router.push("/english/notifications")}
+        >
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
             <path d="M10 2C6.68629 2 4 4.68629 4 8V11.5858L2.29289 13.2929C2.10536 13.4804 2 13.7348 2 14V16C2 16.5523 2.44772 17 3 17H17C17.5523 17 18 16.5523 18 16V14C18 13.7348 17.8946 13.4804 17.7071 13.2929L16 11.5858V8C16 4.68629 13.3137 2 10 2Z" stroke="currentColor" strokeWidth="1.5"/>
             <path d="M8 17C8 18.1046 8.89543 19 10 19C11.1046 19 12 18.1046 12 17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
           </svg>
-          <span className="notification-badge">3</span>
+          {unreadCount > 0 && <span className="notification-badge">{unreadCount}</span>}
         </button>
 
         {/* User Menu */}

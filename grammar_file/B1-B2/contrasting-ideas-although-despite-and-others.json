@@ -1,0 +1,95 @@
+{
+  "id": "contrasting-ideas-although-despite-and-others",
+  "title": "Contrasting ideas: 'although', 'despite' and others",
+  "level": "B1-B2",
+  "introduction": "Do you know how to connect two contrasting ideas with words like although and despite? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "Although, even though, in spite of and despite are all used to link two contrasting ideas or show that one fact makes the other fact surprising. They can all be used at the beginning or in the middle of the sentence.",
+  "rules": [],
+  "keyPoints": [
+    "it is common to use in spite of and despite with the expression the fact that, followed by a subject and verb"
+  ],
+  "examples": [
+    "Do you know how to connect two contrasting ideas with words like although and despite?",
+    "Look at these examples to see how although, even though, in spite of and despite are used.",
+    "Although we don't agree, I think she's a brilliant speaker.",
+    "Even though we don't agree, I think she's a brilliant speaker.",
+    "Grammar explanation",
+    "Although, even though, in spite of and despite are all used to link two contrasting ideas or show that one fact makes the other fact surprising.",
+    "In spite of the pain in his leg, he completed the marathon.",
+    "Despite having a headache, I had a great birthday.",
+    "The train was cancelled.",
+    "In spite of the fact that he worked very hard, he didn't pass the exam.",
+    "Despite the fact that he worked very hard, he didn't pass the exam.",
+    "I enjoyed the course, although I would have liked more grammar practice.",
+    "Although we saw each other every day, we didn't really know each other.",
+    "She didn't get the job, even though she had all the necessary qualifications.",
+    "Though can be used in the same way as although.",
+    "Though I wasn't keen on the film, I thought the music was beautiful.",
+    "Though can also go at the end of the second phrase."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Do you know how to connect two _____ ideas with words like although and despite?",
+      "options": [
+        "contrasting",
+        "contrast",
+        "contrastingly",
+        "contrasted"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to contrasting ideas: 'although', 'despite' and others usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Look at these examples to see how although, _____ though, in spite of and despite are used.",
+      "options": [
+        "even",
+        "evens",
+        "evened",
+        "not even"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to contrasting ideas: 'although', 'despite' and others usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Although we don't agree, I _____ she's a brilliant speaker.",
+      "options": [
+        "think",
+        "thinks",
+        "thinked",
+        "not think"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to contrasting ideas: 'although', 'despite' and others usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "Even though we don't agree, _____ think she's a brilliant speaker.",
+      "correct": "I",
+      "hint": "Apply the rule for contrasting ideas: 'although', 'despite' and others.",
+      "explanation": "The correct form here is 'I'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "Although, even though, in spite of and despite are all used to link _____ contrasting ideas or show that one fact makes the other fact surprising.",
+      "correct": "two",
+      "hint": "Apply the rule for contrasting ideas: 'although', 'despite' and others.",
+      "explanation": "The correct form here is 'two'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "In spite of the pain in _____ leg, he completed the marathon.",
+      "correct": "his",
+      "hint": "Apply the rule for contrasting ideas: 'although', 'despite' and others.",
+      "explanation": "The correct form here is 'his'."
+    }
+  ]
+}

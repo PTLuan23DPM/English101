@@ -1,6 +1,3 @@
-// ------------------------------------------------------
-// Prisma/DB
-// ------------------------------------------------------
 generator client {
   provider      = "prisma-client-js"
   binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
@@ -11,9 +8,435 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ------------------------------------------------------
-// Enums
-// ------------------------------------------------------
+model User {
+  id                    String                @id @default(cuid())
+  name                  String?
+  email                 String?               @unique
+  emailVerified         DateTime?
+  image                 String?
+  role                  Role                  @default(USER)
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
+  password              String?
+  accounts              Account[]
+  activities            Activity[]            @relation("AuthorActivities")
+  attempts              Attempt[]
+  contents              Content[]             @relation("AuthorContents")
+  authoredNotifications Notification[]        @relation("AuthoredNotifications")
+  placementTests        PlacementTestResult[]
+  questions             Question[]            @relation("AuthorQuestions")
+  recordings            Recording[]
+  sessions              Session[]
+  gradedSubs            Submission[]          @relation("SubmissionGrader")
+  submissions           Submission[]          @relation("SubmissionOwner")
+  userNotifications     UserNotification[]    @relation("UserNotifications")
+  progress              UserProgress[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Topic {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  title       String
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  contents    Content[] @relation("TopicsOnContents")
+}
+
+model Tag {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  contents  Content[] @relation("TagsOnContents")
+}
+
+model Module {
+  id          String     @id @default(cuid())
+  code        String     @unique
+  type        ModuleType
+  title       String
+  description String?
+  levelMin    CEFRLevel  @default(A1)
+  levelMax    CEFRLevel  @default(C2)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  units       Unit[]
+
+  @@index([type])
+}
+
+model Unit {
+  id           String         @id @default(cuid())
+  moduleId     String
+  order        Int            @default(1)
+  title        String
+  overview     String?
+  level        CEFRLevel
+  skill        Skill
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  activities   Activity[]
+  contents     Content[]
+  module       Module         @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  UserProgress UserProgress[]
+
+  @@index([moduleId, order])
+  @@index([skill, level])
+}
+
+model Content {
+  id                  String             @id @default(cuid())
+  unitId              String
+  authorId            String?
+  title               String
+  summary             String?
+  sourceUrl           String?
+  level               CEFRLevel
+  skill               Skill
+  locale              String             @default("en")
+  html                String?
+  plainText           String?
+  metadata            Json?
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+  grammarPointId      String?
+  vocabEntryId        String?
+  pronunciationItemId String?
+  author              User?              @relation("AuthorContents", fields: [authorId], references: [id])
+  GrammarPoint        GrammarPoint?      @relation(fields: [grammarPointId], references: [id])
+  PronunciationItem   PronunciationItem? @relation(fields: [pronunciationItemId], references: [id])
+  unit                Unit               @relation(fields: [unitId], references: [id], onDelete: Cascade)
+  VocabEntry          VocabEntry?        @relation(fields: [vocabEntryId], references: [id])
+  media               MediaAsset[]
+  Question            Question[]
+  tags                Tag[]              @relation("TagsOnContents")
+  topics              Topic[]            @relation("TopicsOnContents")
+
+  @@index([unitId])
+  @@index([skill, level])
+}
+
+model MediaAsset {
+  id         String     @id @default(cuid())
+  contentId  String?
+  url        String
+  type       MediaType
+  durationS  Int?
+  mime       String?
+  meta       Json?
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  activityId String?
+  Activity   Activity?  @relation(fields: [activityId], references: [id])
+  content    Content?   @relation(fields: [contentId], references: [id])
+  Question   Question[]
+}
+
+model Activity {
+  id           String       @id @default(cuid())
+  unitId       String
+  authorId     String?
+  type         ActivityType
+  title        String
+  instruction  String?
+  maxScore     Int?
+  timeLimitSec Int?
+  level        CEFRLevel
+  skill        Skill
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  author       User?        @relation("AuthorActivities", fields: [authorId], references: [id])
+  unit         Unit         @relation(fields: [unitId], references: [id], onDelete: Cascade)
+  attempts     Attempt[]
+  media        MediaAsset[]
+  questions    Question[]
+
+  @@index([unitId, type])
+  @@index([skill, level])
+}
+
+model Question {
+  id          String             @id @default(cuid())
+  activityId  String
+  authorId    String?
+  order       Int                @default(1)
+  type        QuestionType
+  prompt      String
+  explanation String?
+  score       Int                @default(1)
+  data        Json?
+  mediaId     String?
+  contentId   String?
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  answers     AnswerKey[]
+  submissions AnswerSubmission[]
+  choices     Choice[]
+  activity    Activity           @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  author      User?              @relation("AuthorQuestions", fields: [authorId], references: [id])
+  content     Content?           @relation(fields: [contentId], references: [id])
+  media       MediaAsset?        @relation(fields: [mediaId], references: [id])
+  Submission  Submission[]
+
+  @@index([activityId, order])
+}
+
+model Choice {
+  id         String   @id @default(cuid())
+  questionId String
+  order      Int      @default(1)
+  text       String
+  value      String?
+  isCorrect  Boolean  @default(false)
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@index([questionId, order])
+}
+
+model AnswerKey {
+  id         String   @id @default(cuid())
+  questionId String
+  key        String
+  meta       Json?
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@index([questionId])
+}
+
+model Attempt {
+  id          String       @id @default(cuid())
+  userId      String
+  activityId  String
+  startedAt   DateTime     @default(now())
+  submittedAt DateTime?
+  score       Int?
+  status      String       @default("in_progress")
+  meta        Json?
+  activity    Activity     @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  submissions Submission[]
+
+  @@unique([userId, activityId, startedAt])
+  @@index([userId, activityId])
+}
+
+model Submission {
+  id               String             @id @default(cuid())
+  attemptId        String
+  userId           String
+  questionId       String
+  answerText       String?
+  answerJson       Json?
+  chosenIds        String[]
+  isCorrect        Boolean?
+  score            Int?
+  feedback         String?
+  gradedAt         DateTime?
+  graderId         String?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  AnswerSubmission AnswerSubmission[]
+  recordings       Recording[]
+  attempt          Attempt            @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  grader           User?              @relation("SubmissionGrader", fields: [graderId], references: [id])
+  question         Question           @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  user             User               @relation("SubmissionOwner", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([attemptId, questionId])
+}
+
+model Recording {
+  id           String     @id @default(cuid())
+  submissionId String
+  userId       String
+  url          String
+  durationS    Int?
+  waveform     Json?
+  meta         Json?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  submission   Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([submissionId])
+}
+
+model GrammarPoint {
+  id          String    @id @default(cuid())
+  title       String
+  level       CEFRLevel
+  explanation String?
+  patterns    String?
+  examples    Json?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  contents    Content[]
+
+  @@index([level])
+}
+
+model VocabEntry {
+  id           String     @id @default(cuid())
+  lemma        String
+  pos          String?
+  phonetic     String?
+  level        CEFRLevel?
+  definition   String?
+  examples     Json?
+  synonyms     String[]
+  antonyms     String[]
+  families     String[]
+  collocations String[]
+  idioms       String[]
+  phrasalVerbs String[]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  contents     Content[]
+
+  @@index([lemma])
+}
+
+model PronunciationItem {
+  id          String     @id @default(cuid())
+  title       String
+  level       CEFRLevel?
+  description String?
+  examples    Json?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  contents    Content[]
+}
+
+model UserProgress {
+  id       String    @id @default(cuid())
+  userId   String
+  unitId   String
+  status   String    @default("not_started")
+  lastSeen DateTime?
+  scoreSum Int?
+  meta     Json?
+  unit     Unit      @relation(fields: [unitId], references: [id], onDelete: Cascade)
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, unitId])
+  @@index([status])
+}
+
+model AnswerSubmission {
+  id           String     @id @default(cuid())
+  questionId   String
+  submissionId String
+  data         Json
+  question     Question   @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  submission   Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+
+  @@index([questionId])
+  @@index([submissionId])
+}
+
+model PasswordReset {
+  id        String   @id @default(cuid())
+  email     String
+  otp       String
+  expiresAt DateTime
+  verified  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([email])
+  @@index([otp])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  title     String
+  message   String
+  target    String
+  authorId  String
+  sentAt    DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  author    User     @relation("AuthoredNotifications", fields: [authorId], references: [id])
+
+  @@index([authorId])
+}
+
+model UserNotification {
+  id        String    @id @default(cuid())
+  userId    String
+  title     String
+  message   String
+  type      String    @default("info")
+  link      String?
+  sentBy    String
+  read      Boolean   @default(false)
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  user      User      @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, read])
+  @@index([sentBy])
+}
+
+model PlacementTestResult {
+  id             String    @id @default(cuid())
+  userId         String
+  score          Int
+  totalQuestions Int       @default(20)
+  cefrLevel      String
+  answers        Json
+  startedAt      DateTime?
+  completedAt    DateTime  @default(now())
+  timeSpent      Int?
+  skillScores    Json?
+  correctAnswers Int?
+  wrongAnswers   Int?
+  skippedAnswers Int?      @default(0)
+  metadata       Json?
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, completedAt])
+  @@index([cefrLevel])
+}
+
 enum Role {
   USER
   ADMIN
@@ -57,13 +480,13 @@ enum ModuleType {
 }
 
 enum ActivityType {
-  LECTURE // bài học lý thuyết/giới thiệu
-  LISTEN_FIND_ERROR // nghe bắt lỗi
-  LISTEN_DETAIL // nghe hiểu chi tiết
-  LISTEN_GIST // nghe ý chính
-  READ_MAIN_IDEA // đọc tìm ý chính
-  READ_INFER // đọc suy luận
-  READ_SKIMMING // đọc tổng quát
+  LECTURE
+  LISTEN_FIND_ERROR
+  LISTEN_DETAIL
+  LISTEN_GIST
+  READ_MAIN_IDEA
+  READ_INFER
+  READ_SKIMMING
   WRITE_SENTENCE
   WRITE_PARAGRAPH
   WRITE_EMAIL
@@ -81,7 +504,7 @@ enum ActivityType {
   FUNCTIONAL_DIALOG
   MEDIATION_SUMMARIZE
   MEDIATION_REPHRASE
-  ASSESS_SECTION // phần thi (nghe/đọc/nói/viết)
+  ASSESS_SECTION
 }
 
 enum QuestionType {
@@ -93,7 +516,7 @@ enum QuestionType {
   ORDERING
   MATCHING
   GAP_FILL
-  AUDIO_RECORD // nộp file/ghi âm
+  AUDIO_RECORD
   FILE_UPLOAD
 }
 
@@ -103,578 +526,4 @@ enum MediaType {
   IMAGE
   TEXT
   PDF
-}
-
-// ------------------------------------------------------
-// Auth (NextAuth.js 5+)
-// ------------------------------------------------------
-model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  password      String?   // For email/password auth
-
-  role Role @default(USER)
-
-  // Placement test & level
-  placementTestCompleted Boolean   @default(false)
-  cefrLevel              String?   // A1, A2, B1, B2, C1, C2
-  placementScore         Int?
-  lastActive             DateTime?
-  streak                 Int       @default(0)
-  longestStreak          Int       @default(0)
-
-  // User preferences
-  language               String    @default("en") // en, vi
-  theme                  String    @default("light") // light, dark
-
-  // học tập
-  progress    UserProgress[]
-  attempts    Attempt[]
-  submissions Submission[]   @relation("SubmissionOwner") // <-- thêm tên quan hệ
-  gradedSubs  Submission[]   @relation("SubmissionGrader") // <-- mới: những bài do user này chấm
-  recordings  Recording[]
-  userActivities  UserActivity[]
-  goals       UserGoal[]
-  placementTests PlacementTestResult[]
-  writingLLMUsage WritingLLMUsage[]
-
-  // authoring
-  contents   Content[]  @relation("AuthorContents")
-  activities Activity[] @relation("AuthorActivities")
-  questions  Question[] @relation("AuthorQuestions")
-  authoredNotifications Notification[] @relation("AuthoredNotifications")
-  userNotifications UserNotification[] @relation("UserNotifications")
-
-  accounts Account[]
-  sessions Session[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Account {
-  id                String  @id @default(cuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String?
-  access_token      String?
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String?
-  session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([provider, providerAccountId])
-}
-
-model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
-
-  @@unique([identifier, token])
-}
-
-// ------------------------------------------------------
-// Taxonomy / Tagging
-// ------------------------------------------------------
-model Topic {
-  id          String    @id @default(cuid())
-  slug        String    @unique
-  title       String
-  description String?
-  contents    Content[] @relation("TopicsOnContents")
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-}
-
-model Tag {
-  id        String    @id @default(cuid())
-  name      String    @unique
-  contents  Content[] @relation("TagsOnContents") // đặt tên quan hệ
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-}
-
-// ------------------------------------------------------
-// Content hierarchy: Module -> Unit(Lesson) -> Activity
-// ------------------------------------------------------
-model Module {
-  id          String     @id @default(cuid())
-  code        String     @unique
-  type        ModuleType
-  title       String
-  description String?
-  levelMin    CEFRLevel  @default(A1)
-  levelMax    CEFRLevel  @default(C2)
-
-  units Unit[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([type])
-}
-
-model Unit {
-  id       String    @id @default(cuid())
-  moduleId String
-  order    Int       @default(1)
-  title    String
-  overview String?
-  level    CEFRLevel
-  skill    Skill
-
-  module     Module     @relation(fields: [moduleId], references: [id], onDelete: Cascade)
-  contents   Content[] // mô tả/nguồn
-  activities Activity[]
-
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
-  UserProgress UserProgress[]
-
-  @@index([moduleId, order])
-  @@index([skill, level])
-}
-
-// Nội dung học liệu (bài đọc, audio, transcript, realia, link…)
-model Content {
-  id        String    @id @default(cuid())
-  unitId    String
-  authorId  String?
-  title     String
-  summary   String?
-  sourceUrl String?
-  level     CEFRLevel
-  skill     Skill
-  locale    String    @default("en") // ngôn ngữ nguồn
-  html      String? // rich text đã sanitize
-  plainText String? // fallback
-  metadata  Json?
-
-  unit   Unit         @relation(fields: [unitId], references: [id], onDelete: Cascade)
-  author User?        @relation("AuthorContents", fields: [authorId], references: [id])
-  media  MediaAsset[]
-  topics Topic[]      @relation("TopicsOnContents")
-  tags   Tag[]        @relation("TagsOnContents")
-
-  createdAt           DateTime           @default(now())
-  updatedAt           DateTime           @updatedAt
-  Question            Question[]
-  GrammarPoint        GrammarPoint?      @relation(fields: [grammarPointId], references: [id])
-  grammarPointId      String?
-  VocabEntry          VocabEntry?        @relation(fields: [vocabEntryId], references: [id])
-  vocabEntryId        String?
-  PronunciationItem   PronunciationItem? @relation(fields: [pronunciationItemId], references: [id])
-  pronunciationItemId String?
-
-  @@index([unitId])
-  @@index([skill, level])
-}
-
-model MediaAsset {
-  id        String    @id @default(cuid())
-  contentId String?
-  url       String
-  type      MediaType
-  durationS Int? // cho audio/video
-  mime      String?
-  meta      Json?
-
-  content    Content?   @relation(fields: [contentId], references: [id], onDelete: SetNull)
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
-  Activity   Activity?  @relation(fields: [activityId], references: [id])
-  activityId String?
-  Question   Question[]
-}
-
-// ------------------------------------------------------
-// Activity (bài tập/bài nói/bài viết/section đánh giá…) & câu hỏi
-// ------------------------------------------------------
-model Activity {
-  id           String       @id @default(cuid())
-  unitId       String
-  authorId     String?
-  type         ActivityType
-  title        String
-  instruction  String?
-  maxScore     Int? // tổng điểm
-  timeLimitSec Int? // nếu là test/section
-  level        CEFRLevel
-  skill        Skill
-
-  unit      Unit         @relation(fields: [unitId], references: [id], onDelete: Cascade)
-  author    User?        @relation("AuthorActivities", fields: [authorId], references: [id])
-  media     MediaAsset[] // audio/video kèm hoạt động (nghe/nói)
-  questions Question[]
-  attempts  Attempt[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([unitId, type])
-  @@index([skill, level])
-}
-
-model Question {
-  id          String       @id @default(cuid())
-  activityId  String
-  authorId    String?
-  order       Int          @default(1)
-  type        QuestionType
-  prompt      String // HTML hoặc Markdown đã sanitize
-  explanation String?
-  score       Int          @default(1)
-  data        Json? // cấu trúc phụ: pairs cho matching, gaps cho gap-fill…
-  // cho nghe/đọc: liên kết đến media hoặc content cụ thể
-  mediaId     String?
-  contentId   String?
-
-  activity    Activity           @relation(fields: [activityId], references: [id], onDelete: Cascade)
-  author      User?              @relation("AuthorQuestions", fields: [authorId], references: [id])
-  media       MediaAsset?        @relation(fields: [mediaId], references: [id], onDelete: SetNull)
-  content     Content?           @relation(fields: [contentId], references: [id], onDelete: SetNull)
-  choices     Choice[]
-  answers     AnswerKey[] // đáp án đúng (nhiều nếu MULTI_CHOICE/matching/gap-fill)
-  submissions AnswerSubmission[]
-
-  createdAt  DateTime     @default(now())
-  updatedAt  DateTime     @updatedAt
-  Submission Submission[]
-
-  @@index([activityId, order])
-}
-
-model Choice {
-  id         String  @id @default(cuid())
-  questionId String
-  order      Int     @default(1)
-  text       String // hoặc HTML
-  value      String? // giá trị nội bộ
-  isCorrect  Boolean @default(false) // redundancy để check nhanh MCQ
-
-  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
-
-  @@index([questionId, order])
-}
-
-model AnswerKey {
-  id         String @id @default(cuid())
-  questionId String
-  key        String // đáp án đúng (text/value), JSON nếu phức tạp
-  meta       Json?
-
-  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
-
-  @@index([questionId])
-}
-
-// ------------------------------------------------------
-// Nộp bài / chấm điểm / ghi âm
-// ------------------------------------------------------
-model Attempt {
-  id          String    @id @default(cuid())
-  userId      String
-  activityId  String
-  startedAt   DateTime  @default(now())
-  submittedAt DateTime?
-  score       Int? // tổng điểm attempt
-  status      String    @default("in_progress") // in_progress | submitted | graded
-  meta        Json?
-
-  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  activity    Activity     @relation(fields: [activityId], references: [id], onDelete: Cascade)
-  submissions Submission[]
-
-  @@unique([userId, activityId, startedAt])
-  @@index([userId, activityId])
-}
-
-model Submission {
-  id         String    @id @default(cuid())
-  attemptId  String
-  userId     String
-  questionId String
-  // lưu bài nộp theo dạng chung
-  answerText String?
-  answerJson Json?
-  chosenIds  String[]
-  isCorrect  Boolean?
-  score      Int?
-  feedback   String?
-  gradedAt   DateTime?
-  graderId   String?
-
-  attempt  Attempt  @relation(fields: [attemptId], references: [id], onDelete: Cascade)
-  user     User     @relation("SubmissionOwner", fields: [userId], references: [id], onDelete: Cascade)
-  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  grader   User?    @relation("SubmissionGrader", fields: [graderId], references: [id])
-
-  recordings Recording[]
-
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime           @updatedAt
-  AnswerSubmission AnswerSubmission[]
-
-  @@index([attemptId, questionId])
-}
-
-model Recording {
-  id           String @id @default(cuid())
-  submissionId String
-  userId       String
-  url          String
-  durationS    Int?
-  waveform     Json? // optional: lưu sample để render
-  meta         Json?
-
-  submission Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
-  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([userId])
-  @@index([submissionId])
-}
-
-// ------------------------------------------------------
-// Kiến thức ngôn ngữ có cấu trúc (Grammar / Vocab / Pronunciation)
-// có thể liên kết vào Content hoặc Activity qua bảng nối
-// ------------------------------------------------------
-model GrammarPoint {
-  id          String    @id @default(cuid())
-  title       String
-  level       CEFRLevel
-  explanation String?
-  patterns    String? // mô tả cấu trúc
-  examples    Json? // mảng ví dụ
-
-  contents  Content[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-
-  @@index([level])
-}
-
-model VocabEntry {
-  id           String     @id @default(cuid())
-  lemma        String
-  pos          String? // noun/verb/adj…
-  phonetic     String?
-  level        CEFRLevel?
-  definition   String?
-  examples     Json? // mảng ví dụ
-  synonyms     String[]
-  antonyms     String[]
-  families     String[] // word families
-  collocations String[]
-  idioms       String[]
-  phrasalVerbs String[]
-
-  contents Content[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([lemma])
-}
-
-model PronunciationItem {
-  id          String     @id @default(cuid())
-  title       String // ví dụ: /θ/ vs /ð/, stress rules, linking rules
-  level       CEFRLevel?
-  description String?
-  examples    Json?
-
-  contents  Content[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-}
-
-// ------------------------------------------------------
-// Tiến độ người học
-// ------------------------------------------------------
-model UserProgress {
-  id       String    @id @default(cuid())
-  userId   String
-  unitId   String
-  status   String    @default("not_started") // not_started | in_progress | completed
-  lastSeen DateTime?
-  scoreSum Int? // tổng điểm tốt nhất
-  meta     Json?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  unit Unit @relation(fields: [unitId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, unitId])
-  @@index([status])
-}
-
-model AnswerSubmission {
-  id           String @id @default(cuid())
-  questionId   String
-  submissionId String
-  data         Json // chi tiết cho matching/order/gap-fill (mapping, thứ tự…)
-
-  question   Question   @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  submission Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
-
-  @@index([questionId])
-  @@index([submissionId])
-}
-
-// ------------------------------------------------------
-// OTP for Password Reset
-// ------------------------------------------------------
-model PasswordReset {
-  id        String   @id @default(cuid())
-  email     String
-  otp       String
-  expiresAt DateTime
-  verified  Boolean  @default(false)
-  createdAt DateTime @default(now())
-
-  @@index([email])
-  @@index([otp])
-}
-
-// ------------------------------------------------------
-// User Activity Tracking for Progress & Streak
-// ------------------------------------------------------
-model UserActivity {
-  id           String   @id @default(cuid())
-  userId       String
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  date         DateTime @default(now())
-  skill        String   // reading, writing, listening, speaking, grammar, vocabulary
-  activityType String   // exercise, practice, test
-  duration     Int?     // minutes
-  score        Float?
-  completed    Boolean  @default(false)
-  metadata     Json?
-
-  createdAt DateTime @default(now())
-
-  @@index([userId, date])
-  @@index([userId, skill])
-}
-
-// ------------------------------------------------------
-// User Goals
-// ------------------------------------------------------
-model UserGoal {
-  id        String    @id @default(cuid())
-  userId    String
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  type      String    // daily_exercises, weekly_hours, target_level, skill_improvement
-  target    Int
-  current   Int       @default(0)
-  deadline  DateTime?
-  completed Boolean   @default(false)
-  metadata  Json?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([userId])
-  @@index([userId, completed])
-}
-
-// ------------------------------------------------------
-// Placement Test Results
-// ------------------------------------------------------
-model PlacementTestResult {
-  id             String   @id @default(cuid())
-  userId         String
-  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  score          Int
-  totalQuestions Int      @default(20)
-  cefrLevel      String
-  answers        Json     // Store all answers and questions
-  startedAt      DateTime? // When user started the test
-  completedAt    DateTime @default(now())
-  timeSpent      Int?     // Time spent in seconds
-  skillScores    Json?    // Scores per skill: {grammar: 8, vocabulary: 7, reading: 6}
-  correctAnswers Int?     // Number of correct answers
-  wrongAnswers   Int?     // Number of wrong answers
-  skippedAnswers Int?     @default(0) // Number of skipped questions
-  metadata       Json?    // Additional metadata
-
-  @@index([userId])
-  @@index([userId, completedAt])
-  @@index([cefrLevel])
-}
-
-// ------------------------------------------------------
-// Writing LLM Feature Usage Tracking
-// ------------------------------------------------------
-model WritingLLMUsage {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  taskId    String?  // Writing task ID (optional, for per-task tracking)
-  feature   String   // outline, brainstorm, thesis, language-pack, rephrase, expand
-  usedAt    DateTime @default(now())
-  metadata  Json?    // Additional data (task level, etc.)
-
-  createdAt DateTime @default(now())
-
-  @@index([userId, taskId, feature])
-  @@index([userId, feature])
-  @@index([usedAt])
-}
-
-// ------------------------------------------------------
-// Admin Notifications
-// ------------------------------------------------------
-model Notification {
-  id        String   @id @default(cuid())
-  title     String
-  message   String
-  target    String   // "all", "A1", "B2", etc.
-  authorId  String
-  author    User     @relation("AuthoredNotifications", fields: [authorId], references: [id])
-  sentAt    DateTime @default(now())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([authorId])
-}
-
-// User-specific notifications (sent to individual users)
-model UserNotification {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
-  title     String
-  message   String
-  type      String   @default("info") // info, success, warning, error
-  link      String?
-  sentBy    String   // Admin user ID who sent this notification
-  read      Boolean  @default(false)
-  readAt    DateTime?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([userId])
-  @@index([userId, read])
-  @@index([sentBy])
 }

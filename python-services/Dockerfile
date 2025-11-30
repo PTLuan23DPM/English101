@@ -27,8 +27,6 @@ COPY requirements.txt .
 RUN grep -vE "torch|transformers|sentence-transformers|openai-whisper|librosa|soundfile|scipy|fastdtw" requirements.txt > req_light.txt && \
     pip install --no-cache-dir -r req_light.txt
 
-# ----------------------------
-
 COPY . .
 RUN mkdir -p temp_audio
 ENV PYTHONUNBUFFERED=1

@@ -10,9 +10,11 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
-ENV NEXTAUTH_SECRET="sG0peXoJJeMyodpAapvYZvV30uAPP4za/cSxN+sXXyI="
-ENV NEXTAUTH_URL="http://localhost:3000"
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV SKIP_ENV_VALIDATION=1
+ENV ESLINT_NO_DEV_ERRORS=true
+# Biến giả để Prisma không crash (cần có nhưng không cần kết nối được)
+ENV DATABASE_URL="postgresql://postgres:password@localhost:5432/mydb"
 
 RUN npx prisma generate
 RUN npm run build

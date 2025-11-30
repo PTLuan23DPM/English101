@@ -1,0 +1,167 @@
+{
+  "prompt": "Please read: tis exam is bull sheep",
+  "expected_text": "tis exam is bull sheep",
+  "transcription": "This exam is very terrible",
+  "audio_file": "custom_practice\\recording.wav",
+  "phoneme_sequence": [
+    {
+      "word": "this",
+      "phonemes": [
+        "DH",
+        "IH1",
+        "S"
+      ]
+    },
+    {
+      "word": "exam",
+      "phonemes": [
+        "IH0",
+        "G",
+        "Z",
+        "AE1",
+        "M"
+      ]
+    },
+    {
+      "word": "is",
+      "phonemes": [
+        "IH1",
+        "Z"
+      ]
+    },
+    {
+      "word": "very",
+      "phonemes": [
+        "V",
+        "EH1",
+        "R",
+        "IY0"
+      ]
+    },
+    {
+      "word": "terrible",
+      "phonemes": [
+        "T",
+        "EH1",
+        "R",
+        "AH0",
+        "B",
+        "AH0",
+        "L"
+      ]
+    }
+  ],
+  "dtw_results": null,
+  "gop_results": {
+    "word_scores": [
+      {
+        "word": "this",
+        "expected_word": "tis",
+        "phonemes": [
+          "DH",
+          "IH1",
+          "S"
+        ],
+        "expected_phonemes": [
+          "T",
+          "IH1",
+          "Z"
+        ],
+        "phoneme_match": 0.3333333333333333,
+        "gop": -6.666666666666668,
+        "quality": "Poor"
+      },
+      {
+        "word": "exam",
+        "expected_word": "exam",
+        "phonemes": [
+          "IH0",
+          "G",
+          "Z",
+          "AE1",
+          "M"
+        ],
+        "expected_phonemes": [
+          "IH0",
+          "G",
+          "Z",
+          "AE1",
+          "M"
+        ],
+        "phoneme_match": 1.0,
+        "gop": -0.0,
+        "quality": "Excellent"
+      },
+      {
+        "word": "is",
+        "expected_word": "is",
+        "phonemes": [
+          "IH1",
+          "Z"
+        ],
+        "expected_phonemes": [
+          "IH1",
+          "Z"
+        ],
+        "phoneme_match": 1.0,
+        "gop": -0.0,
+        "quality": "Excellent"
+      },
+      {
+        "word": "very",
+        "expected_word": "bull",
+        "phonemes": [
+          "V",
+          "EH1",
+          "R",
+          "IY0"
+        ],
+        "expected_phonemes": [
+          "B",
+          "UH1",
+          "L"
+        ],
+        "phoneme_match": 0.0,
+        "gop": -10.0,
+        "quality": "Poor"
+      },
+      {
+        "word": "terrible",
+        "expected_word": "sheep",
+        "phonemes": [
+          "T",
+          "EH1",
+          "R",
+          "AH0",
+          "B",
+          "AH0",
+          "L"
+        ],
+        "expected_phonemes": [
+          "SH",
+          "IY1",
+          "P"
+        ],
+        "phoneme_match": 0.0,
+        "gop": -10.0,
+        "quality": "Poor"
+      }
+    ],
+    "overall_gop": -5.333333333333334,
+    "overall_quality": "Poor",
+    "expected_phoneme_count": 16,
+    "actual_phoneme_count": 21,
+    "matching_phonemes": 9,
+    "phoneme_accuracy": 0.6923076923076923,
+    "phoneme_match_score": 0.6923076923076923,
+    "acoustic_quality_score": 0.4666666666666666
+  },
+  "final_score": {
+    "final_score": 44.0,
+    "grade": "F",
+    "gop_component": 46.666666666666664,
+    "content_accuracy": 40.0,
+    "content_matched": false,
+    "dtw_component": null
+  }
+}

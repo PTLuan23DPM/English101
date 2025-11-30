@@ -1,0 +1,90 @@
+{
+  "id": "future-forms-will-be-going-to-and-present-continuous",
+  "title": "Future forms: 'will', 'be going to' and present continuous",
+  "level": "B1-B2",
+  "introduction": "Do you know how to talk about future plans using will, going to and the present continuous? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "We use different verb forms to talk about our plans for the future, depending on what kind of plan it is: a spontaneous plan, a pre-decided plan or an arrangement.",
+  "rules": [
+    "We use different verb forms to talk about our plans for the future, depending on what kind of plan it is: a spontaneous plan, a pre-decided plan or an arrangement.",
+    "We use will to talk about spontaneous plans decided at the moment of speaking.",
+    "We use going to to talk about plans decided before the moment of speaking."
+  ],
+  "keyPoints": [],
+  "examples": [
+    "Do you know how to talk about future plans using will, going to and the present continuous?",
+    "Look at these examples to see how will, going to and the present continuous are used.",
+    "I'm going to try to visit my relatives in Australia this year.",
+    "The restaurant is reserved for 8.",
+    "Grammar explanation",
+    "We use different verb forms to talk about our plans for the future, depending on what kind of plan it is: a spontaneous plan, a pre-decided plan or an arrangement.",
+    "I can't decide what to wear tonight.",
+    "Present continuous",
+    "We usually use the present continuous when the plan is an arrangement – already confirmed with at least one other person and we know the time and place.",
+    "Are you doing anything interesting this weekend?"
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Do you know how to talk about future plans using _____, going to and the present continuous?",
+      "options": [
+        "will",
+        "wills",
+        "willed",
+        "not will"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to future forms: 'will', 'be going to' and present continuous usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Look at these examples to see how _____, going to and the present continuous are used.",
+      "options": [
+        "will",
+        "wills",
+        "willed",
+        "not will"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to future forms: 'will', 'be going to' and present continuous usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "I'm going _____ try to visit my relatives in Australia this year.",
+      "options": [
+        "to",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to future forms: 'will', 'be going to' and present continuous usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "The restaurant _____ reserved for 8.",
+      "correct": "is",
+      "hint": "Apply the rule for future forms: 'will', 'be going to' and present continuous.",
+      "explanation": "The correct form here is 'is'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "We use different verb forms _____ talk about our plans for the future, depending on what kind of plan it is: a spontaneous plan, a pre-decided plan or an arrangement.",
+      "correct": "to",
+      "hint": "Apply the rule for future forms: 'will', 'be going to' and present continuous.",
+      "explanation": "The correct form here is 'to'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "I can't decide what _____ wear tonight.",
+      "correct": "to",
+      "hint": "Apply the rule for future forms: 'will', 'be going to' and present continuous.",
+      "explanation": "The correct form here is 'to'."
+    }
+  ]
+}

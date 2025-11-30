@@ -1,0 +1,106 @@
+{
+  "id": "passives",
+  "title": "Passives",
+  "level": "B1-B2",
+  "introduction": "Do you know how to use the passive voice to change the focus of a sentence? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "We use the passive voice to change the focus of the sentence.",
+  "rules": [
+    "We use the passive voice to change the focus of the sentence.",
+    "Object + be + past participle",
+    "are + past participle",
+    "are being + past participle",
+    "were + past participle",
+    "were being + past participle",
+    "have been + past participle",
+    "had been + past participle",
+    "will be + past participle"
+  ],
+  "keyPoints": [
+    "we prefer not to mention who or what does the action (for example, it's not known, it's obvious or we don't want to say)"
+  ],
+  "examples": [
+    "Do you know how to use the passive voice to change the focus of a sentence?",
+    "Look at these examples to see how the passive voice is used.",
+    "A lot of olive oil is produced in Italy.",
+    "This book was written by Angela Davis.",
+    "The suspect will be released tomorrow.",
+    "This product has not been tested on animals.",
+    "My bike was stolen.",
+    "Avatar was directed by James Cameron.",
+    "Object + be + past participle",
+    "It is not always necessary to add who or what did the action.",
+    "My flight is cancelled.",
+    "Tense / Example / Structure",
+    "Present simple: Alioli is made from oil, garlic and salt.",
+    "Present continuous: The hall is being painted this week.",
+    "Past continuous: The signs were being put up last week.",
+    "Present perfect: Oranges have been grown here for centuries.",
+    "Past perfect: When he got home, he found that his flat had been burgled.",
+    "Future simple: The work will be finished next week."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Do you know how _____ use the passive voice to change the focus of a sentence?",
+      "options": [
+        "to",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to passives usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Look at these examples _____ see how the passive voice is used.",
+      "options": [
+        "to",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to passives usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "A lot of olive oil _____ produced in Italy.",
+      "options": [
+        "is",
+        "be",
+        "been",
+        "being"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to passives usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "This book _____ written by Angela Davis.",
+      "correct": "was",
+      "hint": "Apply the rule for passives.",
+      "explanation": "The correct form here is 'was'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "The suspect _____ released tomorrow.",
+      "correct": "will be",
+      "hint": "Apply the rule for passives.",
+      "explanation": "The correct form here is 'will be'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "This product has not _____ tested on animals.",
+      "correct": "been",
+      "hint": "Apply the rule for passives.",
+      "explanation": "The correct form here is 'been'."
+    }
+  ]
+}

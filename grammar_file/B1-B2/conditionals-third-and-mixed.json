@@ -1,0 +1,109 @@
+{
+  "id": "conditionals-third-and-mixed",
+  "title": "Conditionals: third and mixed",
+  "level": "B1-B2",
+  "introduction": "Do you know how to use third conditionals and mixed conditionals? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "Do you know how to use third and mixed conditionals?",
+  "rules": [
+    "The third conditional is used to imagine a different past.",
+    "the structure is: If + past perfect >> would + infinitive.",
+    "the structure is: If + past simple >> would have + past participle.",
+    "If + past perfect >> would have + past participle.",
+    "If + past perfect >> would + infinitive.",
+    "If + past simple >> would have + past participle."
+  ],
+  "keyPoints": [
+    "we'd moved to Scotland when I was a child, I would have a Scottish accent now",
+    "she was really my friend, she wouldn't have lied to me",
+    "I hadn't been ill, I would have gone to the party",
+    "I had understood the instructions properly, I would have passed the exam",
+    "I hadn't got the job in Tokyo, I wouldn't be with my current partner"
+  ],
+  "examples": [
+    "Do you know how to use third conditionals and mixed conditionals?",
+    "Look at these examples to see how third and mixed conditionals are used.",
+    "We would have walked to the top of the mountain if the weather hadn't been so bad.",
+    "If we'd moved to Scotland when I was a child, I would have a Scottish accent now.",
+    "If she was really my friend, she wouldn't have lied to me.",
+    "Grammar explanation",
+    "Do you know how to use third and mixed conditionals?",
+    "If I hadn't been ill, I would have gone to the party.",
+    "I would have gone to the party if I hadn't been ill.",
+    "Conditional sentences are often divided into different types.",
+    "Third conditional",
+    "The third conditional is used to imagine a different past.",
+    "If I had understood the instructions properly, I would have passed the exam.",
+    "We wouldn't have got lost if my phone hadn't run out of battery.",
+    "In third conditional sentences, the structure is usually: If + past perfect >> would have + past participle.",
+    "Mixed conditionals",
+    "We can use mixed conditionals when we imagine a past change with a result in the present or a present change with a result in the past.",
+    "Here's a sentence imagining how a change in a past situation would have a result in the present.",
+    "If I hadn't got the job in Tokyo, I wouldn't be with my current partner.",
+    "So the structure is: If + past perfect >> would + infinitive."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Do you know how _____ use third conditionals and mixed conditionals?",
+      "options": [
+        "to",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to conditionals: third and mixed usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Look at these examples _____ see how third and mixed conditionals are used.",
+      "options": [
+        "to",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to conditionals: third and mixed usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "We _____ have walked to the top of the mountain if the weather hadn't been so bad.",
+      "options": [
+        "would",
+        "woulds",
+        "woulded",
+        "not would"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to conditionals: third and mixed usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "If we'd moved to Scotland when I was a child, I _____ have a Scottish accent now.",
+      "correct": "would",
+      "hint": "Apply the rule for conditionals: third and mixed.",
+      "explanation": "The correct form here is 'would'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "If she was really my friend, she wouldn't _____ lied to me.",
+      "correct": "have",
+      "hint": "Apply the rule for conditionals: third and mixed.",
+      "explanation": "The correct form here is 'have'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "Do you know how _____ use third and mixed conditionals?",
+      "correct": "to",
+      "hint": "Apply the rule for conditionals: third and mixed.",
+      "explanation": "The correct form here is 'to'."
+    }
+  ]
+}

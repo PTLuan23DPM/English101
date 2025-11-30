@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import prisma from "@/lib/prisma";
-import { CEFRLevel, ActivityType } from "@prisma/client";
+import { requireAuth, unauthorizedResponse } from "@/server/utils/auth";
+import { activityController } from "@/server/controllers/activityController";
 
 /**
  * @swagger
@@ -29,77 +27,28 @@ import { CEFRLevel, ActivityType } from "@prisma/client";
  */
 export async function GET(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    await requireAuth();
 
     const { searchParams } = new URL(req.url);
-    const level = searchParams.get("level");
-    const type = searchParams.get("type");
+    const level = searchParams.get("level") || undefined;
+    const type = searchParams.get("type") || undefined;
 
-    const activities = await prisma.activity.findMany({
-      where: {
-        skill: "LISTENING",
-        ...(level && { level: level as CEFRLevel }),
-        ...(type && { type: type as ActivityType }),
-      },
-      include: {
-        unit: {
-          select: {
-            title: true,
-            level: true,
-          },
-        },
-        media: {
-          select: {
-            id: true,
-            type: true,
-            durationS: true,
-            url: true,
-          },
-        },
-        questions: {
-          select: {
-            id: true,
-            order: true,
-            type: true,
-            score: true,
-          },
-        },
-        _count: {
-          select: {
-            questions: true,
-          },
-        },
-      },
-      orderBy: [
-        { level: 'asc' },
-        { createdAt: 'desc' },
-      ],
-    });
+    const result = await activityController.getActivities("LISTENING", { level, type });
 
     return NextResponse.json({
-      activities: activities.map((activity) => ({
-        id: activity.id,
-        title: activity.title,
-        instruction: activity.instruction,
-        level: activity.level,
-        type: activity.type,
-        maxScore: activity.maxScore,
-        timeLimitSec: activity.timeLimitSec,
-        unitTitle: activity.unit.title,
-        questionCount: activity._count.questions,
-        audioDuration: activity.media[0]?.durationS || 0,
-        hasAudio: activity.media.length > 0,
-      })),
+      activities: result.data,
     });
-  } catch (error) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    
+    if (errorMessage === "Unauthorized") {
+      return unauthorizedResponse();
+    }
+
     console.error("Error fetching listening activities:", error);
     return NextResponse.json(
-      { error: "Failed to fetch activities" },
+      { error: errorMessage || "Failed to fetch activities" },
       { status: 500 }
     );
   }
 }
-

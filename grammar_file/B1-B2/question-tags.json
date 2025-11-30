@@ -1,0 +1,106 @@
+{
+  "id": "question-tags",
+  "title": "Question tags",
+  "level": "B1-B2",
+  "introduction": "Do you know how to use question tags like is he and didn't you? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "We can add question tags like isn't it?, can you? or didn't they? to a statement to make it into a question. Question tags are more common in speaking than writing.",
+  "rules": [
+    "we use it to form the question tag.",
+    "we use to be to make the question tag:",
+    "we use the modal verb to make the question tag:",
+    "when we expect the listener to agree with our statement. In this case, when the statement is positive, we use a negative question tag."
+  ],
+  "keyPoints": [
+    "the statement is negative, we use a positive question tag",
+    "we are sure or almost sure that the listener will confirm that our statement is correct, we say the question tag with a falling intonation",
+    "there is an auxiliary verb in the statement, we use it to form the question tag",
+    "the main verb or auxiliary verb in the statement is am, the positive question tag is am I? but the negative question tag is usually aren't I?:"
+  ],
+  "examples": [
+    "Do you know how to use question tags like is he and didn't you?",
+    "Look at these examples to see how question tags are used.",
+    "You haven't seen this film, have you?",
+    "Your sister lives in Spain, doesn't she?",
+    "He can't drive, can he?",
+    "Grammar explanation",
+    "We can add question tags like isn't it?",
+    "She's a doctor, isn't she?",
+    "Yesterday was so much fun, wasn't it?",
+    "If the statement is negative, we use a positive question tag.",
+    "He isn't here, is he?",
+    "The trains are never on time, are they?",
+    "Nobody has called for me, have they?",
+    "If we are sure or almost sure that the listener will confirm that our statement is correct, we say the question tag with a falling intonation.",
+    "If there is an auxiliary verb in the statement, we use it to form the question tag.",
+    "I don't need to finish this today, do I?",
+    "James is working on that, isn't he?",
+    "Your parents have retired, haven't they?",
+    "The phone didn't ring, did it?",
+    "It was raining that day, wasn't it?"
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Do you know how _____ use question tags like is he and didn't you?",
+      "options": [
+        "to",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to question tags usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Look at these examples _____ see how question tags are used.",
+      "options": [
+        "to",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to question tags usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "If the statement _____ negative, we use a positive question tag.",
+      "options": [
+        "is",
+        "be",
+        "been",
+        "being"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to question tags usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "He isn't here, _____ he?",
+      "correct": "is",
+      "hint": "Apply the rule for question tags.",
+      "explanation": "The correct form here is 'is'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "If we are sure or almost sure that the listener will confirm that our statement _____ correct, we say the question tag with a falling intonation.",
+      "correct": "is",
+      "hint": "Apply the rule for question tags.",
+      "explanation": "The correct form here is 'is'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "If there is an auxiliary verb in the statement, we use it _____ form the question tag.",
+      "correct": "to",
+      "hint": "Apply the rule for question tags.",
+      "explanation": "The correct form here is 'to'."
+    }
+  ]
+}

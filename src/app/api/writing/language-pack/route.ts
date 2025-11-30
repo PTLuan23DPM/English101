@@ -58,8 +58,25 @@ export async function GET(req: NextRequest) {
         return NextResponse.json(validatedResult);
     } catch (error) {
         console.error("Language pack error:", error);
+        const errorMessage = error instanceof Error ? error.message : "Failed to generate language pack";
+        
+        // Handle 503 errors from Gemini
+        const geminiError = error as { code?: number; status?: string; error?: { code?: number; message?: string } };
+        if (geminiError.code === 503 || geminiError.status === "UNAVAILABLE" || geminiError.error?.code === 503) {
+            return NextResponse.json(
+                {
+                    error: {
+                        code: 503,
+                        message: geminiError.error?.message || "The model is overloaded. Please try again later.",
+                        status: "UNAVAILABLE",
+                    },
+                },
+                { status: 503 }
+            );
+        }
+
         return NextResponse.json(
-            { error: error instanceof Error ? error.message : "Failed to generate language pack" },
+            { error: errorMessage },
             { status: 500 }
         );
     }

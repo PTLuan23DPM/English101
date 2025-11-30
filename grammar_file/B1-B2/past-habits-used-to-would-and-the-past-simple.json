@@ -1,0 +1,101 @@
+{
+  "id": "past-habits-used-to-would-and-the-past-simple",
+  "title": "Past habits: 'used to', 'would' and the past simple",
+  "level": "B1-B2",
+  "introduction": "Do you know how to talk about past habits using used to, would and the past simple? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "When we talk about things in the past that are not true any more, we can do it in different ways.",
+  "rules": [
+    "When we talk about things in the past that are not true any more, we can do it in different ways.",
+    "Used to + infinitive"
+  ],
+  "keyPoints": [
+    "we talk about things in the past that are not true any more, we can do it in different ways",
+    "something happened only once, we must use the past simple"
+  ],
+  "examples": [
+    "Do you know how to talk about past habits using used to, would and the past simple?",
+    "Look at these examples to see how used to, would and the past simple are used.",
+    "They used to live in London.",
+    "I didn't use to like olives.",
+    "We would always go to the seaside for our holidays.",
+    "Grammar explanation",
+    "When we talk about things in the past that are not true any more, we can do it in different ways.",
+    "Used to + infinitive",
+    "We can use used to to talk about past states that are not true any more.",
+    "There didn't use to be a supermarket there.",
+    "Did you use to have a garden?",
+    "I used to go swimming every Thursday when I was at school.",
+    "We can use would to talk about repeated past actions that don't happen any more.",
+    "Every Saturday I would go on a long bike ride.",
+    "My dad would read me amazing stories every night at bedtime.",
+    "Past simple",
+    "We can always use the past simple as an alternative to used to or would to talk about past states or habits.",
+    "We would go to the same beach every summer.",
+    "If something happened only once, we must use the past simple."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Do you know how to talk about past habits using _____, would and the past simple?",
+      "options": [
+        "used to",
+        "used tos",
+        "used toed",
+        "not used to"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to past habits: 'used to', 'would' and the past simple usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Look at these examples to see how _____, would and the past simple are used.",
+      "options": [
+        "used to",
+        "used tos",
+        "used toed",
+        "not used to"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to past habits: 'used to', 'would' and the past simple usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "They _____ live in London.",
+      "options": [
+        "used to",
+        "used tos",
+        "used toed",
+        "not used to"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to past habits: 'used to', 'would' and the past simple usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "I didn't use _____ like olives.",
+      "correct": "to",
+      "hint": "Apply the rule for past habits: 'used to', 'would' and the past simple.",
+      "explanation": "The correct form here is 'to'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "We would always go _____ the seaside for our holidays.",
+      "correct": "to",
+      "hint": "Apply the rule for past habits: 'used to', 'would' and the past simple.",
+      "explanation": "The correct form here is 'to'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "When we talk about things in the past that are not true any more, we _____ do it in different ways.",
+      "correct": "can",
+      "hint": "Apply the rule for past habits: 'used to', 'would' and the past simple.",
+      "explanation": "The correct form here is 'can'."
+    }
+  ]
+}

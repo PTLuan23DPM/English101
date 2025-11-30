@@ -1,0 +1,270 @@
+{
+  "prompt": "Please read: The quick brown fox jumps over the lazy dog.",
+  "expected_text": "the quick brown fox jumps over the lazy dog.",
+  "audio_file": "vad_demo\\student_recording.wav",
+  "transcription": " Big Brown Fox jumps over the lazy door.",
+  "phoneme_sequence": [
+    {
+      "word": "Big",
+      "phonemes": [
+        "B",
+        "IH1",
+        "G"
+      ]
+    },
+    {
+      "word": "Brown",
+      "phonemes": [
+        "B",
+        "R",
+        "AW1",
+        "N"
+      ]
+    },
+    {
+      "word": "Fox",
+      "phonemes": [
+        "F",
+        "AA1",
+        "K",
+        "S"
+      ]
+    },
+    {
+      "word": "jumps",
+      "phonemes": [
+        "JH",
+        "AH1",
+        "M",
+        "P",
+        "S"
+      ]
+    },
+    {
+      "word": "over",
+      "phonemes": [
+        "OW1",
+        "V",
+        "ER0"
+      ]
+    },
+    {
+      "word": "the",
+      "phonemes": [
+        "DH",
+        "AH0"
+      ]
+    },
+    {
+      "word": "lazy",
+      "phonemes": [
+        "L",
+        "EY1",
+        "Z",
+        "IY0"
+      ]
+    },
+    {
+      "word": "door.",
+      "phonemes": [
+        "D",
+        "O",
+        "O",
+        "R",
+        "."
+      ]
+    }
+  ],
+  "alignment_file": "vad_demo\\alignment.json",
+  "dtw_results": null,
+  "gop_results": {
+    "overall_gop": 0.01771604938271605,
+    "overall_quality": "Very Poor",
+    "phoneme_accuracy": 0.8125,
+    "phoneme_match_score": 0.025308641975308646,
+    "acoustic_quality_score": NaN,
+    "expected_phoneme_count": 32,
+    "actual_phoneme_count": 30,
+    "matching_phonemes": 26,
+    "word_scores": [
+      {
+        "word": "Big",
+        "expected_word": "the",
+        "phonemes": [
+          "B",
+          "IH1",
+          "G"
+        ],
+        "expected_phonemes": [
+          "DH",
+          "AH0"
+        ],
+        "phoneme_match": 0.0,
+        "acoustic_quality": 0,
+        "gop_score": 0.0,
+        "quality": "Very Poor"
+      },
+      {
+        "word": "Brown",
+        "expected_word": "quick",
+        "phonemes": [
+          "B",
+          "R",
+          "AW1",
+          "N"
+        ],
+        "expected_phonemes": [
+          "K",
+          "W",
+          "IH1",
+          "K"
+        ],
+        "phoneme_match": 0.0,
+        "acoustic_quality": 0,
+        "gop_score": 0.0,
+        "quality": "Very Poor"
+      },
+      {
+        "word": "Fox",
+        "expected_word": "brown",
+        "phonemes": [
+          "F",
+          "AA1",
+          "K",
+          "S"
+        ],
+        "expected_phonemes": [
+          "B",
+          "R",
+          "AW1",
+          "N"
+        ],
+        "phoneme_match": 0.0,
+        "acoustic_quality": 0,
+        "gop_score": 0.0,
+        "quality": "Very Poor"
+      },
+      {
+        "word": "jumps",
+        "expected_word": "fox",
+        "phonemes": [
+          "JH",
+          "AH1",
+          "M",
+          "P",
+          "S"
+        ],
+        "expected_phonemes": [
+          "F",
+          "AA1",
+          "K",
+          "S"
+        ],
+        "phoneme_match": 0.2277777777777778,
+        "acoustic_quality": 0,
+        "gop_score": 0.15944444444444444,
+        "quality": "Very Poor"
+      },
+      {
+        "word": "over",
+        "expected_word": "jumps",
+        "phonemes": [
+          "OW1",
+          "V",
+          "ER0"
+        ],
+        "expected_phonemes": [
+          "JH",
+          "AH1",
+          "M",
+          "P",
+          "S"
+        ],
+        "phoneme_match": 0.0,
+        "acoustic_quality": 0,
+        "gop_score": 0.0,
+        "quality": "Very Poor"
+      },
+      {
+        "word": "the",
+        "expected_word": "over",
+        "phonemes": [
+          "DH",
+          "AH0"
+        ],
+        "expected_phonemes": [
+          "OW1",
+          "V",
+          "ER0"
+        ],
+        "phoneme_match": 0.0,
+        "acoustic_quality": 0,
+        "gop_score": 0.0,
+        "quality": "Very Poor"
+      },
+      {
+        "word": "lazy",
+        "expected_word": "the",
+        "phonemes": [
+          "L",
+          "EY1",
+          "Z",
+          "IY0"
+        ],
+        "expected_phonemes": [
+          "DH",
+          "AH0"
+        ],
+        "phoneme_match": 0.0,
+        "acoustic_quality": 0,
+        "gop_score": 0.0,
+        "quality": "Very Poor"
+      },
+      {
+        "word": "door.",
+        "expected_word": "lazy",
+        "phonemes": [
+          "D",
+          "O",
+          "O",
+          "R",
+          "."
+        ],
+        "expected_phonemes": [
+          "L",
+          "EY1",
+          "Z",
+          "IY0"
+        ],
+        "phoneme_match": 0.0,
+        "acoustic_quality": 0,
+        "gop_score": 0.0,
+        "quality": "Very Poor"
+      },
+      {
+        "word": null,
+        "expected_word": "dog.",
+        "phonemes": null,
+        "expected_phonemes": [
+          "D",
+          "O",
+          "G",
+          "."
+        ],
+        "phoneme_match": 0.0,
+        "acoustic_quality": 0.0,
+        "gop_score": 0.0,
+        "quality": "Missing"
+      }
+    ],
+    "used_acoustic_model": false
+  },
+  "final_score": {
+    "final_score": 37.72403776325345,
+    "gop_component": 1.771604938271605,
+    "content_accuracy": 73.67647058823529,
+    "dtw_component": null,
+    "grade": "F (Poor)",
+    "content_matched": false
+  }
+}

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { toast } from "sonner";
 import AIAssistant from "@/components/AIAssistant";
 import AnalyticsCharts from "@/components/AnalyticsCharts";
@@ -41,6 +41,7 @@ type DashboardStats = {
     score: number | null;
     maxScore: number | null;
     submittedAt: Date | null;
+    metadata?: { taskTitle?: string; taskType?: string; targetWords?: string };
   }>;
 };
 
@@ -63,20 +64,100 @@ export default function DashboardPage() {
   const [quickResult, setQuickResult] = useState<DictionaryResult | null>(null);
   const [quickSearching, setQuickSearching] = useState(false);
 
+  // Use useLayoutEffect to scroll before paint
+  useLayoutEffect(() => {
+    // Force scroll to top immediately
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    
+    // Also try after a microtask
+    Promise.resolve().then(() => {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    });
+  }, []);
+
   useEffect(() => {
     fetchDashboardStats();
+    
+    // Additional scroll attempts after render
+    const scrollToTop = () => {
+      window.scrollTo(0, 0);
+      if (document.documentElement) {
+        document.documentElement.scrollTop = 0;
+      }
+      if (document.body) {
+        document.body.scrollTop = 0;
+      }
+    };
+    
+    // Scroll multiple times to ensure it works
+    scrollToTop();
+    const timeout1 = setTimeout(scrollToTop, 0);
+    const timeout2 = setTimeout(scrollToTop, 50);
+    const timeout3 = setTimeout(scrollToTop, 100);
+    const timeout4 = setTimeout(scrollToTop, 200);
+    
+    return () => {
+      clearTimeout(timeout1);
+      clearTimeout(timeout2);
+      clearTimeout(timeout3);
+      clearTimeout(timeout4);
+    };
   }, []);
 
   const fetchDashboardStats = async () => {
     try {
-      const res = await fetch("/api/dashboard/stats");
+      // Fetch user stats from API
+      const res = await fetch("/api/user/stats");
       if (res.ok) {
         const data = await res.json();
-        setStats(data);
-      } else {
-        // Use mock data if API fails or no data
-        setStats(getMockStats());
+        if (data.success) {
+          // Transform API data to dashboard format
+          const transformedStats = {
+            user: {
+              name: data.stats.name || "Student",
+              email: data.stats.email || "student@example.com",
+              image: data.stats.image || null,
+            },
+            stats: {
+              streak: data.stats.streak || 0,
+              completedUnits: 0, // Can be calculated from activities
+              inProgressUnits: 0,
+              totalAttempts: data.stats.totalActivities || 0,
+              avgScore: data.stats.avgScore || 0,
+            },
+            skillsBreakdown: Object.entries(data.stats.skillScores || {}).map(([skill, scoreData]) => {
+                const score = scoreData as { count?: number; avg?: number };
+                return {
+                    skill: skill.toUpperCase(),
+                    completed: score.count || 0,
+                    avgScore: Math.round((score.avg || 0) * 10), // Convert to percentage
+                };
+            }),
+            recentProgress: [],
+            recentAttempts: data.stats.recentActivities?.map((act: unknown) => {
+                const activity = act as { id?: string; metadata?: { taskId?: string; level?: string; taskTitle?: string; taskType?: string; targetWords?: string }; skill?: string; score?: number; date?: string };
+                return {
+                    id: activity.id,
+                    activityTitle: activity.metadata?.taskId || "Practice Activity",
+                    skill: activity.skill,
+                    level: activity.metadata?.level || "B1",
+                    score: activity.score ? Math.round(activity.score * 10) : null,
+                    maxScore: 100,
+                    submittedAt: activity.date,
+                    metadata: activity.metadata as { taskTitle?: string; taskType?: string; targetWords?: string } | undefined,
+                };
+            }) || [],
+          };
+          setStats(transformedStats);
+          return;
+        }
       }
+      // Fallback to mock data
+      setStats(getMockStats());
     } catch (error) {
       console.error("Failed to fetch dashboard stats:", error);
       setStats(getMockStats());
@@ -209,49 +290,51 @@ export default function DashboardPage() {
             </div>
 
             <div className="checklist">
-              <div className="checklist-item completed">
+              <Link href="/english/goals" className="checklist-item completed">
                 <div className="check-icon-wrapper">
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                     <circle cx="10" cy="10" r="10" fill="#10b981"/>
                     <path d="M6 10L9 13L14 7" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 </div>
-                <span className="check-text">Add your target score</span>
-              </div>
+                <span className="check-text">Set your learning goals</span>
+              </Link>
 
-              <Link href="/english/assessment" className="checklist-item current">
+              <Link href="/english/test" className="checklist-item current">
                 <div className="check-icon-wrapper">
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                     <circle cx="10" cy="10" r="9" stroke="#6366f1" strokeWidth="2" fill="white"/>
                   </svg>
                 </div>
-                <span className="check-text">Learn your speaking level</span>
+                <span className="check-text">Take placement test</span>
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ marginLeft: "auto" }}>
                   <path d="M6 4L10 8L6 12" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </Link>
 
-              <Link href="/english/assessment" className="checklist-item">
+              <Link href="/english/writing" className="checklist-item">
                 <div className="check-icon-wrapper">
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                     <circle cx="10" cy="10" r="9" stroke="#64748b" strokeWidth="2" fill="white"/>
                   </svg>
                 </div>
-                <span className="check-text">Learn your writing level</span>
+                <span className="check-text">Complete your first writing task</span>
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ marginLeft: "auto" }}>
                   <path d="M6 4L10 8L6 12" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </Link>
 
-              <div className="checklist-item locked">
+              <Link href="/english/progress" className="checklist-item">
                 <div className="check-icon-wrapper">
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                    <circle cx="10" cy="10" r="9" stroke="#cbd5e1" strokeWidth="2" fill="#f1f5f9"/>
-                    <path d="M10 7V10M10 13H10.01" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round"/>
+                    <circle cx="10" cy="10" r="9" stroke="#64748b" strokeWidth="2" fill="white"/>
                   </svg>
                 </div>
-                <span className="check-text" style={{ color: "#94a3b8" }}>View premium sample reports</span>
-              </div>
+                <span className="check-text">Review your progress</span>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ marginLeft: "auto" }}>
+                  <path d="M6 4L10 8L6 12" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </Link>
             </div>
           </div>
 
@@ -437,17 +520,115 @@ export default function DashboardPage() {
             <h3>Recent Activity</h3>
             <p>Your latest learning progress and completed exercises</p>
           </div>
-          <div className="activity-table-header">
-            <span>Time</span><span>Task</span><span>Task Description</span><span>Status</span><span>Progress</span>
-          </div>
-          <div className="activity-empty">
-            <div className="empty-illustration">🌱🦕</div>
-            <h4>You don&apos;t have any completed activities yet</h4>
-            <p>Check out sample reports to see feedback examples for premium users</p>
-            <button className="sample-reports-btn">View Premium Sample Reports</button>
-            <p className="activity-footer">Free users can see up to 5 completed records. Upgrade to see more results</p>
-            <a href="#" className="view-all-link">View all in My Reports →</a>
-          </div>
+          
+          {stats?.recentAttempts && stats.recentAttempts.length > 0 ? (
+            <>
+              <div className="modern-table">
+                <div className="table-header">
+                  <div className="th time-col">Time</div>
+                  <div className="th task-col">Task</div>
+                  <div className="th description-col">Task Description</div>
+                  <div className="th status-col">Status</div>
+                  <div className="th progress-col">Progress</div>
+                </div>
+                <div className="table-body">
+                  {stats.recentAttempts.map((attempt, index) => (
+                    <div key={attempt.id} className={`table-row ${index % 2 === 0 ? 'even' : 'odd'}`}>
+                      <div className="td time-col">
+                        <div className="time-display">
+                          <span className="time-value">
+                            {attempt.submittedAt
+                              ? new Date(attempt.submittedAt).toLocaleTimeString("en-US", {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })
+                              : "N/A"}
+                          </span>
+                          <span className="date-value">
+                            {attempt.submittedAt
+                              ? new Date(attempt.submittedAt).toLocaleDateString("en-US", {
+                                  month: "short",
+                                  day: "numeric",
+                                })
+                              : ""}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="td task-col">
+                        <div className="task-info">
+                          <span className="task-icon-modern">
+                            {attempt.skill === "writing" ? "✍️" : 
+                             attempt.skill === "reading" ? "📚" : 
+                             attempt.skill === "listening" ? "🎧" : "🎤"}
+                          </span>
+                          <span className="task-name-modern">
+                            {attempt.skill.charAt(0).toUpperCase() + attempt.skill.slice(1)}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="td description-col">
+                        <div className="description-content">
+                          <span className="description-title">
+                            {attempt.metadata?.taskTitle || attempt.activityTitle}
+                          </span>
+                          {attempt.metadata?.taskType && (
+                            <span className="description-type">{attempt.metadata.taskType}</span>
+                          )}
+                          {attempt.level && (
+                            <span className="level-badge-modern">{attempt.level}</span>
+                          )}
+                          {attempt.metadata?.targetWords && (
+                            <span className="word-count-badge">{attempt.metadata.targetWords}</span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="td status-col">
+                        <span className="status-badge-modern completed">
+                          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                            <circle cx="7" cy="7" r="6" fill="currentColor" opacity="0.2"/>
+                            <path d="M4 7L6 9L10 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                          </svg>
+                          Completed
+                        </span>
+                      </div>
+                      <div className="td progress-col">
+                        {attempt.score !== null ? (
+                          <div className="score-display">
+                            <div className="score-bar">
+                              <div 
+                                className="score-fill" 
+                                style={{ 
+                                  width: `${attempt.score}%`,
+                                  background: attempt.score >= 70 ? '#10b981' : attempt.score >= 50 ? '#f59e0b' : '#ef4444'
+                                }}
+                              />
+                            </div>
+                            <span className={`score-value ${attempt.score >= 70 ? 'high' : attempt.score >= 50 ? 'medium' : 'low'}`}>
+                              {attempt.score.toFixed(1)}
+                            </span>
+                          </div>
+                        ) : (
+                          <span className="score-na">—</span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <Link href="/english/reports" className="view-all-link">
+                View all in My Reports →
+              </Link>
+            </>
+          ) : (
+            <div className="activity-empty">
+              <div className="empty-illustration">🌱</div>
+              <h4>You don&apos;t have any completed activities yet</h4>
+              <p>Start practicing to see your progress here!</p>
+              <Link href="/english/writing" className="btn primary">
+                Start Your First Exercise
+              </Link>
+            </div>
+          )}
         </div>
 
         {/* Analytics */}

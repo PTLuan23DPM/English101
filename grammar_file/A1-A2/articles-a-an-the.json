@@ -1,0 +1,104 @@
+{
+  "id": "articles-a-an-the",
+  "title": "Articles: 'a', 'an', 'the'",
+  "level": "A1-A2",
+  "introduction": "Do you know how to use a, an and the? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "Here are some of the most important things to know about using articles.",
+  "rules": [
+    "When we say what people's jobs are, we usually use a/an.",
+    "When we talk about things in general, we normally use a plural or uncountable noun with no article.",
+    "When we talk about a particular group of things, we use the."
+  ],
+  "keyPoints": [
+    "we say what people's jobs are, we usually use a/an",
+    "we talk about things in general, we normally use a plural or uncountable noun with no article",
+    "we talk about a particular group of things, we use the"
+  ],
+  "examples": [
+    "She's a doctor.",
+    "I need an umbrella.",
+    "Have you heard the news?",
+    "I don't like spiders.",
+    "He's an architect.",
+    "She's a scientist.",
+    "My grandmother was a teacher.",
+    "I saw a good film yesterday.",
+    "Do you want a drink?",
+    "She has a university degree.",
+    "It took me an hour to get home.",
+    "I'm going to take the dog for a walk.",
+    "Have you seen the car key?",
+    "They go to the school next to the bridge.",
+    "Birds eat worms.",
+    "Water freezes at 0°C.",
+    "Children need a lot of sleep.",
+    "We went to the zoo and saw the kangaroos.",
+    "Do you know how to use a, an and the?",
+    "Look at these examples to see how articles are used."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "She's _____ doctor.",
+      "options": [
+        "a",
+        "some",
+        "any",
+        "one"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to articles: 'a', 'an', 'the' usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "I need _____ umbrella.",
+      "options": [
+        "an",
+        "some",
+        "any",
+        "one"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to articles: 'a', 'an', 'the' usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Have you heard _____ news?",
+      "options": [
+        "the",
+        "some",
+        "any",
+        "one"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to articles: 'a', 'an', 'the' usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "He's _____ architect.",
+      "correct": "an",
+      "hint": "Apply the rule for articles: 'a', 'an', 'the'.",
+      "explanation": "The correct form here is 'an'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "She's _____ scientist.",
+      "correct": "a",
+      "hint": "Apply the rule for articles: 'a', 'an', 'the'.",
+      "explanation": "The correct form here is 'a'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "My grandmother was _____ teacher.",
+      "correct": "a",
+      "hint": "Apply the rule for articles: 'a', 'an', 'the'.",
+      "explanation": "The correct form here is 'a'."
+    }
+  ]
+}

@@ -1,0 +1,105 @@
+{
+  "id": "modals-permission-and-obligation",
+  "title": "Modals: permission and obligation",
+  "level": "B1-B2",
+  "introduction": "Do you know how to use modal verbs to talk about permission and obligation? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "We often use verbs with modal meanings to talk about permission and obligation.",
+  "rules": [
+    "We use can't and mustn't to show that something is prohibited – it is not allowed.",
+    "We use can't to talk about something that is against the rules, particularly when we didn't make the rules.",
+    "We use must not to talk about what is not permitted.",
+    "We use have to and must to express obligation.",
+    "We use have to instead.",
+    "We use don't have to to show that there is no obligation."
+  ],
+  "keyPoints": [
+    "we don't use must to express obligation in the past"
+  ],
+  "examples": [
+    "Do you know how to use modal verbs to talk about permission and obligation?",
+    "Look at these examples to see how can, can't, must, mustn't, have to and don't have to are used.",
+    "You can put your shoes and coat over there.",
+    "You can't leave your bike there.",
+    "I must call the electrician and get that light fixed.",
+    "You mustn't worry about me.",
+    "You have to have a licence to drive a car.",
+    "You don't have to have a licence to cycle on the roads.",
+    "Grammar explanation",
+    "We often use verbs with modal meanings to talk about permission and obligation.",
+    "We often use can to ask for and give permission.",
+    "You can use my car if you like.",
+    "Can I make a suggestion?",
+    "Could I ask you something?",
+    "Could I interrupt?",
+    "Could I borrow your pen for a moment, please?",
+    "May is the most formal way to ask for and give permission.",
+    "May I see your passport, please?",
+    "Customers may request a refund within a period of 30 days.",
+    "These pages may be photocopied for classroom use."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Do you know how _____ use modal verbs to talk about permission and obligation?",
+      "options": [
+        "to",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to modals: permission and obligation usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Look at these examples to see how can, can't, must, mustn't, _____ and don't have to are used.",
+      "options": [
+        "have to",
+        "have tos",
+        "have toed",
+        "not have to"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to modals: permission and obligation usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "You _____ put your shoes and coat over there.",
+      "options": [
+        "can",
+        "will",
+        "would",
+        "shall"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to modals: permission and obligation usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "You _____'t leave your bike there.",
+      "correct": "can",
+      "hint": "Apply the rule for modals: permission and obligation.",
+      "explanation": "The correct form here is 'can'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "I _____ call the electrician and get that light fixed.",
+      "correct": "must",
+      "hint": "Apply the rule for modals: permission and obligation.",
+      "explanation": "The correct form here is 'must'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "You _____ have a licence to drive a car.",
+      "correct": "have to",
+      "hint": "Apply the rule for modals: permission and obligation.",
+      "explanation": "The correct form here is 'have to'."
+    }
+  ]
+}

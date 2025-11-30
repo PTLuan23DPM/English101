@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
+import { fetchWithRetry, handleLLMError } from "@/lib/utils/llm-retry";
 
 interface LanguagePack {
   phrases: string[];
@@ -19,9 +20,12 @@ interface Props {
   level: string;
   type: string;
   onInsert: (text: string) => void;
+  isAvailable?: boolean;
+  remaining?: number;
+  onUsage?: () => void;
 }
 
-export default function LanguagePackPanel({ level, type, onInsert }: Props) {
+export default function LanguagePackPanel({ level, type, onInsert, isAvailable = true, remaining = 0, onUsage }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<LanguagePack | null>(null);
@@ -30,157 +34,213 @@ export default function LanguagePackPanel({ level, type, onInsert }: Props) {
   );
 
   const loadLanguagePack = async () => {
+    if (!isAvailable) {
+      toast.error("Usage limit reached", {
+        description: `You have used all ${remaining === 0 ? "available" : remaining} uses of this feature.`,
+      });
+      return;
+    }
+
     setLoading(true);
     try {
-      const response = await fetch(
-        `/api/writing/language-pack?level=${encodeURIComponent(level)}&type=${encodeURIComponent(type)}`
+      const response = await fetchWithRetry(
+        `/api/writing/language-pack?level=${encodeURIComponent(level)}&type=${encodeURIComponent(type)}`,
+        {
+          method: "GET",
+        },
+        {
+          maxRetries: 3,
+          baseDelay: 1000,
+          maxDelay: 10000,
+          onRetry: (attempt, delay) => {
+            toast.info("Service busy, retrying...", {
+              description: `Attempt ${attempt}/3. Waiting ${delay / 1000}s...`,
+              duration: delay,
+            });
+          },
+        }
       );
 
       if (!response.ok) {
-        const error = await response.json();
+        const error = await response.json().catch(() => ({ error: "Unknown error" }));
         throw new Error(error.error || "Failed to load language pack");
       }
 
       const result: LanguagePack = await response.json();
       setData(result);
+      
+      // Record usage
+      if (onUsage) {
+        onUsage();
+      }
+      
       toast.success("Language pack loaded!");
     } catch (error) {
       console.error("Language pack error:", error);
-      toast.error(error instanceof Error ? error.message : "Failed to load language pack");
+      const { title, description } = handleLLMError(error, "load language pack");
+      toast.error(title, { description });
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (isOpen && !data) {
+    if (isOpen && !data && isAvailable) {
       loadLanguagePack();
+    } else if (isOpen && !isAvailable) {
+      toast.error("Usage limit reached", {
+        description: `You have used all available uses of this feature.`,
+      });
+      setIsOpen(false);
     }
-  }, [isOpen]);
+  }, [isOpen, isAvailable]);
 
   const insertItem = (item: string) => {
     onInsert(item + " ");
     toast.success("Inserted!");
   };
 
+  const handleOpen = () => {
+    if (!isAvailable) {
+      toast.error("Usage limit reached", {
+        description: `You have used all ${remaining === 0 ? "available" : remaining} uses of this feature.`,
+      });
+      return;
+    }
+    setIsOpen(true);
+  };
+
   return (
     <>
       <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="ai-feature-btn language-btn"
-        title="Language resources"
+        onClick={handleOpen}
+        disabled={!isAvailable}
+        className={`ai-feature-btn language-btn ${!isAvailable ? "disabled" : ""}`}
+        title={!isAvailable ? `Usage limit reached` : `Language resources (${remaining} uses remaining)`}
       >
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
         </svg>
         Language Pack
+        {remaining > 0 && <span className="usage-badge remaining">{remaining}</span>}
+        {!isAvailable && <span className="usage-badge">Used</span>}
       </button>
 
       {isOpen && (
-        <div className="ai-panel language-panel">
-          <div className="ai-panel-header">
-            <h3>📚 Language Resources</h3>
-            <button onClick={() => setIsOpen(false)} className="close-btn">
-              ×
-            </button>
-          </div>
-
-          {loading ? (
-            <div className="loading-state">
-              <svg className="spinner" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10" />
-              </svg>
-              <p>Loading language pack...</p>
+        <div className="ai-modal-overlay" onClick={() => setIsOpen(false)}>
+          <div className="ai-modal language-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="ai-modal-header">
+              <h3>📚 Language Resources</h3>
+              <button onClick={() => setIsOpen(false)} className="close-btn">
+                ×
+              </button>
             </div>
-          ) : data ? (
-            <>
-              <div className="language-tabs">
-                <button
-                  className={activeTab === "phrases" ? "active" : ""}
-                  onClick={() => setActiveTab("phrases")}
-                >
-                  Phrases
-                </button>
-                <button
-                  className={activeTab === "markers" ? "active" : ""}
-                  onClick={() => setActiveTab("markers")}
-                >
-                  Discourse Markers
-                </button>
-                <button
-                  className={activeTab === "collocations" ? "active" : ""}
-                  onClick={() => setActiveTab("collocations")}
-                >
-                  Collocations
-                </button>
-                <button
-                  className={activeTab === "starters" ? "active" : ""}
-                  onClick={() => setActiveTab("starters")}
-                >
-                  Sentence Starters
-                </button>
-              </div>
 
-              <div className="language-content">
-                {activeTab === "phrases" && (
-                  <div className="language-items">
-                    {data.phrases.map((phrase, idx) => (
-                      <div key={idx} className="language-item">
-                        <span>{phrase}</span>
-                        <button onClick={() => insertItem(phrase)} className="insert-btn-sm">
-                          +
-                        </button>
-                      </div>
-                    ))}
+            <div className="ai-modal-content">
+              {loading ? (
+                <div className="loading-state">
+                  <svg className="spinner" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10" />
+                  </svg>
+                  <p>Loading language pack...</p>
+                </div>
+              ) : data ? (
+                <>
+                  <div className="language-tabs">
+                    <button
+                      className={activeTab === "phrases" ? "active" : ""}
+                      onClick={() => setActiveTab("phrases")}
+                    >
+                      Phrases
+                    </button>
+                    <button
+                      className={activeTab === "markers" ? "active" : ""}
+                      onClick={() => setActiveTab("markers")}
+                    >
+                      Discourse Markers
+                    </button>
+                    <button
+                      className={activeTab === "collocations" ? "active" : ""}
+                      onClick={() => setActiveTab("collocations")}
+                    >
+                      Collocations
+                    </button>
+                    <button
+                      className={activeTab === "starters" ? "active" : ""}
+                      onClick={() => setActiveTab("starters")}
+                    >
+                      Sentence Starters
+                    </button>
                   </div>
-                )}
 
-                {activeTab === "markers" && (
-                  <div className="markers-grid">
-                    {Object.entries(data.discourseMarkers).map(([category, markers]) => (
-                      <div key={category} className="marker-category">
-                        <h5>{category.charAt(0).toUpperCase() + category.slice(1)}</h5>
-                        {markers.map((marker, idx) => (
+                  <div className="language-content">
+                    {activeTab === "phrases" && (
+                      <div className="language-items">
+                        {data.phrases.map((phrase, idx) => (
                           <div key={idx} className="language-item">
-                            <span>{marker}</span>
-                            <button onClick={() => insertItem(marker)} className="insert-btn-sm">
+                            <span>{phrase}</span>
+                            <button onClick={() => insertItem(phrase)} className="insert-btn-sm">
                               +
                             </button>
                           </div>
                         ))}
                       </div>
-                    ))}
-                  </div>
-                )}
+                    )}
 
-                {activeTab === "collocations" && (
-                  <div className="language-items">
-                    {data.collocations.map((collocation, idx) => (
-                      <div key={idx} className="language-item">
-                        <span>{collocation}</span>
-                        <button onClick={() => insertItem(collocation)} className="insert-btn-sm">
-                          +
-                        </button>
+                    {activeTab === "markers" && (
+                      <div className="markers-grid">
+                        {Object.entries(data.discourseMarkers).map(([category, markers]) => (
+                          <div key={category} className="marker-category">
+                            <h5>{category.charAt(0).toUpperCase() + category.slice(1)}</h5>
+                            {markers.map((marker, idx) => (
+                              <div key={idx} className="language-item">
+                                <span>{marker}</span>
+                                <button onClick={() => insertItem(marker)} className="insert-btn-sm">
+                                  +
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                )}
+                    )}
 
-                {activeTab === "starters" && (
-                  <div className="language-items">
-                    {data.sentenceStarters.map((starter, idx) => (
-                      <div key={idx} className="language-item">
-                        <span>{starter}</span>
-                        <button onClick={() => insertItem(starter)} className="insert-btn-sm">
-                          +
-                        </button>
+                    {activeTab === "collocations" && (
+                      <div className="language-items">
+                        {data.collocations.map((collocation, idx) => (
+                          <div key={idx} className="language-item">
+                            <span>{collocation}</span>
+                            <button onClick={() => insertItem(collocation)} className="insert-btn-sm">
+                              +
+                            </button>
+                          </div>
+                        ))}
                       </div>
-                    ))}
+                    )}
+
+                    {activeTab === "starters" && (
+                      <div className="language-items">
+                        {data.sentenceStarters.map((starter, idx) => (
+                          <div key={idx} className="language-item">
+                            <span>{starter}</span>
+                            <button onClick={() => insertItem(starter)} className="insert-btn-sm">
+                              +
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-            </>
-          ) : null}
+                </>
+              ) : null}
+            </div>
+
+            <div className="ai-modal-footer">
+              <button onClick={() => setIsOpen(false)} className="secondary-btn">
+                Close
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </>

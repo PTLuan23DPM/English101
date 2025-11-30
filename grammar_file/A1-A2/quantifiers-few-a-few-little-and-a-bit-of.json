@@ -1,0 +1,89 @@
+{
+  "id": "quantifiers-few-a-few-little-and-a-bit-of",
+  "title": "Quantifiers: 'few', 'a few', 'little' and 'a bit of'",
+  "level": "A1-A2",
+  "introduction": "Do you know how to use a few, few, very little and a bit of? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "A few and a bit of or a little mean some. Often we feel this amount is enough or more than we expected. We use a few with plural nouns and a bit of or a little with uncountable nouns.",
+  "rules": [
+    "We use few and very little to show that we are talking about a small amount."
+  ],
+  "keyPoints": [
+    "you can use little without very, but it is less common and sounds quite formal"
+  ],
+  "examples": [
+    "Do you know how to use a few, few, very little and a bit of?",
+    "Look at these examples to see how these quantifiers are used with countable and uncountable nouns.",
+    "I have a few friends, so I'm not lonely.",
+    "She has few friends, so she's quite lonely.",
+    "I have a few ideas.",
+    "There are few places where you can still see these birds.",
+    "We have very little time.",
+    "I have very little money.",
+    "She had little water."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Do you know how to use a few, few, very _____ and a bit of?",
+      "options": [
+        "little",
+        "littles",
+        "littleed",
+        "not little"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to quantifiers: 'few', 'a few', 'little' and 'a bit of' usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Look at these examples to see how these quantifiers _____ used with countable and uncountable nouns.",
+      "options": [
+        "are",
+        "be",
+        "been",
+        "being"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to quantifiers: 'few', 'a few', 'little' and 'a bit of' usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "I have a _____ friends, so I'm not lonely.",
+      "options": [
+        "few",
+        "fews",
+        "fewed",
+        "not few"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to quantifiers: 'few', 'a few', 'little' and 'a bit of' usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "She has _____ friends, so she's quite lonely.",
+      "correct": "few",
+      "hint": "Apply the rule for quantifiers: 'few', 'a few', 'little' and 'a bit of'.",
+      "explanation": "The correct form here is 'few'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "I have a _____ ideas.",
+      "correct": "few",
+      "hint": "Apply the rule for quantifiers: 'few', 'a few', 'little' and 'a bit of'.",
+      "explanation": "The correct form here is 'few'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "There are _____ places where you can still see these birds.",
+      "correct": "few",
+      "hint": "Apply the rule for quantifiers: 'few', 'a few', 'little' and 'a bit of'.",
+      "explanation": "The correct form here is 'few'."
+    }
+  ]
+}

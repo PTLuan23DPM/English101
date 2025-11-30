@@ -1,0 +1,105 @@
+{
+  "id": "modals-probability",
+  "title": "Modals: probability",
+  "level": "C1",
+  "introduction": "Do you know how to use modal verbs and other expressions to show how probable you think something is? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "Certainty",
+  "rules": [
+    "we use must to show that we deduced this – we have arrived at this conclusion by reasoning.",
+    "We use should and shouldn't to show expectations about the future.",
+    "We use might, may or could to say that we think something in the present or future is possible but we're not sure.",
+    "Couldn't is different from may not and might not. It means something is impossible."
+  ],
+  "keyPoints": [
+    "we use must to show that we deduced this – we have arrived at this conclusion by reasoning",
+    "can is not used to talk about possibility in relation to a specific event or situation",
+    "all modal verbs are followed by an infinitive without to"
+  ],
+  "examples": [
+    "Do you know how to use modal verbs and other expressions to show how probable you think something is?",
+    "Look at these examples to see how modal verbs and other expressions are used to show how certain the speaker is about something.",
+    "She might well be on the train.",
+    "That must be his dad.",
+    "That can't be right.",
+    "You're bound to make mistakes occasionally.",
+    "This page focuses on expressing the probability of present and future situations.",
+    "Grammar explanation",
+    "We use must when we feel sure that something is true or think it's the only realistic possibility.",
+    "You must be tired.",
+    "That must be Clare's house.",
+    "This must be her house.",
+    "There are transport strikes tomorrow, so travel is bound to be more difficult.",
+    "They are by far the best team – they're bound to win.",
+    "Be bound to is not a modal verb, but it is a related expression.",
+    "That can't be right, can it?",
+    "It can't be easy for him, looking after three kids on his own.",
+    "Degrees of uncertainty",
+    "should/shouldn't",
+    "We use should and shouldn't to show expectations about the future."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Do you know how _____ use modal verbs and other expressions to show how probable you think something is?",
+      "options": [
+        "to",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to modals: probability usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Look at these examples _____ see how modal verbs and other expressions are used to show how certain the speaker is about something.",
+      "options": [
+        "to",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to modals: probability usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "She _____ well be on the train.",
+      "options": [
+        "might",
+        "will",
+        "would",
+        "shall"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to modals: probability usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "That _____ be his dad.",
+      "correct": "must",
+      "hint": "Apply the rule for modals: probability.",
+      "explanation": "The correct form here is 'must'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "That _____'t be right.",
+      "correct": "can",
+      "hint": "Apply the rule for modals: probability.",
+      "explanation": "The correct form here is 'can'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "You're bound _____ make mistakes occasionally.",
+      "correct": "to",
+      "hint": "Apply the rule for modals: probability.",
+      "explanation": "The correct form here is 'to'."
+    }
+  ]
+}

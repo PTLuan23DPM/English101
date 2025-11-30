@@ -1,0 +1,88 @@
+{
+  "id": "stative-verbs",
+  "title": "Stative verbs",
+  "level": "B1-B2",
+  "introduction": "Do you know how to use stative verbs like think, love, smell and have? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "Stative verbs describe a state rather than an action. They aren't usually used in the present continuous form.",
+  "rules": [],
+  "keyPoints": [],
+  "examples": [
+    "Do you know how to use stative verbs like think, love, smell and have?",
+    "Look at these examples to see how stative verbs are used.",
+    "I love this song!",
+    "Do you have a pen?",
+    "I don't know the answer.",
+    "Verbs that are sometimes stative",
+    "A number of verbs can refer to states or actions, depending on the context.",
+    "Some other examples are:",
+    "I have an old car.",
+    "Do you see any problems with that?",
+    "This coffee tastes delicious.",
+    "Other verbs like this include: agree, appear, doubt, feel, guess, hear, imagine, look, measure, remember, smell, weigh, wish."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Do you know how to use stative _____ like think, love, smell and have?",
+      "options": [
+        "verbs",
+        "verbss",
+        "verbsed",
+        "not verbs"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to stative verbs usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Look at these examples to _____ how stative verbs are used.",
+      "options": [
+        "see",
+        "sees",
+        "seeed",
+        "not see"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to stative verbs usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "I love _____ song!",
+      "options": [
+        "this",
+        "thiss",
+        "thised",
+        "not this"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to stative verbs usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "Do you _____ a pen?",
+      "correct": "have",
+      "hint": "Apply the rule for stative verbs.",
+      "explanation": "The correct form here is 'have'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "I don't _____ the answer.",
+      "correct": "know",
+      "hint": "Apply the rule for stative verbs.",
+      "explanation": "The correct form here is 'know'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "Verbs that _____ sometimes stative",
+      "correct": "are",
+      "hint": "Apply the rule for stative verbs.",
+      "explanation": "The correct form here is 'are'."
+    }
+  ]
+}

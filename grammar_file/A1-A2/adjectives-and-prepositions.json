@@ -1,0 +1,98 @@
+{
+  "id": "adjectives-and-prepositions",
+  "title": "Adjectives and prepositions",
+  "level": "A1-A2",
+  "introduction": "Do you know how to use adjectives with prepositions like interested in or similar to? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "Some adjectives go with certain prepositions. There are no grammatical rules for which preposition is used with which adjective, so it's a good idea to try to learn them together. To help you do this, write new vocabulary in your notebook in a sentence or phrase.",
+  "rules": [
+    "We use at with adjectives like good/bad/amazing/brilliant/terrible, etc. to talk about skills and abilities."
+  ],
+  "keyPoints": [],
+  "examples": [
+    "I'm interested in the idea.",
+    "My jacket is similar to yours.",
+    "She's brilliant at maths.",
+    "My neighbour is angry about the party.",
+    "He's really good at English.",
+    "She's amazing at the piano.",
+    "They're terrible at organising anything.",
+    "I'm not very good at drawing.",
+    "I'm angry about the decision.",
+    "He's nervous about the presentation.",
+    "She's excited about the new job.",
+    "They were worried about the exam.",
+    "She was afraid of telling her mum.",
+    "I'm frightened of having an accident.",
+    "He's scared of flying.",
+    "You should be proud of your progress.",
+    "He's married to the director.",
+    "I'm addicted to my phone.",
+    "I'm allergic to nuts.",
+    "It's similar to the old one."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "I'm interested _____ the idea.",
+      "options": [
+        "in",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to adjectives and prepositions usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "My jacket is similar _____ yours.",
+      "options": [
+        "to",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to adjectives and prepositions usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "She's brilliant _____ maths.",
+      "options": [
+        "at",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to adjectives and prepositions usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "My neighbour is angry _____ the party.",
+      "correct": "about",
+      "hint": "Apply the rule for adjectives and prepositions.",
+      "explanation": "The correct form here is 'about'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "He's really good _____ English.",
+      "correct": "at",
+      "hint": "Apply the rule for adjectives and prepositions.",
+      "explanation": "The correct form here is 'at'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "She's amazing _____ the piano.",
+      "correct": "at",
+      "hint": "Apply the rule for adjectives and prepositions.",
+      "explanation": "The correct form here is 'at'."
+    }
+  ]
+}

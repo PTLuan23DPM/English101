@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
-import bcrypt from "bcryptjs";
+import { authController } from "@/server/controllers/authController";
+import { createErrorResponse } from "@/server/utils/response";
 import { handleError } from "@/lib/error-handler";
 
 export async function POST(req: NextRequest) {
@@ -8,58 +8,24 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { name, email, password } = body;
 
-    // Validation
-    if (!email || !password) {
-      return NextResponse.json(
-        { error: "Email and password are required" },
-        { status: 400 }
-      );
+    const result = await authController.register({ name, email, password });
+
+    return NextResponse.json(result, { status: 201 });
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    
+    if (errorMessage === "Email and password are required") {
+      return createErrorResponse(errorMessage, 400);
     }
 
-    if (password.length < 8) {
-      return NextResponse.json(
-        { error: "Password must be at least 8 characters" },
-        { status: 400 }
-      );
+    if (errorMessage === "Password must be at least 8 characters") {
+      return createErrorResponse(errorMessage, 400);
     }
 
-    // Check if user already exists
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
-    });
-
-    if (existingUser) {
-      return NextResponse.json(
-        { error: "User with this email already exists" },
-        { status: 409 }
-      );
+    if (errorMessage === "User with this email already exists") {
+      return createErrorResponse(errorMessage, 409);
     }
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Create user
-    const user = await prisma.user.create({
-      data: {
-        name: name || email.split("@")[0],
-        email,
-        password: hashedPassword,
-        role: "USER",
-      },
-    });
-
-    return NextResponse.json(
-      {
-        message: "User created successfully",
-        user: {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-        },
-      },
-      { status: 201 }
-    );
-  } catch (error) {
     return handleError(error);
   }
 }

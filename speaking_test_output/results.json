@@ -1,0 +1,143 @@
+{
+  "prompt": "Please read: The quick brown fox jumps over the lazy dog.",
+  "expected_text": "The quick brown fox jumps over the lazy dog.",
+  "transcription": "Quick brand Fox over lazy dot",
+  "audio_file": "speaking_test_output\\recording.wav",
+  "phoneme_sequence": [
+    {
+      "word": "quick",
+      "phonemes": [
+        "UNK"
+      ]
+    },
+    {
+      "word": "brand",
+      "phonemes": [
+        "UNK"
+      ]
+    },
+    {
+      "word": "fox",
+      "phonemes": [
+        "UNK"
+      ]
+    },
+    {
+      "word": "over",
+      "phonemes": [
+        "UNK"
+      ]
+    },
+    {
+      "word": "lazy",
+      "phonemes": [
+        "UNK"
+      ]
+    },
+    {
+      "word": "dot",
+      "phonemes": [
+        "UNK"
+      ]
+    }
+  ],
+  "dtw_results": null,
+  "gop_results": {
+    "word_scores": [
+      {
+        "word": "quick",
+        "expected_word": "the",
+        "phonemes": [
+          "UNK"
+        ],
+        "expected_phonemes": [
+          "UNK"
+        ],
+        "phoneme_match": 1.0,
+        "gop": -0.0,
+        "quality": "Excellent"
+      },
+      {
+        "word": "brand",
+        "expected_word": "quick",
+        "phonemes": [
+          "UNK"
+        ],
+        "expected_phonemes": [
+          "UNK"
+        ],
+        "phoneme_match": 1.0,
+        "gop": -0.0,
+        "quality": "Excellent"
+      },
+      {
+        "word": "fox",
+        "expected_word": "brown",
+        "phonemes": [
+          "UNK"
+        ],
+        "expected_phonemes": [
+          "UNK"
+        ],
+        "phoneme_match": 1.0,
+        "gop": -0.0,
+        "quality": "Excellent"
+      },
+      {
+        "word": "over",
+        "expected_word": "fox",
+        "phonemes": [
+          "UNK"
+        ],
+        "expected_phonemes": [
+          "UNK"
+        ],
+        "phoneme_match": 1.0,
+        "gop": -0.0,
+        "quality": "Excellent"
+      },
+      {
+        "word": "lazy",
+        "expected_word": "jumps",
+        "phonemes": [
+          "UNK"
+        ],
+        "expected_phonemes": [
+          "UNK"
+        ],
+        "phoneme_match": 1.0,
+        "gop": -0.0,
+        "quality": "Excellent"
+      },
+      {
+        "word": "dot",
+        "expected_word": "over",
+        "phonemes": [
+          "UNK"
+        ],
+        "expected_phonemes": [
+          "UNK"
+        ],
+        "phoneme_match": 1.0,
+        "gop": -0.0,
+        "quality": "Excellent"
+      }
+    ],
+    "overall_gop": 0.0,
+    "overall_quality": "Excellent",
+    "expected_phoneme_count": 9,
+    "actual_phoneme_count": 6,
+    "matching_phonemes": 1,
+    "phoneme_accuracy": 1.0,
+    "phoneme_match_score": 1.0,
+    "acoustic_quality_score": 1.0
+  },
+  "final_score": {
+    "final_score": 80.0,
+    "grade": "B",
+    "gop_component": 100.0,
+    "content_accuracy": 50.0,
+    "content_matched": false,
+    "dtw_component": null
+  }
+}

@@ -1,16 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import prisma from "@/lib/prisma";
+import { requireAuth, unauthorizedResponse } from "@/server/utils/auth";
+import { goalsController } from "@/server/controllers/goalsController";
 
 export async function DELETE(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
+    const session = await requireAuth();
     const { searchParams } = new URL(req.url);
     const goalId = searchParams.get("goalId");
 
@@ -21,35 +15,19 @@ export async function DELETE(req: NextRequest) {
       );
     }
 
-    // Check if goal exists and belongs to user
-    const existingGoal = await prisma.userGoal.findFirst({
-      where: {
-        id: goalId,
-        userId: session.user.id,
-      },
-    });
+    const result = await goalsController.deleteGoal(session.user.id, goalId);
 
-    if (!existingGoal) {
-      return NextResponse.json(
-        { error: "Goal not found" },
-        { status: 404 }
-      );
+    return NextResponse.json(result.data, { status: result.success ? 200 : 500 });
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    
+    if (errorMessage === "Unauthorized") {
+      return unauthorizedResponse();
     }
 
-    // Delete goal
-    await prisma.userGoal.delete({
-      where: { id: goalId },
-    });
-
-    return NextResponse.json({
-      success: true,
-      message: "Goal deleted successfully",
-    });
-  } catch (error) {
     console.error("Delete goal error:", error);
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
-      { error: "Failed to delete goal", details: errorMessage },
+      { error: "Failed to delete goal" },
       { status: 500 }
     );
   }

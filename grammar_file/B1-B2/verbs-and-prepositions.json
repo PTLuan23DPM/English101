@@ -1,0 +1,99 @@
+{
+  "id": "verbs-and-prepositions",
+  "title": "Verbs and prepositions",
+  "level": "B1-B2",
+  "introduction": "Do you know how to use the prepositions for, from, in, of, on, to and with after verbs? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "When a verb is part of a longer sentence, it is often followed by a specific preposition.",
+  "rules": [],
+  "keyPoints": [
+    "a verb is part of a longer sentence, it is often followed by a specific preposition",
+    "you make so much noise, I can't concentrate on my work"
+  ],
+  "examples": [
+    "Do you know how to use the prepositions for, from, in, of, on, to and with after verbs?",
+    "Look at these examples to see how prepositions are used after verbs.",
+    "Can you wait for me to finish my lunch?",
+    "Grammar explanation",
+    "When a verb is part of a longer sentence, it is often followed by a specific preposition.",
+    "She listens to the radio a lot.",
+    "There are no grammatical rules to help you know which preposition is used with which verb, so it's a good idea to try to learn them together.",
+    "He apologised for being late.",
+    "I applied for the job but I didn't get it.",
+    "How do you ask for a coffee in Polish?",
+    "I can't go out tonight because I have to prepare for my interview tomorrow.",
+    "Verbs with from",
+    "This spray should protect you from mosquitoes.",
+    "Has he recovered from the accident yet?",
+    "Verbs with in",
+    "She doesn't believe in coincidences.",
+    "Our company specialises in computer software.",
+    "You have to work hard if you want to succeed in life.",
+    "Verbs with of",
+    "I don't approve of hunting animals for their fur."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Do you know how to use the prepositions for, from, in, of, on, to and _____ after verbs?",
+      "options": [
+        "with",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to verbs and prepositions usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Look at these examples _____ see how prepositions are used after verbs.",
+      "options": [
+        "to",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to verbs and prepositions usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Can you wait _____ me to finish my lunch?",
+      "options": [
+        "for",
+        "under",
+        "between",
+        "into"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to verbs and prepositions usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "She listens _____ the radio a lot.",
+      "correct": "to",
+      "hint": "Apply the rule for verbs and prepositions.",
+      "explanation": "The correct form here is 'to'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "There are no grammatical rules to help you know which preposition is used _____ which verb, so it's a good idea to try to learn them together.",
+      "correct": "with",
+      "hint": "Apply the rule for verbs and prepositions.",
+      "explanation": "The correct form here is 'with'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "He apologised _____ being late.",
+      "correct": "for",
+      "hint": "Apply the rule for verbs and prepositions.",
+      "explanation": "The correct form here is 'for'."
+    }
+  ]
+}

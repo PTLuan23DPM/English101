@@ -1,0 +1,88 @@
+{
+  "id": "adjectives-ending-in-ed-and-ing",
+  "title": "Adjectives ending in '-ed' and '-ing'",
+  "level": "A1-A2",
+  "introduction": "Do you know the difference between bored and boring? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "Adjectives that end in -ed (e.g. bored, interested) and adjectives that end in -ing (e.g. boring, interesting) are often confused.",
+  "rules": [],
+  "keyPoints": [],
+  "examples": [
+    "I was really bored in that presentation.",
+    "That was a really boring presentation.",
+    "Have you seen that film? It's really frightening.",
+    "I could listen to her for hours. She's so interesting.",
+    "I can't sleep! That noise is really annoying!",
+    "interested) and adjectives that end in -ing (e",
+    "Do you know the difference between bored and boring?",
+    "Look at these examples to see how adjectives ending in -ed and -ing are used.",
+    "I was so bored in that lesson, I almost fell asleep.",
+    "He was surprised to see Helen after all those years.",
+    "She was really tired and went to bed early.",
+    "I could listen to her for hours."
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "I was really _____ in that presentation.",
+      "options": [
+        "bored",
+        "boreds",
+        "boreded",
+        "not bored"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to adjectives ending in '-ed' and '-ing' usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "That was a _____ boring presentation.",
+      "options": [
+        "really",
+        "reallys",
+        "reallyed",
+        "not really"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to adjectives ending in '-ed' and '-ing' usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "Have you seen that _____ It's really frightening.",
+      "options": [
+        "film?",
+        "films",
+        "filmed",
+        "not film"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to adjectives ending in '-ed' and '-ing' usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "I could listen to her _____ hours. She's so interesting.",
+      "correct": "for",
+      "hint": "Apply the rule for adjectives ending in '-ed' and '-ing'.",
+      "explanation": "The correct form here is 'for'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "I can't sleep! That _____ is really annoying!",
+      "correct": "noise",
+      "hint": "Apply the rule for adjectives ending in '-ed' and '-ing'.",
+      "explanation": "The correct form here is 'noise'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "interested) and adjectives that _____ in -ing (e",
+      "correct": "end",
+      "hint": "Apply the rule for adjectives ending in '-ed' and '-ing'.",
+      "explanation": "The correct form here is 'end'."
+    }
+  ]
+}

@@ -1,0 +1,85 @@
+{
+  "prompt": "Please read: Hello world.",
+  "expected_text": "Hello world.",
+  "transcription": "Hello world.",
+  "audio_file": "dtw_demo_r20\\recording.wav",
+  "phoneme_sequence": [
+    {
+      "word": "hello",
+      "phonemes": [
+        "HH",
+        "AH0",
+        "L",
+        "OW1"
+      ]
+    },
+    {
+      "word": "world",
+      "phonemes": [
+        "W",
+        "ER1",
+        "L",
+        "D"
+      ]
+    }
+  ],
+  "dtw_results": null,
+  "gop_results": {
+    "word_scores": [
+      {
+        "word": "hello",
+        "expected_word": "hello",
+        "phonemes": [
+          "HH",
+          "AH0",
+          "L",
+          "OW1"
+        ],
+        "expected_phonemes": [
+          "HH",
+          "AH0",
+          "L",
+          "OW1"
+        ],
+        "phoneme_match": 1.0,
+        "gop": -0.0,
+        "quality": "Excellent"
+      },
+      {
+        "word": "world",
+        "expected_word": "world",
+        "phonemes": [
+          "W",
+          "ER1",
+          "L",
+          "D"
+        ],
+        "expected_phonemes": [
+          "W",
+          "ER1",
+          "L",
+          "D"
+        ],
+        "phoneme_match": 1.0,
+        "gop": -0.0,
+        "quality": "Excellent"
+      }
+    ],
+    "overall_gop": 0.0,
+    "overall_quality": "Excellent",
+    "expected_phoneme_count": 8,
+    "actual_phoneme_count": 8,
+    "matching_phonemes": 7,
+    "phoneme_accuracy": 1.0,
+    "phoneme_match_score": 1.0,
+    "acoustic_quality_score": 1.0
+  },
+  "final_score": {
+    "final_score": 100.0,
+    "grade": "A",
+    "gop_component": 100.0,
+    "content_accuracy": 100.0,
+    "content_matched": true,
+    "dtw_component": null
+  }
+}

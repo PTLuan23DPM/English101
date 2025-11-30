@@ -1,0 +1,99 @@
+{
+  "id": "present-simple",
+  "title": "Present simple",
+  "level": "A1-A2",
+  "introduction": "Do you know how to use the present simple? Test what you know with interactive exercises and read the explanation to help you.",
+  "explanation": "We can use the present simple to talk about things we do regularly.",
+  "rules": [],
+  "keyPoints": [
+    "the negative, we use don't or doesn't",
+    "questions, we use do or does"
+  ],
+  "examples": [
+    "I eat a lot of fruit and vegetables.",
+    "My dad phones me every day.",
+    "She doesn't like her job.",
+    "What time do you get up at weekends?",
+    "I go to the gym three times a week.",
+    "We drink coffee at work.",
+    "She loves her job.",
+    "A lot of people work at home now.",
+    "My favourite TV show starts at 8 o'clock.",
+    "She finishes work early on Fridays.",
+    "My brother studies at university.",
+    "He has a flat in the city centre.",
+    "She does yoga on Tuesdays.",
+    "My dog goes for a walk every morning.",
+    "We don't eat meat.",
+    "She doesn't have a lot of free time.",
+    "Do you watch a lot of films?",
+    "Does he speak English?",
+    "Do you know how to use the present simple?",
+    "Grammar explanation"
+  ],
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "She _____ like her job.",
+      "options": [
+        "doesn't",
+        "didn't",
+        "won't",
+        "can't"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to present simple usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "What time _____ you get up at weekends?",
+      "options": [
+        "do",
+        "did",
+        "doing",
+        "done"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to present simple usage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Choose the correct option to complete the sentence:",
+      "sentence": "She _____ yoga on Tuesdays.",
+      "options": [
+        "does",
+        "did",
+        "doing",
+        "done"
+      ],
+      "correct": 0,
+      "explanation": "The missing part relates to present simple usage."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "We _____ eat meat.",
+      "correct": "don't",
+      "hint": "Apply the rule for present simple.",
+      "explanation": "The correct form here is 'don't'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "She _____ have a lot of free time.",
+      "correct": "doesn't",
+      "hint": "Apply the rule for present simple.",
+      "explanation": "The correct form here is 'doesn't'."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Fill in the blank with the correct grammar form:",
+      "sentence": "_____ you watch a lot of films?",
+      "correct": "Do",
+      "hint": "Apply the rule for present simple.",
+      "explanation": "The correct form here is 'Do'."
+    }
+  ]
+}

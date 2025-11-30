@@ -2,12 +2,10 @@
 
 import { useEffect, useState } from "react";
 import {
-  RadarChart,
-  Radar,
-  PolarGrid,
-  PolarAngleAxis,
-  PolarRadiusAxis,
-  ResponsiveContainer,
+  LineChart,
+  Line,
+  AreaChart,
+  Area,
   BarChart,
   Bar,
   XAxis,
@@ -15,6 +13,8 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
+  ResponsiveContainer,
+  Cell,
 } from "recharts";
 
 interface SkillsData {
@@ -46,17 +46,19 @@ export default function AnalyticsCharts({
   const [skillsData, setSkillsData] = useState<SkillChartData[]>([]);
   const [performanceData, setPerformanceData] = useState<PerformanceChartData[]>([]);
 
+  const COLORS = ["#6366f1", "#8b5cf6", "#ec4899", "#f59e0b", "#10b981", "#06b6d4"];
+
   useEffect(() => {
-    // Prepare skills radar chart data
+    // Prepare skills chart data
     const skills = skillsBreakdown.map((item) => ({
-      skill: item.skill.replace("_", " "),
+      skill: item.skill.replace("_", " ").replace("WRITING", "Writing").replace("READING", "Reading").replace("LISTENING", "Listening").replace("SPEAKING", "Speaking"),
       value: item.avgScore || 0,
       fullMark: 100,
     }));
 
     // Prepare performance bar chart data
     const performance = skillsBreakdown.map((item) => ({
-      skill: item.skill.replace("_", " "),
+      skill: item.skill.replace("_", " ").replace("WRITING", "Writing").replace("READING", "Reading").replace("LISTENING", "Listening").replace("SPEAKING", "Speaking"),
       completed: item.completed,
       avgScore: item.avgScore || 0,
     }));
@@ -76,64 +78,154 @@ export default function AnalyticsCharts({
   }
 
   return (
-    <div className="analytics-charts">
-      <div className="chart-container">
-        <h4 style={{ marginBottom: "16px", fontSize: "16px", fontWeight: "600" }}>
-          Skills Performance
-        </h4>
-        <ResponsiveContainer width="100%" height={300}>
-          <RadarChart data={skillsData}>
-            <PolarGrid />
-            <PolarAngleAxis
+    <div className="analytics-charts-modern">
+      {/* Average Score by Skill - Radial Bar Chart */}
+      <div className="chart-card">
+        <div className="chart-header">
+          <div>
+            <h4>📊 Skills Performance</h4>
+            <p>Your strengths across different skills</p>
+          </div>
+        </div>
+        <ResponsiveContainer width="100%" height={360}>
+          <LineChart data={skillsData} margin={{ top: 20, right: 30, bottom: 20, left: 20 }}>
+            <defs>
+              <linearGradient id="colorArea" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3}/>
+                <stop offset="95%" stopColor="#6366f1" stopOpacity={0.05}/>
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" strokeOpacity={0.6} />
+            <XAxis 
               dataKey="skill"
-              tick={{ fontSize: 12, fill: "#666" }}
+              tick={{ fontSize: 13, fill: "#1e293b", fontWeight: 600 }}
+              axisLine={{ stroke: "#cbd5e1", strokeWidth: 2 }}
+              tickLine={{ stroke: "#cbd5e1" }}
             />
-            <PolarRadiusAxis
-              angle={90}
+            <YAxis 
               domain={[0, 100]}
-              tick={{ fontSize: 10, fill: "#999" }}
+              tick={{ fontSize: 12, fill: "#64748b", fontWeight: 500 }}
+              axisLine={{ stroke: "#cbd5e1", strokeWidth: 2 }}
+              tickLine={{ stroke: "#cbd5e1" }}
+              label={{ 
+                value: "Score (%)", 
+                angle: -90, 
+                position: "insideLeft",
+                style: { fill: "#64748b", fontWeight: 600, fontSize: 13 }
+              }}
             />
-            <Radar
-              name="Score"
+            <Tooltip 
+              contentStyle={{
+                backgroundColor: "rgba(255, 255, 255, 0.98)",
+                border: "none",
+                borderRadius: "12px",
+                boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
+                padding: "12px 16px",
+              }}
+              labelStyle={{ fontWeight: 700, color: "#1e293b", marginBottom: "4px" }}
+              cursor={{ strokeDasharray: "3 3" }}
+            />
+            <Area 
+              type="monotone"
               dataKey="value"
-              stroke="#667eea"
-              fill="#667eea"
-              fillOpacity={0.6}
+              stroke="#6366f1"
+              strokeWidth={0}
+              fill="url(#colorArea)"
+              name="Score"
             />
-            <Tooltip />
-          </RadarChart>
+            <Line 
+              type="monotone"
+              dataKey="value" 
+              stroke="#6366f1"
+              strokeWidth={3}
+              dot={{ 
+                fill: "#6366f1", 
+                strokeWidth: 3, 
+                r: 6,
+                stroke: "white"
+              }}
+              activeDot={{ 
+                r: 8,
+                stroke: "#6366f1",
+                strokeWidth: 3,
+                fill: "white"
+              }}
+              name="Score"
+            />
+          </LineChart>
         </ResponsiveContainer>
       </div>
 
-      <div className="chart-container">
-        <h4 style={{ marginBottom: "16px", fontSize: "16px", fontWeight: "600" }}>
-          Activity & Scores
-        </h4>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={performanceData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis
-              dataKey="skill"
-              tick={{ fontSize: 12, fill: "#666" }}
-              angle={-45}
-              textAnchor="end"
-              height={80}
+      {/* Activities & Performance Comparison */}
+      <div className="chart-card">
+        <div className="chart-header">
+          <div>
+            <h4>📈 Activity Progress & Performance</h4>
+            <p>Completed exercises and average scores</p>
+          </div>
+        </div>
+        <ResponsiveContainer width="100%" height={360}>
+          <BarChart data={performanceData} margin={{ top: 20 }}>
+            <defs>
+              <linearGradient id="completedGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#8b5cf6" stopOpacity={1}/>
+                <stop offset="100%" stopColor="#6366f1" stopOpacity={0.8}/>
+              </linearGradient>
+              <linearGradient id="scoreGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#10b981" stopOpacity={1}/>
+                <stop offset="100%" stopColor="#059669" stopOpacity={0.8}/>
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" strokeOpacity={0.6} />
+            <XAxis 
+              dataKey="skill" 
+              tick={{ fontSize: 13, fill: "#1e293b", fontWeight: 600 }}
+              axisLine={{ stroke: "#cbd5e1" }}
             />
-            <YAxis yAxisId="left" tick={{ fontSize: 12, fill: "#666" }} />
-            <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 12, fill: "#666" }} />
-            <Tooltip />
-            <Legend />
-            <Bar
+            <YAxis 
               yAxisId="left"
-              dataKey="completed"
-              fill="#667eea"
-              name="Completed"
+              tick={{ fontSize: 12, fill: "#64748b" }}
+              axisLine={{ stroke: "#cbd5e1" }}
+              label={{ value: "Completed", angle: -90, position: "insideLeft", style: { fill: "#64748b", fontWeight: 600 } }}
             />
-            <Bar
+            <YAxis 
               yAxisId="right"
-              dataKey="avgScore"
-              fill="#10b981"
-              name="Avg Score"
+              orientation="right"
+              domain={[0, 100]}
+              tick={{ fontSize: 12, fill: "#64748b" }}
+              axisLine={{ stroke: "#cbd5e1" }}
+              label={{ value: "Score", angle: 90, position: "insideRight", style: { fill: "#64748b", fontWeight: 600 } }}
+            />
+            <Tooltip 
+              contentStyle={{
+                backgroundColor: "rgba(255, 255, 255, 0.98)",
+                border: "none",
+                borderRadius: "12px",
+                boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
+                padding: "12px 16px",
+              }}
+              labelStyle={{ fontWeight: 700, color: "#1e293b", marginBottom: "8px" }}
+              cursor={{ fill: "rgba(99, 102, 241, 0.05)" }}
+            />
+            <Legend 
+              wrapperStyle={{ paddingTop: "20px" }}
+              iconType="circle"
+            />
+            <Bar 
+              yAxisId="left"
+              dataKey="completed" 
+              name="Activities Completed" 
+              fill="url(#completedGrad)"
+              radius={[8, 8, 0, 0]}
+              barSize={40}
+            />
+            <Bar 
+              yAxisId="right"
+              dataKey="avgScore" 
+              name="Average Score (%)" 
+              fill="url(#scoreGrad)"
+              radius={[8, 8, 0, 0]}
+              barSize={40}
             />
           </BarChart>
         </ResponsiveContainer>

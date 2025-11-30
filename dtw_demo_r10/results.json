@@ -1,0 +1,185 @@
+{
+  "prompt": "Please read: Hello world.",
+  "expected_text": "Hello world.",
+  "transcription": "Now, their symbols are stored at this table in reddit app. We want to copy",
+  "audio_file": "dtw_demo_r10\\recording.wav",
+  "phoneme_sequence": [
+    {
+      "word": "now",
+      "phonemes": [
+        "N",
+        "AW1"
+      ]
+    },
+    {
+      "word": "their",
+      "phonemes": [
+        "DH",
+        "EH1",
+        "R"
+      ]
+    },
+    {
+      "word": "symbols",
+      "phonemes": [
+        "S",
+        "IH1",
+        "M",
+        "B",
+        "AH0",
+        "L",
+        "Z"
+      ]
+    },
+    {
+      "word": "are",
+      "phonemes": [
+        "AA1",
+        "R"
+      ]
+    },
+    {
+      "word": "stored",
+      "phonemes": [
+        "S",
+        "T",
+        "AO1",
+        "R",
+        "D"
+      ]
+    },
+    {
+      "word": "at",
+      "phonemes": [
+        "AE1",
+        "T"
+      ]
+    },
+    {
+      "word": "this",
+      "phonemes": [
+        "DH",
+        "IH1",
+        "S"
+      ]
+    },
+    {
+      "word": "table",
+      "phonemes": [
+        "T",
+        "EY1",
+        "B",
+        "AH0",
+        "L"
+      ]
+    },
+    {
+      "word": "in",
+      "phonemes": [
+        "IH0",
+        "N"
+      ]
+    },
+    {
+      "word": "reddit",
+      "phonemes": [
+        "UNK"
+      ]
+    },
+    {
+      "word": "app",
+      "phonemes": [
+        "AE1",
+        "P"
+      ]
+    },
+    {
+      "word": "we",
+      "phonemes": [
+        "W",
+        "IY1"
+      ]
+    },
+    {
+      "word": "want",
+      "phonemes": [
+        "W",
+        "AA1",
+        "N",
+        "T"
+      ]
+    },
+    {
+      "word": "to",
+      "phonemes": [
+        "T",
+        "UW1"
+      ]
+    },
+    {
+      "word": "copy",
+      "phonemes": [
+        "K",
+        "AA1",
+        "P",
+        "IY0"
+      ]
+    }
+  ],
+  "dtw_results": null,
+  "gop_results": {
+    "word_scores": [
+      {
+        "word": "now",
+        "expected_word": "hello",
+        "phonemes": [
+          "N",
+          "AW1"
+        ],
+        "expected_phonemes": [
+          "HH",
+          "AH0",
+          "L",
+          "OW1"
+        ],
+        "phoneme_match": 0.0,
+        "gop": -10.0,
+        "quality": "Poor"
+      },
+      {
+        "word": "their",
+        "expected_word": "world",
+        "phonemes": [
+          "DH",
+          "EH1",
+          "R"
+        ],
+        "expected_phonemes": [
+          "W",
+          "ER1",
+          "L",
+          "D"
+        ],
+        "phoneme_match": 0.0,
+        "gop": -10.0,
+        "quality": "Poor"
+      }
+    ],
+    "overall_gop": -10.0,
+    "overall_quality": "Poor",
+    "expected_phoneme_count": 8,
+    "actual_phoneme_count": 46,
+    "matching_phonemes": 4,
+    "phoneme_accuracy": 0.5714285714285714,
+    "phoneme_match_score": 0.5714285714285714,
+    "acoustic_quality_score": 0
+  },
+  "final_score": {
+    "final_score": 0.0,
+    "grade": "F",
+    "gop_component": 0,
+    "content_accuracy": 0.0,
+    "content_matched": false,
+    "dtw_component": null
+  }
+}

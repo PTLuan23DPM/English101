@@ -1,21 +1,21 @@
-import path from "path";
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  webpack: (config) => {
-    config.resolve.alias = {
-      ...(config.resolve.alias || {}),
-      "@": path.resolve(__dirname, "src"),
-    };
-    return config;
-  },
-  // Tạm thời tắt ESLint trong build để không bị chặn
+  // --- THÊM DÒNG NÀY (QUAN TRỌNG NHẤT) ---
+  output: 'standalone',
+
+  // Các config khác (giữ nguyên)
   eslint: {
     ignoreDuringBuilds: true,
   },
-  // Tắt TypeScript type checking trong build (nếu cần)
   typescript: {
-    ignoreBuildErrors: true, // Giữ false để vẫn check TypeScript errors
+    ignoreBuildErrors: true,
+  },
+  // (Tùy chọn) Giúp debug lỗi build
+  logging: {
+    fetches: {
+      fullUrl: true,
+    },
   },
 };
 

@@ -602,17 +602,25 @@ model UserGoal {
 // Placement Test Results
 // ------------------------------------------------------
 model PlacementTestResult {
-  id          String   @id @default(cuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  score       Int
-  totalQuestions Int   @default(20)
-  cefrLevel   String
-  answers     Json     // Store all answers and questions
-  completedAt DateTime @default(now())
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  score          Int
+  totalQuestions Int      @default(20)
+  cefrLevel      String
+  answers        Json     // Store all answers and questions
+  startedAt      DateTime? // When user started the test
+  completedAt    DateTime @default(now())
+  timeSpent      Int?     // Time spent in seconds
+  skillScores    Json?    // Scores per skill: {grammar: 8, vocabulary: 7, reading: 6}
+  correctAnswers Int?     // Number of correct answers
+  wrongAnswers   Int?     // Number of wrong answers
+  skippedAnswers Int?     @default(0) // Number of skipped questions
+  metadata       Json?    // Additional metadata
 
   @@index([userId])
   @@index([userId, completedAt])
+  @@index([cefrLevel])
 }
 
 // ------------------------------------------------------

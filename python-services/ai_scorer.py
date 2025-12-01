@@ -322,13 +322,13 @@ def score_speech():
 if __name__ == '__main__':
     # Check for required system dependencies
     if not check_ffmpeg_available():
-        logger.warning("⚠️  FFmpeg is not available. Audio conversion features will not work.")
+        logger.warning("FFmpeg is not available. Audio conversion features will not work.")
         logger.warning("   Please install ffmpeg:")
         logger.warning("   - Windows: Download from https://ffmpeg.org/download.html or use: choco install ffmpeg")
         logger.warning("   - Linux: sudo apt-get install ffmpeg")
         logger.warning("   - Mac: brew install ffmpeg")
     else:
-        logger.info("✅ FFmpeg is available")
+        logger.info("FFmpeg is available")
     
     port = int(os.environ.get('PORT', 8080))
     logger.info(f"🚀 AI Scorer running on port {port}")

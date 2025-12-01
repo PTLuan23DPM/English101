@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { handleError } from "@/lib/error-handler";
+import { Prisma } from "@prisma/client";
 
 // GET: Lấy chi tiết một Reading task
 export async function GET(
@@ -97,7 +98,26 @@ export async function PUT(
     }
 
     // Build update data (only include provided fields)
-    const updateData: any = {};
+    const updateData: {
+      title?: string;
+      subtitle?: string | null;
+      cefr?: string;
+      genre?: string;
+      source?: string | null;
+      tags?: string[];
+      estimatedTime?: number | null;
+      wordCount?: number | null;
+      coverEmoji?: string;
+      gradient?: string | null;
+      readingSkills?: string[];
+      keyIdeas?: string[];
+      vocabulary?: Prisma.InputJsonValue | Prisma.NullableJsonNullValueInput;
+      contentSections?: Prisma.InputJsonValue | Prisma.NullableJsonNullValueInput;
+      exercises?: Prisma.InputJsonValue | Prisma.NullableJsonNullValueInput;
+      recommended?: boolean;
+      order?: number;
+      active?: boolean;
+    } = {};
     if (title !== undefined) updateData.title = title.trim();
     if (subtitle !== undefined) updateData.subtitle = subtitle?.trim() || null;
     if (cefr !== undefined) updateData.cefr = cefr.trim();
@@ -110,9 +130,9 @@ export async function PUT(
     if (gradient !== undefined) updateData.gradient = gradient || null;
     if (readingSkills !== undefined) updateData.readingSkills = Array.isArray(readingSkills) ? readingSkills : [];
     if (keyIdeas !== undefined) updateData.keyIdeas = Array.isArray(keyIdeas) ? keyIdeas : [];
-    if (vocabulary !== undefined) updateData.vocabulary = vocabulary;
-    if (contentSections !== undefined) updateData.contentSections = contentSections;
-    if (exercises !== undefined) updateData.exercises = exercises;
+    if (vocabulary !== undefined) updateData.vocabulary = vocabulary as Prisma.InputJsonValue;
+    if (contentSections !== undefined) updateData.contentSections = contentSections as Prisma.InputJsonValue;
+    if (exercises !== undefined) updateData.exercises = exercises as Prisma.InputJsonValue;
     if (recommended !== undefined) updateData.recommended = recommended;
     if (order !== undefined) updateData.order = order;
     if (active !== undefined) updateData.active = active;
@@ -174,4 +194,5 @@ export async function DELETE(
     return handleError(error);
   }
 }
+
 

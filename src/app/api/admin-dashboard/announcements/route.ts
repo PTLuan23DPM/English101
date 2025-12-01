@@ -30,7 +30,9 @@ export async function GET(req: NextRequest) {
 
     const skip = (page - 1) * limit;
 
-    const where: any = {};
+    const where: {
+      isPublished?: boolean;
+    } = {};
     if (isPublished !== null) {
       where.isPublished = isPublished === "true";
     }
@@ -38,6 +40,7 @@ export async function GET(req: NextRequest) {
     let announcements, total;
     try {
       [announcements, total] = await Promise.all([
+        // @ts-expect-error - Announcement model may not exist in Prisma schema
         prisma.announcement.findMany({
           where,
           skip,
@@ -56,14 +59,16 @@ export async function GET(req: NextRequest) {
             },
           },
         }),
+        // @ts-expect-error - Announcement model may not exist in Prisma schema
         prisma.announcement.count({ where }),
       ]);
-    } catch (dbError: any) {
+    } catch (dbError: unknown) {
+      const error = dbError as { code?: string; message?: string };
       // Check if it's a "Cannot read properties of undefined" error (Prisma Client not generated)
       if (
-        dbError?.message?.includes("Cannot read properties of undefined") ||
-        dbError?.message?.includes("reading 'findMany'") ||
-        dbError?.message?.includes("announcement is not a function")
+        error.message?.includes("Cannot read properties of undefined") ||
+        error.message?.includes("reading 'findMany'") ||
+        error.message?.includes("announcement is not a function")
       ) {
         return NextResponse.json(
           {
@@ -74,11 +79,11 @@ export async function GET(req: NextRequest) {
         );
       }
       // Check if it's a table doesn't exist error
-      if (dbError?.code === "P2021" || dbError?.message?.includes("does not exist")) {
+      if (error.code === "P2021" || error.message?.includes("does not exist")) {
         return NextResponse.json(
           {
             error: "Database table not found. Please run migrations: npm run db:migrate",
-            details: dbError.message,
+            details: error.message,
           },
           { status: 500 }
         );
@@ -142,6 +147,7 @@ export async function POST(req: NextRequest) {
 
     let announcement;
     try {
+      // @ts-expect-error - Announcement model may not exist in Prisma schema
       announcement = await prisma.announcement.create({
         data: {
           title: title.trim(),
@@ -165,12 +171,13 @@ export async function POST(req: NextRequest) {
           },
         },
       });
-    } catch (dbError: any) {
+    } catch (dbError: unknown) {
+      const error = dbError as { code?: string; message?: string };
       // Check if it's a "Cannot read properties of undefined" error
       if (
-        dbError?.message?.includes("Cannot read properties of undefined") ||
-        dbError?.message?.includes("reading 'create'") ||
-        dbError?.message?.includes("announcement is not a function")
+        error.message?.includes("Cannot read properties of undefined") ||
+        error.message?.includes("reading 'create'") ||
+        error.message?.includes("announcement is not a function")
       ) {
         return NextResponse.json(
           {

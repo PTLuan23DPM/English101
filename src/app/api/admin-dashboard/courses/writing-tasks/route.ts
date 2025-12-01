@@ -28,7 +28,11 @@ export async function GET(req: NextRequest) {
     const type = searchParams.get("type");
     const active = searchParams.get("active");
 
-    const where: any = {};
+    const where: {
+      level?: string;
+      type?: string;
+      active?: boolean;
+    } = {};
     if (level) where.level = level;
     if (type) where.type = type;
     if (active !== null) where.active = active === "true";

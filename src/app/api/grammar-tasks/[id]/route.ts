@@ -33,13 +33,27 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
     const { id } = await params;
     const body = await req.json();
-    const updateData: any = {};
+    const updateData: {
+      title?: string;
+      icon?: string;
+      type?: string;
+      level?: string;
+      introduction?: string;
+      exampleCount?: number;
+      exerciseCount?: number;
+      recommended?: boolean;
+      color?: string;
+      order?: number;
+      active?: boolean;
+    } = {};
 
     if (body.title !== undefined) updateData.title = body.title.trim();
     if (body.icon !== undefined) updateData.icon = body.icon;
     if (body.type !== undefined) updateData.type = body.type.trim();
     if (body.level !== undefined) updateData.level = body.level.trim();
-    if (body.introduction !== undefined) updateData.introduction = body.introduction?.trim() || null;
+    if (body.introduction !== undefined) {
+      updateData.introduction = body.introduction?.trim() || undefined;
+    }
     if (body.exampleCount !== undefined) updateData.exampleCount = body.exampleCount;
     if (body.exerciseCount !== undefined) updateData.exerciseCount = body.exerciseCount;
     if (body.recommended !== undefined) updateData.recommended = body.recommended;
@@ -77,4 +91,5 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     return handleError(error);
   }
 }
+
 

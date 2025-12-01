@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { handleError } from "@/lib/error-handler";
+import { Prisma } from "@prisma/client";
 
 // GET: Lấy chi tiết một Speaking task
 export async function GET(
@@ -92,14 +93,28 @@ export async function PUT(
     }
 
     // Build update data (only include provided fields)
-    const updateData: any = {};
+    const updateData: {
+      title?: string;
+      type?: string;
+      level?: string;
+      prompt?: string;
+      timeLimit?: string;
+      tips?: string[];
+      vocab?: Prisma.InputJsonValue | Prisma.NullableJsonNullValueInput;
+      phrases?: string[];
+      recommended?: boolean;
+      icon?: string;
+      color?: string;
+      order?: number;
+      active?: boolean;
+    } = {};
     if (title !== undefined) updateData.title = title.trim();
     if (type !== undefined) updateData.type = type.trim();
     if (level !== undefined) updateData.level = level.trim();
     if (prompt !== undefined) updateData.prompt = prompt.trim();
     if (timeLimit !== undefined) updateData.timeLimit = timeLimit.trim();
     if (tips !== undefined) updateData.tips = Array.isArray(tips) ? tips : [];
-    if (vocab !== undefined) updateData.vocab = vocab;
+    if (vocab !== undefined) updateData.vocab = vocab as Prisma.InputJsonValue;
     if (phrases !== undefined) updateData.phrases = Array.isArray(phrases) ? phrases : [];
     if (recommended !== undefined) updateData.recommended = recommended;
     if (icon !== undefined) updateData.icon = icon;
@@ -164,4 +179,5 @@ export async function DELETE(
     return handleError(error);
   }
 }
+
 

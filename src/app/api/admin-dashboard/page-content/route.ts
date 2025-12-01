@@ -5,7 +5,7 @@ import prisma from "@/lib/prisma";
 import { handleError } from "@/lib/error-handler";
 
 // GET: Lấy danh sách page content
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
 
@@ -25,6 +25,7 @@ export async function GET(req: NextRequest) {
 
     let pages;
     try {
+      // @ts-expect-error - PageContent model may not exist in Prisma schema
       pages = await prisma.pageContent.findMany({
         orderBy: { slug: "asc" },
         include: {
@@ -37,12 +38,13 @@ export async function GET(req: NextRequest) {
           },
         },
       });
-    } catch (dbError: any) {
+    } catch (dbError: unknown) {
+      const error = dbError as { code?: string; message?: string };
       // Check if it's a "Cannot read properties of undefined" error
       if (
-        dbError?.message?.includes("Cannot read properties of undefined") ||
-        dbError?.message?.includes("reading 'findMany'") ||
-        dbError?.message?.includes("pageContent is not a function")
+        error.message?.includes("Cannot read properties of undefined") ||
+        error.message?.includes("reading 'findMany'") ||
+        error.message?.includes("pageContent is not a function")
       ) {
         return NextResponse.json(
           {
@@ -53,11 +55,11 @@ export async function GET(req: NextRequest) {
         );
       }
       // Check if it's a table doesn't exist error
-      if (dbError?.code === "P2021" || dbError?.message?.includes("does not exist")) {
+      if (error.code === "P2021" || error.message?.includes("does not exist")) {
         return NextResponse.json(
           {
             error: "Database table not found. Please run migrations: npm run db:migrate",
-            details: dbError.message,
+            details: error.message,
           },
           { status: 500 }
         );
@@ -105,6 +107,7 @@ export async function POST(req: NextRequest) {
 
     let page;
     try {
+      // @ts-expect-error - PageContent model may not exist in Prisma schema
       page = await prisma.pageContent.create({
         data: {
           slug: slug.trim().toLowerCase(),
@@ -124,12 +127,13 @@ export async function POST(req: NextRequest) {
           },
         },
       });
-    } catch (dbError: any) {
+    } catch (dbError: unknown) {
+      const error = dbError as { code?: string; message?: string };
       // Check if it's a "Cannot read properties of undefined" error
       if (
-        dbError?.message?.includes("Cannot read properties of undefined") ||
-        dbError?.message?.includes("reading 'create'") ||
-        dbError?.message?.includes("pageContent is not a function")
+        error.message?.includes("Cannot read properties of undefined") ||
+        error.message?.includes("reading 'create'") ||
+        error.message?.includes("pageContent is not a function")
       ) {
         return NextResponse.json(
           {

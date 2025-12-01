@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { Prisma, NotificationTrigger } from "@prisma/client";
 
 // GET: Fetch a single automatic notification
 export async function GET(
@@ -69,16 +70,27 @@ export async function PUT(
     const body = await req.json();
     const { title, message, trigger, active, conditions, targetUserIds } = body;
 
-    const updateData: any = {};
+    const updateData: {
+      title?: string;
+      message?: string;
+      trigger?: NotificationTrigger | null;
+      active?: boolean;
+      conditions?: Prisma.InputJsonValue | Prisma.NullableJsonNullValueInput;
+      targetUserIds?: Prisma.InputJsonValue | Prisma.NullableJsonNullValueInput;
+    } = {};
     if (title) updateData.title = title;
     if (message) updateData.message = message;
-    if (trigger) updateData.trigger = trigger;
+    if (trigger) updateData.trigger = trigger as NotificationTrigger;
     if (active !== undefined) updateData.active = active;
-    if (conditions) updateData.conditions = JSON.stringify(conditions);
+    if (conditions !== undefined) {
+      updateData.conditions = conditions 
+        ? (typeof conditions === "string" ? conditions : JSON.stringify(conditions)) as Prisma.InputJsonValue
+        : Prisma.JsonNull;
+    }
     if (targetUserIds !== undefined) {
-      updateData.targetUserIds = targetUserIds && targetUserIds.length > 0
-        ? JSON.stringify(targetUserIds)
-        : null;
+      updateData.targetUserIds = targetUserIds && Array.isArray(targetUserIds) && targetUserIds.length > 0
+        ? targetUserIds as Prisma.InputJsonValue // Prisma will handle JSON serialization for Json fields
+        : Prisma.JsonNull;
     }
 
     const notification = await prisma.notification.update({

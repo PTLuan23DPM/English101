@@ -31,13 +31,17 @@ export async function GET(req: NextRequest) {
 
     const skip = (page - 1) * limit;
 
-    const where: any = {};
+    const where: {
+      status?: string;
+      type?: string;
+    } = {};
     if (status) where.status = status;
     if (type) where.type = type;
 
     let feedbacks, total;
     try {
       [feedbacks, total] = await Promise.all([
+        // @ts-expect-error - Feedback model may not exist in Prisma schema
         prisma.feedback.findMany({
           where,
           skip,
@@ -63,14 +67,16 @@ export async function GET(req: NextRequest) {
             },
           },
         }),
+        // @ts-expect-error - Feedback model may not exist in Prisma schema
         prisma.feedback.count({ where }),
       ]);
-    } catch (dbError: any) {
+    } catch (dbError: unknown) {
+      const error = dbError as { code?: string; message?: string };
       // Check for Prisma Client not generated
       if (
-        dbError?.message?.includes("Cannot read properties of undefined") ||
-        dbError?.message?.includes("reading 'findMany'") ||
-        dbError?.message?.includes("feedback is not a function")
+        error.message?.includes("Cannot read properties of undefined") ||
+        error.message?.includes("reading 'findMany'") ||
+        error.message?.includes("feedback is not a function")
       ) {
         return NextResponse.json(
           {
@@ -83,9 +89,9 @@ export async function GET(req: NextRequest) {
       
       // Check for table not found (P2021 error code or message)
       if (
-        dbError?.code === "P2021" ||
-        dbError?.message?.includes("does not exist") ||
-        dbError?.message?.includes("table") && dbError?.message?.includes("not found")
+        error.code === "P2021" ||
+        error.message?.includes("does not exist") ||
+        error.message?.includes("table") && error.message?.includes("not found")
       ) {
         return NextResponse.json(
           {

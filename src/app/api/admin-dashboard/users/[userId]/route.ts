@@ -94,11 +94,16 @@ export async function PATCH(
     const body = await req.json();
     const { name, image, role, cefrLevel } = body;
 
-    const updateData: any = {};
+    const updateData: {
+      name?: string | null;
+      image?: string | null;
+      role?: "USER" | "ADMIN";
+      cefrLevel?: string | null;
+    } = {};
     if (name !== undefined) updateData.name = name?.trim() || null;
     if (image !== undefined) updateData.image = image || null;
     if (role !== undefined && ["USER", "ADMIN"].includes(role)) {
-      updateData.role = role;
+      updateData.role = role as "USER" | "ADMIN";
     }
     if (cefrLevel !== undefined) updateData.cefrLevel = cefrLevel || null;
 

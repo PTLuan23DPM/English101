@@ -5,7 +5,7 @@ import prisma from "@/lib/prisma";
 import { handleError } from "@/lib/error-handler";
 
 // GET: Lấy danh sách modules
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
 
@@ -48,11 +48,12 @@ export async function GET(req: NextRequest) {
           },
         },
       });
-    } catch (dbError: any) {
+    } catch (dbError: unknown) {
+      const error = dbError as { code?: string; message?: string };
       if (
-        dbError?.code === "P2021" ||
-        dbError?.message?.includes("does not exist") ||
-        (dbError?.message?.includes("table") && dbError?.message?.includes("not found"))
+        error.code === "P2021" ||
+        error.message?.includes("does not exist") ||
+        (error.message?.includes("table") && error.message?.includes("not found"))
       ) {
         return NextResponse.json(
           {
@@ -104,9 +105,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    let module;
+    let newModule;
     try {
-      module = await prisma.module.create({
+      newModule = await prisma.module.create({
         data: {
           code: code.trim(),
           type,
@@ -125,16 +126,17 @@ export async function POST(req: NextRequest) {
           },
         },
       });
-    } catch (dbError: any) {
-      if (dbError?.code === "P2002") {
+    } catch (dbError: unknown) {
+      const error = dbError as { code?: string; message?: string };
+      if (error.code === "P2002") {
         return NextResponse.json(
           { error: "Module code already exists" },
           { status: 400 }
         );
       }
       if (
-        dbError?.code === "P2021" ||
-        dbError?.message?.includes("does not exist")
+        error.code === "P2021" ||
+        error.message?.includes("does not exist")
       ) {
         return NextResponse.json(
           {
@@ -149,7 +151,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      module,
+      module: newModule,
     });
   } catch (error) {
     return handleError(error);

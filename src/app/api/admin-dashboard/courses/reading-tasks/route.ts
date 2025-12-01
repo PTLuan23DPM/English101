@@ -28,7 +28,11 @@ export async function GET(req: NextRequest) {
     const genre = searchParams.get("genre");
     const active = searchParams.get("active");
 
-    const where: any = {};
+    const where: {
+      cefr?: string;
+      genre?: string;
+      active?: boolean;
+    } = {};
     if (cefr) where.cefr = cefr;
     if (genre) where.genre = genre;
     if (active !== null) where.active = active === "true";
@@ -36,7 +40,6 @@ export async function GET(req: NextRequest) {
     // Check if readingTask model exists
     try {
       const tasks = await prisma.readingTask.findMany({
-      where,
         where,
         orderBy: [
           { order: "asc" },
@@ -48,8 +51,9 @@ export async function GET(req: NextRequest) {
         success: true,
         tasks,
       });
-    } catch (dbError: any) {
-      if (dbError?.code === "P2021" || dbError?.message?.includes("does not exist")) {
+    } catch (dbError: unknown) {
+      const error = dbError as { code?: string; message?: string };
+      if (error.code === "P2021" || error.message?.includes("does not exist")) {
         return NextResponse.json(
           {
             error: "Database table not found. Please run: npx prisma db push",
@@ -58,7 +62,7 @@ export async function GET(req: NextRequest) {
           { status: 500 }
         );
       }
-      if (dbError?.message?.includes("readingTask")) {
+      if (error.message?.includes("readingTask")) {
         return NextResponse.json(
           {
             error: "Prisma Client missing readingTask model. Please restart dev server after running 'npx prisma generate'",

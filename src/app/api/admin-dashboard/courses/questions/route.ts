@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { handleError } from "@/lib/error-handler";
+import { Prisma } from "@prisma/client";
 
 // GET: Lấy danh sách questions (có thể filter theo activityId)
 export async function GET(req: NextRequest) {
@@ -26,7 +27,9 @@ export async function GET(req: NextRequest) {
     const searchParams = req.nextUrl.searchParams;
     const activityId = searchParams.get("activityId");
 
-    const where: any = {};
+    const where: {
+      activityId?: string;
+    } = {};
     if (activityId) where.activityId = activityId;
 
     let questions;
@@ -47,10 +50,11 @@ export async function GET(req: NextRequest) {
           answers: true,
         },
       });
-    } catch (dbError: any) {
+    } catch (dbError: unknown) {
+      const error = dbError as { code?: string; message?: string };
       if (
-        dbError?.code === "P2021" ||
-        dbError?.message?.includes("does not exist")
+        error.code === "P2021" ||
+        error.message?.includes("does not exist")
       ) {
         return NextResponse.json(
           {
@@ -114,7 +118,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    let question;
+    let question: Awaited<ReturnType<typeof prisma.question.create>>;
     try {
       // Create question
       question = await prisma.question.create({
@@ -162,12 +166,12 @@ export async function POST(req: NextRequest) {
       // Create answers if provided
       if (answers && Array.isArray(answers) && answers.length > 0) {
         await Promise.all(
-          answers.map((answer: { key: string; meta?: any }) =>
+          answers.map((answer: { key: string; meta?: unknown }) =>
             prisma.answerKey.create({
               data: {
                 questionId: question.id,
                 key: answer.key,
-                meta: answer.meta || null,
+                meta: answer.meta ?? Prisma.JsonNull,
               },
             })
           )
@@ -175,7 +179,7 @@ export async function POST(req: NextRequest) {
       }
 
       // Reload question with choices and answers
-      question = await prisma.question.findUnique({
+      const reloadedQuestion = await prisma.question.findUnique({
         where: { id: question.id },
         include: {
           activity: {
@@ -190,10 +194,14 @@ export async function POST(req: NextRequest) {
           answers: true,
         },
       });
-    } catch (dbError: any) {
+      if (reloadedQuestion) {
+        question = reloadedQuestion;
+      }
+    } catch (dbError: unknown) {
+      const error = dbError as { code?: string; message?: string };
       if (
-        dbError?.code === "P2021" ||
-        dbError?.message?.includes("does not exist")
+        error.code === "P2021" ||
+        error.message?.includes("does not exist")
       ) {
         return NextResponse.json(
           {

@@ -32,7 +32,10 @@ export async function GET(req: NextRequest) {
     const skip = (page - 1) * limit;
 
     // Build where clause
-    const where: any = {};
+    const where: {
+      OR?: Array<{ name?: { contains: string; mode: "insensitive" }; email?: { contains: string; mode: "insensitive" } }>;
+      role?: "USER" | "ADMIN";
+    } = {};
     if (search) {
       where.OR = [
         { name: { contains: search, mode: "insensitive" } },
@@ -40,7 +43,7 @@ export async function GET(req: NextRequest) {
       ];
     }
     if (role) {
-      where.role = role;
+      where.role = role as "USER" | "ADMIN";
     }
 
     // Get users with pagination

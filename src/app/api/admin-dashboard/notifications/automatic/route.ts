@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 
 // GET: Fetch all automatic notifications
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session || session.user?.role !== "ADMIN") {
@@ -22,9 +23,10 @@ export async function GET(req: NextRequest) {
           createdAt: "desc",
         },
       });
-    } catch (schemaError: any) {
+    } catch (schemaError: unknown) {
       // If schema not migrated yet, return empty array
-      if (schemaError.code === "P2021" || schemaError.message?.includes("does not exist")) {
+      const error = schemaError as { code?: string; message?: string };
+      if (error.code === "P2021" || error.message?.includes("does not exist")) {
         console.warn("[Automatic Notifications] Schema not migrated yet, returning empty array");
         return NextResponse.json({
           success: true,
@@ -65,13 +67,14 @@ export async function GET(req: NextRequest) {
       success: true,
       notifications: notificationsWithParsedConditions,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("[Automatic Notifications GET] Error:", error);
+    const err = error as { message?: string; stack?: string };
     return NextResponse.json(
       {
         success: false,
-        error: error.message || "Failed to fetch notifications",
-        details: process.env.NODE_ENV === "development" ? error.stack : undefined,
+        error: err.message || "Failed to fetch notifications",
+        details: process.env.NODE_ENV === "development" ? err.stack : undefined,
       },
       { status: 500 }
     );
@@ -123,7 +126,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Prepare targetUserIds - handle both array and null/undefined
-    let targetUserIdsValue: any = null;
+    let targetUserIdsValue: string[] | null = null;
     if (targetUserIds && Array.isArray(targetUserIds) && targetUserIds.length > 0) {
       targetUserIdsValue = targetUserIds; // Prisma will handle JSON serialization for Json fields
     }
@@ -137,8 +140,8 @@ export async function POST(req: NextRequest) {
         notificationType: "AUTOMATIC",
         trigger: trigger,
         active: active !== undefined ? active : true,
-        conditions: conditions ? (typeof conditions === "string" ? conditions : JSON.stringify(conditions)) : null,
-        targetUserIds: targetUserIdsValue,
+        conditions: conditions ? (typeof conditions === "string" ? conditions : JSON.stringify(conditions)) : Prisma.JsonNull,
+        targetUserIds: targetUserIdsValue ?? Prisma.JsonNull,
       },
     });
 
@@ -158,18 +161,19 @@ export async function POST(req: NextRequest) {
           : null,
       },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("[Automatic Notifications POST] Error:", error);
+    const err = error as { message?: string; code?: string; meta?: unknown; stack?: string };
     console.error("[Automatic Notifications POST] Error details:", {
-      message: error.message,
-      code: error.code,
-      meta: error.meta,
+      message: err.message,
+      code: err.code,
+      meta: err.meta,
     });
     return NextResponse.json(
       {
         success: false,
-        error: error.message || "Failed to create notification",
-        details: process.env.NODE_ENV === "development" ? error.stack : undefined,
+        error: err.message || "Failed to create notification",
+        details: process.env.NODE_ENV === "development" ? err.stack : undefined,
       },
       { status: 500 }
     );

@@ -28,6 +28,7 @@ export async function GET(
 
     let page;
     try {
+      // @ts-expect-error - PageContent model may not exist in Prisma schema
       page = await prisma.pageContent.findUnique({
         where: { slug: params.slug },
         include: {
@@ -40,12 +41,13 @@ export async function GET(
           },
         },
       });
-    } catch (dbError: any) {
+    } catch (dbError: unknown) {
+      const error = dbError as { code?: string; message?: string };
       // Check if it's a "Cannot read properties of undefined" error
       if (
-        dbError?.message?.includes("Cannot read properties of undefined") ||
-        dbError?.message?.includes("reading 'findUnique'") ||
-        dbError?.message?.includes("pageContent is not a function")
+        error.message?.includes("Cannot read properties of undefined") ||
+        error.message?.includes("reading 'findUnique'") ||
+        error.message?.includes("pageContent is not a function")
       ) {
         return NextResponse.json(
           {
@@ -96,7 +98,12 @@ export async function PATCH(
     const body = await req.json();
     const { title, content, isPublished, metadata } = body;
 
-    const updateData: any = {};
+    const updateData: {
+      title?: string;
+      content?: string;
+      isPublished?: boolean;
+      metadata?: unknown;
+    } = {};
     if (title !== undefined) updateData.title = title.trim();
     if (content !== undefined) updateData.content = content.trim();
     if (isPublished !== undefined) updateData.isPublished = isPublished;
@@ -104,6 +111,7 @@ export async function PATCH(
 
     let page;
     try {
+      // @ts-expect-error - PageContent model may not exist in Prisma schema
       page = await prisma.pageContent.update({
         where: { slug: params.slug },
         data: updateData,
@@ -117,12 +125,13 @@ export async function PATCH(
           },
         },
       });
-    } catch (dbError: any) {
+    } catch (dbError: unknown) {
+      const error = dbError as { code?: string; message?: string };
       // Check if it's a "Cannot read properties of undefined" error
       if (
-        dbError?.message?.includes("Cannot read properties of undefined") ||
-        dbError?.message?.includes("reading 'update'") ||
-        dbError?.message?.includes("pageContent is not a function")
+        error.message?.includes("Cannot read properties of undefined") ||
+        error.message?.includes("reading 'update'") ||
+        error.message?.includes("pageContent is not a function")
       ) {
         return NextResponse.json(
           {

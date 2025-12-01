@@ -68,7 +68,19 @@ export async function PUT(
       active,
     } = body;
 
-    const updateData: any = {};
+    const updateData: {
+      title?: string;
+      icon?: string;
+      type?: string;
+      level?: string;
+      prompt?: string;
+      targetWords?: string;
+      tips?: string[];
+      recommended?: boolean;
+      color?: string;
+      order?: number;
+      active?: boolean;
+    } = {};
 
     if (title !== undefined) updateData.title = title.trim();
     if (icon !== undefined) updateData.icon = icon;
@@ -134,4 +146,5 @@ export async function DELETE(
     return handleError(error);
   }
 }
+
 

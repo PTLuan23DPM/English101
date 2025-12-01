@@ -12,7 +12,11 @@ export async function GET(req: NextRequest) {
     const type = searchParams.get("type");
     const active = searchParams.get("active") !== "false"; // Default: only active
 
-    const where: any = {
+    const where: {
+      active: boolean;
+      level?: string;
+      type?: string;
+    } = {
       active: active !== false,
     };
 
@@ -105,4 +109,5 @@ export async function POST(req: NextRequest) {
     return handleError(error);
   }
 }
+
 

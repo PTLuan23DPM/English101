@@ -1,4 +1,4 @@
-import { PrismaClient, CEFRLevel, Skill, ModuleType, ActivityType, QuestionType } from '@prisma/client';
+import { PrismaClient, CEFRLevel, Skill, ModuleType, ActivityType, QuestionType, Prisma } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { WRITING_TASKS } from '../src/app/english/writing/data/writingTasks';
 import { READING_LESSONS } from '../src/data/readingLessons';
@@ -337,7 +337,17 @@ async function main() {
     const societyTopic = topics.find(t => t.slug === 'society');
 
     // Culture content
-    const cultureContent1Data: any = {
+    const cultureContent1Data: {
+        unitId: string;
+        authorId: string;
+        title: string;
+        summary: string;
+        level: CEFRLevel;
+        skill: Skill;
+        html: string;
+        plainText: string;
+        topics?: { connect: Array<{ id: string }> };
+    } = {
         unitId: cultureUnit1.id,
         authorId: adminUser.id,
         title: 'British vs American English: Key Differences',
@@ -356,7 +366,17 @@ async function main() {
     }
     const cultureContent1 = await prisma.content.create({ data: cultureContent1Data });
 
-    const cultureContent2Data: any = {
+    const cultureContent2Data: {
+        unitId: string;
+        authorId: string;
+        title: string;
+        summary: string;
+        level: CEFRLevel;
+        skill: Skill;
+        html: string;
+        plainText: string;
+        topics?: { connect: Array<{ id: string }> };
+    } = {
         unitId: cultureUnit2.id,
         authorId: adminUser.id,
         title: 'Climate Change: A Global Challenge',
@@ -375,7 +395,17 @@ async function main() {
     }
     const cultureContent2 = await prisma.content.create({ data: cultureContent2Data });
 
-    const cultureContent3Data: any = {
+    const cultureContent3Data: {
+        unitId: string;
+        authorId: string;
+        title: string;
+        summary: string;
+        level: CEFRLevel;
+        skill: Skill;
+        html: string;
+        plainText: string;
+        topics?: { connect: Array<{ id: string }> };
+    } = {
         unitId: cultureUnit3.id,
         authorId: adminUser.id,
         title: 'Artificial Intelligence: Transforming Our World',
@@ -1139,9 +1169,9 @@ async function main() {
                 gradient: lesson.gradient,
                 readingSkills: lesson.readingSkills,
                 keyIdeas: lesson.keyIdeas,
-                vocabulary: lesson.vocabulary as any,
-                contentSections: lesson.contentSections as any,
-                exercises: lesson.exercises as any,
+                vocabulary: lesson.vocabulary as unknown as Prisma.InputJsonValue,
+                contentSections: lesson.contentSections as unknown as Prisma.InputJsonValue,
+                exercises: lesson.exercises as unknown as Prisma.InputJsonValue,
                 recommended: false,
                 order: i,
                 active: true,
@@ -1160,9 +1190,9 @@ async function main() {
                 gradient: lesson.gradient,
                 readingSkills: lesson.readingSkills,
                 keyIdeas: lesson.keyIdeas,
-                vocabulary: lesson.vocabulary as any,
-                contentSections: lesson.contentSections as any,
-                exercises: lesson.exercises as any,
+                vocabulary: lesson.vocabulary as unknown as Prisma.InputJsonValue,
+                contentSections: lesson.contentSections as unknown as Prisma.InputJsonValue,
+                exercises: lesson.exercises as unknown as Prisma.InputJsonValue,
                 recommended: false,
                 order: i,
                 active: true,
@@ -1231,7 +1261,7 @@ async function main() {
                 prompt: task.prompt,
                 timeLimit: task.timeLimit,
                 tips: task.tips,
-                vocab: task.vocab as any,
+                vocab: task.vocab as Prisma.InputJsonValue,
                 phrases: task.phrases,
                 recommended: task.recommended || false,
                 icon: task.icon || "🎤",
@@ -1247,7 +1277,7 @@ async function main() {
                 prompt: task.prompt,
                 timeLimit: task.timeLimit,
                 tips: task.tips,
-                vocab: task.vocab as any,
+                vocab: task.vocab as Prisma.InputJsonValue,
                 phrases: task.phrases,
                 recommended: task.recommended || false,
                 icon: task.icon || "🎤",

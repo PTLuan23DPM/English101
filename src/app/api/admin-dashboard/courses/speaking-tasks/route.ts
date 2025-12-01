@@ -28,7 +28,11 @@ export async function GET(req: NextRequest) {
     const type = searchParams.get("type");
     const active = searchParams.get("active");
 
-    const where: any = {};
+    const where: {
+      level?: string;
+      type?: string;
+      active?: boolean;
+    } = {};
     if (level) where.level = level;
     if (type) where.type = type;
     if (active !== null) where.active = active === "true";
@@ -46,8 +50,9 @@ export async function GET(req: NextRequest) {
         success: true,
         tasks,
       });
-    } catch (dbError: any) {
-      if (dbError?.code === "P2021" || dbError?.message?.includes("does not exist")) {
+    } catch (dbError: unknown) {
+      const error = dbError as { code?: string; message?: string };
+      if (error.code === "P2021" || error.message?.includes("does not exist")) {
         return NextResponse.json(
           {
             error: "Database table not found. Please run: npx prisma db push",
@@ -56,7 +61,7 @@ export async function GET(req: NextRequest) {
           { status: 500 }
         );
       }
-      if (dbError?.message?.includes("speakingTask")) {
+      if (error.message?.includes("speakingTask")) {
         return NextResponse.json(
           {
             error: "Prisma Client missing speakingTask model. Please restart dev server after running 'npx prisma generate'",
@@ -153,4 +158,5 @@ export async function POST(req: NextRequest) {
     return handleError(error);
   }
 }
+
 

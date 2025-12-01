@@ -66,12 +66,13 @@ export async function POST(req: NextRequest) {
           })
         )
       );
-    } catch (dbError: any) {
+    } catch (dbError: unknown) {
+      const error = dbError as { code?: string; message?: string };
       // Check for Prisma Client not generated
       if (
-        dbError?.message?.includes("Cannot read properties of undefined") ||
-        dbError?.message?.includes("reading 'create'") ||
-        dbError?.message?.includes("userNotification is not a function")
+        error.message?.includes("Cannot read properties of undefined") ||
+        error.message?.includes("reading 'create'") ||
+        error.message?.includes("userNotification is not a function")
       ) {
         return NextResponse.json(
           {
@@ -84,9 +85,9 @@ export async function POST(req: NextRequest) {
       
       // Check for table not found
       if (
-        dbError?.code === "P2021" ||
-        dbError?.message?.includes("does not exist") ||
-        (dbError?.message?.includes("table") && dbError?.message?.includes("not found"))
+        error.code === "P2021" ||
+        error.message?.includes("does not exist") ||
+        (error.message?.includes("table") && error.message?.includes("not found"))
       ) {
         return NextResponse.json(
           {

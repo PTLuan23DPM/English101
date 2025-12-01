@@ -4,7 +4,7 @@ import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 
 // GET: Lấy lịch sử thông báo đã gửi
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
 
@@ -70,10 +70,10 @@ export async function GET(req: NextRequest) {
       
       acc[key].recipients.push({
         id: notif.user.id,
-        name: notif.user.name,
+        name: notif.user.name ?? "",
         email: notif.user.email,
-        read: notif.read,
-      });
+        read: Boolean(notif.read),
+      } as { id: string; name: string; email: string; read: boolean });
       
       acc[key].totalSent++;
       if (notif.read) {
@@ -81,9 +81,19 @@ export async function GET(req: NextRequest) {
       }
       
       return acc;
-    }, {} as Record<string, any>);
+    }, {} as Record<string, {
+      id: string;
+      title: string;
+      message: string;
+      type: string;
+      link: string | null;
+      sentAt: Date;
+      totalSent: number;
+      readCount: number;
+      recipients: Array<{ id: string; name: string; email: string; read: boolean }>;
+    }>);
 
-    const history = Object.values(groupedNotifications).map((group: any) => ({
+    const history = Object.values(groupedNotifications).map((group) => ({
       id: group.id,
       title: group.title,
       message: group.message,

@@ -28,6 +28,7 @@ export async function GET(
 
     let announcement;
     try {
+      // @ts-expect-error - Announcement model may not exist in Prisma schema
       announcement = await prisma.announcement.findUnique({
         where: { id: params.id },
         include: {
@@ -40,12 +41,13 @@ export async function GET(
           },
         },
       });
-    } catch (dbError: any) {
+    } catch (dbError: unknown) {
+      const error = dbError as { code?: string; message?: string };
       // Check if it's a "Cannot read properties of undefined" error
       if (
-        dbError?.message?.includes("Cannot read properties of undefined") ||
-        dbError?.message?.includes("reading 'findUnique'") ||
-        dbError?.message?.includes("announcement is not a function")
+        error.message?.includes("Cannot read properties of undefined") ||
+        error.message?.includes("reading 'findUnique'") ||
+        error.message?.includes("announcement is not a function")
       ) {
         return NextResponse.json(
           {
@@ -106,7 +108,17 @@ export async function PATCH(
       metadata,
     } = body;
 
-    const updateData: any = {};
+    const updateData: {
+      title?: string;
+      content?: string;
+      summary?: string | null;
+      isPublished?: boolean;
+      priority?: number;
+      startDate?: Date | null;
+      endDate?: Date | null;
+      imageUrl?: string | null;
+      metadata?: unknown;
+    } = {};
     if (title !== undefined) updateData.title = title.trim();
     if (content !== undefined) updateData.content = content.trim();
     if (summary !== undefined) updateData.summary = summary?.trim() || null;
@@ -119,6 +131,7 @@ export async function PATCH(
 
     let announcement;
     try {
+      // @ts-expect-error - Announcement model may not exist in Prisma schema
       announcement = await prisma.announcement.update({
         where: { id: params.id },
         data: updateData,
@@ -132,12 +145,13 @@ export async function PATCH(
           },
         },
       });
-    } catch (dbError: any) {
+    } catch (dbError: unknown) {
+      const error = dbError as { code?: string; message?: string };
       // Check if it's a "Cannot read properties of undefined" error
       if (
-        dbError?.message?.includes("Cannot read properties of undefined") ||
-        dbError?.message?.includes("reading 'update'") ||
-        dbError?.message?.includes("announcement is not a function")
+        error.message?.includes("Cannot read properties of undefined") ||
+        error.message?.includes("reading 'update'") ||
+        error.message?.includes("announcement is not a function")
       ) {
         return NextResponse.json(
           {
@@ -182,15 +196,17 @@ export async function DELETE(
     }
 
     try {
+      // @ts-expect-error - Announcement model may not exist in Prisma schema
       await prisma.announcement.delete({
         where: { id: params.id },
       });
-    } catch (dbError: any) {
+    } catch (dbError: unknown) {
+      const error = dbError as { code?: string; message?: string };
       // Check if it's a "Cannot read properties of undefined" error
       if (
-        dbError?.message?.includes("Cannot read properties of undefined") ||
-        dbError?.message?.includes("reading 'delete'") ||
-        dbError?.message?.includes("announcement is not a function")
+        error.message?.includes("Cannot read properties of undefined") ||
+        error.message?.includes("reading 'delete'") ||
+        error.message?.includes("announcement is not a function")
       ) {
         return NextResponse.json(
           {

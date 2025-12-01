@@ -35,10 +35,12 @@ export async function GET(req: NextRequest) {
     if (skill && skill.toUpperCase() === "WRITING") {
       try {
         // Build where clause exactly like activityService.getActivitiesBySkill
-        const whereClause: any = {
+        const whereClause: {
+          skill: "WRITING";
+          level?: "A1" | "A2" | "B1" | "B2" | "C1" | "C2";
+        } = {
           skill: "WRITING",
-          ...(level && { level: level as any }),
-          ...(type && { type: type as any }),
+          ...(level && { level: level as "A1" | "A2" | "B1" | "B2" | "C1" | "C2" }),
         };
 
         console.log("[Admin Activities API] WRITING skill query:", JSON.stringify(whereClause, null, 2));
@@ -46,7 +48,35 @@ export async function GET(req: NextRequest) {
         // Use the same orderBy as user page: [{ level: "asc" }, { createdAt: "desc" }]
         // Use the EXACT same baseInclude as activityService.getActivitiesBySkill for WRITING
         // Then enhance with admin-specific fields
-        const baseInclude: any = {
+        const baseInclude: {
+          unit: {
+            select: {
+              title: boolean;
+              level: boolean;
+              id: boolean;
+              module: {
+                select: {
+                  id: boolean;
+                  code: boolean;
+                  title: boolean;
+                };
+              };
+            };
+          };
+          questions: {
+            select: {
+              id: boolean;
+              order: boolean;
+              type: boolean;
+              score: boolean;
+            };
+          };
+          _count: {
+            select: {
+              questions: boolean;
+            };
+          };
+        } = {
           unit: {
             select: {
               title: true,
@@ -114,10 +144,11 @@ export async function GET(req: NextRequest) {
           success: true,
           activities,
         });
-      } catch (dbError: any) {
+      } catch (dbError: unknown) {
+        const error = dbError as { code?: string; message?: string };
         if (
-          dbError?.code === "P2021" ||
-          dbError?.message?.includes("does not exist")
+          error.code === "P2021" ||
+          error.message?.includes("does not exist")
         ) {
           return NextResponse.json(
             {
@@ -133,14 +164,17 @@ export async function GET(req: NextRequest) {
     }
 
     // For other skills, use the original query logic
-    const where: any = {};
+    const where: {
+      unitId?: string;
+      skill?: "WRITING" | "READING" | "LISTENING" | "SPEAKING" | "GRAMMAR" | "VOCABULARY";
+      level?: "A1" | "A2" | "B1" | "B2" | "C1" | "C2";
+    } = {};
     if (unitId) where.unitId = unitId;
     if (skill) {
       // Ensure skill is a valid enum value
-      where.skill = skill.toUpperCase();
+      where.skill = skill.toUpperCase() as "WRITING" | "READING" | "LISTENING" | "SPEAKING" | "GRAMMAR" | "VOCABULARY";
     }
-    if (level) where.level = level;
-    if (type) where.type = type;
+    if (level) where.level = level as "A1" | "A2" | "B1" | "B2" | "C1" | "C2";
     
     console.log("[Activities API] Query params:", { unitId, skill, level, type, where });
 
@@ -185,10 +219,11 @@ export async function GET(req: NextRequest) {
           },
         },
       });
-    } catch (dbError: any) {
+    } catch (dbError: unknown) {
+      const error = dbError as { code?: string; message?: string };
       if (
-        dbError?.code === "P2021" ||
-        dbError?.message?.includes("does not exist")
+        error.code === "P2021" ||
+        error.message?.includes("does not exist")
       ) {
         return NextResponse.json(
           {
@@ -250,7 +285,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    let activity;
+    let activity: Awaited<ReturnType<typeof prisma.activity.create>>;
     try {
       // Create activity
       activity = await prisma.activity.create({
@@ -284,7 +319,7 @@ export async function POST(req: NextRequest) {
               data: {
                 activityId: activity.id,
                 url: media.url,
-                type: media.type,
+                type: media.type as "AUDIO" | "VIDEO" | "IMAGE",
                 durationS: media.durationS || null,
               },
             })
@@ -292,7 +327,7 @@ export async function POST(req: NextRequest) {
         );
 
         // Reload activity with media
-        activity = await prisma.activity.findUnique({
+        const reloadedActivity = await prisma.activity.findUnique({
           where: { id: activity.id },
           include: {
             unit: {
@@ -304,11 +339,15 @@ export async function POST(req: NextRequest) {
             media: true,
           },
         });
+        if (reloadedActivity) {
+          activity = reloadedActivity;
+        }
       }
-    } catch (dbError: any) {
+    } catch (dbError: unknown) {
+      const error = dbError as { code?: string; message?: string };
       if (
-        dbError?.code === "P2021" ||
-        dbError?.message?.includes("does not exist")
+        error.code === "P2021" ||
+        error.message?.includes("does not exist")
       ) {
         return NextResponse.json(
           {

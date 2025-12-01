@@ -29,12 +29,16 @@ export async function PATCH(
     const body = await req.json();
     const { status, priority } = body;
 
-    const updateData: any = {};
+    const updateData: {
+      status?: string;
+      priority?: number;
+    } = {};
     if (status !== undefined) updateData.status = status;
     if (priority !== undefined) updateData.priority = priority;
 
     let feedback;
     try {
+      // @ts-expect-error - Feedback model may not exist in Prisma schema
       feedback = await prisma.feedback.update({
         where: { id: params.id },
         data: updateData,
@@ -55,11 +59,12 @@ export async function PATCH(
           },
         },
       });
-    } catch (dbError: any) {
+    } catch (dbError: unknown) {
+      const error = dbError as { code?: string; message?: string };
       // Check for Prisma Client not generated
       if (
-        dbError?.message?.includes("Cannot read properties of undefined") ||
-        dbError?.message?.includes("reading 'update'")
+        error.message?.includes("Cannot read properties of undefined") ||
+        error.message?.includes("reading 'update'")
       ) {
         return NextResponse.json(
           {
@@ -72,9 +77,9 @@ export async function PATCH(
       
       // Check for table not found
       if (
-        dbError?.code === "P2021" ||
-        dbError?.message?.includes("does not exist") ||
-        (dbError?.message?.includes("table") && dbError?.message?.includes("not found"))
+        error.code === "P2021" ||
+        error.message?.includes("does not exist") ||
+        (error.message?.includes("table") && error.message?.includes("not found"))
       ) {
         return NextResponse.json(
           {

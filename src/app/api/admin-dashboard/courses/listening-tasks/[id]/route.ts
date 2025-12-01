@@ -93,7 +93,22 @@ export async function PUT(
     }
 
     // Build update data (only include provided fields)
-    const updateData: any = {};
+    const updateData: {
+      title?: string;
+      type?: string;
+      level?: string;
+      description?: string;
+      duration?: string;
+      speakers?: string;
+      accent?: string;
+      questions?: number;
+      tags?: string[];
+      recommended?: boolean;
+      icon?: string;
+      color?: string;
+      order?: number;
+      active?: boolean;
+    } = {};
     if (title !== undefined) updateData.title = title.trim();
     if (type !== undefined) updateData.type = type.trim();
     if (level !== undefined) updateData.level = level.trim();
@@ -166,4 +181,5 @@ export async function DELETE(
     return handleError(error);
   }
 }
+
 

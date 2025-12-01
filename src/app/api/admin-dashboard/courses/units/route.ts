@@ -27,11 +27,14 @@ export async function GET(req: NextRequest) {
     const moduleId = searchParams.get("moduleId");
     const skill = searchParams.get("skill");
 
-    const where: any = {};
+    const where: {
+      moduleId?: string;
+      skill?: "WRITING" | "READING" | "LISTENING" | "SPEAKING" | "GRAMMAR" | "VOCABULARY" | "MEDIATION" | "CULTURE";
+    } = {};
     if (moduleId) where.moduleId = moduleId;
     if (skill) {
       // Ensure skill is a valid enum value
-      where.skill = skill.toUpperCase();
+      where.skill = skill.toUpperCase() as "WRITING" | "READING" | "LISTENING" | "SPEAKING" | "GRAMMAR" | "VOCABULARY" | "MEDIATION" | "CULTURE";
     }
     
     console.log("[Units API] Query params:", { moduleId, skill, where });
@@ -60,10 +63,11 @@ export async function GET(req: NextRequest) {
           },
         },
       });
-    } catch (dbError: any) {
+    } catch (dbError: unknown) {
+      const error = dbError as { code?: string; message?: string };
       if (
-        dbError?.code === "P2021" ||
-        dbError?.message?.includes("does not exist")
+        error.code === "P2021" ||
+        error.message?.includes("does not exist")
       ) {
         return NextResponse.json(
           {
@@ -136,10 +140,11 @@ export async function POST(req: NextRequest) {
           },
         },
       });
-    } catch (dbError: any) {
+    } catch (dbError: unknown) {
+      const error = dbError as { code?: string; message?: string };
       if (
-        dbError?.code === "P2021" ||
-        dbError?.message?.includes("does not exist")
+        error.code === "P2021" ||
+        error.message?.includes("does not exist")
       ) {
         return NextResponse.json(
           {

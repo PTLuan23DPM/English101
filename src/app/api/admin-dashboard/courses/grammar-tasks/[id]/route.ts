@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { handleError } from "@/lib/error-handler";
+import { Prisma } from "@prisma/client";
 
 // GET: Lấy chi tiết một Grammar task
 export async function GET(
@@ -90,12 +91,24 @@ export async function PUT(
     }
 
     // Build update data (only include provided fields)
-    const updateData: any = {};
+    const updateData: {
+      title?: string;
+      level?: string;
+      introduction?: string;
+      examples?: Prisma.InputJsonValue | Prisma.NullableJsonNullValueInput;
+      exercises?: Prisma.InputJsonValue | Prisma.NullableJsonNullValueInput;
+      category?: string | null;
+      recommended?: boolean;
+      order?: number;
+      active?: boolean;
+      exampleCount?: number;
+      exerciseCount?: number;
+    } = {};
     if (title !== undefined) updateData.title = title.trim();
     if (level !== undefined) updateData.level = level.trim();
     if (introduction !== undefined) updateData.introduction = introduction.trim();
-    if (examples !== undefined) updateData.examples = examples;
-    if (exercises !== undefined) updateData.exercises = exercises;
+    if (examples !== undefined) updateData.examples = examples as Prisma.InputJsonValue;
+    if (exercises !== undefined) updateData.exercises = exercises as Prisma.InputJsonValue;
     if (category !== undefined) updateData.category = category?.trim() || null;
     if (recommended !== undefined) updateData.recommended = recommended;
     if (order !== undefined) updateData.order = order;
@@ -173,4 +186,5 @@ export async function DELETE(
     return handleError(error);
   }
 }
+
 

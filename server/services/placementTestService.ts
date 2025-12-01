@@ -4,6 +4,7 @@
  */
 
 import prisma from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 
 export class PlacementTestService {
     /**
@@ -33,7 +34,7 @@ export class PlacementTestService {
         data: {
             score: number;
             totalQuestions: number;
-            answers: any[];
+            answers: unknown[];
         }
     ) {
         try {
@@ -60,7 +61,7 @@ export class PlacementTestService {
                     score: data.score,
                     totalQuestions: data.totalQuestions,
                     cefrLevel: level,
-                    answers: data.answers,
+                    answers: data.answers as Prisma.InputJsonValue,
                 },
             });
             console.log("[PlacementTestService] PlacementTestResult created:", testResult.id);
@@ -83,10 +84,11 @@ export class PlacementTestService {
                 cefrLevel: level,
                 description,
             };
-        } catch (error: any) {
+        } catch (error: unknown) {
+            const err = error as { code?: string; message?: string };
             console.error("[PlacementTestService] Error in saveTestResult:", error);
-            console.error("[PlacementTestService] Error code:", error?.code);
-            console.error("[PlacementTestService] Error message:", error?.message);
+            console.error("[PlacementTestService] Error code:", err?.code);
+            console.error("[PlacementTestService] Error message:", err?.message);
             throw error;
         }
     }
